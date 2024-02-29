@@ -1,5 +1,5 @@
 #include "glayenv.hpp"
-void GLAYGraphCSRxrtBufferHandlePerKernel::mapGLAYOverlayProgramBuffersBFS(struct GraphCSR *graph)
+void GLAYxrtBufferHandlePerKernel::mapGLAYOverlayProgramBuffersBFS(struct GraphCSR *graph)
 {
 // --------------------------------------------------------------------------------------
 // Name ENGINE_PARALLEL_READ_WRITE    ID 0    mapping 7    cycles 29   buffer_8-auxiliary_2 ( graph->num_vertices )-( graph->num_vertices * 2 )

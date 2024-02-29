@@ -10,11 +10,28 @@ from datetime import datetime
 
 # Validate the number of arguments
 if len(sys.argv) != 14:
-    print("Usage: <script> <XILINX_VIVADO> <FULL_SRC_IP_DIR_GEN_VIP> <KERNEL_NAME> <FULL_SRC_IP_DIR_OVERLAY> <FULL_SRC_IP_DIR_RTL> <FULL_SRC_IP_DIR_UTILS> <FULL_SRC_IP_DIR_UTILS_TCL> <UTILS_DIR> <ARCHITECTURE> <CAPABILITY> <ALGORITHM_NAME> <PAUSE_FILE_GENERATION> <INCLUDE_DIR>")
+    print(
+        "Usage: <script> <XILINX_VIVADO> <FULL_SRC_IP_DIR_GEN_VIP> <KERNEL_NAME> <FULL_SRC_IP_DIR_OVERLAY> <FULL_SRC_IP_DIR_RTL> <FULL_SRC_IP_DIR_UTILS> <FULL_SRC_IP_DIR_UTILS_TCL> <UTILS_DIR> <ARCHITECTURE> <CAPABILITY> <ALGORITHM_NAME> <PAUSE_FILE_GENERATION> <INCLUDE_DIR>"
+    )
     sys.exit(1)
 
 # Assuming the script name is the first argument, and the directories follow after.
-_, XILINX_VIVADO, FULL_SRC_IP_DIR_GEN_VIP, KERNEL_NAME, FULL_SRC_IP_DIR_OVERLAY, FULL_SRC_IP_DIR_RTL, FULL_SRC_IP_DIR_UTILS, FULL_SRC_IP_DIR_UTILS_TCL, UTILS_DIR, ARCHITECTURE, CAPABILITY, ALGORITHM_NAME, PAUSE_FILE_GENERATION, INCLUDE_DIR = sys.argv
+(
+    _,
+    XILINX_VIVADO,
+    FULL_SRC_IP_DIR_GEN_VIP,
+    KERNEL_NAME,
+    FULL_SRC_IP_DIR_OVERLAY,
+    FULL_SRC_IP_DIR_RTL,
+    FULL_SRC_IP_DIR_UTILS,
+    FULL_SRC_IP_DIR_UTILS_TCL,
+    UTILS_DIR,
+    ARCHITECTURE,
+    CAPABILITY,
+    ALGORITHM_NAME,
+    PAUSE_FILE_GENERATION,
+    INCLUDE_DIR,
+) = sys.argv
 
 
 # Getting the current date and time
@@ -26,22 +43,34 @@ formatted_datetime = current_datetime.strftime("%Y-%m-%d %H:%M:%S")
 
 # Construct the full path for the file
 config_filename = f"topology.json"
-config_file_path = os.path.join(FULL_SRC_IP_DIR_OVERLAY, ARCHITECTURE, CAPABILITY, config_filename)
+config_file_path = os.path.join(
+    FULL_SRC_IP_DIR_OVERLAY, ARCHITECTURE, CAPABILITY, config_filename
+)
 
 # output_folder_path_tcl  = os.path.join(FULL_SRC_IP_DIR_UTILS_TCL)
-output_folder_path_testbench   = os.path.join(FULL_SRC_IP_DIR_RTL, UTILS_DIR, INCLUDE_DIR, "testbench")
-output_folder_path_topology    = os.path.join(FULL_SRC_IP_DIR_RTL, UTILS_DIR, INCLUDE_DIR, "topology")
-output_folder_path_global      = os.path.join(FULL_SRC_IP_DIR_RTL, UTILS_DIR, INCLUDE_DIR, "global")
-output_folder_path_parameters  = os.path.join(FULL_SRC_IP_DIR_RTL, UTILS_DIR, INCLUDE_DIR, "parameters")
-output_folder_path_portmaps    = os.path.join(FULL_SRC_IP_DIR_RTL, UTILS_DIR, INCLUDE_DIR, "portmaps")
-output_folder_path_slice       = os.path.join(FULL_SRC_IP_DIR_RTL, UTILS_DIR, "slice")
-output_folder_path_kernel      = os.path.join(FULL_SRC_IP_DIR_RTL, "kernel")
-output_folder_path_cu          = os.path.join(FULL_SRC_IP_DIR_RTL, "cu")
-output_folder_path_pkgs        = os.path.join(FULL_SRC_IP_DIR_RTL, "pkg")
-output_folder_path_vip         = os.path.join(FULL_SRC_IP_DIR_GEN_VIP)
-full_src_ip_dir_utils_rpt      = os.path.join(FULL_SRC_IP_DIR_UTILS,"utils.rpt")
-full_src_ip_dir_utils_qor      = os.path.join(FULL_SRC_IP_DIR_UTILS,"utils.qor")
-full_src_ip_dir_utils_dcp      = os.path.join(FULL_SRC_IP_DIR_UTILS,"utils.dcp")
+output_folder_path_testbench = os.path.join(
+    FULL_SRC_IP_DIR_RTL, UTILS_DIR, INCLUDE_DIR, "testbench"
+)
+output_folder_path_topology = os.path.join(
+    FULL_SRC_IP_DIR_RTL, UTILS_DIR, INCLUDE_DIR, "topology"
+)
+output_folder_path_global = os.path.join(
+    FULL_SRC_IP_DIR_RTL, UTILS_DIR, INCLUDE_DIR, "global"
+)
+output_folder_path_parameters = os.path.join(
+    FULL_SRC_IP_DIR_RTL, UTILS_DIR, INCLUDE_DIR, "parameters"
+)
+output_folder_path_portmaps = os.path.join(
+    FULL_SRC_IP_DIR_RTL, UTILS_DIR, INCLUDE_DIR, "portmaps"
+)
+output_folder_path_slice = os.path.join(FULL_SRC_IP_DIR_RTL, UTILS_DIR, "slice")
+output_folder_path_kernel = os.path.join(FULL_SRC_IP_DIR_RTL, "kernel")
+output_folder_path_cu = os.path.join(FULL_SRC_IP_DIR_RTL, "cu")
+output_folder_path_pkgs = os.path.join(FULL_SRC_IP_DIR_RTL, "pkg")
+output_folder_path_vip = os.path.join(FULL_SRC_IP_DIR_GEN_VIP)
+full_src_ip_dir_utils_rpt = os.path.join(FULL_SRC_IP_DIR_UTILS, "utils.rpt")
+full_src_ip_dir_utils_qor = os.path.join(FULL_SRC_IP_DIR_UTILS, "utils.qor")
+full_src_ip_dir_utils_dcp = os.path.join(FULL_SRC_IP_DIR_UTILS, "utils.dcp")
 
 
 if not os.path.exists(output_folder_path_topology):
@@ -87,22 +116,46 @@ if not os.path.exists(output_folder_path_testbench):
     os.makedirs(output_folder_path_testbench)
 
 
-output_file_kernel_cu_topology = os.path.join(output_folder_path_topology,"kernel_cu_topology.vh")
-output_file_kernel_cu_portmap = os.path.join(output_folder_path_portmaps,"m_axi_portmap_kernel_cu.vh")
-output_file_kernel_cu_ports = os.path.join(output_folder_path_portmaps,"m_axi_ports_kernel_cu.vh")
+output_file_kernel_cu_topology = os.path.join(
+    output_folder_path_topology, "kernel_cu_topology.vh"
+)
+output_file_kernel_cu_portmap = os.path.join(
+    output_folder_path_portmaps, "m_axi_portmap_kernel_cu.vh"
+)
+output_file_kernel_cu_ports = os.path.join(
+    output_folder_path_portmaps, "m_axi_ports_kernel_cu.vh"
+)
 
-output_file_filelist_xsim_ip_vhdl_f = os.path.join(FULL_SRC_IP_DIR_UTILS,"glay_kernel_filelist_xsim.ip.vhdl.f")
-output_file_filelist_xsim_ip_sv_f = os.path.join(FULL_SRC_IP_DIR_UTILS,"glay_kernel_filelist_xsim.ip.sv.f")
-output_file_filelist_xsim_ip_v_f = os.path.join(FULL_SRC_IP_DIR_UTILS,"glay_kernel_filelist_xsim.ip.v.f")
+output_file_filelist_xsim_ip_vhdl_f = os.path.join(
+    FULL_SRC_IP_DIR_UTILS, "glay_kernel_filelist_xsim.ip.vhdl.f"
+)
+output_file_filelist_xsim_ip_sv_f = os.path.join(
+    FULL_SRC_IP_DIR_UTILS, "glay_kernel_filelist_xsim.ip.sv.f"
+)
+output_file_filelist_xsim_ip_v_f = os.path.join(
+    FULL_SRC_IP_DIR_UTILS, "glay_kernel_filelist_xsim.ip.v.f"
+)
 
-output_file_pkg_mxx_axi4_fe  = os.path.join(output_folder_path_pkgs,"00_pkg_mxx_axi4_fe.sv")
-output_file_pkg_mxx_axi4_mid = os.path.join(output_folder_path_pkgs,"00_pkg_mxx_axi4_mid.sv")
-output_file_pkg_mxx_axi4_be  = os.path.join(output_folder_path_pkgs,"00_pkg_mxx_axi4_be.sv")
+output_file_pkg_mxx_axi4_fe = os.path.join(
+    output_folder_path_pkgs, "00_pkg_mxx_axi4_fe.sv"
+)
+output_file_pkg_mxx_axi4_mid = os.path.join(
+    output_folder_path_pkgs, "00_pkg_mxx_axi4_mid.sv"
+)
+output_file_pkg_mxx_axi4_be = os.path.join(
+    output_folder_path_pkgs, "00_pkg_mxx_axi4_be.sv"
+)
 
 
-output_file_buffer_channels_tcl = os.path.join(FULL_SRC_IP_DIR_UTILS_TCL,"project_map_buffers_m_axi_ports.tcl")
-output_file_generate_m_axi_vip_tcl = os.path.join(FULL_SRC_IP_DIR_UTILS_TCL,"project_generate_m_axi_vip.tcl")
-output_file_generate_ports_tcl = os.path.join(FULL_SRC_IP_DIR_UTILS_TCL,"project_generate_m_axi_ports.tcl")
+output_file_buffer_channels_tcl = os.path.join(
+    FULL_SRC_IP_DIR_UTILS_TCL, "project_map_buffers_m_axi_ports.tcl"
+)
+output_file_generate_m_axi_vip_tcl = os.path.join(
+    FULL_SRC_IP_DIR_UTILS_TCL, "project_generate_m_axi_vip.tcl"
+)
+output_file_generate_ports_tcl = os.path.join(
+    FULL_SRC_IP_DIR_UTILS_TCL, "project_generate_m_axi_ports.tcl"
+)
 
 
 # STEPS.SYNTH_DESIGN.TCL.PRE
@@ -123,8 +176,11 @@ output_file_generate_ports_tcl = os.path.join(FULL_SRC_IP_DIR_UTILS_TCL,"project
 # STEPS.POST_ROUTE_PHYS_OPT_DESIGN.TCL.PRE
 # STEPS.POST_ROUTE_PHYS_OPT_DESIGN.TCL.POST
 
+
 # Define a function to write report generation TCL code
-def write_report_generation_tcl(output_file, stage, report_types, dcp, ass_rpt, time_rpt, util_rpt, sugg_rpt, rqs):
+def write_report_generation_tcl(
+    output_file, stage, report_types, dcp, ass_rpt, time_rpt, util_rpt, sugg_rpt, rqs
+):
     report_code = f"""
 report_qor_assessment  -exclude_methodology_checks -name {ass_rpt} -max_paths 100 -full_assessment_details -file {ass_rpt}
 report_qor_suggestions -report_all_suggestions -max_paths 100 -file {sugg_rpt} 
@@ -140,6 +196,7 @@ report_timing_summary -delay_type min_max -report_unconstrained -check_timing_ve
     with open(output_file, "w") as file:
         file.write(report_code)
 
+
 # Define a function to write QoR suggestion reading TCL code
 def write_qor_suggestion_reading_tcl(output_file, read_rqs):
     read_code = f"""
@@ -153,6 +210,7 @@ if {{ [file exists {read_rqs}] == 1}} {{
     with open(output_file, "w") as file:
         file.write(read_code)
 
+
 # Base directories
 utils_tcl_dir = FULL_SRC_IP_DIR_UTILS_TCL
 qor_dir = full_src_ip_dir_utils_qor
@@ -164,56 +222,111 @@ stages = ["synth", "opt", "place", "phys_opt", "route", "post_route_phys_opt"]
 
 # Generate TCL files for each stage
 for i, stage in enumerate(stages):
-    output_file_project_generate = os.path.join(utils_tcl_dir, f"project_generate_qor_post_{stage}.tcl")
-    output_file_project_read = os.path.join(utils_tcl_dir, f"project_read_qor_pre_{stage}.tcl")
+    output_file_project_generate = os.path.join(
+        utils_tcl_dir, f"project_generate_qor_post_{stage}.tcl"
+    )
+    output_file_project_read = os.path.join(
+        utils_tcl_dir, f"project_read_qor_pre_{stage}.tcl"
+    )
 
     rqs = os.path.join(qor_dir, f"project_generate_qor_read_post_{stage}.rqs")
     dcp = os.path.join(dcp_dir, f"project_generate_checkpoint_post_{stage}.dcp")
     ass_rpt = os.path.join(qor_dir, f"project_generate_qor_assessment_post_{stage}.rpt")
-    sugg_rpt = os.path.join(qor_dir, f"project_generate_qor_suggesstion_post_{stage}.rpt")
+    sugg_rpt = os.path.join(
+        qor_dir, f"project_generate_qor_suggesstion_post_{stage}.rpt"
+    )
     time_rpt = os.path.join(rpt_dir, f"project_generate_time_{stage}")
     util_rpt = os.path.join(rpt_dir, f"project_generate_utilization_post_{stage}")
 
     # Generate report TCL
-    write_report_generation_tcl(output_file_project_generate, stage, "all", dcp, ass_rpt,time_rpt, util_rpt, sugg_rpt, rqs)
+    write_report_generation_tcl(
+        output_file_project_generate,
+        stage,
+        "all",
+        dcp,
+        ass_rpt,
+        time_rpt,
+        util_rpt,
+        sugg_rpt,
+        rqs,
+    )
 
-   # Generate QoR suggestion reading TCL
+    # Generate QoR suggestion reading TCL
     if i == 0:
         # First stage reads from the last stage
-        prev_stage_rqs = os.path.join(qor_dir, f"project_generate_qor_post_{stages[-1]}.rqs")
+        prev_stage_rqs = os.path.join(
+            qor_dir, f"project_generate_qor_post_{stages[-1]}.rqs"
+        )
     else:
         # Subsequent stages read from the previous stage
-        prev_stage_rqs = os.path.join(qor_dir, f"project_generate_qor_post_{stages[i-1]}.rqs")
+        prev_stage_rqs = os.path.join(
+            qor_dir, f"project_generate_qor_post_{stages[i-1]}.rqs"
+        )
     write_qor_suggestion_reading_tcl(output_file_project_read, prev_stage_rqs)
 
 
+output_file_afu_portmap = os.path.join(
+    output_folder_path_portmaps, "m_axi_portmap_afu.vh"
+)
+output_file_afu_ports = os.path.join(output_folder_path_portmaps, "m_axi_ports_afu.vh")
+output_file_afu_topology = os.path.join(output_folder_path_topology, "afu_topology.vh")
 
-output_file_afu_portmap = os.path.join(output_folder_path_portmaps,"m_axi_portmap_afu.vh")
-output_file_afu_ports = os.path.join(output_folder_path_portmaps,"m_axi_ports_afu.vh")
-output_file_afu_topology = os.path.join(output_folder_path_topology,"afu_topology.vh")
+output_file_bundle_arbitration = os.path.join(
+    output_folder_path_topology, "bundle_arbitration.vh"
+)
+output_file_bundle_topology = os.path.join(
+    output_folder_path_topology, "bundle_topology.vh"
+)
+output_file_cu_arbitration = os.path.join(
+    output_folder_path_topology, "cu_arbitration.vh"
+)
 
-output_file_bundle_arbitration = os.path.join(output_folder_path_topology, "bundle_arbitration.vh")
-output_file_bundle_topology = os.path.join(output_folder_path_topology , "bundle_topology.vh")
-output_file_cu_arbitration = os.path.join(output_folder_path_topology, "cu_arbitration.vh")
+output_file_lane_arbitration = os.path.join(
+    output_folder_path_topology, "lane_arbitration.vh"
+)
+output_file_lane_topology = os.path.join(
+    output_folder_path_topology, "lane_topology.vh"
+)
 
-output_file_lane_arbitration = os.path.join(output_folder_path_topology,"lane_arbitration.vh")
-output_file_lane_topology = os.path.join(output_folder_path_topology,"lane_topology.vh")
+output_file_engine_template_topology = os.path.join(
+    output_folder_path_topology, "engine_template_topology.vh"
+)
+output_file_fifo_wrapper_topology = os.path.join(
+    output_folder_path_topology, "fifo_wrapper_topology.vh"
+)
 
-output_file_engine_template_topology = os.path.join(output_folder_path_topology,"engine_template_topology.vh")
-output_file_fifo_wrapper_topology    = os.path.join(output_folder_path_topology,"fifo_wrapper_topology.vh")
-
-output_file_path_global = os.path.join(output_folder_path_global,"config_parameters.vh")
-output_file_path_topology = os.path.join(output_folder_path_parameters,"topology_parameters.vh")
-output_file_set_top_parameters = os.path.join(output_folder_path_parameters,"set_top_parameters.vh")
-output_file_slv_m_axi_vip_func = os.path.join(output_folder_path_testbench,"module_slv_m_axi_vip_func.vh")
-output_file_slv_m_axi_vip_dump = os.path.join(output_folder_path_testbench,"module_slv_m_axi_vip_dump.vh")
-output_file_slv_m_axi_vip_inst = os.path.join(output_folder_path_testbench,"module_slv_m_axi_vip_inst.vh")
-output_file_slv_m_axi_vip_import = os.path.join(output_folder_path_testbench,"module_slv_m_axi_vip_import.vh")
-output_file_testbench_parameters = os.path.join(output_folder_path_parameters,"testbench_parameters.vh")
-output_file_top_parameters = os.path.join(output_folder_path_parameters,"top_parameters.vh")
-output_file_top_portmap = os.path.join(output_folder_path_portmaps,"m_axi_portmap_top.vh")
-output_file_top_ports = os.path.join(output_folder_path_portmaps,"m_axi_ports_top.vh")
-output_file_top_wires = os.path.join(output_folder_path_portmaps,"m_axi_wires_top.vh")
+output_file_path_global = os.path.join(
+    output_folder_path_global, "config_parameters.vh"
+)
+output_file_path_topology = os.path.join(
+    output_folder_path_parameters, "topology_parameters.vh"
+)
+output_file_set_top_parameters = os.path.join(
+    output_folder_path_parameters, "set_top_parameters.vh"
+)
+output_file_slv_m_axi_vip_func = os.path.join(
+    output_folder_path_testbench, "module_slv_m_axi_vip_func.vh"
+)
+output_file_slv_m_axi_vip_dump = os.path.join(
+    output_folder_path_testbench, "module_slv_m_axi_vip_dump.vh"
+)
+output_file_slv_m_axi_vip_inst = os.path.join(
+    output_folder_path_testbench, "module_slv_m_axi_vip_inst.vh"
+)
+output_file_slv_m_axi_vip_import = os.path.join(
+    output_folder_path_testbench, "module_slv_m_axi_vip_import.vh"
+)
+output_file_testbench_parameters = os.path.join(
+    output_folder_path_parameters, "testbench_parameters.vh"
+)
+output_file_top_parameters = os.path.join(
+    output_folder_path_parameters, "top_parameters.vh"
+)
+output_file_top_portmap = os.path.join(
+    output_folder_path_portmaps, "m_axi_portmap_top.vh"
+)
+output_file_top_ports = os.path.join(output_folder_path_portmaps, "m_axi_ports_top.vh")
+output_file_top_wires = os.path.join(output_folder_path_portmaps, "m_axi_wires_top.vh")
 
 with open(config_file_path, "r") as file:
     config_data = json.load(file)
@@ -232,6 +345,7 @@ engine_properties = config_data["engine_properties"]
 # fifo_engine   = config_data["fifo_engine"]
 
 XPM_FIFO_ENABLE = cu_properties["xpm_fifo"]
+
 
 def recreate_data_structures_from_columns(engine_properties, categories_order):
     """
@@ -258,14 +372,21 @@ def recreate_data_structures_from_columns(engine_properties, categories_order):
 
     return recreated_data
 
+
 # Define the order of categories as they appear in the engine_properties lists
 categories_order = [
-    "mapping", "cycles", "luts",
-    "fifo_engine", "fifo_memory",
-    "fifo_control_request", "fifo_control_response"
+    "mapping",
+    "cycles",
+    "luts",
+    "fifo_engine",
+    "fifo_memory",
+    "fifo_control_request",
+    "fifo_control_response",
 ]
 # Recreate the data structures for all categories
-engine_properties_structures = recreate_data_structures_from_columns(engine_properties, categories_order)
+engine_properties_structures = recreate_data_structures_from_columns(
+    engine_properties, categories_order
+)
 
 # Now, extract each category into its own variable
 mapping = engine_properties_structures["mapping"]
@@ -279,12 +400,14 @@ fifo_engine = engine_properties_structures["fifo_engine"]
 DISTINCT_CHANNELS = set(int(properties[0]) for properties in channels.values())
 NUM_CHANNELS_TOP = len(DISTINCT_CHANNELS)
 
+
 def get_config(config_data, algorithm):
     # Default to 'bundle' if the specified algorithm is not found
     selected_config = config_data.get(algorithm, config_data[CAPABILITY])
 
     # Sort the keys and create the configuration array
     return [selected_config[key] for key in sorted(selected_config.keys(), key=int)]
+
 
 # Define the filename based on the CAPABILITY
 if CAPABILITY == "Single":
@@ -302,12 +425,15 @@ CU_BUNDLES_CONFIG_ARRAY = get_config(config_data, topology)
 NUM_CUS_MAX = 1  # As there's only one CU
 NUM_BUNDLES_MAX = len(CU_BUNDLES_CONFIG_ARRAY)
 NUM_LANES_MAX = max(len(bundle) for bundle in CU_BUNDLES_CONFIG_ARRAY)
-NUM_ENGINES_MAX = max(len(lane) for bundle in CU_BUNDLES_CONFIG_ARRAY for lane in bundle)
+NUM_ENGINES_MAX = max(
+    len(lane) for bundle in CU_BUNDLES_CONFIG_ARRAY for lane in bundle
+)
 
 NUM_CUS = NUM_CUS_MAX
 NUM_BUNDLES = NUM_BUNDLES_MAX
 NUM_LANES = NUM_LANES_MAX
 NUM_ENGINES = NUM_ENGINES_MAX
+
 
 # Padding function for connect array
 def pad_connect_array(connect_array, max_cast):
@@ -316,16 +442,19 @@ def pad_connect_array(connect_array, max_cast):
         padded_array.append(0)
     return padded_array
 
+
 def pad_engines(lane, max_engines):
     padded_lane = lane.copy()
     while len(padded_lane) < max_engines:
         padded_lane.append(0)
     return padded_lane
 
+
 def pad_engines_cast(lane, max_engines):
     while len(lane) < max_engines:
         lane.append([0] * NUM_CAST_MAX)
     return lane
+
 
 # Modified pad_data to accept a default pad value
 def pad_data(data, max_length, default_val=0):
@@ -334,78 +463,93 @@ def pad_data(data, max_length, default_val=0):
         padded_data.append(default_val)
     return padded_data
 
+
 def pad_lane(bundle):
     return pad_data(bundle, NUM_LANES_MAX, [0] * NUM_ENGINES_MAX)
 
+
 def pad_bundle(bundle):
     while len(bundle) < NUM_LANES_MAX:
-        bundle.append([[0]*NUM_CAST_MAX]*NUM_ENGINES_MAX)
+        bundle.append([[0] * NUM_CAST_MAX] * NUM_ENGINES_MAX)
     return bundle
 
+
 def get_width(engine_name):
-    match = re.search(r'W:(\d+)', engine_name)
+    match = re.search(r"W:(\d+)", engine_name)
     if match:
         return int(match.group(1))
     return 0
+
 
 def get_engine_id(engine_name):
     base_name = engine_name.split("(")[0]
     return mapping.get(base_name, 0)
 
+
 def get_memory_fifo(engine_name):
     base_name = engine_name.split("(")[0]
     return fifo_memory.get(base_name, 0)
+
 
 def get_control_fifo_response(engine_name):
     base_name = engine_name.split("(")[0]
     return fifo_control_response.get(base_name, 0)
 
+
 def get_control_fifo_request(engine_name):
     base_name = engine_name.split("(")[0]
     return fifo_control_request.get(base_name, 0)
 
+
 def get_engine_fifo(engine_name):
     base_name = engine_name.split("(")[0]
     return fifo_engine.get(base_name, 0)
+
 
 def get_memory_arbiter_num(engine_name):
     base_name = engine_name.split("(")[0]
     value = fifo_memory.get(base_name, 0)
     return 1 if value != 0 else 0
 
+
 def get_control_arbiter_num_response(engine_name):
     base_name = engine_name.split("(")[0]
     value = fifo_control_response.get(base_name, 0)
     return 1 if value != 0 else 0
+
 
 def get_control_arbiter_num_request(engine_name):
     base_name = engine_name.split("(")[0]
     value = fifo_control_request.get(base_name, 0)
     return 1 if value != 0 else 0
 
+
 def get_engine_arbiter_num(engine_name):
     base_name = engine_name.split("(")[0]
     value = fifo_engine.get(base_name, 0)
     return 1 if value != 0 else 0
 
+
 def get_connect_array(engine_name):
-    match = re.search(r'C:(\d+):(\d+)', engine_name)
+    match = re.search(r"C:(\d+):(\d+)", engine_name)
     if match:
         start, end = int(match.group(1)), int(match.group(2))
         return list(range(start, end + 1))
-    
-    match_explicit = re.search(r'C:([\d,]+)', engine_name)
+
+    match_explicit = re.search(r"C:([\d,]+)", engine_name)
     if match_explicit:
-        values = [int(x) for x in match_explicit.group(1).split(',')]
+        values = [int(x) for x in match_explicit.group(1).split(",")]
         return values
 
     return []
+
 
 def vhdl_format(array):
     if not isinstance(array, list):
         return str(array)
     inner_data = ", ".join(vhdl_format(subarray) for subarray in array)
     return "'{" + inner_data + "}\n"
+
 
 def extract_cast_width(token):
     """Extracts the cast width value from a token in the form (C:x:y) or (C:x,y,z,...)."""
@@ -419,6 +563,7 @@ def extract_cast_width(token):
             return len(values[0].split(","))
     return 0
 
+
 def generate_config_cast_width_array():
     """Generates the CU_BUNDLES_CONFIG_CAST_WIDTH_ARRAY based on CU_BUNDLES_CONFIG_ARRAY."""
     CU_BUNDLES_CONFIG_CAST_WIDTH_ARRAY = []
@@ -431,16 +576,17 @@ def generate_config_cast_width_array():
             # Pad the engine list with zeros up to NUM_ENGINES_MAX
             while len(engine_list) < NUM_ENGINES_MAX:
                 engine_list.append(0)
-            
+
             lane_list.append(engine_list)
 
         # Pad the lane list with zeros up to NUM_LANES_MAX
         while len(lane_list) < NUM_LANES_MAX:
             lane_list.append([0] * NUM_ENGINES_MAX)
-        
+
         CU_BUNDLES_CONFIG_CAST_WIDTH_ARRAY.append(lane_list)
 
     return CU_BUNDLES_CONFIG_CAST_WIDTH_ARRAY
+
 
 def get_engine_name(engine_id, mapping):
     # Use regex to match the engine name ignoring any additional info like "(W:2)" or "(C:0)"
@@ -450,15 +596,23 @@ def get_engine_name(engine_id, mapping):
         return [name for name, id_ in mapping.items() if name == engine_base_name]
     return []
 
-def generate_cu_bundles_config_array_engine_seq_width(cycles_dict, config_array, mapping):
-    seq_width_array = [[[0 for _ in range(NUM_ENGINES_MAX)] for _ in range(NUM_LANES_MAX)] for _ in range(NUM_BUNDLES_MAX)]
-    
+
+def generate_cu_bundles_config_array_engine_seq_width(
+    cycles_dict, config_array, mapping
+):
+    seq_width_array = [
+        [[0 for _ in range(NUM_ENGINES_MAX)] for _ in range(NUM_LANES_MAX)]
+        for _ in range(NUM_BUNDLES_MAX)
+    ]
+
     for bundle_index, lanes in enumerate(config_array):
         for lane_index, engines in enumerate(lanes):
             for engine_index, engine_id in enumerate(engines):
                 engine_name = get_engine_name(engine_id, mapping)
                 if engine_name:
-                    seq_width_array[bundle_index][lane_index][engine_index] = cycles_dict.get(engine_name[0], 0)
+                    seq_width_array[bundle_index][lane_index][engine_index] = (
+                        cycles_dict.get(engine_name[0], 0)
+                    )
                 else:
                     # If engine_name is empty, it means no match was found
                     print(f"No match found for engine ID {engine_id}")
@@ -466,13 +620,17 @@ def generate_cu_bundles_config_array_engine_seq_width(cycles_dict, config_array,
 
     return seq_width_array
 
+
 # The function to generate CU_BUNDLES_CONFIG_ARRAY_ENGINE_SEQ_MIN
 def generate_cu_bundles_config_array_engine_seq_min(seq_width_array):
     """
     Generate the prefix sum array based on the sequence width array.
     Accumulate sums within each lane for every bundle.
     """
-    prefix_sum_array = [[[0 for _ in range(NUM_ENGINES_MAX)] for _ in range(NUM_LANES_MAX)] for _ in range(NUM_BUNDLES_MAX)]
+    prefix_sum_array = [
+        [[0 for _ in range(NUM_ENGINES_MAX)] for _ in range(NUM_LANES_MAX)]
+        for _ in range(NUM_BUNDLES_MAX)
+    ]
     running_sum = 0
     for bundle_index in range(len(seq_width_array)):
         for lane_index in range(len(seq_width_array[bundle_index])):
@@ -484,6 +642,7 @@ def generate_cu_bundles_config_array_engine_seq_min(seq_width_array):
                 running_sum += seq_width_array[bundle_index][lane_index][engine_index]
 
     return prefix_sum_array
+
 
 def calculate_total_luts(luts, configuration):
     total_luts = 0
@@ -498,29 +657,42 @@ def calculate_total_luts(luts, configuration):
             if not isinstance(engine, list):
                 raise ValueError("Each engine should be a list")
             for engine_instance in engine:
-                engine_name = engine_instance.split('(')[0]
+                engine_name = engine_instance.split("(")[0]
                 total_luts += luts.get(engine_name, 0)
 
     return total_luts
+
 
 total_luts = calculate_total_luts(luts, CU_BUNDLES_CONFIG_ARRAY)
 
 CU_BUNDLES_CONFIG_CAST_WIDTH_ARRAY = generate_config_cast_width_array()
 
 # Generate CU_BUNDLES_CONFIG_ARRAY_ENGINE_SEQ_WIDTH
-CU_BUNDLES_CONFIG_ARRAY_ENGINE_SEQ_WIDTH = generate_cu_bundles_config_array_engine_seq_width(
-    engine_properties_structures["cycles"], CU_BUNDLES_CONFIG_ARRAY, mapping
+CU_BUNDLES_CONFIG_ARRAY_ENGINE_SEQ_WIDTH = (
+    generate_cu_bundles_config_array_engine_seq_width(
+        engine_properties_structures["cycles"], CU_BUNDLES_CONFIG_ARRAY, mapping
+    )
 )
 
 # Generate CU_BUNDLES_CONFIG_ARRAY_ENGINE_SEQ_MIN
-CU_BUNDLES_CONFIG_ARRAY_ENGINE_SEQ_MIN = generate_cu_bundles_config_array_engine_seq_min(
-    CU_BUNDLES_CONFIG_ARRAY_ENGINE_SEQ_WIDTH
+CU_BUNDLES_CONFIG_ARRAY_ENGINE_SEQ_MIN = (
+    generate_cu_bundles_config_array_engine_seq_min(
+        CU_BUNDLES_CONFIG_ARRAY_ENGINE_SEQ_WIDTH
+    )
 )
 
 # Step 1: Determine NUM_CAST_MAX
-NUM_CAST_MAX = max(
-    [max(engine) if engine else 0 for bundle in CU_BUNDLES_CONFIG_ARRAY for lane in bundle for engine in [get_connect_array(engine_name) for engine_name in lane]]
-) + 1  # Added 1 because the values are 0-indexed
+NUM_CAST_MAX = (
+    max(
+        [
+            max(engine) if engine else 0
+            for bundle in CU_BUNDLES_CONFIG_ARRAY
+            for lane in bundle
+            for engine in [get_connect_array(engine_name) for engine_name in lane]
+        ]
+    )
+    + 1
+)  # Added 1 because the values are 0-indexed
 
 CU_BUNDLES_ENGINE_ID_ARRAY = []
 
@@ -528,26 +700,40 @@ CU_BUNDLES_ENGINE_ID_ARRAY = []
 CU_BUNDLES_COUNT_ARRAY = [len(bundle) for bundle in CU_BUNDLES_CONFIG_ARRAY]
 
 # Calculate number of lanes per bundle for each CU
-CU_BUNDLES_LANES_COUNT_ARRAY = [[len(lane) for lane in bundle] for bundle in CU_BUNDLES_CONFIG_ARRAY]
+CU_BUNDLES_LANES_COUNT_ARRAY = [
+    [len(lane) for lane in bundle] for bundle in CU_BUNDLES_CONFIG_ARRAY
+]
 
-CU_BUNDLES_LANES_ENGINES_COUNT_ARRAY = [pad_data([len(lane) for lane in bundle],NUM_LANES_MAX) for bundle in CU_BUNDLES_CONFIG_ARRAY]
+CU_BUNDLES_LANES_ENGINES_COUNT_ARRAY = [
+    pad_data([len(lane) for lane in bundle], NUM_LANES_MAX)
+    for bundle in CU_BUNDLES_CONFIG_ARRAY
+]
 
 # Get engine IDs and pad accordingly
 CU_BUNDLES_ENGINE_CONFIG_ARRAY = [
-    pad_lane([pad_data([get_engine_id(engine) for engine in lane], NUM_ENGINES_MAX) for lane in bundle])
+    pad_lane(
+        [
+            pad_data([get_engine_id(engine) for engine in lane], NUM_ENGINES_MAX)
+            for lane in bundle
+        ]
+    )
     for bundle in CU_BUNDLES_CONFIG_ARRAY
 ]
 
 # Get engine widths and pad accordingly
 CU_BUNDLES_CONFIG_MERGE_WIDTH_ARRAY = [
-    pad_lane([pad_data([get_width(engine) for engine in lane], NUM_ENGINES_MAX) for lane in bundle])
+    pad_lane(
+        [
+            pad_data([get_width(engine) for engine in lane], NUM_ENGINES_MAX)
+            for lane in bundle
+        ]
+    )
     for bundle in CU_BUNDLES_CONFIG_ARRAY
 ]
 
 # Initialize CU_BUNDLES_CONFIG_LANE_MERGE_WIDTH_ARRAY with zeros
 CU_BUNDLES_CONFIG_LANE_MERGE_WIDTH_ARRAY = [
-    [0 for _ in range(NUM_LANES_MAX)]
-    for _ in range(NUM_BUNDLES_MAX)
+    [0 for _ in range(NUM_LANES_MAX)] for _ in range(NUM_BUNDLES_MAX)
 ]
 
 # Sum each lane and place the result in CU_BUNDLES_CONFIG_LANE_MERGE_WIDTH_ARRAY
@@ -557,8 +743,7 @@ for bundle_index, bundle in enumerate(CU_BUNDLES_CONFIG_MERGE_WIDTH_ARRAY):
 
 # Initialize CU_BUNDLES_CONFIG_LANE_CAST_WIDTH_ARRAY with zeros
 CU_BUNDLES_CONFIG_LANE_CAST_WIDTH_ARRAY = [
-    [0 for _ in range(NUM_LANES_MAX)]
-    for _ in range(NUM_BUNDLES_MAX)
+    [0 for _ in range(NUM_LANES_MAX)] for _ in range(NUM_BUNDLES_MAX)
 ]
 
 # Sum each lane and place the result in CU_BUNDLES_CONFIG_LANE_CAST_WIDTH_ARRAY
@@ -568,13 +753,18 @@ for bundle_index, bundle in enumerate(CU_BUNDLES_CONFIG_CAST_WIDTH_ARRAY):
 
 # Create the CU_BUNDLES_CONFIG_MERGE_CONNECT_ARRAY with the correct padding
 CU_BUNDLES_CONFIG_MERGE_CONNECT_ARRAY = [
-    pad_bundle([
-        pad_engines_cast(
-            [pad_connect_array(get_connect_array(engine), NUM_CAST_MAX) for engine in lane], 
-            NUM_ENGINES_MAX
-        ) 
-        for lane in bundle
-    ])
+    pad_bundle(
+        [
+            pad_engines_cast(
+                [
+                    pad_connect_array(get_connect_array(engine), NUM_CAST_MAX)
+                    for engine in lane
+                ],
+                NUM_ENGINES_MAX,
+            )
+            for lane in bundle
+        ]
+    )
     for bundle in CU_BUNDLES_CONFIG_ARRAY
 ]
 
@@ -588,13 +778,11 @@ CU_BUNDLES_CONFIG_LANE_MAX_MERGE_WIDTH_ARRAY = [
 
 # Compute the max values across the engine dimension
 CU_BUNDLES_CONFIG_MAX_MERGE_WIDTH_ARRAY = [
-    [max(lane) for lane in bundle]
-    for bundle in CU_BUNDLES_CONFIG_MERGE_WIDTH_ARRAY
+    [max(lane) for lane in bundle] for bundle in CU_BUNDLES_CONFIG_MERGE_WIDTH_ARRAY
 ]
 
 CU_BUNDLES_CONFIG_MAX_CAST_WIDTH_ARRAY = [
-    [max(lane) for lane in bundle]
-    for bundle in CU_BUNDLES_CONFIG_CAST_WIDTH_ARRAY
+    [max(lane) for lane in bundle] for bundle in CU_BUNDLES_CONFIG_CAST_WIDTH_ARRAY
 ]
 
 counter = 0
@@ -629,6 +817,7 @@ for bundle in CU_BUNDLES_CONFIG_ARRAY:
     new_bundle = pad_bundle(new_bundle)
     CU_BUNDLES_CONFIG_MERGE_CONNECT_PREFIX_ARRAY.append(new_bundle)
 
+
 def check_and_clean_file(file_path):
     # Check if the file exists
     if os.path.exists(file_path):
@@ -640,7 +829,7 @@ def check_and_clean_file(file_path):
 def l2_merge_caches(sequence):
     caches = []
     current_cache = []
-    
+
     for num in sequence:
         if num == 0:
             continue
@@ -649,11 +838,12 @@ def l2_merge_caches(sequence):
                 caches.append(len(current_cache))
                 current_cache = []
         current_cache.append(num)
-    
+
     if current_cache:
         caches.append(len(current_cache))
-    
+
     return caches
+
 
 def generate_channels_properties_parameters(ch_properties):
 
@@ -677,13 +867,22 @@ def generate_channels_properties_parameters(ch_properties):
         channel_config_axi_port_full_be.append(int(values[2]))
         channel_config_data_width_be.append(int(values[1]))
         channel_config_address_width_be.append(int(values[0]))
-  
-
 
     NUM_CHANNELS_MAX = len(channel_config_l1_type)
 
+    return (
+        NUM_CHANNELS_MAX,
+        channel_config_l1_type,
+        channel_config_l2_type,
+        channel_config_address_width_be,
+        channel_config_data_width_be,
+        channel_config_axi_port_full_be,
+        channel_config_address_width_mid,
+        channel_config_data_width_mid,
+        channel_config_address_width_fe,
+        channel_config_data_width_fe,
+    )
 
-    return NUM_CHANNELS_MAX, channel_config_l1_type, channel_config_l2_type, channel_config_address_width_be, channel_config_data_width_be, channel_config_axi_port_full_be, channel_config_address_width_mid, channel_config_data_width_mid, channel_config_address_width_fe, channel_config_data_width_fe
 
 def generate_caches_properties_parameters(cache_properties):
 
@@ -706,24 +905,43 @@ def generate_caches_properties_parameters(cache_properties):
         cache_config_l2_num_ways.append(int(values[1]))
         cache_config_l2_size.append(int(values[0]))
 
-
-    return cache_config_l2_size, cache_config_l2_num_ways, cache_config_l1_size, cache_config_l1_num_ways, cache_config_l1_prefetch, cache_config_l1_ram, cache_config_l2_ram, cache_config_l2_ctrl
+    return (
+        cache_config_l2_size,
+        cache_config_l2_num_ways,
+        cache_config_l1_size,
+        cache_config_l1_num_ways,
+        cache_config_l1_prefetch,
+        cache_config_l1_ram,
+        cache_config_l2_ram,
+        cache_config_l2_ctrl,
+    )
 
 
 CHANNEL_CONFIG_L1_TYPE = []
 CHANNEL_CONFIG_L2_TYPE = []
 CHANNEL_CONFIG_L2_MERGE = []
-CHANNEL_CONFIG_ADDRESS_WIDTH_BE=[]
-CHANNEL_CONFIG_DATA_WIDTH_BE=[]
-CHANNEL_CONFIG_AXI_PORT_FULL_BE=[]
-CHANNEL_CONFIG_ADDRESS_WIDTH_MID=[]
-CHANNEL_CONFIG_DATA_WIDTH_MID=[]
-CHANNEL_CONFIG_ADDRESS_WIDTH_FE=[]
-CHANNEL_CONFIG_DATA_WIDTH_FE=[]
+CHANNEL_CONFIG_ADDRESS_WIDTH_BE = []
+CHANNEL_CONFIG_DATA_WIDTH_BE = []
+CHANNEL_CONFIG_AXI_PORT_FULL_BE = []
+CHANNEL_CONFIG_ADDRESS_WIDTH_MID = []
+CHANNEL_CONFIG_DATA_WIDTH_MID = []
+CHANNEL_CONFIG_ADDRESS_WIDTH_FE = []
+CHANNEL_CONFIG_DATA_WIDTH_FE = []
 
-NUM_CHANNELS_MAX  = 1
+NUM_CHANNELS_MAX = 1
 
-NUM_CHANNELS_MAX,CHANNEL_CONFIG_L1_TYPE,CHANNEL_CONFIG_L2_TYPE, CHANNEL_CONFIG_ADDRESS_WIDTH_BE, CHANNEL_CONFIG_DATA_WIDTH_BE, CHANNEL_CONFIG_AXI_PORT_FULL_BE, CHANNEL_CONFIG_ADDRESS_WIDTH_MID, CHANNEL_CONFIG_DATA_WIDTH_MID, CHANNEL_CONFIG_ADDRESS_WIDTH_FE, CHANNEL_CONFIG_DATA_WIDTH_FE= generate_channels_properties_parameters(ch_properties)
+(
+    NUM_CHANNELS_MAX,
+    CHANNEL_CONFIG_L1_TYPE,
+    CHANNEL_CONFIG_L2_TYPE,
+    CHANNEL_CONFIG_ADDRESS_WIDTH_BE,
+    CHANNEL_CONFIG_DATA_WIDTH_BE,
+    CHANNEL_CONFIG_AXI_PORT_FULL_BE,
+    CHANNEL_CONFIG_ADDRESS_WIDTH_MID,
+    CHANNEL_CONFIG_DATA_WIDTH_MID,
+    CHANNEL_CONFIG_ADDRESS_WIDTH_FE,
+    CHANNEL_CONFIG_DATA_WIDTH_FE,
+) = generate_channels_properties_parameters(ch_properties)
 CHANNEL_CONFIG_L2_MERGE = l2_merge_caches(CHANNEL_CONFIG_L2_TYPE)
 CHANNEL_CONFIG_L2_COUNT = len(CHANNEL_CONFIG_L2_MERGE)
 
@@ -736,7 +954,16 @@ CACHE_CONFIG_L2_SIZE = []
 CACHE_CONFIG_L2_RAM = []
 CACHE_CONFIG_L2_CTRL = []
 
-CACHE_CONFIG_L2_SIZE, CACHE_CONFIG_L2_NUM_WAYS, CACHE_CONFIG_L1_SIZE, CACHE_CONFIG_L1_NUM_WAYS, CACHE_CONFIG_L1_PREFETCH, CACHE_CONFIG_L1_RAM, CACHE_CONFIG_L2_RAM, CACHE_CONFIG_L2_CTRL = generate_caches_properties_parameters(cache_properties)
+(
+    CACHE_CONFIG_L2_SIZE,
+    CACHE_CONFIG_L2_NUM_WAYS,
+    CACHE_CONFIG_L1_SIZE,
+    CACHE_CONFIG_L1_NUM_WAYS,
+    CACHE_CONFIG_L1_PREFETCH,
+    CACHE_CONFIG_L1_RAM,
+    CACHE_CONFIG_L2_RAM,
+    CACHE_CONFIG_L2_CTRL,
+) = generate_caches_properties_parameters(cache_properties)
 
 
 def find_max_value(list1, list2, list1_c, list2_c, max_size):
@@ -745,9 +972,9 @@ def find_max_value(list1, list2, list1_c, list2_c, max_size):
     list2_temp = []
 
     for index in range(max_size):
-        if(list1_c[index] != 0):
+        if list1_c[index] != 0:
             list1_temp.append(list1[index])
-        if(list2_c[index] != 0):
+        if list2_c[index] != 0:
             list2_temp.append(list2[index])
 
     combined_list = [x for x in list1_temp + list2_temp if x is not None]
@@ -759,71 +986,116 @@ def find_max_value(list1, list2, list1_c, list2_c, max_size):
     # Return the maximum value
     return max(combined_list)
 
-CACHE_CONFIG_MAX_NUM_WAYS = find_max_value(CACHE_CONFIG_L1_NUM_WAYS, CACHE_CONFIG_L2_NUM_WAYS, CHANNEL_CONFIG_L1_TYPE, CHANNEL_CONFIG_L2_TYPE, NUM_CHANNELS_TOP)
-CACHE_CONFIG_MAX_SIZE = find_max_value(CACHE_CONFIG_L1_SIZE, CACHE_CONFIG_L2_SIZE, CHANNEL_CONFIG_L1_TYPE, CHANNEL_CONFIG_L2_TYPE, NUM_CHANNELS_TOP)
+
+CACHE_CONFIG_MAX_NUM_WAYS = find_max_value(
+    CACHE_CONFIG_L1_NUM_WAYS,
+    CACHE_CONFIG_L2_NUM_WAYS,
+    CHANNEL_CONFIG_L1_TYPE,
+    CHANNEL_CONFIG_L2_TYPE,
+    NUM_CHANNELS_TOP,
+)
+CACHE_CONFIG_MAX_SIZE = find_max_value(
+    CACHE_CONFIG_L1_SIZE,
+    CACHE_CONFIG_L2_SIZE,
+    CHANNEL_CONFIG_L1_TYPE,
+    CHANNEL_CONFIG_L2_TYPE,
+    NUM_CHANNELS_TOP,
+)
 
 # Get engine IDs and pad accordingly
 CU_BUNDLES_CONFIG_FIFO_ARBITER_SIZE_MEMORY = [
-    pad_lane([pad_data([get_memory_fifo(engine) for engine in lane], NUM_ENGINES_MAX) for lane in bundle])
+    pad_lane(
+        [
+            pad_data([get_memory_fifo(engine) for engine in lane], NUM_ENGINES_MAX)
+            for lane in bundle
+        ]
+    )
     for bundle in CU_BUNDLES_CONFIG_ARRAY
 ]
 
 CU_BUNDLES_CONFIG_FIFO_ARBITER_SIZE_ENGINE = [
-    pad_lane([pad_data([get_engine_fifo(engine) for engine in lane], NUM_ENGINES_MAX) for lane in bundle])
+    pad_lane(
+        [
+            pad_data([get_engine_fifo(engine) for engine in lane], NUM_ENGINES_MAX)
+            for lane in bundle
+        ]
+    )
     for bundle in CU_BUNDLES_CONFIG_ARRAY
 ]
 
 CU_BUNDLES_CONFIG_FIFO_ARBITER_SIZE_CONTROL_RESPONSE = [
-    pad_lane([pad_data([get_control_fifo_response(engine) for engine in lane], NUM_ENGINES_MAX) for lane in bundle])
+    pad_lane(
+        [
+            pad_data(
+                [get_control_fifo_response(engine) for engine in lane], NUM_ENGINES_MAX
+            )
+            for lane in bundle
+        ]
+    )
     for bundle in CU_BUNDLES_CONFIG_ARRAY
 ]
 
 CU_BUNDLES_CONFIG_FIFO_ARBITER_SIZE_CONTROL_REQUEST = [
-    pad_lane([pad_data([get_control_fifo_request(engine) for engine in lane], NUM_ENGINES_MAX) for lane in bundle])
+    pad_lane(
+        [
+            pad_data(
+                [get_control_fifo_request(engine) for engine in lane], NUM_ENGINES_MAX
+            )
+            for lane in bundle
+        ]
+    )
     for bundle in CU_BUNDLES_CONFIG_ARRAY
 ]
 
 
 # Initialize CU_BUNDLES_CONFIG_LANE_CAST_WIDTH_ARRAY with zeros
 CU_BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_MEMORY = [
-    [0 for _ in range(NUM_LANES_MAX)]
-    for _ in range(NUM_BUNDLES_MAX)
+    [0 for _ in range(NUM_LANES_MAX)] for _ in range(NUM_BUNDLES_MAX)
 ]
 
 CU_BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_ENGINE = [
-    [0 for _ in range(NUM_LANES_MAX)]
-    for _ in range(NUM_BUNDLES_MAX)
+    [0 for _ in range(NUM_LANES_MAX)] for _ in range(NUM_BUNDLES_MAX)
 ]
 
 CU_BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_CONTROL_RESPONSE = [
-    [0 for _ in range(NUM_LANES_MAX)]
-    for _ in range(NUM_BUNDLES_MAX)
+    [0 for _ in range(NUM_LANES_MAX)] for _ in range(NUM_BUNDLES_MAX)
 ]
 
 CU_BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_CONTROL_REQUEST = [
-    [0 for _ in range(NUM_LANES_MAX)]
-    for _ in range(NUM_BUNDLES_MAX)
+    [0 for _ in range(NUM_LANES_MAX)] for _ in range(NUM_BUNDLES_MAX)
 ]
 
 # Sum each lane and place the result in CU_BUNDLES_CONFIG_LANE_CAST_WIDTH_ARRAY
 for bundle_index, bundle in enumerate(CU_BUNDLES_CONFIG_FIFO_ARBITER_SIZE_MEMORY):
     for lane_index, lane in enumerate(bundle):
-        CU_BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_MEMORY[bundle_index][lane_index] = sum(lane)
+        CU_BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_MEMORY[bundle_index][lane_index] = sum(
+            lane
+        )
 
 # Sum each lane and place the result in CU_BUNDLES_CONFIG_LANE_CAST_WIDTH_ARRAY
 for bundle_index, bundle in enumerate(CU_BUNDLES_CONFIG_FIFO_ARBITER_SIZE_ENGINE):
     for lane_index, lane in enumerate(bundle):
-        CU_BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_ENGINE[bundle_index][lane_index] = sum(lane)
+        CU_BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_ENGINE[bundle_index][lane_index] = sum(
+            lane
+        )
 
 # Sum each lane and place the result in CU_BUNDLES_CONFIG_LANE_CAST_WIDTH_ARRAY
-for bundle_index, bundle in enumerate(CU_BUNDLES_CONFIG_FIFO_ARBITER_SIZE_CONTROL_RESPONSE):
+for bundle_index, bundle in enumerate(
+    CU_BUNDLES_CONFIG_FIFO_ARBITER_SIZE_CONTROL_RESPONSE
+):
     for lane_index, lane in enumerate(bundle):
-        CU_BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_CONTROL_RESPONSE[bundle_index][lane_index] = sum(lane)
+        CU_BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_CONTROL_RESPONSE[bundle_index][
+            lane_index
+        ] = sum(lane)
 
 # Sum each lane and place the result in CU_BUNDLES_CONFIG_LANE_CAST_WIDTH_ARRAY
-for bundle_index, bundle in enumerate(CU_BUNDLES_CONFIG_FIFO_ARBITER_SIZE_CONTROL_REQUEST):
+for bundle_index, bundle in enumerate(
+    CU_BUNDLES_CONFIG_FIFO_ARBITER_SIZE_CONTROL_REQUEST
+):
     for lane_index, lane in enumerate(bundle):
-        CU_BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_CONTROL_REQUEST[bundle_index][lane_index] = sum(lane)
+        CU_BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_CONTROL_REQUEST[bundle_index][
+            lane_index
+        ] = sum(lane)
 
 CU_BUNDLES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_MEMORY = [
     sum(lane) for lane in CU_BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_MEMORY
@@ -838,111 +1110,157 @@ CU_BUNDLES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_CONTROL_REQUEST = [
     sum(lane) for lane in CU_BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_CONTROL_REQUEST
 ]
 
-CU_BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_MEMORY  = sum(CU_BUNDLES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_MEMORY)
-CU_BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_ENGINE  = sum(CU_BUNDLES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_ENGINE)
-CU_BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_CONTROL_RESPONSE = sum(CU_BUNDLES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_CONTROL_RESPONSE)
-CU_BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_CONTROL_REQUEST = sum(CU_BUNDLES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_CONTROL_REQUEST)
+CU_BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_MEMORY = sum(
+    CU_BUNDLES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_MEMORY
+)
+CU_BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_ENGINE = sum(
+    CU_BUNDLES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_ENGINE
+)
+CU_BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_CONTROL_RESPONSE = sum(
+    CU_BUNDLES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_CONTROL_RESPONSE
+)
+CU_BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_CONTROL_REQUEST = sum(
+    CU_BUNDLES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_CONTROL_REQUEST
+)
 
 # Get engine IDs and pad accordingly
 CU_BUNDLES_CONFIG_ENGINE_ARBITER_NUM_MEMORY = [
-    pad_lane([pad_data([get_memory_arbiter_num(engine) for engine in lane], NUM_ENGINES_MAX) for lane in bundle])
+    pad_lane(
+        [
+            pad_data(
+                [get_memory_arbiter_num(engine) for engine in lane], NUM_ENGINES_MAX
+            )
+            for lane in bundle
+        ]
+    )
     for bundle in CU_BUNDLES_CONFIG_ARRAY
 ]
 
 CU_BUNDLES_CONFIG_ENGINE_ARBITER_NUM_ENGINE = [
-    pad_lane([pad_data([get_engine_arbiter_num(engine) for engine in lane], NUM_ENGINES_MAX) for lane in bundle])
+    pad_lane(
+        [
+            pad_data(
+                [get_engine_arbiter_num(engine) for engine in lane], NUM_ENGINES_MAX
+            )
+            for lane in bundle
+        ]
+    )
     for bundle in CU_BUNDLES_CONFIG_ARRAY
 ]
 
 CU_BUNDLES_CONFIG_ENGINE_ARBITER_NUM_CONTROL_RESPONSE = [
-    pad_lane([pad_data([get_control_arbiter_num_response(engine) for engine in lane], NUM_ENGINES_MAX) for lane in bundle])
+    pad_lane(
+        [
+            pad_data(
+                [get_control_arbiter_num_response(engine) for engine in lane],
+                NUM_ENGINES_MAX,
+            )
+            for lane in bundle
+        ]
+    )
     for bundle in CU_BUNDLES_CONFIG_ARRAY
 ]
 
 CU_BUNDLES_CONFIG_ENGINE_ARBITER_NUM_CONTROL_REQUEST = [
-    pad_lane([pad_data([get_control_arbiter_num_request(engine) for engine in lane], NUM_ENGINES_MAX) for lane in bundle])
+    pad_lane(
+        [
+            pad_data(
+                [get_control_arbiter_num_request(engine) for engine in lane],
+                NUM_ENGINES_MAX,
+            )
+            for lane in bundle
+        ]
+    )
     for bundle in CU_BUNDLES_CONFIG_ARRAY
 ]
 
 # Initialize CU_BUNDLES_CONFIG_LANE_CAST_WIDTH_ARRAY with zeros
 CU_BUNDLES_CONFIG_LANE_ARBITER_NUM_MEMORY = [
-    [0 for _ in range(NUM_LANES_MAX)]
-    for _ in range(NUM_BUNDLES_MAX)
+    [0 for _ in range(NUM_LANES_MAX)] for _ in range(NUM_BUNDLES_MAX)
 ]
 
 CU_BUNDLES_CONFIG_LANE_ARBITER_NUM_ENGINE = [
-    [0 for _ in range(NUM_LANES_MAX)]
-    for _ in range(NUM_BUNDLES_MAX)
+    [0 for _ in range(NUM_LANES_MAX)] for _ in range(NUM_BUNDLES_MAX)
 ]
 
 CU_BUNDLES_CONFIG_LANE_ARBITER_NUM_CONTROL_RESPONSE = [
-    [0 for _ in range(NUM_LANES_MAX)]
-    for _ in range(NUM_BUNDLES_MAX)
+    [0 for _ in range(NUM_LANES_MAX)] for _ in range(NUM_BUNDLES_MAX)
 ]
 
 CU_BUNDLES_CONFIG_LANE_ARBITER_NUM_CONTROL_REQUEST = [
-    [0 for _ in range(NUM_LANES_MAX)]
-    for _ in range(NUM_BUNDLES_MAX)
+    [0 for _ in range(NUM_LANES_MAX)] for _ in range(NUM_BUNDLES_MAX)
 ]
 
 # Initialize CU_BUNDLES_CONFIG_LANE_CAST_WIDTH_ARRAY with zeros
 CU_BUNDLES_CONFIG_LANE_ARBITER_NUM_MEMORY_TEMP = [
-    [0 for _ in range(NUM_LANES_MAX)]
-    for _ in range(NUM_BUNDLES_MAX)
+    [0 for _ in range(NUM_LANES_MAX)] for _ in range(NUM_BUNDLES_MAX)
 ]
 
 CU_BUNDLES_CONFIG_LANE_ARBITER_NUM_ENGINE_TEMP = [
-    [0 for _ in range(NUM_LANES_MAX)]
-    for _ in range(NUM_BUNDLES_MAX)
+    [0 for _ in range(NUM_LANES_MAX)] for _ in range(NUM_BUNDLES_MAX)
 ]
 
 CU_BUNDLES_CONFIG_LANE_ARBITER_NUM_CONTROL_RESPONSE_TEMP = [
-    [0 for _ in range(NUM_LANES_MAX)]
-    for _ in range(NUM_BUNDLES_MAX)
+    [0 for _ in range(NUM_LANES_MAX)] for _ in range(NUM_BUNDLES_MAX)
 ]
 
 CU_BUNDLES_CONFIG_LANE_ARBITER_NUM_CONTROL_REQUEST_TEMP = [
-    [0 for _ in range(NUM_LANES_MAX)]
-    for _ in range(NUM_BUNDLES_MAX)
+    [0 for _ in range(NUM_LANES_MAX)] for _ in range(NUM_BUNDLES_MAX)
 ]
 
 # Sum each lane and place the result in CU_BUNDLES_CONFIG_LANE_CAST_WIDTH_ARRAY
 for bundle_index, bundle in enumerate(CU_BUNDLES_CONFIG_ENGINE_ARBITER_NUM_MEMORY):
     for lane_index, lane in enumerate(bundle):
         CU_BUNDLES_CONFIG_LANE_ARBITER_NUM_MEMORY[bundle_index][lane_index] = sum(lane)
-        CU_BUNDLES_CONFIG_LANE_ARBITER_NUM_MEMORY_TEMP[bundle_index][lane_index] = 1 if any(lane) else 0 
+        CU_BUNDLES_CONFIG_LANE_ARBITER_NUM_MEMORY_TEMP[bundle_index][lane_index] = (
+            1 if any(lane) else 0
+        )
 
 # Sum each lane and place the result in CU_BUNDLES_CONFIG_LANE_CAST_WIDTH_ARRAY
 for bundle_index, bundle in enumerate(CU_BUNDLES_CONFIG_ENGINE_ARBITER_NUM_ENGINE):
     for lane_index, lane in enumerate(bundle):
         CU_BUNDLES_CONFIG_LANE_ARBITER_NUM_ENGINE[bundle_index][lane_index] = sum(lane)
-        CU_BUNDLES_CONFIG_LANE_ARBITER_NUM_ENGINE_TEMP[bundle_index][lane_index] = 1 if any(lane) else 0 
+        CU_BUNDLES_CONFIG_LANE_ARBITER_NUM_ENGINE_TEMP[bundle_index][lane_index] = (
+            1 if any(lane) else 0
+        )
 
 # Sum each lane and place the result in CU_BUNDLES_CONFIG_LANE_CAST_WIDTH_ARRAY
-for bundle_index, bundle in enumerate(CU_BUNDLES_CONFIG_ENGINE_ARBITER_NUM_CONTROL_RESPONSE):
+for bundle_index, bundle in enumerate(
+    CU_BUNDLES_CONFIG_ENGINE_ARBITER_NUM_CONTROL_RESPONSE
+):
     for lane_index, lane in enumerate(bundle):
-        CU_BUNDLES_CONFIG_LANE_ARBITER_NUM_CONTROL_RESPONSE[bundle_index][lane_index] = sum(lane)
-        CU_BUNDLES_CONFIG_LANE_ARBITER_NUM_CONTROL_RESPONSE_TEMP[bundle_index][lane_index] = 1 if any(lane) else 0 
+        CU_BUNDLES_CONFIG_LANE_ARBITER_NUM_CONTROL_RESPONSE[bundle_index][
+            lane_index
+        ] = sum(lane)
+        CU_BUNDLES_CONFIG_LANE_ARBITER_NUM_CONTROL_RESPONSE_TEMP[bundle_index][
+            lane_index
+        ] = (1 if any(lane) else 0)
 
 # Sum each lane and place the result in CU_BUNDLES_CONFIG_LANE_CAST_WIDTH_ARRAY
-for bundle_index, bundle in enumerate(CU_BUNDLES_CONFIG_ENGINE_ARBITER_NUM_CONTROL_REQUEST):
+for bundle_index, bundle in enumerate(
+    CU_BUNDLES_CONFIG_ENGINE_ARBITER_NUM_CONTROL_REQUEST
+):
     for lane_index, lane in enumerate(bundle):
-        CU_BUNDLES_CONFIG_LANE_ARBITER_NUM_CONTROL_REQUEST[bundle_index][lane_index] = sum(lane)
-        CU_BUNDLES_CONFIG_LANE_ARBITER_NUM_CONTROL_REQUEST_TEMP[bundle_index][lane_index] = 1 if any(lane) else 0 
-
+        CU_BUNDLES_CONFIG_LANE_ARBITER_NUM_CONTROL_REQUEST[bundle_index][lane_index] = (
+            sum(lane)
+        )
+        CU_BUNDLES_CONFIG_LANE_ARBITER_NUM_CONTROL_REQUEST_TEMP[bundle_index][
+            lane_index
+        ] = (1 if any(lane) else 0)
 
 
 CU_BUNDLES_CONFIG_BUNDLE_ARBITER_NUM_MEMORY_TEMP = [
-    1 if any(lane) else 0  for lane in CU_BUNDLES_CONFIG_LANE_ARBITER_NUM_MEMORY
+    1 if any(lane) else 0 for lane in CU_BUNDLES_CONFIG_LANE_ARBITER_NUM_MEMORY
 ]
 CU_BUNDLES_CONFIG_BUNDLE_ARBITER_NUM_ENGINE_TEMP = [
-    1 if any(lane) else 0  for lane in CU_BUNDLES_CONFIG_LANE_ARBITER_NUM_ENGINE
+    1 if any(lane) else 0 for lane in CU_BUNDLES_CONFIG_LANE_ARBITER_NUM_ENGINE
 ]
 CU_BUNDLES_CONFIG_BUNDLE_ARBITER_NUM_CONTROL_RESPONSE_TEMP = [
-    1 if any(lane) else 0  for lane in CU_BUNDLES_CONFIG_LANE_ARBITER_NUM_CONTROL_RESPONSE
+    1 if any(lane) else 0
+    for lane in CU_BUNDLES_CONFIG_LANE_ARBITER_NUM_CONTROL_RESPONSE
 ]
 CU_BUNDLES_CONFIG_BUNDLE_ARBITER_NUM_CONTROL_REQUEST_TEMP = [
-   1 if any(lane) else 0  for lane in CU_BUNDLES_CONFIG_LANE_ARBITER_NUM_CONTROL_REQUEST
+    1 if any(lane) else 0 for lane in CU_BUNDLES_CONFIG_LANE_ARBITER_NUM_CONTROL_REQUEST
 ]
 
 
@@ -959,10 +1277,18 @@ CU_BUNDLES_CONFIG_BUNDLE_ARBITER_NUM_CONTROL_REQUEST = [
     sum(lane) for lane in CU_BUNDLES_CONFIG_LANE_ARBITER_NUM_CONTROL_REQUEST_TEMP
 ]
 
-CU_BUNDLES_CONFIG_CU_ARBITER_NUM_MEMORY  = sum(CU_BUNDLES_CONFIG_BUNDLE_ARBITER_NUM_MEMORY_TEMP)
-CU_BUNDLES_CONFIG_CU_ARBITER_NUM_ENGINE  = sum(CU_BUNDLES_CONFIG_BUNDLE_ARBITER_NUM_ENGINE_TEMP)
-CU_BUNDLES_CONFIG_CU_ARBITER_NUM_CONTROL_RESPONSE = sum(CU_BUNDLES_CONFIG_BUNDLE_ARBITER_NUM_CONTROL_RESPONSE_TEMP)
-CU_BUNDLES_CONFIG_CU_ARBITER_NUM_CONTROL_REQUEST = sum(CU_BUNDLES_CONFIG_BUNDLE_ARBITER_NUM_CONTROL_REQUEST_TEMP)
+CU_BUNDLES_CONFIG_CU_ARBITER_NUM_MEMORY = sum(
+    CU_BUNDLES_CONFIG_BUNDLE_ARBITER_NUM_MEMORY_TEMP
+)
+CU_BUNDLES_CONFIG_CU_ARBITER_NUM_ENGINE = sum(
+    CU_BUNDLES_CONFIG_BUNDLE_ARBITER_NUM_ENGINE_TEMP
+)
+CU_BUNDLES_CONFIG_CU_ARBITER_NUM_CONTROL_RESPONSE = sum(
+    CU_BUNDLES_CONFIG_BUNDLE_ARBITER_NUM_CONTROL_RESPONSE_TEMP
+)
+CU_BUNDLES_CONFIG_CU_ARBITER_NUM_CONTROL_REQUEST = sum(
+    CU_BUNDLES_CONFIG_BUNDLE_ARBITER_NUM_CONTROL_REQUEST_TEMP
+)
 
 check_and_clean_file(output_file_generate_ports_tcl)
 check_and_clean_file(output_file_buffer_channels_tcl)
@@ -1009,12 +1335,18 @@ parameter integer C_M{0:02d}_AXI_DATA_WIDTH       = {1} ,
 parameter integer C_M{0:02d}_AXI_ID_WIDTH         = 1   ,
 """
     for index, channel in enumerate(DISTINCT_CHANNELS):
-        output_lines.append(ports_template.format(channel,CHANNEL_CONFIG_DATA_WIDTH_BE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index]))
-    
+        output_lines.append(
+            ports_template.format(
+                channel,
+                CHANNEL_CONFIG_DATA_WIDTH_BE[index],
+                CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],
+            )
+        )
+
     output_lines.append(f"parameter integer C_S_AXI_CONTROL_ADDR_WIDTH = 12 ,")
     output_lines.append(f"parameter integer C_S_AXI_CONTROL_DATA_WIDTH = 32")
 
-    file.write('\n'.join(output_lines))
+    file.write("\n".join(output_lines))
 
 # Write to VHDL file
 with open(output_file_path_global, "w") as file:
@@ -1025,8 +1357,10 @@ with open(output_file_path_global, "w") as file:
     file.write(f"parameter NUM_ENGINES = {NUM_ENGINES};\n")
     file.write(f"parameter NUM_MODULES = 3;\n")
     file.write(f"parameter NUM_CHANNELS           = {NUM_CHANNELS_TOP};\n")
-    
-    file.write(f"parameter CACHE_CONFIG_MAX_NUM_WAYS   = {CACHE_CONFIG_MAX_NUM_WAYS};\n")
+
+    file.write(
+        f"parameter CACHE_CONFIG_MAX_NUM_WAYS   = {CACHE_CONFIG_MAX_NUM_WAYS};\n"
+    )
     file.write(f"parameter CACHE_CONFIG_MAX_SIZE = {CACHE_CONFIG_MAX_SIZE};\n\n")
 
     file.write(f"parameter NUM_CHANNELS_WIDTH_BITS = {NUM_CHANNELS_TOP};\n")
@@ -1035,27 +1369,37 @@ with open(output_file_path_global, "w") as file:
     file.write(f"parameter NUM_LANES_WIDTH_BITS    = {NUM_LANES};\n")
     file.write(f"parameter NUM_ENGINES_WIDTH_BITS  = {NUM_ENGINES};\n")
     file.write(f"parameter NUM_MODULES_WIDTH_BITS  = 3;\n")
-    file.write(f"parameter CU_PACKET_SEQUENCE_ID_WIDTH_BITS = $clog2(({CU_BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_ENGINE}*NUM_BUNDLES)+(8*NUM_BUNDLES));\n")
+    file.write(
+        f"parameter CU_PACKET_SEQUENCE_ID_WIDTH_BITS = $clog2(({CU_BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_ENGINE}*NUM_BUNDLES)+(8*NUM_BUNDLES));\n"
+    )
 
     for buffer_name, properties in channels.items():
         uppercase_buffer_name = buffer_name.upper()
         file.write(f"parameter {uppercase_buffer_name}_WIDTH_BITS = {properties[1]};\n")
 
     file.write(f"parameter XPM_FIFO_ENABLE  = {XPM_FIFO_ENABLE};\n")
-    
+
 # Write to VHDL file
 with open(output_file_path_topology, "w") as file:
 
-    file.write("// --------------------------------------------------------------------------------------\n")
+    file.write(
+        "// --------------------------------------------------------------------------------------\n"
+    )
     file.write("// FIFO SETTINGS\n")
-    file.write("// --------------------------------------------------------------------------------------\n")
+    file.write(
+        "// --------------------------------------------------------------------------------------\n"
+    )
 
     file.write("parameter FIFO_WRITE_DEPTH = 32,\n")
     file.write("parameter PROG_THRESH      = 24,\n\n")
 
-    file.write("// --------------------------------------------------------------------------------------\n")
+    file.write(
+        "// --------------------------------------------------------------------------------------\n"
+    )
     file.write("// CU CONFIGURATIONS SETTINGS\n")
-    file.write("// --------------------------------------------------------------------------------------\n")
+    file.write(
+        "// --------------------------------------------------------------------------------------\n"
+    )
 
     file.write(f"parameter NUM_CHANNELS    = {NUM_CHANNELS_TOP},\n")
 
@@ -1076,231 +1420,1070 @@ with open(output_file_path_topology, "w") as file:
     file.write(f"parameter NUM_LANES_INDEX   = {NUM_LANES},\n")
     file.write(f"parameter NUM_ENGINES_INDEX = {NUM_ENGINES},\n\n")
 
-    file.write(f"parameter CACHE_CONFIG_MAX_NUM_WAYS   = {CACHE_CONFIG_MAX_NUM_WAYS},\n")
+    file.write(
+        f"parameter CACHE_CONFIG_MAX_NUM_WAYS   = {CACHE_CONFIG_MAX_NUM_WAYS},\n"
+    )
     file.write(f"parameter CACHE_CONFIG_MAX_SIZE = {CACHE_CONFIG_MAX_SIZE},\n\n")
 
     # ... [The previous writing for the arrays here] ...
-    file.write("// --------------------------------------------------------------------------------------\n")
+    file.write(
+        "// --------------------------------------------------------------------------------------\n"
+    )
     file.write("// TOPOLOGY CONFIGURATIONS CHANNEL\n")
-    file.write("// --------------------------------------------------------------------------------------\n")
+    file.write(
+        "// --------------------------------------------------------------------------------------\n"
+    )
     file.write(f"parameter NUM_CHANNELS_MAX = {NUM_CHANNELS_MAX},\n")
-    file.write("parameter int CHANNEL_CONFIG_L1_CACHE[NUM_CHANNELS_MAX]               =" + vhdl_format(CHANNEL_CONFIG_L1_TYPE) + ",\n")
-    file.write("parameter int CHANNEL_CONFIG_L2_CACHE[NUM_CHANNELS_MAX]               =" + vhdl_format(CHANNEL_CONFIG_L2_TYPE) + ",\n")
-    file.write("parameter int CHANNEL_CONFIG_DATA_WIDTH_BE[NUM_CHANNELS_MAX]          =" + vhdl_format(CHANNEL_CONFIG_DATA_WIDTH_BE) + ",\n")
-    file.write("parameter int CHANNEL_CONFIG_ADDRESS_WIDTH_BE[NUM_CHANNELS_MAX]       =" + vhdl_format(CHANNEL_CONFIG_ADDRESS_WIDTH_BE) + ",\n")
-    file.write("parameter int CHANNEL_CONFIG_DATA_WIDTH_MID[NUM_CHANNELS_MAX]         =" + vhdl_format(CHANNEL_CONFIG_DATA_WIDTH_MID) + ",\n")
-    file.write("parameter int CHANNEL_CONFIG_ADDRESS_WIDTH_MID[NUM_CHANNELS_MAX]      =" + vhdl_format(CHANNEL_CONFIG_ADDRESS_WIDTH_MID) + ",\n")
-    file.write("parameter int CHANNEL_CONFIG_DATA_WIDTH_FE[NUM_CHANNELS_MAX]          =" + vhdl_format(CHANNEL_CONFIG_DATA_WIDTH_FE) + ",\n")
-    file.write("parameter int CHANNEL_CONFIG_ADDRESS_WIDTH_FE[NUM_CHANNELS_MAX]       =" + vhdl_format(CHANNEL_CONFIG_ADDRESS_WIDTH_FE) + ",\n")
+    file.write(
+        "parameter int CHANNEL_CONFIG_L1_CACHE[NUM_CHANNELS_MAX]               ="
+        + vhdl_format(CHANNEL_CONFIG_L1_TYPE)
+        + ",\n"
+    )
+    file.write(
+        "parameter int CHANNEL_CONFIG_L2_CACHE[NUM_CHANNELS_MAX]               ="
+        + vhdl_format(CHANNEL_CONFIG_L2_TYPE)
+        + ",\n"
+    )
+    file.write(
+        "parameter int CHANNEL_CONFIG_DATA_WIDTH_BE[NUM_CHANNELS_MAX]          ="
+        + vhdl_format(CHANNEL_CONFIG_DATA_WIDTH_BE)
+        + ",\n"
+    )
+    file.write(
+        "parameter int CHANNEL_CONFIG_ADDRESS_WIDTH_BE[NUM_CHANNELS_MAX]       ="
+        + vhdl_format(CHANNEL_CONFIG_ADDRESS_WIDTH_BE)
+        + ",\n"
+    )
+    file.write(
+        "parameter int CHANNEL_CONFIG_DATA_WIDTH_MID[NUM_CHANNELS_MAX]         ="
+        + vhdl_format(CHANNEL_CONFIG_DATA_WIDTH_MID)
+        + ",\n"
+    )
+    file.write(
+        "parameter int CHANNEL_CONFIG_ADDRESS_WIDTH_MID[NUM_CHANNELS_MAX]      ="
+        + vhdl_format(CHANNEL_CONFIG_ADDRESS_WIDTH_MID)
+        + ",\n"
+    )
+    file.write(
+        "parameter int CHANNEL_CONFIG_DATA_WIDTH_FE[NUM_CHANNELS_MAX]          ="
+        + vhdl_format(CHANNEL_CONFIG_DATA_WIDTH_FE)
+        + ",\n"
+    )
+    file.write(
+        "parameter int CHANNEL_CONFIG_ADDRESS_WIDTH_FE[NUM_CHANNELS_MAX]       ="
+        + vhdl_format(CHANNEL_CONFIG_ADDRESS_WIDTH_FE)
+        + ",\n"
+    )
 
-    file.write("parameter int CACHE_CONFIG_L2_SIZE[NUM_CHANNELS_MAX]         =" + vhdl_format(CACHE_CONFIG_L2_SIZE) + ",\n")
-    file.write("parameter int CACHE_CONFIG_L2_NUM_WAYS[NUM_CHANNELS_MAX]      =" + vhdl_format(CACHE_CONFIG_L2_NUM_WAYS) + ",\n")
-    file.write("parameter int CACHE_CONFIG_L1_SIZE[NUM_CHANNELS_MAX]          =" + vhdl_format(CACHE_CONFIG_L1_SIZE) + ",\n")
-    file.write("parameter int CACHE_CONFIG_L1_NUM_WAYS[NUM_CHANNELS_MAX]       =" + vhdl_format(CACHE_CONFIG_L1_NUM_WAYS) + ",\n")
-    file.write("parameter int CACHE_CONFIG_L1_PREFETCH[NUM_CHANNELS_MAX]       =" + vhdl_format(CACHE_CONFIG_L1_PREFETCH) + ",\n")
+    file.write(
+        "parameter int CACHE_CONFIG_L2_SIZE[NUM_CHANNELS_MAX]         ="
+        + vhdl_format(CACHE_CONFIG_L2_SIZE)
+        + ",\n"
+    )
+    file.write(
+        "parameter int CACHE_CONFIG_L2_NUM_WAYS[NUM_CHANNELS_MAX]      ="
+        + vhdl_format(CACHE_CONFIG_L2_NUM_WAYS)
+        + ",\n"
+    )
+    file.write(
+        "parameter int CACHE_CONFIG_L1_SIZE[NUM_CHANNELS_MAX]          ="
+        + vhdl_format(CACHE_CONFIG_L1_SIZE)
+        + ",\n"
+    )
+    file.write(
+        "parameter int CACHE_CONFIG_L1_NUM_WAYS[NUM_CHANNELS_MAX]       ="
+        + vhdl_format(CACHE_CONFIG_L1_NUM_WAYS)
+        + ",\n"
+    )
+    file.write(
+        "parameter int CACHE_CONFIG_L1_PREFETCH[NUM_CHANNELS_MAX]       ="
+        + vhdl_format(CACHE_CONFIG_L1_PREFETCH)
+        + ",\n"
+    )
 
-    
-    file.write("// --------------------------------------------------------------------------------------\n")
+    file.write(
+        "// --------------------------------------------------------------------------------------\n"
+    )
     file.write("// TOPOLOGY CONFIGURATIONS DEFAULTS\n")
-    file.write("// --------------------------------------------------------------------------------------\n")
+    file.write(
+        "// --------------------------------------------------------------------------------------\n"
+    )
 
-    file.write(f"parameter CU_BUNDLES_COUNT_ARRAY                           = {NUM_BUNDLES_MAX},\n")
-    file.write("parameter int CU_BUNDLES_CONFIG_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX]                             = " + str(CU_BUNDLES_ENGINE_CONFIG_ARRAY).replace("[", "'{").replace("]", "}\n") + ",\n")    
-    file.write("parameter int CU_BUNDLES_CONFIG_ARRAY_ENGINE_SEQ_MIN[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX]              =" + vhdl_format(CU_BUNDLES_CONFIG_ARRAY_ENGINE_SEQ_MIN) + ",\n")
-    file.write("parameter int CU_BUNDLES_CONFIG_ARRAY_ENGINE_SEQ_WIDTH[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX]            =" + vhdl_format(CU_BUNDLES_CONFIG_ARRAY_ENGINE_SEQ_WIDTH) + ",\n")
-    file.write("parameter int CU_BUNDLES_CONFIG_BUNDLE_ARBITER_NUM_CONTROL_REQUEST[NUM_BUNDLES_MAX]= " + vhdl_format(CU_BUNDLES_CONFIG_BUNDLE_ARBITER_NUM_CONTROL_REQUEST)+ ",\n")    
-    file.write("parameter int CU_BUNDLES_CONFIG_BUNDLE_ARBITER_NUM_CONTROL_RESPONSE[NUM_BUNDLES_MAX]= " + vhdl_format(CU_BUNDLES_CONFIG_BUNDLE_ARBITER_NUM_CONTROL_RESPONSE)+ ",\n")    
-    file.write("parameter int CU_BUNDLES_CONFIG_BUNDLE_ARBITER_NUM_ENGINE[NUM_BUNDLES_MAX] = " + vhdl_format(CU_BUNDLES_CONFIG_BUNDLE_ARBITER_NUM_ENGINE) + ",\n")  
-    file.write("parameter int CU_BUNDLES_CONFIG_BUNDLE_ARBITER_NUM_MEMORY[NUM_BUNDLES_MAX] = " + vhdl_format(CU_BUNDLES_CONFIG_BUNDLE_ARBITER_NUM_MEMORY) + ",\n")
-    file.write("parameter int CU_BUNDLES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_CONTROL_REQUEST[NUM_BUNDLES_MAX]= " + vhdl_format(CU_BUNDLES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_CONTROL_REQUEST)+ ",\n")    
-    file.write("parameter int CU_BUNDLES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_CONTROL_RESPONSE[NUM_BUNDLES_MAX]= " + vhdl_format(CU_BUNDLES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_CONTROL_RESPONSE)+ ",\n")    
-    file.write("parameter int CU_BUNDLES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_ENGINE[NUM_BUNDLES_MAX] = " + vhdl_format(CU_BUNDLES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_ENGINE) + ",\n")  
-    file.write("parameter int CU_BUNDLES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_MEMORY[NUM_BUNDLES_MAX] = " + vhdl_format(CU_BUNDLES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_MEMORY) + ",\n")
-    file.write("parameter int CU_BUNDLES_CONFIG_CAST_WIDTH_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX]                  = " + str(CU_BUNDLES_CONFIG_CAST_WIDTH_ARRAY).replace("[", "'{").replace("]", "}\n") + ",\n")
-    file.write("parameter int CU_BUNDLES_CONFIG_ENGINE_ARBITER_NUM_CONTROL_REQUEST[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX] = " + str(CU_BUNDLES_CONFIG_ENGINE_ARBITER_NUM_CONTROL_REQUEST).replace("[", "'{").replace("]", "}\n") + ",\n")    
-    file.write("parameter int CU_BUNDLES_CONFIG_ENGINE_ARBITER_NUM_CONTROL_RESPONSE[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX] = " + str(CU_BUNDLES_CONFIG_ENGINE_ARBITER_NUM_CONTROL_RESPONSE).replace("[", "'{").replace("]", "}\n") + ",\n")    
-    file.write("parameter int CU_BUNDLES_CONFIG_ENGINE_ARBITER_NUM_ENGINE[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX] = " + str(CU_BUNDLES_CONFIG_ENGINE_ARBITER_NUM_ENGINE).replace("[", "'{").replace("]", "}\n") + ",\n")    
-    file.write("parameter int CU_BUNDLES_CONFIG_ENGINE_ARBITER_NUM_MEMORY[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX] = " + str(CU_BUNDLES_CONFIG_ENGINE_ARBITER_NUM_MEMORY).replace("[", "'{").replace("]", "}\n") + ",\n")    
-    file.write("parameter int CU_BUNDLES_CONFIG_ENGINE_FIFO_ARBITER_SIZE_CONTROL_REQUEST[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX] = " + str(CU_BUNDLES_CONFIG_FIFO_ARBITER_SIZE_CONTROL_REQUEST).replace("[", "'{").replace("]", "}\n") + ",\n")    
-    file.write("parameter int CU_BUNDLES_CONFIG_ENGINE_FIFO_ARBITER_SIZE_CONTROL_RESPONSE[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX] = " + str(CU_BUNDLES_CONFIG_FIFO_ARBITER_SIZE_CONTROL_RESPONSE).replace("[", "'{").replace("]", "}\n") + ",\n")    
-    file.write("parameter int CU_BUNDLES_CONFIG_ENGINE_FIFO_ARBITER_SIZE_ENGINE[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX] = " + str(CU_BUNDLES_CONFIG_FIFO_ARBITER_SIZE_ENGINE).replace("[", "'{").replace("]", "}\n") + ",\n")    
-    file.write("parameter int CU_BUNDLES_CONFIG_ENGINE_FIFO_ARBITER_SIZE_MEMORY[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX] = " + str(CU_BUNDLES_CONFIG_FIFO_ARBITER_SIZE_MEMORY).replace("[", "'{").replace("]", "}\n") + ",\n")    
-    file.write("parameter int CU_BUNDLES_CONFIG_LANE_ARBITER_NUM_CONTROL_REQUEST[NUM_BUNDLES_MAX][NUM_LANES_MAX]= " + vhdl_format(CU_BUNDLES_CONFIG_LANE_ARBITER_NUM_CONTROL_REQUEST)+ ",\n")    
-    file.write("parameter int CU_BUNDLES_CONFIG_LANE_ARBITER_NUM_CONTROL_RESPONSE[NUM_BUNDLES_MAX][NUM_LANES_MAX]= " + vhdl_format(CU_BUNDLES_CONFIG_LANE_ARBITER_NUM_CONTROL_RESPONSE)+ ",\n")    
-    file.write("parameter int CU_BUNDLES_CONFIG_LANE_ARBITER_NUM_ENGINE[NUM_BUNDLES_MAX][NUM_LANES_MAX] = " + vhdl_format(CU_BUNDLES_CONFIG_LANE_ARBITER_NUM_ENGINE) + ",\n")  
-    file.write("parameter int CU_BUNDLES_CONFIG_LANE_ARBITER_NUM_MEMORY[NUM_BUNDLES_MAX][NUM_LANES_MAX] = " + vhdl_format(CU_BUNDLES_CONFIG_LANE_ARBITER_NUM_MEMORY) + ",\n")
-    file.write("parameter int CU_BUNDLES_CONFIG_LANE_CAST_WIDTH_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX]                              = " + vhdl_format(CU_BUNDLES_CONFIG_LANE_CAST_WIDTH_ARRAY) + ",\n")
-    file.write("parameter int CU_BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_CONTROL_REQUEST[NUM_BUNDLES_MAX][NUM_LANES_MAX]= " + vhdl_format(CU_BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_CONTROL_REQUEST)+ ",\n")    
-    file.write("parameter int CU_BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_CONTROL_RESPONSE[NUM_BUNDLES_MAX][NUM_LANES_MAX]= " + vhdl_format(CU_BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_CONTROL_RESPONSE)+ ",\n")    
-    file.write("parameter int CU_BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_ENGINE[NUM_BUNDLES_MAX][NUM_LANES_MAX] = " + vhdl_format(CU_BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_ENGINE) + ",\n")  
-    file.write("parameter int CU_BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_MEMORY[NUM_BUNDLES_MAX][NUM_LANES_MAX] = " + vhdl_format(CU_BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_MEMORY) + ",\n")
-    file.write("parameter int CU_BUNDLES_CONFIG_LANE_MAX_CAST_WIDTH_ARRAY[NUM_BUNDLES_MAX]                                         = " + vhdl_format(CU_BUNDLES_CONFIG_LANE_MAX_CAST_WIDTH_ARRAY) + ",\n")
-    file.write("parameter int CU_BUNDLES_CONFIG_LANE_MAX_MERGE_WIDTH_ARRAY[NUM_BUNDLES_MAX]                                        = " + vhdl_format(CU_BUNDLES_CONFIG_LANE_MAX_MERGE_WIDTH_ARRAY) + ",\n")
-    file.write("parameter int CU_BUNDLES_CONFIG_LANE_MERGE_WIDTH_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX]                             = " + vhdl_format(CU_BUNDLES_CONFIG_LANE_MERGE_WIDTH_ARRAY) + ",\n")
-    file.write("parameter int CU_BUNDLES_CONFIG_MAX_CAST_WIDTH_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX]                               = " + vhdl_format(CU_BUNDLES_CONFIG_MAX_CAST_WIDTH_ARRAY) + ",\n")
-    file.write("parameter int CU_BUNDLES_CONFIG_MAX_MERGE_WIDTH_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX]                              = " + vhdl_format(CU_BUNDLES_CONFIG_MAX_MERGE_WIDTH_ARRAY) + ",\n")
-    file.write("parameter int CU_BUNDLES_CONFIG_MERGE_CONNECT_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX][NUM_CAST_MAX] = " + vhdl_format(CU_BUNDLES_CONFIG_MERGE_CONNECT_ARRAY) + ",\n")
-    file.write("parameter int CU_BUNDLES_CONFIG_MERGE_CONNECT_PREFIX_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX][NUM_CAST_MAX] = " + vhdl_format(CU_BUNDLES_CONFIG_MERGE_CONNECT_PREFIX_ARRAY) + ",\n")
-    file.write("parameter int CU_BUNDLES_CONFIG_MERGE_WIDTH_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX]                 = " + str(CU_BUNDLES_CONFIG_MERGE_WIDTH_ARRAY).replace("[", "'{").replace("]", "}\n") + ",\n")
-    file.write("parameter int CU_BUNDLES_ENGINE_ID_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX]                          = " + str(CU_BUNDLES_ENGINE_ID_ARRAY).replace("[", "'{").replace("]", "}\n") + ",\n")
-    file.write("parameter int CU_BUNDLES_LANES_COUNT_ARRAY[NUM_BUNDLES_MAX] = '{%s},\n" % (",".join(map(str, CU_BUNDLES_COUNT_ARRAY))))
-    file.write("parameter int CU_BUNDLES_LANES_ENGINES_COUNT_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX]                                 = " + str(CU_BUNDLES_LANES_ENGINES_COUNT_ARRAY).replace("[", "'{").replace("]", "}\n") + ",\n")
-    file.write(f"parameter int CU_BUNDLES_CONFIG_CU_ARBITER_NUM_CONTROL_REQUEST=  {CU_BUNDLES_CONFIG_CU_ARBITER_NUM_CONTROL_REQUEST} ,\n")   
-    file.write(f"parameter int CU_BUNDLES_CONFIG_CU_ARBITER_NUM_CONTROL_RESPONSE=  {CU_BUNDLES_CONFIG_CU_ARBITER_NUM_CONTROL_RESPONSE} ,\n")   
-    file.write(f"parameter int CU_BUNDLES_CONFIG_CU_ARBITER_NUM_ENGINE =  {CU_BUNDLES_CONFIG_CU_ARBITER_NUM_ENGINE} ,\n")  
-    file.write(f"parameter int CU_BUNDLES_CONFIG_CU_ARBITER_NUM_MEMORY =  {CU_BUNDLES_CONFIG_CU_ARBITER_NUM_MEMORY} ,\n")   
-    file.write(f"parameter int CU_BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_CONTROL_REQUEST=  {CU_BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_CONTROL_REQUEST} ,\n")   
-    file.write(f"parameter int CU_BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_CONTROL_RESPONSE=  {CU_BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_CONTROL_RESPONSE} ,\n")   
-    file.write(f"parameter int CU_BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_ENGINE =  {CU_BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_ENGINE} ,\n")  
-    file.write(f"parameter int CU_BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_MEMORY =  {CU_BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_MEMORY} ,\n")   
-    
-    file.write(f"parameter int BUNDLES_CONFIG_CU_ARBITER_NUM_CONTROL_REQUEST=  {CU_BUNDLES_CONFIG_CU_ARBITER_NUM_CONTROL_REQUEST} ,\n") 
-    file.write(f"parameter int BUNDLES_CONFIG_CU_ARBITER_NUM_CONTROL_RESPONSE=  {CU_BUNDLES_CONFIG_CU_ARBITER_NUM_CONTROL_RESPONSE} ,\n")   
-    file.write(f"parameter int BUNDLES_CONFIG_CU_ARBITER_NUM_ENGINE =  {CU_BUNDLES_CONFIG_CU_ARBITER_NUM_ENGINE} ,\n")  
-    file.write(f"parameter int BUNDLES_CONFIG_CU_ARBITER_NUM_MEMORY =  {CU_BUNDLES_CONFIG_CU_ARBITER_NUM_MEMORY} ,\n")   
-    file.write(f"parameter int BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_CONTROL_REQUEST=  {CU_BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_CONTROL_REQUEST} ,\n") 
-    file.write(f"parameter int BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_CONTROL_RESPONSE=  {CU_BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_CONTROL_RESPONSE} ,\n")   
-    file.write(f"parameter int BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_ENGINE =  {CU_BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_ENGINE} ,\n")  
-    file.write(f"parameter int BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_MEMORY =  {CU_BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_MEMORY} ,\n")   
-    file.write(f"parameter BUNDLES_COUNT_ARRAY                                                                                  = {NUM_BUNDLES_MAX},\n")
-    file.write("parameter int BUNDLES_CONFIG_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX]                             = " + str(CU_BUNDLES_ENGINE_CONFIG_ARRAY).replace("[", "'{").replace("]", "}\n") + ",\n")
-    file.write("parameter int BUNDLES_CONFIG_ARRAY_ENGINE_SEQ_MIN[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX]              =" + vhdl_format(CU_BUNDLES_CONFIG_ARRAY_ENGINE_SEQ_MIN) + ",\n")
-    file.write("parameter int BUNDLES_CONFIG_ARRAY_ENGINE_SEQ_WIDTH[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX]            =" + vhdl_format(CU_BUNDLES_CONFIG_ARRAY_ENGINE_SEQ_WIDTH) + ",\n")
-    file.write("parameter int BUNDLES_CONFIG_BUNDLE_ARBITER_NUM_CONTROL_REQUEST[NUM_BUNDLES_MAX]= " + vhdl_format(CU_BUNDLES_CONFIG_BUNDLE_ARBITER_NUM_CONTROL_REQUEST)+ ",\n")    
-    file.write("parameter int BUNDLES_CONFIG_BUNDLE_ARBITER_NUM_CONTROL_RESPONSE[NUM_BUNDLES_MAX]= " + vhdl_format(CU_BUNDLES_CONFIG_BUNDLE_ARBITER_NUM_CONTROL_RESPONSE)+ ",\n")    
-    file.write("parameter int BUNDLES_CONFIG_BUNDLE_ARBITER_NUM_ENGINE[NUM_BUNDLES_MAX] = " + vhdl_format(CU_BUNDLES_CONFIG_BUNDLE_ARBITER_NUM_ENGINE) + ",\n")  
-    file.write("parameter int BUNDLES_CONFIG_BUNDLE_ARBITER_NUM_MEMORY[NUM_BUNDLES_MAX] = " + vhdl_format(CU_BUNDLES_CONFIG_BUNDLE_ARBITER_NUM_MEMORY) + ",\n")
-    file.write("parameter int BUNDLES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_CONTROL_REQUEST[NUM_BUNDLES_MAX]= " + vhdl_format(CU_BUNDLES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_CONTROL_REQUEST)+ ",\n")    
-    file.write("parameter int BUNDLES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_CONTROL_RESPONSE[NUM_BUNDLES_MAX]= " + vhdl_format(CU_BUNDLES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_CONTROL_RESPONSE)+ ",\n")    
-    file.write("parameter int BUNDLES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_ENGINE[NUM_BUNDLES_MAX] = " + vhdl_format(CU_BUNDLES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_ENGINE) + ",\n")  
-    file.write("parameter int BUNDLES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_MEMORY[NUM_BUNDLES_MAX] = " + vhdl_format(CU_BUNDLES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_MEMORY) + ",\n")
-    file.write("parameter int BUNDLES_CONFIG_CAST_WIDTH_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX]                  = " + str(CU_BUNDLES_CONFIG_CAST_WIDTH_ARRAY).replace("[", "'{").replace("]", "}\n") + ",\n")
-    file.write("parameter int BUNDLES_CONFIG_ENGINE_ARBITER_NUM_CONTROL_REQUEST[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX] = " + str(CU_BUNDLES_CONFIG_ENGINE_ARBITER_NUM_CONTROL_REQUEST).replace("[", "'{").replace("]", "}\n") + ",\n")    
-    file.write("parameter int BUNDLES_CONFIG_ENGINE_ARBITER_NUM_CONTROL_RESPONSE[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX] = " + str(CU_BUNDLES_CONFIG_ENGINE_ARBITER_NUM_CONTROL_RESPONSE).replace("[", "'{").replace("]", "}\n") + ",\n")    
-    file.write("parameter int BUNDLES_CONFIG_ENGINE_ARBITER_NUM_ENGINE[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX] = " + str(CU_BUNDLES_CONFIG_ENGINE_ARBITER_NUM_ENGINE).replace("[", "'{").replace("]", "}\n") + ",\n")    
-    file.write("parameter int BUNDLES_CONFIG_ENGINE_ARBITER_NUM_MEMORY[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX] = " + str(CU_BUNDLES_CONFIG_ENGINE_ARBITER_NUM_MEMORY).replace("[", "'{").replace("]", "}\n") + ",\n")    
-    file.write("parameter int BUNDLES_CONFIG_ENGINE_FIFO_ARBITER_SIZE_CONTROL_REQUEST[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX] = " + str(CU_BUNDLES_CONFIG_FIFO_ARBITER_SIZE_CONTROL_REQUEST).replace("[", "'{").replace("]", "}\n") + ",\n")    
-    file.write("parameter int BUNDLES_CONFIG_ENGINE_FIFO_ARBITER_SIZE_CONTROL_RESPONSE[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX] = " + str(CU_BUNDLES_CONFIG_FIFO_ARBITER_SIZE_CONTROL_RESPONSE).replace("[", "'{").replace("]", "}\n") + ",\n")    
-    file.write("parameter int BUNDLES_CONFIG_ENGINE_FIFO_ARBITER_SIZE_ENGINE[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX] = " + str(CU_BUNDLES_CONFIG_FIFO_ARBITER_SIZE_ENGINE).replace("[", "'{").replace("]", "}\n") + ",\n")    
-    file.write("parameter int BUNDLES_CONFIG_ENGINE_FIFO_ARBITER_SIZE_MEMORY[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX] = " + str(CU_BUNDLES_CONFIG_FIFO_ARBITER_SIZE_MEMORY).replace("[", "'{").replace("]", "}\n") + ",\n")    
-    file.write("parameter int BUNDLES_CONFIG_LANE_ARBITER_NUM_CONTROL_REQUEST[NUM_BUNDLES_MAX][NUM_LANES_MAX]= " + vhdl_format(CU_BUNDLES_CONFIG_LANE_ARBITER_NUM_CONTROL_REQUEST)+ ",\n")    
-    file.write("parameter int BUNDLES_CONFIG_LANE_ARBITER_NUM_CONTROL_RESPONSE[NUM_BUNDLES_MAX][NUM_LANES_MAX]= " + vhdl_format(CU_BUNDLES_CONFIG_LANE_ARBITER_NUM_CONTROL_RESPONSE)+ ",\n")    
-    file.write("parameter int BUNDLES_CONFIG_LANE_ARBITER_NUM_ENGINE[NUM_BUNDLES_MAX][NUM_LANES_MAX] = " + vhdl_format(CU_BUNDLES_CONFIG_LANE_ARBITER_NUM_ENGINE) + ",\n")  
-    file.write("parameter int BUNDLES_CONFIG_LANE_ARBITER_NUM_MEMORY[NUM_BUNDLES_MAX][NUM_LANES_MAX] = " + vhdl_format(CU_BUNDLES_CONFIG_LANE_ARBITER_NUM_MEMORY) + ",\n")
-    file.write("parameter int BUNDLES_CONFIG_LANE_CAST_WIDTH_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX]                              = " + vhdl_format(CU_BUNDLES_CONFIG_LANE_CAST_WIDTH_ARRAY) + ",\n")
-    file.write("parameter int BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_CONTROL_REQUEST[NUM_BUNDLES_MAX][NUM_LANES_MAX]= " + vhdl_format(CU_BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_CONTROL_REQUEST)+ ",\n")    
-    file.write("parameter int BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_CONTROL_RESPONSE[NUM_BUNDLES_MAX][NUM_LANES_MAX]= " + vhdl_format(CU_BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_CONTROL_RESPONSE)+ ",\n")    
-    file.write("parameter int BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_ENGINE[NUM_BUNDLES_MAX][NUM_LANES_MAX] = " + vhdl_format(CU_BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_ENGINE) + ",\n")  
-    file.write("parameter int BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_MEMORY[NUM_BUNDLES_MAX][NUM_LANES_MAX] = " + vhdl_format(CU_BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_MEMORY) + ",\n")
-    file.write("parameter int BUNDLES_CONFIG_LANE_MAX_CAST_WIDTH_ARRAY[NUM_BUNDLES_MAX]                                         = " + vhdl_format(CU_BUNDLES_CONFIG_LANE_MAX_CAST_WIDTH_ARRAY) + ",\n")
-    file.write("parameter int BUNDLES_CONFIG_LANE_MAX_MERGE_WIDTH_ARRAY[NUM_BUNDLES_MAX]                                        = " + vhdl_format(CU_BUNDLES_CONFIG_LANE_MAX_MERGE_WIDTH_ARRAY) + ",\n")
-    file.write("parameter int BUNDLES_CONFIG_LANE_MERGE_WIDTH_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX]                             = " + vhdl_format(CU_BUNDLES_CONFIG_LANE_MERGE_WIDTH_ARRAY) + ",\n")
-    file.write("parameter int BUNDLES_CONFIG_MAX_CAST_WIDTH_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX]                               = " + vhdl_format(CU_BUNDLES_CONFIG_MAX_CAST_WIDTH_ARRAY) + ",\n")
-    file.write("parameter int BUNDLES_CONFIG_MAX_MERGE_WIDTH_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX]                              = " + vhdl_format(CU_BUNDLES_CONFIG_MAX_MERGE_WIDTH_ARRAY) + ",\n")
-    file.write("parameter int BUNDLES_CONFIG_MERGE_CONNECT_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX][NUM_CAST_MAX] = " + vhdl_format(CU_BUNDLES_CONFIG_MERGE_CONNECT_ARRAY) + ",\n")
-    file.write("parameter int BUNDLES_CONFIG_MERGE_CONNECT_PREFIX_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX][NUM_CAST_MAX] = " + vhdl_format(CU_BUNDLES_CONFIG_MERGE_CONNECT_PREFIX_ARRAY) + ",\n")
-    file.write("parameter int BUNDLES_CONFIG_MERGE_WIDTH_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX]                 = " + str(CU_BUNDLES_CONFIG_MERGE_WIDTH_ARRAY).replace("[", "'{").replace("]", "}\n") + ",\n")
-    file.write("parameter int BUNDLES_ENGINE_ID_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX]                          = " + str(CU_BUNDLES_ENGINE_ID_ARRAY).replace("[", "'{").replace("]", "}\n") + ",\n")
-    file.write("parameter int BUNDLES_LANES_COUNT_ARRAY[NUM_BUNDLES_MAX]                                                        = '{%s},\n" % (",".join(map(str, CU_BUNDLES_COUNT_ARRAY))))
-    file.write("parameter int BUNDLES_LANES_ENGINES_COUNT_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX]                                 = " + str(CU_BUNDLES_LANES_ENGINES_COUNT_ARRAY).replace("[", "'{").replace("]", "}\n") + ",\n")
-   
-    file.write("parameter int LANES_CONFIG_ARRAY[NUM_LANES_MAX][NUM_ENGINES_MAX]                                    = " + str(CU_BUNDLES_ENGINE_CONFIG_ARRAY[0]).replace("[", "'{").replace("]", "}\n") + ",\n")
-    file.write("parameter int LANES_CONFIG_ARRAY_ENGINE_SEQ_MIN[NUM_LANES_MAX][NUM_ENGINES_MAX]                     =" + vhdl_format(CU_BUNDLES_CONFIG_ARRAY_ENGINE_SEQ_MIN[0]) + ",\n")
-    file.write("parameter int LANES_CONFIG_ARRAY_ENGINE_SEQ_WIDTH[NUM_LANES_MAX][NUM_ENGINES_MAX]                   =" + vhdl_format(CU_BUNDLES_CONFIG_ARRAY_ENGINE_SEQ_WIDTH[0]) + ",\n")
-    file.write("parameter int LANES_CONFIG_BUNDLE_ARBITER_NUM_CONTROL_REQUEST= " + vhdl_format(CU_BUNDLES_CONFIG_BUNDLE_ARBITER_NUM_CONTROL_REQUEST[0])+ ",\n")   
-    file.write("parameter int LANES_CONFIG_BUNDLE_ARBITER_NUM_CONTROL_RESPONSE= " + vhdl_format(CU_BUNDLES_CONFIG_BUNDLE_ARBITER_NUM_CONTROL_RESPONSE[0])+ ",\n")    
-    file.write("parameter int LANES_CONFIG_BUNDLE_ARBITER_NUM_ENGINE = " + vhdl_format(CU_BUNDLES_CONFIG_BUNDLE_ARBITER_NUM_ENGINE[0]) + ",\n")  
-    file.write("parameter int LANES_CONFIG_BUNDLE_ARBITER_NUM_MEMORY = " + vhdl_format(CU_BUNDLES_CONFIG_BUNDLE_ARBITER_NUM_MEMORY[0]) + ",\n")
-    file.write("parameter int LANES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_CONTROL_REQUEST= " + vhdl_format(CU_BUNDLES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_CONTROL_REQUEST[0])+ ",\n")   
-    file.write("parameter int LANES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_CONTROL_RESPONSE= " + vhdl_format(CU_BUNDLES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_CONTROL_RESPONSE[0])+ ",\n")    
-    file.write("parameter int LANES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_ENGINE = " + vhdl_format(CU_BUNDLES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_ENGINE[0]) + ",\n")  
-    file.write("parameter int LANES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_MEMORY = " + vhdl_format(CU_BUNDLES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_MEMORY[0]) + ",\n")
-    file.write("parameter int LANES_CONFIG_CAST_WIDTH_ARRAY[NUM_LANES_MAX][NUM_ENGINES_MAX]                         = " + str(CU_BUNDLES_CONFIG_CAST_WIDTH_ARRAY[0]).replace("[", "'{").replace("]", "}\n") + ",\n")
-    file.write("parameter int LANES_CONFIG_ENGINE_ARBITER_NUM_CONTROL_REQUEST[NUM_LANES_MAX][NUM_ENGINES_MAX]   = " + str(CU_BUNDLES_CONFIG_ENGINE_ARBITER_NUM_CONTROL_REQUEST[0]).replace("[", "'{").replace("]", "}\n") + ",\n")    
-    file.write("parameter int LANES_CONFIG_ENGINE_ARBITER_NUM_CONTROL_RESPONSE[NUM_LANES_MAX][NUM_ENGINES_MAX]   = " + str(CU_BUNDLES_CONFIG_ENGINE_ARBITER_NUM_CONTROL_RESPONSE[0]).replace("[", "'{").replace("]", "}\n") + ",\n")    
-    file.write("parameter int LANES_CONFIG_ENGINE_ARBITER_NUM_ENGINE[NUM_LANES_MAX][NUM_ENGINES_MAX]    = " + str(CU_BUNDLES_CONFIG_ENGINE_ARBITER_NUM_ENGINE[0]).replace("[", "'{").replace("]", "}\n") + ",\n")    
-    file.write("parameter int LANES_CONFIG_ENGINE_ARBITER_NUM_MEMORY[NUM_LANES_MAX][NUM_ENGINES_MAX]   = " + str(CU_BUNDLES_CONFIG_ENGINE_ARBITER_NUM_MEMORY[0]).replace("[", "'{").replace("]", "}\n") + ",\n")    
-    file.write("parameter int LANES_CONFIG_ENGINE_FIFO_ARBITER_SIZE_CONTROL_REQUEST[NUM_LANES_MAX][NUM_ENGINES_MAX]   = " + str(CU_BUNDLES_CONFIG_FIFO_ARBITER_SIZE_CONTROL_REQUEST[0]).replace("[", "'{").replace("]", "}\n") + ",\n")    
-    file.write("parameter int LANES_CONFIG_ENGINE_FIFO_ARBITER_SIZE_CONTROL_RESPONSE[NUM_LANES_MAX][NUM_ENGINES_MAX]   = " + str(CU_BUNDLES_CONFIG_FIFO_ARBITER_SIZE_CONTROL_RESPONSE[0]).replace("[", "'{").replace("]", "}\n") + ",\n")    
-    file.write("parameter int LANES_CONFIG_ENGINE_FIFO_ARBITER_SIZE_ENGINE[NUM_LANES_MAX][NUM_ENGINES_MAX]    = " + str(CU_BUNDLES_CONFIG_FIFO_ARBITER_SIZE_ENGINE[0]).replace("[", "'{").replace("]", "}\n") + ",\n")    
-    file.write("parameter int LANES_CONFIG_ENGINE_FIFO_ARBITER_SIZE_MEMORY[NUM_LANES_MAX][NUM_ENGINES_MAX]   = " + str(CU_BUNDLES_CONFIG_FIFO_ARBITER_SIZE_MEMORY[0]).replace("[", "'{").replace("]", "}\n") + ",\n")    
-    file.write("parameter int LANES_CONFIG_LANE_ARBITER_NUM_CONTROL_REQUEST[NUM_LANES_MAX]= " + vhdl_format(CU_BUNDLES_CONFIG_LANE_ARBITER_NUM_CONTROL_REQUEST[0])+ ",\n")    
-    file.write("parameter int LANES_CONFIG_LANE_ARBITER_NUM_CONTROL_RESPONSE[NUM_LANES_MAX]= " + vhdl_format(CU_BUNDLES_CONFIG_LANE_ARBITER_NUM_CONTROL_RESPONSE[0])+ ",\n")    
-    file.write("parameter int LANES_CONFIG_LANE_ARBITER_NUM_ENGINE[NUM_LANES_MAX] = " + vhdl_format(CU_BUNDLES_CONFIG_LANE_ARBITER_NUM_ENGINE[0]) + ",\n")  
-    file.write("parameter int LANES_CONFIG_LANE_ARBITER_NUM_MEMORY[NUM_LANES_MAX] = " + vhdl_format(CU_BUNDLES_CONFIG_LANE_ARBITER_NUM_MEMORY[0]) + ",\n")
-    file.write("parameter int LANES_CONFIG_LANE_CAST_WIDTH_ARRAY[NUM_LANES_MAX]                                     = " + vhdl_format(CU_BUNDLES_CONFIG_LANE_CAST_WIDTH_ARRAY[0]) + ",\n")
-    file.write("parameter int LANES_CONFIG_LANE_FIFO_ARBITER_SIZE_CONTROL_REQUEST[NUM_LANES_MAX]= " + vhdl_format(CU_BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_CONTROL_REQUEST[0])+ ",\n")    
-    file.write("parameter int LANES_CONFIG_LANE_FIFO_ARBITER_SIZE_CONTROL_RESPONSE[NUM_LANES_MAX]= " + vhdl_format(CU_BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_CONTROL_RESPONSE[0])+ ",\n")    
-    file.write("parameter int LANES_CONFIG_LANE_FIFO_ARBITER_SIZE_ENGINE[NUM_LANES_MAX] = " + vhdl_format(CU_BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_ENGINE[0]) + ",\n")  
-    file.write("parameter int LANES_CONFIG_LANE_FIFO_ARBITER_SIZE_MEMORY[NUM_LANES_MAX] = " + vhdl_format(CU_BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_MEMORY[0]) + ",\n")
-    file.write("parameter int LANES_CONFIG_LANE_MAX_CAST_WIDTH_ARRAY                                                = " + vhdl_format(CU_BUNDLES_CONFIG_LANE_MAX_CAST_WIDTH_ARRAY[0]) + ",\n")
-    file.write("parameter int LANES_CONFIG_LANE_MAX_MERGE_WIDTH_ARRAY                                               = " + vhdl_format(CU_BUNDLES_CONFIG_LANE_MAX_MERGE_WIDTH_ARRAY[0]) + ",\n")
-    file.write("parameter int LANES_CONFIG_LANE_MERGE_WIDTH_ARRAY[NUM_LANES_MAX]                                    = " + vhdl_format(CU_BUNDLES_CONFIG_LANE_MERGE_WIDTH_ARRAY[0]) + ",\n")
-    file.write("parameter int LANES_CONFIG_MAX_CAST_WIDTH_ARRAY[NUM_LANES_MAX]                                      = " + vhdl_format(CU_BUNDLES_CONFIG_MAX_CAST_WIDTH_ARRAY[0]) + ",\n")
-    file.write("parameter int LANES_CONFIG_MAX_MERGE_WIDTH_ARRAY[NUM_LANES_MAX]                                     = " + vhdl_format(CU_BUNDLES_CONFIG_MAX_MERGE_WIDTH_ARRAY[0]) + ",\n")
-    file.write("parameter int LANES_CONFIG_MERGE_CONNECT_ARRAY[NUM_LANES_MAX][NUM_ENGINES_MAX][NUM_CAST_MAX]        = " + vhdl_format(CU_BUNDLES_CONFIG_MERGE_CONNECT_ARRAY[0]) + ",\n")
-    file.write("parameter int LANES_CONFIG_MERGE_CONNECT_PREFIX_ARRAY[NUM_LANES_MAX][NUM_ENGINES_MAX][NUM_CAST_MAX] = " + vhdl_format(CU_BUNDLES_CONFIG_MERGE_CONNECT_PREFIX_ARRAY[0]) + ",\n")
-    file.write("parameter int LANES_CONFIG_MERGE_WIDTH_ARRAY[NUM_LANES_MAX][NUM_ENGINES_MAX]                        = " + str(CU_BUNDLES_CONFIG_MERGE_WIDTH_ARRAY[0]).replace("[", "'{").replace("]", "}\n") + ",\n")
-    file.write("parameter int LANES_COUNT_ARRAY[NUM_BUNDLES_MAX]                                             = '{%s},\n" % (",".join(map(str, CU_BUNDLES_COUNT_ARRAY))))
-    file.write("parameter int LANES_ENGINE_ID_ARRAY[NUM_LANES_MAX][NUM_ENGINES_MAX]                                 = " + str(CU_BUNDLES_ENGINE_ID_ARRAY[0]).replace("[", "'{").replace("]", "}\n") + ",\n")
-    file.write("parameter int LANES_ENGINES_COUNT_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX]                      = " + str(CU_BUNDLES_LANES_ENGINES_COUNT_ARRAY).replace("[", "'{").replace("]", "}\n") + ",\n")
-    file.write(f"parameter int LANES_CONFIG_CU_ARBITER_NUM_CONTROL_REQUEST=  {CU_BUNDLES_CONFIG_CU_ARBITER_NUM_CONTROL_REQUEST} ,\n")  
-    file.write(f"parameter int LANES_CONFIG_CU_ARBITER_NUM_CONTROL_RESPONSE=  {CU_BUNDLES_CONFIG_CU_ARBITER_NUM_CONTROL_RESPONSE} ,\n")   
-    file.write(f"parameter int LANES_CONFIG_CU_ARBITER_NUM_ENGINE =  {CU_BUNDLES_CONFIG_CU_ARBITER_NUM_ENGINE} ,\n")  
-    file.write(f"parameter int LANES_CONFIG_CU_ARBITER_NUM_MEMORY =  {CU_BUNDLES_CONFIG_CU_ARBITER_NUM_MEMORY} ,\n")   
-    file.write(f"parameter int LANES_CONFIG_CU_FIFO_ARBITER_SIZE_CONTROL_REQUEST=  {CU_BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_CONTROL_REQUEST} ,\n")  
-    file.write(f"parameter int LANES_CONFIG_CU_FIFO_ARBITER_SIZE_CONTROL_RESPONSE=  {CU_BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_CONTROL_RESPONSE} ,\n")   
-    file.write(f"parameter int LANES_CONFIG_CU_FIFO_ARBITER_SIZE_ENGINE =  {CU_BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_ENGINE} ,\n")  
-    file.write(f"parameter int LANES_CONFIG_CU_FIFO_ARBITER_SIZE_MEMORY =  {CU_BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_MEMORY} ,\n")   
+    file.write(
+        f"parameter CU_BUNDLES_COUNT_ARRAY                           = {NUM_BUNDLES_MAX},\n"
+    )
+    file.write(
+        "parameter int CU_BUNDLES_CONFIG_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX]                             = "
+        + str(CU_BUNDLES_ENGINE_CONFIG_ARRAY).replace("[", "'{").replace("]", "}\n")
+        + ",\n"
+    )
+    file.write(
+        "parameter int CU_BUNDLES_CONFIG_ARRAY_ENGINE_SEQ_MIN[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX]              ="
+        + vhdl_format(CU_BUNDLES_CONFIG_ARRAY_ENGINE_SEQ_MIN)
+        + ",\n"
+    )
+    file.write(
+        "parameter int CU_BUNDLES_CONFIG_ARRAY_ENGINE_SEQ_WIDTH[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX]            ="
+        + vhdl_format(CU_BUNDLES_CONFIG_ARRAY_ENGINE_SEQ_WIDTH)
+        + ",\n"
+    )
+    file.write(
+        "parameter int CU_BUNDLES_CONFIG_BUNDLE_ARBITER_NUM_CONTROL_REQUEST[NUM_BUNDLES_MAX]= "
+        + vhdl_format(CU_BUNDLES_CONFIG_BUNDLE_ARBITER_NUM_CONTROL_REQUEST)
+        + ",\n"
+    )
+    file.write(
+        "parameter int CU_BUNDLES_CONFIG_BUNDLE_ARBITER_NUM_CONTROL_RESPONSE[NUM_BUNDLES_MAX]= "
+        + vhdl_format(CU_BUNDLES_CONFIG_BUNDLE_ARBITER_NUM_CONTROL_RESPONSE)
+        + ",\n"
+    )
+    file.write(
+        "parameter int CU_BUNDLES_CONFIG_BUNDLE_ARBITER_NUM_ENGINE[NUM_BUNDLES_MAX] = "
+        + vhdl_format(CU_BUNDLES_CONFIG_BUNDLE_ARBITER_NUM_ENGINE)
+        + ",\n"
+    )
+    file.write(
+        "parameter int CU_BUNDLES_CONFIG_BUNDLE_ARBITER_NUM_MEMORY[NUM_BUNDLES_MAX] = "
+        + vhdl_format(CU_BUNDLES_CONFIG_BUNDLE_ARBITER_NUM_MEMORY)
+        + ",\n"
+    )
+    file.write(
+        "parameter int CU_BUNDLES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_CONTROL_REQUEST[NUM_BUNDLES_MAX]= "
+        + vhdl_format(CU_BUNDLES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_CONTROL_REQUEST)
+        + ",\n"
+    )
+    file.write(
+        "parameter int CU_BUNDLES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_CONTROL_RESPONSE[NUM_BUNDLES_MAX]= "
+        + vhdl_format(CU_BUNDLES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_CONTROL_RESPONSE)
+        + ",\n"
+    )
+    file.write(
+        "parameter int CU_BUNDLES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_ENGINE[NUM_BUNDLES_MAX] = "
+        + vhdl_format(CU_BUNDLES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_ENGINE)
+        + ",\n"
+    )
+    file.write(
+        "parameter int CU_BUNDLES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_MEMORY[NUM_BUNDLES_MAX] = "
+        + vhdl_format(CU_BUNDLES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_MEMORY)
+        + ",\n"
+    )
+    file.write(
+        "parameter int CU_BUNDLES_CONFIG_CAST_WIDTH_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX]                  = "
+        + str(CU_BUNDLES_CONFIG_CAST_WIDTH_ARRAY).replace("[", "'{").replace("]", "}\n")
+        + ",\n"
+    )
+    file.write(
+        "parameter int CU_BUNDLES_CONFIG_ENGINE_ARBITER_NUM_CONTROL_REQUEST[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX] = "
+        + str(CU_BUNDLES_CONFIG_ENGINE_ARBITER_NUM_CONTROL_REQUEST)
+        .replace("[", "'{")
+        .replace("]", "}\n")
+        + ",\n"
+    )
+    file.write(
+        "parameter int CU_BUNDLES_CONFIG_ENGINE_ARBITER_NUM_CONTROL_RESPONSE[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX] = "
+        + str(CU_BUNDLES_CONFIG_ENGINE_ARBITER_NUM_CONTROL_RESPONSE)
+        .replace("[", "'{")
+        .replace("]", "}\n")
+        + ",\n"
+    )
+    file.write(
+        "parameter int CU_BUNDLES_CONFIG_ENGINE_ARBITER_NUM_ENGINE[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX] = "
+        + str(CU_BUNDLES_CONFIG_ENGINE_ARBITER_NUM_ENGINE)
+        .replace("[", "'{")
+        .replace("]", "}\n")
+        + ",\n"
+    )
+    file.write(
+        "parameter int CU_BUNDLES_CONFIG_ENGINE_ARBITER_NUM_MEMORY[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX] = "
+        + str(CU_BUNDLES_CONFIG_ENGINE_ARBITER_NUM_MEMORY)
+        .replace("[", "'{")
+        .replace("]", "}\n")
+        + ",\n"
+    )
+    file.write(
+        "parameter int CU_BUNDLES_CONFIG_ENGINE_FIFO_ARBITER_SIZE_CONTROL_REQUEST[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX] = "
+        + str(CU_BUNDLES_CONFIG_FIFO_ARBITER_SIZE_CONTROL_REQUEST)
+        .replace("[", "'{")
+        .replace("]", "}\n")
+        + ",\n"
+    )
+    file.write(
+        "parameter int CU_BUNDLES_CONFIG_ENGINE_FIFO_ARBITER_SIZE_CONTROL_RESPONSE[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX] = "
+        + str(CU_BUNDLES_CONFIG_FIFO_ARBITER_SIZE_CONTROL_RESPONSE)
+        .replace("[", "'{")
+        .replace("]", "}\n")
+        + ",\n"
+    )
+    file.write(
+        "parameter int CU_BUNDLES_CONFIG_ENGINE_FIFO_ARBITER_SIZE_ENGINE[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX] = "
+        + str(CU_BUNDLES_CONFIG_FIFO_ARBITER_SIZE_ENGINE)
+        .replace("[", "'{")
+        .replace("]", "}\n")
+        + ",\n"
+    )
+    file.write(
+        "parameter int CU_BUNDLES_CONFIG_ENGINE_FIFO_ARBITER_SIZE_MEMORY[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX] = "
+        + str(CU_BUNDLES_CONFIG_FIFO_ARBITER_SIZE_MEMORY)
+        .replace("[", "'{")
+        .replace("]", "}\n")
+        + ",\n"
+    )
+    file.write(
+        "parameter int CU_BUNDLES_CONFIG_LANE_ARBITER_NUM_CONTROL_REQUEST[NUM_BUNDLES_MAX][NUM_LANES_MAX]= "
+        + vhdl_format(CU_BUNDLES_CONFIG_LANE_ARBITER_NUM_CONTROL_REQUEST)
+        + ",\n"
+    )
+    file.write(
+        "parameter int CU_BUNDLES_CONFIG_LANE_ARBITER_NUM_CONTROL_RESPONSE[NUM_BUNDLES_MAX][NUM_LANES_MAX]= "
+        + vhdl_format(CU_BUNDLES_CONFIG_LANE_ARBITER_NUM_CONTROL_RESPONSE)
+        + ",\n"
+    )
+    file.write(
+        "parameter int CU_BUNDLES_CONFIG_LANE_ARBITER_NUM_ENGINE[NUM_BUNDLES_MAX][NUM_LANES_MAX] = "
+        + vhdl_format(CU_BUNDLES_CONFIG_LANE_ARBITER_NUM_ENGINE)
+        + ",\n"
+    )
+    file.write(
+        "parameter int CU_BUNDLES_CONFIG_LANE_ARBITER_NUM_MEMORY[NUM_BUNDLES_MAX][NUM_LANES_MAX] = "
+        + vhdl_format(CU_BUNDLES_CONFIG_LANE_ARBITER_NUM_MEMORY)
+        + ",\n"
+    )
+    file.write(
+        "parameter int CU_BUNDLES_CONFIG_LANE_CAST_WIDTH_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX]                              = "
+        + vhdl_format(CU_BUNDLES_CONFIG_LANE_CAST_WIDTH_ARRAY)
+        + ",\n"
+    )
+    file.write(
+        "parameter int CU_BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_CONTROL_REQUEST[NUM_BUNDLES_MAX][NUM_LANES_MAX]= "
+        + vhdl_format(CU_BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_CONTROL_REQUEST)
+        + ",\n"
+    )
+    file.write(
+        "parameter int CU_BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_CONTROL_RESPONSE[NUM_BUNDLES_MAX][NUM_LANES_MAX]= "
+        + vhdl_format(CU_BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_CONTROL_RESPONSE)
+        + ",\n"
+    )
+    file.write(
+        "parameter int CU_BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_ENGINE[NUM_BUNDLES_MAX][NUM_LANES_MAX] = "
+        + vhdl_format(CU_BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_ENGINE)
+        + ",\n"
+    )
+    file.write(
+        "parameter int CU_BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_MEMORY[NUM_BUNDLES_MAX][NUM_LANES_MAX] = "
+        + vhdl_format(CU_BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_MEMORY)
+        + ",\n"
+    )
+    file.write(
+        "parameter int CU_BUNDLES_CONFIG_LANE_MAX_CAST_WIDTH_ARRAY[NUM_BUNDLES_MAX]                                         = "
+        + vhdl_format(CU_BUNDLES_CONFIG_LANE_MAX_CAST_WIDTH_ARRAY)
+        + ",\n"
+    )
+    file.write(
+        "parameter int CU_BUNDLES_CONFIG_LANE_MAX_MERGE_WIDTH_ARRAY[NUM_BUNDLES_MAX]                                        = "
+        + vhdl_format(CU_BUNDLES_CONFIG_LANE_MAX_MERGE_WIDTH_ARRAY)
+        + ",\n"
+    )
+    file.write(
+        "parameter int CU_BUNDLES_CONFIG_LANE_MERGE_WIDTH_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX]                             = "
+        + vhdl_format(CU_BUNDLES_CONFIG_LANE_MERGE_WIDTH_ARRAY)
+        + ",\n"
+    )
+    file.write(
+        "parameter int CU_BUNDLES_CONFIG_MAX_CAST_WIDTH_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX]                               = "
+        + vhdl_format(CU_BUNDLES_CONFIG_MAX_CAST_WIDTH_ARRAY)
+        + ",\n"
+    )
+    file.write(
+        "parameter int CU_BUNDLES_CONFIG_MAX_MERGE_WIDTH_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX]                              = "
+        + vhdl_format(CU_BUNDLES_CONFIG_MAX_MERGE_WIDTH_ARRAY)
+        + ",\n"
+    )
+    file.write(
+        "parameter int CU_BUNDLES_CONFIG_MERGE_CONNECT_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX][NUM_CAST_MAX] = "
+        + vhdl_format(CU_BUNDLES_CONFIG_MERGE_CONNECT_ARRAY)
+        + ",\n"
+    )
+    file.write(
+        "parameter int CU_BUNDLES_CONFIG_MERGE_CONNECT_PREFIX_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX][NUM_CAST_MAX] = "
+        + vhdl_format(CU_BUNDLES_CONFIG_MERGE_CONNECT_PREFIX_ARRAY)
+        + ",\n"
+    )
+    file.write(
+        "parameter int CU_BUNDLES_CONFIG_MERGE_WIDTH_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX]                 = "
+        + str(CU_BUNDLES_CONFIG_MERGE_WIDTH_ARRAY)
+        .replace("[", "'{")
+        .replace("]", "}\n")
+        + ",\n"
+    )
+    file.write(
+        "parameter int CU_BUNDLES_ENGINE_ID_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX]                          = "
+        + str(CU_BUNDLES_ENGINE_ID_ARRAY).replace("[", "'{").replace("]", "}\n")
+        + ",\n"
+    )
+    file.write(
+        "parameter int CU_BUNDLES_LANES_COUNT_ARRAY[NUM_BUNDLES_MAX] = '{%s},\n"
+        % (",".join(map(str, CU_BUNDLES_COUNT_ARRAY)))
+    )
+    file.write(
+        "parameter int CU_BUNDLES_LANES_ENGINES_COUNT_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX]                                 = "
+        + str(CU_BUNDLES_LANES_ENGINES_COUNT_ARRAY)
+        .replace("[", "'{")
+        .replace("]", "}\n")
+        + ",\n"
+    )
+    file.write(
+        f"parameter int CU_BUNDLES_CONFIG_CU_ARBITER_NUM_CONTROL_REQUEST=  {CU_BUNDLES_CONFIG_CU_ARBITER_NUM_CONTROL_REQUEST} ,\n"
+    )
+    file.write(
+        f"parameter int CU_BUNDLES_CONFIG_CU_ARBITER_NUM_CONTROL_RESPONSE=  {CU_BUNDLES_CONFIG_CU_ARBITER_NUM_CONTROL_RESPONSE} ,\n"
+    )
+    file.write(
+        f"parameter int CU_BUNDLES_CONFIG_CU_ARBITER_NUM_ENGINE =  {CU_BUNDLES_CONFIG_CU_ARBITER_NUM_ENGINE} ,\n"
+    )
+    file.write(
+        f"parameter int CU_BUNDLES_CONFIG_CU_ARBITER_NUM_MEMORY =  {CU_BUNDLES_CONFIG_CU_ARBITER_NUM_MEMORY} ,\n"
+    )
+    file.write(
+        f"parameter int CU_BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_CONTROL_REQUEST=  {CU_BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_CONTROL_REQUEST} ,\n"
+    )
+    file.write(
+        f"parameter int CU_BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_CONTROL_RESPONSE=  {CU_BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_CONTROL_RESPONSE} ,\n"
+    )
+    file.write(
+        f"parameter int CU_BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_ENGINE =  {CU_BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_ENGINE} ,\n"
+    )
+    file.write(
+        f"parameter int CU_BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_MEMORY =  {CU_BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_MEMORY} ,\n"
+    )
 
-    file.write("parameter int ENGINES_CONFIG_ARRAY[NUM_ENGINES_MAX]                                          = " + str(CU_BUNDLES_ENGINE_CONFIG_ARRAY[0][0]).replace("[", "'{").replace("]", "}\n") + ",\n")
-    file.write("parameter int ENGINES_CONFIG_ARRAY_ENGINE_SEQ_MIN[NUM_ENGINES_MAX]                             =" + vhdl_format(CU_BUNDLES_CONFIG_ARRAY_ENGINE_SEQ_MIN[0][0]) + ",\n")
-    file.write("parameter int ENGINES_CONFIG_ARRAY_ENGINE_SEQ_WIDTH[NUM_ENGINES_MAX]                           =" + vhdl_format(CU_BUNDLES_CONFIG_ARRAY_ENGINE_SEQ_WIDTH[0][0]) + ",\n")
-    file.write("parameter int ENGINES_CONFIG_BUNDLE_ARBITER_NUM_CONTROL_REQUEST= " + vhdl_format(CU_BUNDLES_CONFIG_BUNDLE_ARBITER_NUM_CONTROL_REQUEST[0])+ ",\n")   
-    file.write("parameter int ENGINES_CONFIG_BUNDLE_ARBITER_NUM_CONTROL_RESPONSE= " + vhdl_format(CU_BUNDLES_CONFIG_BUNDLE_ARBITER_NUM_CONTROL_RESPONSE[0])+ ",\n")  
-    file.write("parameter int ENGINES_CONFIG_BUNDLE_ARBITER_NUM_ENGINE = " + vhdl_format(CU_BUNDLES_CONFIG_BUNDLE_ARBITER_NUM_ENGINE[0]) + ",\n")  
-    file.write("parameter int ENGINES_CONFIG_BUNDLE_ARBITER_NUM_MEMORY = " + vhdl_format(CU_BUNDLES_CONFIG_BUNDLE_ARBITER_NUM_MEMORY[0]) + ",\n")
-    file.write("parameter int ENGINES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_CONTROL_REQUEST= " + vhdl_format(CU_BUNDLES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_CONTROL_REQUEST[0])+ ",\n")   
-    file.write("parameter int ENGINES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_CONTROL_RESPONSE= " + vhdl_format(CU_BUNDLES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_CONTROL_RESPONSE[0])+ ",\n")  
-    file.write("parameter int ENGINES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_ENGINE = " + vhdl_format(CU_BUNDLES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_ENGINE[0]) + ",\n")  
-    file.write("parameter int ENGINES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_MEMORY = " + vhdl_format(CU_BUNDLES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_MEMORY[0]) + ",\n")
-    file.write("parameter int ENGINES_CONFIG_CAST_WIDTH_ARRAY[NUM_ENGINES_MAX]                               = " + str(CU_BUNDLES_CONFIG_CAST_WIDTH_ARRAY[0][0]).replace("[", "'{").replace("]", "}\n") + ",\n")
-    file.write("parameter int ENGINES_CONFIG_ENGINE_ARBITER_NUM_CONTROL_REQUEST[NUM_ENGINES_MAX] = " + str(CU_BUNDLES_CONFIG_ENGINE_ARBITER_NUM_CONTROL_REQUEST[0][0]).replace("[", "'{").replace("]", "}\n") + ",\n")    
-    file.write("parameter int ENGINES_CONFIG_ENGINE_ARBITER_NUM_CONTROL_RESPONSE[NUM_ENGINES_MAX] = " + str(CU_BUNDLES_CONFIG_ENGINE_ARBITER_NUM_CONTROL_RESPONSE[0][0]).replace("[", "'{").replace("]", "}\n") + ",\n")    
-    file.write("parameter int ENGINES_CONFIG_ENGINE_ARBITER_NUM_ENGINE[NUM_ENGINES_MAX]  = " + str(CU_BUNDLES_CONFIG_ENGINE_ARBITER_NUM_ENGINE[0][0]).replace("[", "'{").replace("]", "}\n") + ",\n")    
-    file.write("parameter int ENGINES_CONFIG_ENGINE_ARBITER_NUM_MEMORY[NUM_ENGINES_MAX]  = " + str(CU_BUNDLES_CONFIG_ENGINE_ARBITER_NUM_MEMORY[0][0]).replace("[", "'{").replace("]", "}\n") + ",\n")    
-    file.write("parameter int ENGINES_CONFIG_ENGINE_FIFO_ARBITER_SIZE_CONTROL_REQUEST[NUM_ENGINES_MAX] = " + str(CU_BUNDLES_CONFIG_FIFO_ARBITER_SIZE_CONTROL_REQUEST[0][0]).replace("[", "'{").replace("]", "}\n") + ",\n")    
-    file.write("parameter int ENGINES_CONFIG_ENGINE_FIFO_ARBITER_SIZE_CONTROL_RESPONSE[NUM_ENGINES_MAX] = " + str(CU_BUNDLES_CONFIG_FIFO_ARBITER_SIZE_CONTROL_RESPONSE[0][0]).replace("[", "'{").replace("]", "}\n") + ",\n")    
-    file.write("parameter int ENGINES_CONFIG_ENGINE_FIFO_ARBITER_SIZE_ENGINE[NUM_ENGINES_MAX]  = " + str(CU_BUNDLES_CONFIG_FIFO_ARBITER_SIZE_ENGINE[0][0]).replace("[", "'{").replace("]", "}\n") + ",\n")    
-    file.write("parameter int ENGINES_CONFIG_ENGINE_FIFO_ARBITER_SIZE_MEMORY[NUM_ENGINES_MAX]  = " + str(CU_BUNDLES_CONFIG_FIFO_ARBITER_SIZE_MEMORY[0][0]).replace("[", "'{").replace("]", "}\n") + ",\n")    
-    file.write("parameter int ENGINES_CONFIG_LANE_ARBITER_NUM_CONTROL_REQUEST   = " + vhdl_format(CU_BUNDLES_CONFIG_LANE_ARBITER_NUM_CONTROL_REQUEST[0][0])+ ",\n")  
-    file.write("parameter int ENGINES_CONFIG_LANE_ARBITER_NUM_CONTROL_RESPONSE   = " + vhdl_format(CU_BUNDLES_CONFIG_LANE_ARBITER_NUM_CONTROL_RESPONSE[0][0])+ ",\n")    
-    file.write("parameter int ENGINES_CONFIG_LANE_ARBITER_NUM_ENGINE    = " + vhdl_format(CU_BUNDLES_CONFIG_LANE_ARBITER_NUM_ENGINE[0][0]) + ",\n")  
-    file.write("parameter int ENGINES_CONFIG_LANE_ARBITER_NUM_MEMORY    = " + vhdl_format(CU_BUNDLES_CONFIG_LANE_ARBITER_NUM_MEMORY[0][0]) + ",\n")
-    file.write("parameter int ENGINES_CONFIG_LANE_CAST_WIDTH_ARRAY[NUM_LANES_MAX]                            = " + vhdl_format(CU_BUNDLES_CONFIG_LANE_CAST_WIDTH_ARRAY[0]) + ",\n")
-    file.write("parameter int ENGINES_CONFIG_LANE_FIFO_ARBITER_SIZE_CONTROL_REQUEST   = " + vhdl_format(CU_BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_CONTROL_REQUEST[0][0])+ ",\n")  
-    file.write("parameter int ENGINES_CONFIG_LANE_FIFO_ARBITER_SIZE_CONTROL_RESPONSE   = " + vhdl_format(CU_BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_CONTROL_RESPONSE[0][0])+ ",\n")    
-    file.write("parameter int ENGINES_CONFIG_LANE_FIFO_ARBITER_SIZE_ENGINE    = " + vhdl_format(CU_BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_ENGINE[0][0]) + ",\n")  
-    file.write("parameter int ENGINES_CONFIG_LANE_FIFO_ARBITER_SIZE_MEMORY    = " + vhdl_format(CU_BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_MEMORY[0][0]) + ",\n")
-    file.write("parameter int ENGINES_CONFIG_LANE_MERGE_WIDTH_ARRAY[NUM_LANES_MAX]                           = " + vhdl_format(CU_BUNDLES_CONFIG_LANE_MERGE_WIDTH_ARRAY[0]) + ",\n")
-    file.write("parameter int ENGINES_CONFIG_MAX_CAST_WIDTH_ARRAY                                            = " + vhdl_format(CU_BUNDLES_CONFIG_MAX_CAST_WIDTH_ARRAY[0][0]) + ",\n")
-    file.write("parameter int ENGINES_CONFIG_MAX_MERGE_WIDTH_ARRAY                                           = " + vhdl_format(CU_BUNDLES_CONFIG_MAX_MERGE_WIDTH_ARRAY[0][0]) + ",\n")
-    file.write("parameter int ENGINES_CONFIG_MERGE_CONNECT_ARRAY[NUM_ENGINES_MAX][NUM_CAST_MAX]              = " + vhdl_format(CU_BUNDLES_CONFIG_MERGE_CONNECT_ARRAY[0][0]) + ",\n")
-    file.write("parameter int ENGINES_CONFIG_MERGE_CONNECT_PREFIX_ARRAY[NUM_ENGINES_MAX][NUM_CAST_MAX]       = " + vhdl_format(CU_BUNDLES_CONFIG_MERGE_CONNECT_PREFIX_ARRAY[0][0]) + ",\n")
-    file.write("parameter int ENGINES_CONFIG_MERGE_WIDTH_ARRAY[NUM_ENGINES_MAX]                              = " + str(CU_BUNDLES_CONFIG_MERGE_WIDTH_ARRAY[0][0]).replace("[", "'{").replace("]", "}\n") + ",\n")
-    file.write("parameter int ENGINES_COUNT_ARRAY[NUM_LANES_MAX]                                             = " + str(CU_BUNDLES_LANES_ENGINES_COUNT_ARRAY[0]).replace("[", "'{").replace("]", "}") + ",\n")
-    file.write("parameter int ENGINES_ENGINE_ID_ARRAY[NUM_ENGINES_MAX]                                       = " + str(CU_BUNDLES_ENGINE_ID_ARRAY[0][0]).replace("[", "'{").replace("]", "}\n") + ",\n")
-    file.write(f"parameter int ENGINES_CONFIG_CU_ARBITER_NUM_CONTROL_REQUEST=  {CU_BUNDLES_CONFIG_CU_ARBITER_NUM_CONTROL_REQUEST} ,\n") 
-    file.write(f"parameter int ENGINES_CONFIG_CU_ARBITER_NUM_CONTROL_RESPONSE=  {CU_BUNDLES_CONFIG_CU_ARBITER_NUM_CONTROL_RESPONSE} ,\n")   
-    file.write(f"parameter int ENGINES_CONFIG_CU_ARBITER_NUM_ENGINE =  {CU_BUNDLES_CONFIG_CU_ARBITER_NUM_ENGINE} ,\n")  
-    file.write(f"parameter int ENGINES_CONFIG_CU_ARBITER_NUM_MEMORY =  {CU_BUNDLES_CONFIG_CU_ARBITER_NUM_MEMORY} ,\n")   
-    file.write(f"parameter int ENGINES_CONFIG_CU_FIFO_ARBITER_SIZE_CONTROL_REQUEST=  {CU_BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_CONTROL_REQUEST} ,\n") 
-    file.write(f"parameter int ENGINES_CONFIG_CU_FIFO_ARBITER_SIZE_CONTROL_RESPONSE=  {CU_BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_CONTROL_RESPONSE} ,\n")   
-    file.write(f"parameter int ENGINES_CONFIG_CU_FIFO_ARBITER_SIZE_ENGINE =  {CU_BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_ENGINE} ,\n")  
-    file.write(f"parameter int ENGINES_CONFIG_CU_FIFO_ARBITER_SIZE_MEMORY =  {CU_BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_MEMORY}\n")   
+    file.write(
+        f"parameter int BUNDLES_CONFIG_CU_ARBITER_NUM_CONTROL_REQUEST=  {CU_BUNDLES_CONFIG_CU_ARBITER_NUM_CONTROL_REQUEST} ,\n"
+    )
+    file.write(
+        f"parameter int BUNDLES_CONFIG_CU_ARBITER_NUM_CONTROL_RESPONSE=  {CU_BUNDLES_CONFIG_CU_ARBITER_NUM_CONTROL_RESPONSE} ,\n"
+    )
+    file.write(
+        f"parameter int BUNDLES_CONFIG_CU_ARBITER_NUM_ENGINE =  {CU_BUNDLES_CONFIG_CU_ARBITER_NUM_ENGINE} ,\n"
+    )
+    file.write(
+        f"parameter int BUNDLES_CONFIG_CU_ARBITER_NUM_MEMORY =  {CU_BUNDLES_CONFIG_CU_ARBITER_NUM_MEMORY} ,\n"
+    )
+    file.write(
+        f"parameter int BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_CONTROL_REQUEST=  {CU_BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_CONTROL_REQUEST} ,\n"
+    )
+    file.write(
+        f"parameter int BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_CONTROL_RESPONSE=  {CU_BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_CONTROL_RESPONSE} ,\n"
+    )
+    file.write(
+        f"parameter int BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_ENGINE =  {CU_BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_ENGINE} ,\n"
+    )
+    file.write(
+        f"parameter int BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_MEMORY =  {CU_BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_MEMORY} ,\n"
+    )
+    file.write(
+        f"parameter BUNDLES_COUNT_ARRAY                                                                                  = {NUM_BUNDLES_MAX},\n"
+    )
+    file.write(
+        "parameter int BUNDLES_CONFIG_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX]                             = "
+        + str(CU_BUNDLES_ENGINE_CONFIG_ARRAY).replace("[", "'{").replace("]", "}\n")
+        + ",\n"
+    )
+    file.write(
+        "parameter int BUNDLES_CONFIG_ARRAY_ENGINE_SEQ_MIN[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX]              ="
+        + vhdl_format(CU_BUNDLES_CONFIG_ARRAY_ENGINE_SEQ_MIN)
+        + ",\n"
+    )
+    file.write(
+        "parameter int BUNDLES_CONFIG_ARRAY_ENGINE_SEQ_WIDTH[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX]            ="
+        + vhdl_format(CU_BUNDLES_CONFIG_ARRAY_ENGINE_SEQ_WIDTH)
+        + ",\n"
+    )
+    file.write(
+        "parameter int BUNDLES_CONFIG_BUNDLE_ARBITER_NUM_CONTROL_REQUEST[NUM_BUNDLES_MAX]= "
+        + vhdl_format(CU_BUNDLES_CONFIG_BUNDLE_ARBITER_NUM_CONTROL_REQUEST)
+        + ",\n"
+    )
+    file.write(
+        "parameter int BUNDLES_CONFIG_BUNDLE_ARBITER_NUM_CONTROL_RESPONSE[NUM_BUNDLES_MAX]= "
+        + vhdl_format(CU_BUNDLES_CONFIG_BUNDLE_ARBITER_NUM_CONTROL_RESPONSE)
+        + ",\n"
+    )
+    file.write(
+        "parameter int BUNDLES_CONFIG_BUNDLE_ARBITER_NUM_ENGINE[NUM_BUNDLES_MAX] = "
+        + vhdl_format(CU_BUNDLES_CONFIG_BUNDLE_ARBITER_NUM_ENGINE)
+        + ",\n"
+    )
+    file.write(
+        "parameter int BUNDLES_CONFIG_BUNDLE_ARBITER_NUM_MEMORY[NUM_BUNDLES_MAX] = "
+        + vhdl_format(CU_BUNDLES_CONFIG_BUNDLE_ARBITER_NUM_MEMORY)
+        + ",\n"
+    )
+    file.write(
+        "parameter int BUNDLES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_CONTROL_REQUEST[NUM_BUNDLES_MAX]= "
+        + vhdl_format(CU_BUNDLES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_CONTROL_REQUEST)
+        + ",\n"
+    )
+    file.write(
+        "parameter int BUNDLES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_CONTROL_RESPONSE[NUM_BUNDLES_MAX]= "
+        + vhdl_format(CU_BUNDLES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_CONTROL_RESPONSE)
+        + ",\n"
+    )
+    file.write(
+        "parameter int BUNDLES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_ENGINE[NUM_BUNDLES_MAX] = "
+        + vhdl_format(CU_BUNDLES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_ENGINE)
+        + ",\n"
+    )
+    file.write(
+        "parameter int BUNDLES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_MEMORY[NUM_BUNDLES_MAX] = "
+        + vhdl_format(CU_BUNDLES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_MEMORY)
+        + ",\n"
+    )
+    file.write(
+        "parameter int BUNDLES_CONFIG_CAST_WIDTH_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX]                  = "
+        + str(CU_BUNDLES_CONFIG_CAST_WIDTH_ARRAY).replace("[", "'{").replace("]", "}\n")
+        + ",\n"
+    )
+    file.write(
+        "parameter int BUNDLES_CONFIG_ENGINE_ARBITER_NUM_CONTROL_REQUEST[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX] = "
+        + str(CU_BUNDLES_CONFIG_ENGINE_ARBITER_NUM_CONTROL_REQUEST)
+        .replace("[", "'{")
+        .replace("]", "}\n")
+        + ",\n"
+    )
+    file.write(
+        "parameter int BUNDLES_CONFIG_ENGINE_ARBITER_NUM_CONTROL_RESPONSE[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX] = "
+        + str(CU_BUNDLES_CONFIG_ENGINE_ARBITER_NUM_CONTROL_RESPONSE)
+        .replace("[", "'{")
+        .replace("]", "}\n")
+        + ",\n"
+    )
+    file.write(
+        "parameter int BUNDLES_CONFIG_ENGINE_ARBITER_NUM_ENGINE[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX] = "
+        + str(CU_BUNDLES_CONFIG_ENGINE_ARBITER_NUM_ENGINE)
+        .replace("[", "'{")
+        .replace("]", "}\n")
+        + ",\n"
+    )
+    file.write(
+        "parameter int BUNDLES_CONFIG_ENGINE_ARBITER_NUM_MEMORY[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX] = "
+        + str(CU_BUNDLES_CONFIG_ENGINE_ARBITER_NUM_MEMORY)
+        .replace("[", "'{")
+        .replace("]", "}\n")
+        + ",\n"
+    )
+    file.write(
+        "parameter int BUNDLES_CONFIG_ENGINE_FIFO_ARBITER_SIZE_CONTROL_REQUEST[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX] = "
+        + str(CU_BUNDLES_CONFIG_FIFO_ARBITER_SIZE_CONTROL_REQUEST)
+        .replace("[", "'{")
+        .replace("]", "}\n")
+        + ",\n"
+    )
+    file.write(
+        "parameter int BUNDLES_CONFIG_ENGINE_FIFO_ARBITER_SIZE_CONTROL_RESPONSE[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX] = "
+        + str(CU_BUNDLES_CONFIG_FIFO_ARBITER_SIZE_CONTROL_RESPONSE)
+        .replace("[", "'{")
+        .replace("]", "}\n")
+        + ",\n"
+    )
+    file.write(
+        "parameter int BUNDLES_CONFIG_ENGINE_FIFO_ARBITER_SIZE_ENGINE[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX] = "
+        + str(CU_BUNDLES_CONFIG_FIFO_ARBITER_SIZE_ENGINE)
+        .replace("[", "'{")
+        .replace("]", "}\n")
+        + ",\n"
+    )
+    file.write(
+        "parameter int BUNDLES_CONFIG_ENGINE_FIFO_ARBITER_SIZE_MEMORY[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX] = "
+        + str(CU_BUNDLES_CONFIG_FIFO_ARBITER_SIZE_MEMORY)
+        .replace("[", "'{")
+        .replace("]", "}\n")
+        + ",\n"
+    )
+    file.write(
+        "parameter int BUNDLES_CONFIG_LANE_ARBITER_NUM_CONTROL_REQUEST[NUM_BUNDLES_MAX][NUM_LANES_MAX]= "
+        + vhdl_format(CU_BUNDLES_CONFIG_LANE_ARBITER_NUM_CONTROL_REQUEST)
+        + ",\n"
+    )
+    file.write(
+        "parameter int BUNDLES_CONFIG_LANE_ARBITER_NUM_CONTROL_RESPONSE[NUM_BUNDLES_MAX][NUM_LANES_MAX]= "
+        + vhdl_format(CU_BUNDLES_CONFIG_LANE_ARBITER_NUM_CONTROL_RESPONSE)
+        + ",\n"
+    )
+    file.write(
+        "parameter int BUNDLES_CONFIG_LANE_ARBITER_NUM_ENGINE[NUM_BUNDLES_MAX][NUM_LANES_MAX] = "
+        + vhdl_format(CU_BUNDLES_CONFIG_LANE_ARBITER_NUM_ENGINE)
+        + ",\n"
+    )
+    file.write(
+        "parameter int BUNDLES_CONFIG_LANE_ARBITER_NUM_MEMORY[NUM_BUNDLES_MAX][NUM_LANES_MAX] = "
+        + vhdl_format(CU_BUNDLES_CONFIG_LANE_ARBITER_NUM_MEMORY)
+        + ",\n"
+    )
+    file.write(
+        "parameter int BUNDLES_CONFIG_LANE_CAST_WIDTH_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX]                              = "
+        + vhdl_format(CU_BUNDLES_CONFIG_LANE_CAST_WIDTH_ARRAY)
+        + ",\n"
+    )
+    file.write(
+        "parameter int BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_CONTROL_REQUEST[NUM_BUNDLES_MAX][NUM_LANES_MAX]= "
+        + vhdl_format(CU_BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_CONTROL_REQUEST)
+        + ",\n"
+    )
+    file.write(
+        "parameter int BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_CONTROL_RESPONSE[NUM_BUNDLES_MAX][NUM_LANES_MAX]= "
+        + vhdl_format(CU_BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_CONTROL_RESPONSE)
+        + ",\n"
+    )
+    file.write(
+        "parameter int BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_ENGINE[NUM_BUNDLES_MAX][NUM_LANES_MAX] = "
+        + vhdl_format(CU_BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_ENGINE)
+        + ",\n"
+    )
+    file.write(
+        "parameter int BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_MEMORY[NUM_BUNDLES_MAX][NUM_LANES_MAX] = "
+        + vhdl_format(CU_BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_MEMORY)
+        + ",\n"
+    )
+    file.write(
+        "parameter int BUNDLES_CONFIG_LANE_MAX_CAST_WIDTH_ARRAY[NUM_BUNDLES_MAX]                                         = "
+        + vhdl_format(CU_BUNDLES_CONFIG_LANE_MAX_CAST_WIDTH_ARRAY)
+        + ",\n"
+    )
+    file.write(
+        "parameter int BUNDLES_CONFIG_LANE_MAX_MERGE_WIDTH_ARRAY[NUM_BUNDLES_MAX]                                        = "
+        + vhdl_format(CU_BUNDLES_CONFIG_LANE_MAX_MERGE_WIDTH_ARRAY)
+        + ",\n"
+    )
+    file.write(
+        "parameter int BUNDLES_CONFIG_LANE_MERGE_WIDTH_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX]                             = "
+        + vhdl_format(CU_BUNDLES_CONFIG_LANE_MERGE_WIDTH_ARRAY)
+        + ",\n"
+    )
+    file.write(
+        "parameter int BUNDLES_CONFIG_MAX_CAST_WIDTH_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX]                               = "
+        + vhdl_format(CU_BUNDLES_CONFIG_MAX_CAST_WIDTH_ARRAY)
+        + ",\n"
+    )
+    file.write(
+        "parameter int BUNDLES_CONFIG_MAX_MERGE_WIDTH_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX]                              = "
+        + vhdl_format(CU_BUNDLES_CONFIG_MAX_MERGE_WIDTH_ARRAY)
+        + ",\n"
+    )
+    file.write(
+        "parameter int BUNDLES_CONFIG_MERGE_CONNECT_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX][NUM_CAST_MAX] = "
+        + vhdl_format(CU_BUNDLES_CONFIG_MERGE_CONNECT_ARRAY)
+        + ",\n"
+    )
+    file.write(
+        "parameter int BUNDLES_CONFIG_MERGE_CONNECT_PREFIX_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX][NUM_CAST_MAX] = "
+        + vhdl_format(CU_BUNDLES_CONFIG_MERGE_CONNECT_PREFIX_ARRAY)
+        + ",\n"
+    )
+    file.write(
+        "parameter int BUNDLES_CONFIG_MERGE_WIDTH_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX]                 = "
+        + str(CU_BUNDLES_CONFIG_MERGE_WIDTH_ARRAY)
+        .replace("[", "'{")
+        .replace("]", "}\n")
+        + ",\n"
+    )
+    file.write(
+        "parameter int BUNDLES_ENGINE_ID_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX][NUM_ENGINES_MAX]                          = "
+        + str(CU_BUNDLES_ENGINE_ID_ARRAY).replace("[", "'{").replace("]", "}\n")
+        + ",\n"
+    )
+    file.write(
+        "parameter int BUNDLES_LANES_COUNT_ARRAY[NUM_BUNDLES_MAX]                                                        = '{%s},\n"
+        % (",".join(map(str, CU_BUNDLES_COUNT_ARRAY)))
+    )
+    file.write(
+        "parameter int BUNDLES_LANES_ENGINES_COUNT_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX]                                 = "
+        + str(CU_BUNDLES_LANES_ENGINES_COUNT_ARRAY)
+        .replace("[", "'{")
+        .replace("]", "}\n")
+        + ",\n"
+    )
 
-    file.write(f"// total_luts={total_luts}\n\n")  
-   
+    file.write(
+        "parameter int LANES_CONFIG_ARRAY[NUM_LANES_MAX][NUM_ENGINES_MAX]                                    = "
+        + str(CU_BUNDLES_ENGINE_CONFIG_ARRAY[0]).replace("[", "'{").replace("]", "}\n")
+        + ",\n"
+    )
+    file.write(
+        "parameter int LANES_CONFIG_ARRAY_ENGINE_SEQ_MIN[NUM_LANES_MAX][NUM_ENGINES_MAX]                     ="
+        + vhdl_format(CU_BUNDLES_CONFIG_ARRAY_ENGINE_SEQ_MIN[0])
+        + ",\n"
+    )
+    file.write(
+        "parameter int LANES_CONFIG_ARRAY_ENGINE_SEQ_WIDTH[NUM_LANES_MAX][NUM_ENGINES_MAX]                   ="
+        + vhdl_format(CU_BUNDLES_CONFIG_ARRAY_ENGINE_SEQ_WIDTH[0])
+        + ",\n"
+    )
+    file.write(
+        "parameter int LANES_CONFIG_BUNDLE_ARBITER_NUM_CONTROL_REQUEST= "
+        + vhdl_format(CU_BUNDLES_CONFIG_BUNDLE_ARBITER_NUM_CONTROL_REQUEST[0])
+        + ",\n"
+    )
+    file.write(
+        "parameter int LANES_CONFIG_BUNDLE_ARBITER_NUM_CONTROL_RESPONSE= "
+        + vhdl_format(CU_BUNDLES_CONFIG_BUNDLE_ARBITER_NUM_CONTROL_RESPONSE[0])
+        + ",\n"
+    )
+    file.write(
+        "parameter int LANES_CONFIG_BUNDLE_ARBITER_NUM_ENGINE = "
+        + vhdl_format(CU_BUNDLES_CONFIG_BUNDLE_ARBITER_NUM_ENGINE[0])
+        + ",\n"
+    )
+    file.write(
+        "parameter int LANES_CONFIG_BUNDLE_ARBITER_NUM_MEMORY = "
+        + vhdl_format(CU_BUNDLES_CONFIG_BUNDLE_ARBITER_NUM_MEMORY[0])
+        + ",\n"
+    )
+    file.write(
+        "parameter int LANES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_CONTROL_REQUEST= "
+        + vhdl_format(CU_BUNDLES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_CONTROL_REQUEST[0])
+        + ",\n"
+    )
+    file.write(
+        "parameter int LANES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_CONTROL_RESPONSE= "
+        + vhdl_format(CU_BUNDLES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_CONTROL_RESPONSE[0])
+        + ",\n"
+    )
+    file.write(
+        "parameter int LANES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_ENGINE = "
+        + vhdl_format(CU_BUNDLES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_ENGINE[0])
+        + ",\n"
+    )
+    file.write(
+        "parameter int LANES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_MEMORY = "
+        + vhdl_format(CU_BUNDLES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_MEMORY[0])
+        + ",\n"
+    )
+    file.write(
+        "parameter int LANES_CONFIG_CAST_WIDTH_ARRAY[NUM_LANES_MAX][NUM_ENGINES_MAX]                         = "
+        + str(CU_BUNDLES_CONFIG_CAST_WIDTH_ARRAY[0])
+        .replace("[", "'{")
+        .replace("]", "}\n")
+        + ",\n"
+    )
+    file.write(
+        "parameter int LANES_CONFIG_ENGINE_ARBITER_NUM_CONTROL_REQUEST[NUM_LANES_MAX][NUM_ENGINES_MAX]   = "
+        + str(CU_BUNDLES_CONFIG_ENGINE_ARBITER_NUM_CONTROL_REQUEST[0])
+        .replace("[", "'{")
+        .replace("]", "}\n")
+        + ",\n"
+    )
+    file.write(
+        "parameter int LANES_CONFIG_ENGINE_ARBITER_NUM_CONTROL_RESPONSE[NUM_LANES_MAX][NUM_ENGINES_MAX]   = "
+        + str(CU_BUNDLES_CONFIG_ENGINE_ARBITER_NUM_CONTROL_RESPONSE[0])
+        .replace("[", "'{")
+        .replace("]", "}\n")
+        + ",\n"
+    )
+    file.write(
+        "parameter int LANES_CONFIG_ENGINE_ARBITER_NUM_ENGINE[NUM_LANES_MAX][NUM_ENGINES_MAX]    = "
+        + str(CU_BUNDLES_CONFIG_ENGINE_ARBITER_NUM_ENGINE[0])
+        .replace("[", "'{")
+        .replace("]", "}\n")
+        + ",\n"
+    )
+    file.write(
+        "parameter int LANES_CONFIG_ENGINE_ARBITER_NUM_MEMORY[NUM_LANES_MAX][NUM_ENGINES_MAX]   = "
+        + str(CU_BUNDLES_CONFIG_ENGINE_ARBITER_NUM_MEMORY[0])
+        .replace("[", "'{")
+        .replace("]", "}\n")
+        + ",\n"
+    )
+    file.write(
+        "parameter int LANES_CONFIG_ENGINE_FIFO_ARBITER_SIZE_CONTROL_REQUEST[NUM_LANES_MAX][NUM_ENGINES_MAX]   = "
+        + str(CU_BUNDLES_CONFIG_FIFO_ARBITER_SIZE_CONTROL_REQUEST[0])
+        .replace("[", "'{")
+        .replace("]", "}\n")
+        + ",\n"
+    )
+    file.write(
+        "parameter int LANES_CONFIG_ENGINE_FIFO_ARBITER_SIZE_CONTROL_RESPONSE[NUM_LANES_MAX][NUM_ENGINES_MAX]   = "
+        + str(CU_BUNDLES_CONFIG_FIFO_ARBITER_SIZE_CONTROL_RESPONSE[0])
+        .replace("[", "'{")
+        .replace("]", "}\n")
+        + ",\n"
+    )
+    file.write(
+        "parameter int LANES_CONFIG_ENGINE_FIFO_ARBITER_SIZE_ENGINE[NUM_LANES_MAX][NUM_ENGINES_MAX]    = "
+        + str(CU_BUNDLES_CONFIG_FIFO_ARBITER_SIZE_ENGINE[0])
+        .replace("[", "'{")
+        .replace("]", "}\n")
+        + ",\n"
+    )
+    file.write(
+        "parameter int LANES_CONFIG_ENGINE_FIFO_ARBITER_SIZE_MEMORY[NUM_LANES_MAX][NUM_ENGINES_MAX]   = "
+        + str(CU_BUNDLES_CONFIG_FIFO_ARBITER_SIZE_MEMORY[0])
+        .replace("[", "'{")
+        .replace("]", "}\n")
+        + ",\n"
+    )
+    file.write(
+        "parameter int LANES_CONFIG_LANE_ARBITER_NUM_CONTROL_REQUEST[NUM_LANES_MAX]= "
+        + vhdl_format(CU_BUNDLES_CONFIG_LANE_ARBITER_NUM_CONTROL_REQUEST[0])
+        + ",\n"
+    )
+    file.write(
+        "parameter int LANES_CONFIG_LANE_ARBITER_NUM_CONTROL_RESPONSE[NUM_LANES_MAX]= "
+        + vhdl_format(CU_BUNDLES_CONFIG_LANE_ARBITER_NUM_CONTROL_RESPONSE[0])
+        + ",\n"
+    )
+    file.write(
+        "parameter int LANES_CONFIG_LANE_ARBITER_NUM_ENGINE[NUM_LANES_MAX] = "
+        + vhdl_format(CU_BUNDLES_CONFIG_LANE_ARBITER_NUM_ENGINE[0])
+        + ",\n"
+    )
+    file.write(
+        "parameter int LANES_CONFIG_LANE_ARBITER_NUM_MEMORY[NUM_LANES_MAX] = "
+        + vhdl_format(CU_BUNDLES_CONFIG_LANE_ARBITER_NUM_MEMORY[0])
+        + ",\n"
+    )
+    file.write(
+        "parameter int LANES_CONFIG_LANE_CAST_WIDTH_ARRAY[NUM_LANES_MAX]                                     = "
+        + vhdl_format(CU_BUNDLES_CONFIG_LANE_CAST_WIDTH_ARRAY[0])
+        + ",\n"
+    )
+    file.write(
+        "parameter int LANES_CONFIG_LANE_FIFO_ARBITER_SIZE_CONTROL_REQUEST[NUM_LANES_MAX]= "
+        + vhdl_format(CU_BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_CONTROL_REQUEST[0])
+        + ",\n"
+    )
+    file.write(
+        "parameter int LANES_CONFIG_LANE_FIFO_ARBITER_SIZE_CONTROL_RESPONSE[NUM_LANES_MAX]= "
+        + vhdl_format(CU_BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_CONTROL_RESPONSE[0])
+        + ",\n"
+    )
+    file.write(
+        "parameter int LANES_CONFIG_LANE_FIFO_ARBITER_SIZE_ENGINE[NUM_LANES_MAX] = "
+        + vhdl_format(CU_BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_ENGINE[0])
+        + ",\n"
+    )
+    file.write(
+        "parameter int LANES_CONFIG_LANE_FIFO_ARBITER_SIZE_MEMORY[NUM_LANES_MAX] = "
+        + vhdl_format(CU_BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_MEMORY[0])
+        + ",\n"
+    )
+    file.write(
+        "parameter int LANES_CONFIG_LANE_MAX_CAST_WIDTH_ARRAY                                                = "
+        + vhdl_format(CU_BUNDLES_CONFIG_LANE_MAX_CAST_WIDTH_ARRAY[0])
+        + ",\n"
+    )
+    file.write(
+        "parameter int LANES_CONFIG_LANE_MAX_MERGE_WIDTH_ARRAY                                               = "
+        + vhdl_format(CU_BUNDLES_CONFIG_LANE_MAX_MERGE_WIDTH_ARRAY[0])
+        + ",\n"
+    )
+    file.write(
+        "parameter int LANES_CONFIG_LANE_MERGE_WIDTH_ARRAY[NUM_LANES_MAX]                                    = "
+        + vhdl_format(CU_BUNDLES_CONFIG_LANE_MERGE_WIDTH_ARRAY[0])
+        + ",\n"
+    )
+    file.write(
+        "parameter int LANES_CONFIG_MAX_CAST_WIDTH_ARRAY[NUM_LANES_MAX]                                      = "
+        + vhdl_format(CU_BUNDLES_CONFIG_MAX_CAST_WIDTH_ARRAY[0])
+        + ",\n"
+    )
+    file.write(
+        "parameter int LANES_CONFIG_MAX_MERGE_WIDTH_ARRAY[NUM_LANES_MAX]                                     = "
+        + vhdl_format(CU_BUNDLES_CONFIG_MAX_MERGE_WIDTH_ARRAY[0])
+        + ",\n"
+    )
+    file.write(
+        "parameter int LANES_CONFIG_MERGE_CONNECT_ARRAY[NUM_LANES_MAX][NUM_ENGINES_MAX][NUM_CAST_MAX]        = "
+        + vhdl_format(CU_BUNDLES_CONFIG_MERGE_CONNECT_ARRAY[0])
+        + ",\n"
+    )
+    file.write(
+        "parameter int LANES_CONFIG_MERGE_CONNECT_PREFIX_ARRAY[NUM_LANES_MAX][NUM_ENGINES_MAX][NUM_CAST_MAX] = "
+        + vhdl_format(CU_BUNDLES_CONFIG_MERGE_CONNECT_PREFIX_ARRAY[0])
+        + ",\n"
+    )
+    file.write(
+        "parameter int LANES_CONFIG_MERGE_WIDTH_ARRAY[NUM_LANES_MAX][NUM_ENGINES_MAX]                        = "
+        + str(CU_BUNDLES_CONFIG_MERGE_WIDTH_ARRAY[0])
+        .replace("[", "'{")
+        .replace("]", "}\n")
+        + ",\n"
+    )
+    file.write(
+        "parameter int LANES_COUNT_ARRAY[NUM_BUNDLES_MAX]                                             = '{%s},\n"
+        % (",".join(map(str, CU_BUNDLES_COUNT_ARRAY)))
+    )
+    file.write(
+        "parameter int LANES_ENGINE_ID_ARRAY[NUM_LANES_MAX][NUM_ENGINES_MAX]                                 = "
+        + str(CU_BUNDLES_ENGINE_ID_ARRAY[0]).replace("[", "'{").replace("]", "}\n")
+        + ",\n"
+    )
+    file.write(
+        "parameter int LANES_ENGINES_COUNT_ARRAY[NUM_BUNDLES_MAX][NUM_LANES_MAX]                      = "
+        + str(CU_BUNDLES_LANES_ENGINES_COUNT_ARRAY)
+        .replace("[", "'{")
+        .replace("]", "}\n")
+        + ",\n"
+    )
+    file.write(
+        f"parameter int LANES_CONFIG_CU_ARBITER_NUM_CONTROL_REQUEST=  {CU_BUNDLES_CONFIG_CU_ARBITER_NUM_CONTROL_REQUEST} ,\n"
+    )
+    file.write(
+        f"parameter int LANES_CONFIG_CU_ARBITER_NUM_CONTROL_RESPONSE=  {CU_BUNDLES_CONFIG_CU_ARBITER_NUM_CONTROL_RESPONSE} ,\n"
+    )
+    file.write(
+        f"parameter int LANES_CONFIG_CU_ARBITER_NUM_ENGINE =  {CU_BUNDLES_CONFIG_CU_ARBITER_NUM_ENGINE} ,\n"
+    )
+    file.write(
+        f"parameter int LANES_CONFIG_CU_ARBITER_NUM_MEMORY =  {CU_BUNDLES_CONFIG_CU_ARBITER_NUM_MEMORY} ,\n"
+    )
+    file.write(
+        f"parameter int LANES_CONFIG_CU_FIFO_ARBITER_SIZE_CONTROL_REQUEST=  {CU_BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_CONTROL_REQUEST} ,\n"
+    )
+    file.write(
+        f"parameter int LANES_CONFIG_CU_FIFO_ARBITER_SIZE_CONTROL_RESPONSE=  {CU_BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_CONTROL_RESPONSE} ,\n"
+    )
+    file.write(
+        f"parameter int LANES_CONFIG_CU_FIFO_ARBITER_SIZE_ENGINE =  {CU_BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_ENGINE} ,\n"
+    )
+    file.write(
+        f"parameter int LANES_CONFIG_CU_FIFO_ARBITER_SIZE_MEMORY =  {CU_BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_MEMORY} ,\n"
+    )
+
+    file.write(
+        "parameter int ENGINES_CONFIG_ARRAY[NUM_ENGINES_MAX]                                          = "
+        + str(CU_BUNDLES_ENGINE_CONFIG_ARRAY[0][0])
+        .replace("[", "'{")
+        .replace("]", "}\n")
+        + ",\n"
+    )
+    file.write(
+        "parameter int ENGINES_CONFIG_ARRAY_ENGINE_SEQ_MIN[NUM_ENGINES_MAX]                             ="
+        + vhdl_format(CU_BUNDLES_CONFIG_ARRAY_ENGINE_SEQ_MIN[0][0])
+        + ",\n"
+    )
+    file.write(
+        "parameter int ENGINES_CONFIG_ARRAY_ENGINE_SEQ_WIDTH[NUM_ENGINES_MAX]                           ="
+        + vhdl_format(CU_BUNDLES_CONFIG_ARRAY_ENGINE_SEQ_WIDTH[0][0])
+        + ",\n"
+    )
+    file.write(
+        "parameter int ENGINES_CONFIG_BUNDLE_ARBITER_NUM_CONTROL_REQUEST= "
+        + vhdl_format(CU_BUNDLES_CONFIG_BUNDLE_ARBITER_NUM_CONTROL_REQUEST[0])
+        + ",\n"
+    )
+    file.write(
+        "parameter int ENGINES_CONFIG_BUNDLE_ARBITER_NUM_CONTROL_RESPONSE= "
+        + vhdl_format(CU_BUNDLES_CONFIG_BUNDLE_ARBITER_NUM_CONTROL_RESPONSE[0])
+        + ",\n"
+    )
+    file.write(
+        "parameter int ENGINES_CONFIG_BUNDLE_ARBITER_NUM_ENGINE = "
+        + vhdl_format(CU_BUNDLES_CONFIG_BUNDLE_ARBITER_NUM_ENGINE[0])
+        + ",\n"
+    )
+    file.write(
+        "parameter int ENGINES_CONFIG_BUNDLE_ARBITER_NUM_MEMORY = "
+        + vhdl_format(CU_BUNDLES_CONFIG_BUNDLE_ARBITER_NUM_MEMORY[0])
+        + ",\n"
+    )
+    file.write(
+        "parameter int ENGINES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_CONTROL_REQUEST= "
+        + vhdl_format(CU_BUNDLES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_CONTROL_REQUEST[0])
+        + ",\n"
+    )
+    file.write(
+        "parameter int ENGINES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_CONTROL_RESPONSE= "
+        + vhdl_format(CU_BUNDLES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_CONTROL_RESPONSE[0])
+        + ",\n"
+    )
+    file.write(
+        "parameter int ENGINES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_ENGINE = "
+        + vhdl_format(CU_BUNDLES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_ENGINE[0])
+        + ",\n"
+    )
+    file.write(
+        "parameter int ENGINES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_MEMORY = "
+        + vhdl_format(CU_BUNDLES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_MEMORY[0])
+        + ",\n"
+    )
+    file.write(
+        "parameter int ENGINES_CONFIG_CAST_WIDTH_ARRAY[NUM_ENGINES_MAX]                               = "
+        + str(CU_BUNDLES_CONFIG_CAST_WIDTH_ARRAY[0][0])
+        .replace("[", "'{")
+        .replace("]", "}\n")
+        + ",\n"
+    )
+    file.write(
+        "parameter int ENGINES_CONFIG_ENGINE_ARBITER_NUM_CONTROL_REQUEST[NUM_ENGINES_MAX] = "
+        + str(CU_BUNDLES_CONFIG_ENGINE_ARBITER_NUM_CONTROL_REQUEST[0][0])
+        .replace("[", "'{")
+        .replace("]", "}\n")
+        + ",\n"
+    )
+    file.write(
+        "parameter int ENGINES_CONFIG_ENGINE_ARBITER_NUM_CONTROL_RESPONSE[NUM_ENGINES_MAX] = "
+        + str(CU_BUNDLES_CONFIG_ENGINE_ARBITER_NUM_CONTROL_RESPONSE[0][0])
+        .replace("[", "'{")
+        .replace("]", "}\n")
+        + ",\n"
+    )
+    file.write(
+        "parameter int ENGINES_CONFIG_ENGINE_ARBITER_NUM_ENGINE[NUM_ENGINES_MAX]  = "
+        + str(CU_BUNDLES_CONFIG_ENGINE_ARBITER_NUM_ENGINE[0][0])
+        .replace("[", "'{")
+        .replace("]", "}\n")
+        + ",\n"
+    )
+    file.write(
+        "parameter int ENGINES_CONFIG_ENGINE_ARBITER_NUM_MEMORY[NUM_ENGINES_MAX]  = "
+        + str(CU_BUNDLES_CONFIG_ENGINE_ARBITER_NUM_MEMORY[0][0])
+        .replace("[", "'{")
+        .replace("]", "}\n")
+        + ",\n"
+    )
+    file.write(
+        "parameter int ENGINES_CONFIG_ENGINE_FIFO_ARBITER_SIZE_CONTROL_REQUEST[NUM_ENGINES_MAX] = "
+        + str(CU_BUNDLES_CONFIG_FIFO_ARBITER_SIZE_CONTROL_REQUEST[0][0])
+        .replace("[", "'{")
+        .replace("]", "}\n")
+        + ",\n"
+    )
+    file.write(
+        "parameter int ENGINES_CONFIG_ENGINE_FIFO_ARBITER_SIZE_CONTROL_RESPONSE[NUM_ENGINES_MAX] = "
+        + str(CU_BUNDLES_CONFIG_FIFO_ARBITER_SIZE_CONTROL_RESPONSE[0][0])
+        .replace("[", "'{")
+        .replace("]", "}\n")
+        + ",\n"
+    )
+    file.write(
+        "parameter int ENGINES_CONFIG_ENGINE_FIFO_ARBITER_SIZE_ENGINE[NUM_ENGINES_MAX]  = "
+        + str(CU_BUNDLES_CONFIG_FIFO_ARBITER_SIZE_ENGINE[0][0])
+        .replace("[", "'{")
+        .replace("]", "}\n")
+        + ",\n"
+    )
+    file.write(
+        "parameter int ENGINES_CONFIG_ENGINE_FIFO_ARBITER_SIZE_MEMORY[NUM_ENGINES_MAX]  = "
+        + str(CU_BUNDLES_CONFIG_FIFO_ARBITER_SIZE_MEMORY[0][0])
+        .replace("[", "'{")
+        .replace("]", "}\n")
+        + ",\n"
+    )
+    file.write(
+        "parameter int ENGINES_CONFIG_LANE_ARBITER_NUM_CONTROL_REQUEST   = "
+        + vhdl_format(CU_BUNDLES_CONFIG_LANE_ARBITER_NUM_CONTROL_REQUEST[0][0])
+        + ",\n"
+    )
+    file.write(
+        "parameter int ENGINES_CONFIG_LANE_ARBITER_NUM_CONTROL_RESPONSE   = "
+        + vhdl_format(CU_BUNDLES_CONFIG_LANE_ARBITER_NUM_CONTROL_RESPONSE[0][0])
+        + ",\n"
+    )
+    file.write(
+        "parameter int ENGINES_CONFIG_LANE_ARBITER_NUM_ENGINE    = "
+        + vhdl_format(CU_BUNDLES_CONFIG_LANE_ARBITER_NUM_ENGINE[0][0])
+        + ",\n"
+    )
+    file.write(
+        "parameter int ENGINES_CONFIG_LANE_ARBITER_NUM_MEMORY    = "
+        + vhdl_format(CU_BUNDLES_CONFIG_LANE_ARBITER_NUM_MEMORY[0][0])
+        + ",\n"
+    )
+    file.write(
+        "parameter int ENGINES_CONFIG_LANE_CAST_WIDTH_ARRAY[NUM_LANES_MAX]                            = "
+        + vhdl_format(CU_BUNDLES_CONFIG_LANE_CAST_WIDTH_ARRAY[0])
+        + ",\n"
+    )
+    file.write(
+        "parameter int ENGINES_CONFIG_LANE_FIFO_ARBITER_SIZE_CONTROL_REQUEST   = "
+        + vhdl_format(CU_BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_CONTROL_REQUEST[0][0])
+        + ",\n"
+    )
+    file.write(
+        "parameter int ENGINES_CONFIG_LANE_FIFO_ARBITER_SIZE_CONTROL_RESPONSE   = "
+        + vhdl_format(CU_BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_CONTROL_RESPONSE[0][0])
+        + ",\n"
+    )
+    file.write(
+        "parameter int ENGINES_CONFIG_LANE_FIFO_ARBITER_SIZE_ENGINE    = "
+        + vhdl_format(CU_BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_ENGINE[0][0])
+        + ",\n"
+    )
+    file.write(
+        "parameter int ENGINES_CONFIG_LANE_FIFO_ARBITER_SIZE_MEMORY    = "
+        + vhdl_format(CU_BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_MEMORY[0][0])
+        + ",\n"
+    )
+    file.write(
+        "parameter int ENGINES_CONFIG_LANE_MERGE_WIDTH_ARRAY[NUM_LANES_MAX]                           = "
+        + vhdl_format(CU_BUNDLES_CONFIG_LANE_MERGE_WIDTH_ARRAY[0])
+        + ",\n"
+    )
+    file.write(
+        "parameter int ENGINES_CONFIG_MAX_CAST_WIDTH_ARRAY                                            = "
+        + vhdl_format(CU_BUNDLES_CONFIG_MAX_CAST_WIDTH_ARRAY[0][0])
+        + ",\n"
+    )
+    file.write(
+        "parameter int ENGINES_CONFIG_MAX_MERGE_WIDTH_ARRAY                                           = "
+        + vhdl_format(CU_BUNDLES_CONFIG_MAX_MERGE_WIDTH_ARRAY[0][0])
+        + ",\n"
+    )
+    file.write(
+        "parameter int ENGINES_CONFIG_MERGE_CONNECT_ARRAY[NUM_ENGINES_MAX][NUM_CAST_MAX]              = "
+        + vhdl_format(CU_BUNDLES_CONFIG_MERGE_CONNECT_ARRAY[0][0])
+        + ",\n"
+    )
+    file.write(
+        "parameter int ENGINES_CONFIG_MERGE_CONNECT_PREFIX_ARRAY[NUM_ENGINES_MAX][NUM_CAST_MAX]       = "
+        + vhdl_format(CU_BUNDLES_CONFIG_MERGE_CONNECT_PREFIX_ARRAY[0][0])
+        + ",\n"
+    )
+    file.write(
+        "parameter int ENGINES_CONFIG_MERGE_WIDTH_ARRAY[NUM_ENGINES_MAX]                              = "
+        + str(CU_BUNDLES_CONFIG_MERGE_WIDTH_ARRAY[0][0])
+        .replace("[", "'{")
+        .replace("]", "}\n")
+        + ",\n"
+    )
+    file.write(
+        "parameter int ENGINES_COUNT_ARRAY[NUM_LANES_MAX]                                             = "
+        + str(CU_BUNDLES_LANES_ENGINES_COUNT_ARRAY[0])
+        .replace("[", "'{")
+        .replace("]", "}")
+        + ",\n"
+    )
+    file.write(
+        "parameter int ENGINES_ENGINE_ID_ARRAY[NUM_ENGINES_MAX]                                       = "
+        + str(CU_BUNDLES_ENGINE_ID_ARRAY[0][0]).replace("[", "'{").replace("]", "}\n")
+        + ",\n"
+    )
+    file.write(
+        f"parameter int ENGINES_CONFIG_CU_ARBITER_NUM_CONTROL_REQUEST=  {CU_BUNDLES_CONFIG_CU_ARBITER_NUM_CONTROL_REQUEST} ,\n"
+    )
+    file.write(
+        f"parameter int ENGINES_CONFIG_CU_ARBITER_NUM_CONTROL_RESPONSE=  {CU_BUNDLES_CONFIG_CU_ARBITER_NUM_CONTROL_RESPONSE} ,\n"
+    )
+    file.write(
+        f"parameter int ENGINES_CONFIG_CU_ARBITER_NUM_ENGINE =  {CU_BUNDLES_CONFIG_CU_ARBITER_NUM_ENGINE} ,\n"
+    )
+    file.write(
+        f"parameter int ENGINES_CONFIG_CU_ARBITER_NUM_MEMORY =  {CU_BUNDLES_CONFIG_CU_ARBITER_NUM_MEMORY} ,\n"
+    )
+    file.write(
+        f"parameter int ENGINES_CONFIG_CU_FIFO_ARBITER_SIZE_CONTROL_REQUEST=  {CU_BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_CONTROL_REQUEST} ,\n"
+    )
+    file.write(
+        f"parameter int ENGINES_CONFIG_CU_FIFO_ARBITER_SIZE_CONTROL_RESPONSE=  {CU_BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_CONTROL_RESPONSE} ,\n"
+    )
+    file.write(
+        f"parameter int ENGINES_CONFIG_CU_FIFO_ARBITER_SIZE_ENGINE =  {CU_BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_ENGINE} ,\n"
+    )
+    file.write(
+        f"parameter int ENGINES_CONFIG_CU_FIFO_ARBITER_SIZE_MEMORY =  {CU_BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_MEMORY}\n"
+    )
+
+    file.write(f"// total_luts={total_luts}\n\n")
 
 
 # Write to SV file
@@ -1308,33 +2491,46 @@ with open(output_file_bundle_topology, "w") as file:
     cast_count = [0] * NUM_LANES
 
     for j in range(NUM_BUNDLES):
-        LANES_CONFIG_MAX_MERGE_WIDTH_ARRAY      = CU_BUNDLES_CONFIG_MAX_MERGE_WIDTH_ARRAY[j]      
-        LANES_CONFIG_MAX_CAST_WIDTH_ARRAY       = CU_BUNDLES_CONFIG_MAX_CAST_WIDTH_ARRAY[j]       
-        LANES_CONFIG_LANE_MAX_CAST_WIDTH_ARRAY  = CU_BUNDLES_CONFIG_LANE_MAX_CAST_WIDTH_ARRAY[j]  
-        LANES_CONFIG_LANE_MAX_MERGE_WIDTH_ARRAY = CU_BUNDLES_CONFIG_LANE_MAX_MERGE_WIDTH_ARRAY[j] 
-        LANES_CONFIG_MERGE_CONNECT_PREFIX_ARRAY = CU_BUNDLES_CONFIG_MERGE_CONNECT_PREFIX_ARRAY[j] 
-        LANES_CONFIG_ARRAY                      = CU_BUNDLES_CONFIG_ARRAY[j]                      
-        LANES_CONFIG_ARRAY_ENGINE_SEQ_MIN       = CU_BUNDLES_CONFIG_ARRAY_ENGINE_SEQ_MIN[j]                    
-        LANES_CONFIG_ARRAY_ENGINE_SEQ_WIDTH     = CU_BUNDLES_CONFIG_ARRAY_ENGINE_SEQ_WIDTH[j]      
-        LANES_CONFIG_CAST_WIDTH_ARRAY           = CU_BUNDLES_CONFIG_CAST_WIDTH_ARRAY[j]           
-        LANES_CONFIG_LANE_CAST_WIDTH_ARRAY      = CU_BUNDLES_CONFIG_LANE_CAST_WIDTH_ARRAY[j]      
-        LANES_CONFIG_LANE_MERGE_WIDTH_ARRAY     = CU_BUNDLES_CONFIG_LANE_MERGE_WIDTH_ARRAY[j]     
-        LANES_CONFIG_MERGE_CONNECT_ARRAY        = CU_BUNDLES_CONFIG_MERGE_CONNECT_ARRAY[j]        
-        LANES_CONFIG_MERGE_WIDTH_ARRAY          = CU_BUNDLES_CONFIG_MERGE_WIDTH_ARRAY[j]          
-        LANES_ENGINE_ID_ARRAY                   = CU_BUNDLES_ENGINE_ID_ARRAY[j]                   
-        ENGINES_COUNT_ARRAY                     = CU_BUNDLES_LANES_ENGINES_COUNT_ARRAY[j]                 
-        ID_BUNDLE                               = j                                            
-        NUM_LANES                               = CU_BUNDLES_COUNT_ARRAY[j]   
+        LANES_CONFIG_MAX_MERGE_WIDTH_ARRAY = CU_BUNDLES_CONFIG_MAX_MERGE_WIDTH_ARRAY[j]
+        LANES_CONFIG_MAX_CAST_WIDTH_ARRAY = CU_BUNDLES_CONFIG_MAX_CAST_WIDTH_ARRAY[j]
+        LANES_CONFIG_LANE_MAX_CAST_WIDTH_ARRAY = (
+            CU_BUNDLES_CONFIG_LANE_MAX_CAST_WIDTH_ARRAY[j]
+        )
+        LANES_CONFIG_LANE_MAX_MERGE_WIDTH_ARRAY = (
+            CU_BUNDLES_CONFIG_LANE_MAX_MERGE_WIDTH_ARRAY[j]
+        )
+        LANES_CONFIG_MERGE_CONNECT_PREFIX_ARRAY = (
+            CU_BUNDLES_CONFIG_MERGE_CONNECT_PREFIX_ARRAY[j]
+        )
+        LANES_CONFIG_ARRAY = CU_BUNDLES_CONFIG_ARRAY[j]
+        LANES_CONFIG_ARRAY_ENGINE_SEQ_MIN = CU_BUNDLES_CONFIG_ARRAY_ENGINE_SEQ_MIN[j]
+        LANES_CONFIG_ARRAY_ENGINE_SEQ_WIDTH = CU_BUNDLES_CONFIG_ARRAY_ENGINE_SEQ_WIDTH[
+            j
+        ]
+        LANES_CONFIG_CAST_WIDTH_ARRAY = CU_BUNDLES_CONFIG_CAST_WIDTH_ARRAY[j]
+        LANES_CONFIG_LANE_CAST_WIDTH_ARRAY = CU_BUNDLES_CONFIG_LANE_CAST_WIDTH_ARRAY[j]
+        LANES_CONFIG_LANE_MERGE_WIDTH_ARRAY = CU_BUNDLES_CONFIG_LANE_MERGE_WIDTH_ARRAY[
+            j
+        ]
+        LANES_CONFIG_MERGE_CONNECT_ARRAY = CU_BUNDLES_CONFIG_MERGE_CONNECT_ARRAY[j]
+        LANES_CONFIG_MERGE_WIDTH_ARRAY = CU_BUNDLES_CONFIG_MERGE_WIDTH_ARRAY[j]
+        LANES_ENGINE_ID_ARRAY = CU_BUNDLES_ENGINE_ID_ARRAY[j]
+        ENGINES_COUNT_ARRAY = CU_BUNDLES_LANES_ENGINES_COUNT_ARRAY[j]
+        ID_BUNDLE = j
+        NUM_LANES = CU_BUNDLES_COUNT_ARRAY[j]
         file.write("\n")
         file.write(f"generate\n")
         file.write(f"     if(ID_BUNDLE == {j})\n")
-        file.write(f"                    begin\n")         
+        file.write(f"                    begin\n")
         for lane_merge in range(NUM_LANES):
             lane_merge_l = lane_merge
             LANE_MERGE_PIPELINE_STAGES = 0
-            LANES_CONFIG_LANE_MERGE_WIDTH_ARRAY_L = LANES_CONFIG_LANE_MERGE_WIDTH_ARRAY[lane_merge_l]
+            LANES_CONFIG_LANE_MERGE_WIDTH_ARRAY_L = LANES_CONFIG_LANE_MERGE_WIDTH_ARRAY[
+                lane_merge_l
+            ]
 
-            file.write(f"""               hyper_pipeline_noreset #(
+            file.write(
+                f"""               hyper_pipeline_noreset #(
                    .STAGES({LANE_MERGE_PIPELINE_STAGES}                            ),
                    .WIDTH ($bits(lanes_fifo_request_cast_lane_out_signals_in[{lane_merge_l}][0]) )
                ) inst_hyper_pipeline_lanes_fifo_request_cast_lane_out_signals_in_{lane_merge_l}_0 (
@@ -1387,30 +2583,45 @@ with open(output_file_bundle_topology, "w") as file:
                    .din   (lanes_response_engine_in[{lane_merge_l}]),
                    .dout  (lanes_response_merge_engine_in[{lane_merge_l}][0])
                );
-""")
+"""
+            )
 
             if LANES_CONFIG_LANE_MERGE_WIDTH_ARRAY_L != 0:
                 merge_count = 0
                 LANE_CAST_PIPELINE_STAGES = 0
                 for lane_cast in range(NUM_LANES):
                     lane_cast_l = lane_cast
-                    LANES_CONFIG_LANE_CAST_WIDTH_ARRAY_L = LANES_CONFIG_LANE_CAST_WIDTH_ARRAY[lane_cast_l]
+                    LANES_CONFIG_LANE_CAST_WIDTH_ARRAY_L = (
+                        LANES_CONFIG_LANE_CAST_WIDTH_ARRAY[lane_cast_l]
+                    )
                     ENGINES_COUNT_ARRAY_L = ENGINES_COUNT_ARRAY[lane_cast_l]
 
-                    if LANES_CONFIG_LANE_CAST_WIDTH_ARRAY_L != 0 and lane_cast_l != lane_merge_l:
+                    if (
+                        LANES_CONFIG_LANE_CAST_WIDTH_ARRAY_L != 0
+                        and lane_cast_l != lane_merge_l
+                    ):
                         for engine_idx in range(ENGINES_COUNT_ARRAY_L):
                             engine_idx_l = engine_idx
-                            LANES_CONFIG_CAST_WIDTH_ARRAY_L = LANES_CONFIG_CAST_WIDTH_ARRAY[lane_cast_l][engine_idx_l]
+                            LANES_CONFIG_CAST_WIDTH_ARRAY_L = (
+                                LANES_CONFIG_CAST_WIDTH_ARRAY[lane_cast_l][engine_idx_l]
+                            )
 
                             for cast_idx in range(LANES_CONFIG_CAST_WIDTH_ARRAY_L):
                                 cast_idx_l = cast_idx
-                                LANES_CONFIG_MERGE_CONNECT_ARRAY_L = LANES_CONFIG_MERGE_CONNECT_ARRAY[lane_cast_l][engine_idx_l][cast_idx_l]
+                                LANES_CONFIG_MERGE_CONNECT_ARRAY_L = (
+                                    LANES_CONFIG_MERGE_CONNECT_ARRAY[lane_cast_l][
+                                        engine_idx_l
+                                    ][cast_idx_l]
+                                )
 
                                 if LANES_CONFIG_MERGE_CONNECT_ARRAY_L == lane_merge_l:
                                     merge_count += 1
                                     cast_count[lane_cast_l] += 1
-                                    file.write(f"                      assign lanes_fifo_response_merge_lane_in_signals_in[{lane_merge_l}][{merge_count}].rd_en             = 1'b1;\n")
-                                    file.write(f"""               hyper_pipeline_noreset #(
+                                    file.write(
+                                        f"                      assign lanes_fifo_response_merge_lane_in_signals_in[{lane_merge_l}][{merge_count}].rd_en             = 1'b1;\n"
+                                    )
+                                    file.write(
+                                        f"""               hyper_pipeline_noreset #(
                    .STAGES({LANE_CAST_PIPELINE_STAGES}                            ),
                    .WIDTH ($bits(lanes_fifo_request_cast_lane_out_signals_in[{lane_cast_l}][{cast_count[lane_cast_l]}].rd_en) )
                ) inst_hyper_pipeline_lanes_fifo_request_cast_lane_out_signals_in_{lane_cast_l}_{cast_count[lane_cast_l]}_rd_en (
@@ -1428,13 +2639,13 @@ with open(output_file_bundle_topology, "w") as file:
                    .dout  (lanes_response_merge_engine_in[{lane_merge_l}][{merge_count}])
                );
 
-""")
-                               
+"""
+                                    )
 
-        file.write(f"                    end\n") 
+        file.write(f"                    end\n")
         file.write(f"endgenerate\n")
-    
-    file.write(f"// total_luts={total_luts}\n\n")   
+
+    file.write(f"// total_luts={total_luts}\n\n")
 
 
 # Write to SV file
@@ -1442,46 +2653,59 @@ with open(output_file_lane_topology, "w") as file:
     cast_count = [0] * NUM_LANES
 
     for j in range(NUM_BUNDLES):
-        LANES_CONFIG_MAX_MERGE_WIDTH_ARRAY      = CU_BUNDLES_CONFIG_MAX_MERGE_WIDTH_ARRAY[j]      
-        LANES_CONFIG_MAX_CAST_WIDTH_ARRAY       = CU_BUNDLES_CONFIG_MAX_CAST_WIDTH_ARRAY[j]       
-        LANES_CONFIG_LANE_MAX_CAST_WIDTH_ARRAY  = CU_BUNDLES_CONFIG_LANE_MAX_CAST_WIDTH_ARRAY[j]  
-        LANES_CONFIG_LANE_MAX_MERGE_WIDTH_ARRAY = CU_BUNDLES_CONFIG_LANE_MAX_MERGE_WIDTH_ARRAY[j] 
-        LANES_CONFIG_MERGE_CONNECT_PREFIX_ARRAY = CU_BUNDLES_CONFIG_MERGE_CONNECT_PREFIX_ARRAY[j] 
-        LANES_CONFIG_ARRAY                      = CU_BUNDLES_CONFIG_ARRAY[j]                      
-        LANES_CONFIG_ARRAY_ENGINE_SEQ_MIN       = CU_BUNDLES_CONFIG_ARRAY_ENGINE_SEQ_MIN[j]                    
-        LANES_CONFIG_ARRAY_ENGINE_SEQ_WIDTH     = CU_BUNDLES_CONFIG_ARRAY_ENGINE_SEQ_WIDTH[j]      
-        LANES_CONFIG_CAST_WIDTH_ARRAY           = CU_BUNDLES_CONFIG_CAST_WIDTH_ARRAY[j]           
-        LANES_CONFIG_LANE_CAST_WIDTH_ARRAY      = CU_BUNDLES_CONFIG_LANE_CAST_WIDTH_ARRAY[j]      
-        LANES_CONFIG_LANE_MERGE_WIDTH_ARRAY     = CU_BUNDLES_CONFIG_LANE_MERGE_WIDTH_ARRAY[j]     
-        LANES_CONFIG_MERGE_CONNECT_ARRAY        = CU_BUNDLES_CONFIG_MERGE_CONNECT_ARRAY[j]        
-        LANES_CONFIG_MERGE_WIDTH_ARRAY          = CU_BUNDLES_CONFIG_MERGE_WIDTH_ARRAY[j]          
-        LANES_ENGINE_ID_ARRAY                   = CU_BUNDLES_ENGINE_ID_ARRAY[j]                   
-        ENGINES_COUNT_ARRAY                     = CU_BUNDLES_LANES_ENGINES_COUNT_ARRAY[j]                 
-        ID_BUNDLE                               = j                                            
-        NUM_LANES                               = CU_BUNDLES_COUNT_ARRAY[j]   
-        
+        LANES_CONFIG_MAX_MERGE_WIDTH_ARRAY = CU_BUNDLES_CONFIG_MAX_MERGE_WIDTH_ARRAY[j]
+        LANES_CONFIG_MAX_CAST_WIDTH_ARRAY = CU_BUNDLES_CONFIG_MAX_CAST_WIDTH_ARRAY[j]
+        LANES_CONFIG_LANE_MAX_CAST_WIDTH_ARRAY = (
+            CU_BUNDLES_CONFIG_LANE_MAX_CAST_WIDTH_ARRAY[j]
+        )
+        LANES_CONFIG_LANE_MAX_MERGE_WIDTH_ARRAY = (
+            CU_BUNDLES_CONFIG_LANE_MAX_MERGE_WIDTH_ARRAY[j]
+        )
+        LANES_CONFIG_MERGE_CONNECT_PREFIX_ARRAY = (
+            CU_BUNDLES_CONFIG_MERGE_CONNECT_PREFIX_ARRAY[j]
+        )
+        LANES_CONFIG_ARRAY = CU_BUNDLES_CONFIG_ARRAY[j]
+        LANES_CONFIG_ARRAY_ENGINE_SEQ_MIN = CU_BUNDLES_CONFIG_ARRAY_ENGINE_SEQ_MIN[j]
+        LANES_CONFIG_ARRAY_ENGINE_SEQ_WIDTH = CU_BUNDLES_CONFIG_ARRAY_ENGINE_SEQ_WIDTH[
+            j
+        ]
+        LANES_CONFIG_CAST_WIDTH_ARRAY = CU_BUNDLES_CONFIG_CAST_WIDTH_ARRAY[j]
+        LANES_CONFIG_LANE_CAST_WIDTH_ARRAY = CU_BUNDLES_CONFIG_LANE_CAST_WIDTH_ARRAY[j]
+        LANES_CONFIG_LANE_MERGE_WIDTH_ARRAY = CU_BUNDLES_CONFIG_LANE_MERGE_WIDTH_ARRAY[
+            j
+        ]
+        LANES_CONFIG_MERGE_CONNECT_ARRAY = CU_BUNDLES_CONFIG_MERGE_CONNECT_ARRAY[j]
+        LANES_CONFIG_MERGE_WIDTH_ARRAY = CU_BUNDLES_CONFIG_MERGE_WIDTH_ARRAY[j]
+        LANES_ENGINE_ID_ARRAY = CU_BUNDLES_ENGINE_ID_ARRAY[j]
+        ENGINES_COUNT_ARRAY = CU_BUNDLES_LANES_ENGINES_COUNT_ARRAY[j]
+        ID_BUNDLE = j
+        NUM_LANES = CU_BUNDLES_COUNT_ARRAY[j]
+
         for l in range(NUM_LANES):
 
-            ENGINES_CONFIG_MAX_MERGE_WIDTH_ARRAY   =LANES_CONFIG_MAX_MERGE_WIDTH_ARRAY[l]          
-            ENGINES_CONFIG_MAX_CAST_WIDTH_ARRAY    =LANES_CONFIG_MAX_CAST_WIDTH_ARRAY[l]           
-            ENGINES_CONFIG_MERGE_CONNECT_PREFIX_ARRAY  =LANES_CONFIG_MERGE_CONNECT_PREFIX_ARRAY[l] 
-            ENGINES_CONFIG_ARRAY                   =LANES_CONFIG_ARRAY[l]                          
-            ENGINES_CONFIG_ARRAY_ENGINE_SEQ_MIN    =LANES_CONFIG_ARRAY_ENGINE_SEQ_MIN[l]                                 
-            ENGINES_CONFIG_ARRAY_ENGINE_SEQ_WIDTH  =LANES_CONFIG_ARRAY_ENGINE_SEQ_WIDTH[l]          
-            ENGINES_CONFIG_CAST_WIDTH_ARRAY        =LANES_CONFIG_CAST_WIDTH_ARRAY[l]               
-            ENGINES_CONFIG_MERGE_CONNECT_ARRAY     =LANES_CONFIG_MERGE_CONNECT_ARRAY[l]            
-            ENGINES_CONFIG_MERGE_WIDTH_ARRAY       =LANES_CONFIG_MERGE_WIDTH_ARRAY[l]              
-            ENGINES_ENGINE_ID_ARRAY                =LANES_ENGINE_ID_ARRAY[l]                       
-            ID_LANE                                =l                                              
-            LANE_CAST_WIDTH                        =LANES_CONFIG_LANE_CAST_WIDTH_ARRAY[l]          
-            LANE_MERGE_WIDTH                       =LANES_CONFIG_LANE_MERGE_WIDTH_ARRAY[l]         
-            NUM_ENGINES                            =ENGINES_COUNT_ARRAY[l]                         
-
+            ENGINES_CONFIG_MAX_MERGE_WIDTH_ARRAY = LANES_CONFIG_MAX_MERGE_WIDTH_ARRAY[l]
+            ENGINES_CONFIG_MAX_CAST_WIDTH_ARRAY = LANES_CONFIG_MAX_CAST_WIDTH_ARRAY[l]
+            ENGINES_CONFIG_MERGE_CONNECT_PREFIX_ARRAY = (
+                LANES_CONFIG_MERGE_CONNECT_PREFIX_ARRAY[l]
+            )
+            ENGINES_CONFIG_ARRAY = LANES_CONFIG_ARRAY[l]
+            ENGINES_CONFIG_ARRAY_ENGINE_SEQ_MIN = LANES_CONFIG_ARRAY_ENGINE_SEQ_MIN[l]
+            ENGINES_CONFIG_ARRAY_ENGINE_SEQ_WIDTH = LANES_CONFIG_ARRAY_ENGINE_SEQ_WIDTH[
+                l
+            ]
+            ENGINES_CONFIG_CAST_WIDTH_ARRAY = LANES_CONFIG_CAST_WIDTH_ARRAY[l]
+            ENGINES_CONFIG_MERGE_CONNECT_ARRAY = LANES_CONFIG_MERGE_CONNECT_ARRAY[l]
+            ENGINES_CONFIG_MERGE_WIDTH_ARRAY = LANES_CONFIG_MERGE_WIDTH_ARRAY[l]
+            ENGINES_ENGINE_ID_ARRAY = LANES_ENGINE_ID_ARRAY[l]
+            ID_LANE = l
+            LANE_CAST_WIDTH = LANES_CONFIG_LANE_CAST_WIDTH_ARRAY[l]
+            LANE_MERGE_WIDTH = LANES_CONFIG_LANE_MERGE_WIDTH_ARRAY[l]
+            NUM_ENGINES = ENGINES_COUNT_ARRAY[l]
 
             file.write("\n")
             file.write(f"generate\n")
             file.write(f"     if((ID_BUNDLE == {j}) && (ID_LANE == {l}))\n")
-            file.write(f"          begin\n")       
+            file.write(f"          begin\n")
 
             # Initialize counters
             cast_count = 0
@@ -1491,12 +2715,19 @@ with open(output_file_lane_topology, "w") as file:
             for engine_idx in range(NUM_ENGINES):
                 engine_idx_l = engine_idx
                 ENGINE_PIPELINE_STAGES = 0
-                ENGINES_CONFIG_MERGE_WIDTH_ARRAY_L = ENGINES_CONFIG_MERGE_WIDTH_ARRAY[engine_idx_l]
-                ENGINES_CONFIG_CAST_WIDTH_ARRAY_L = ENGINES_CONFIG_CAST_WIDTH_ARRAY[engine_idx_l]
+                ENGINES_CONFIG_MERGE_WIDTH_ARRAY_L = ENGINES_CONFIG_MERGE_WIDTH_ARRAY[
+                    engine_idx_l
+                ]
+                ENGINES_CONFIG_CAST_WIDTH_ARRAY_L = ENGINES_CONFIG_CAST_WIDTH_ARRAY[
+                    engine_idx_l
+                ]
 
-                file.write(f"               assign engines_fifo_response_merge_lane_in_signals_in[{engine_idx_l}][0].rd_en = 1'b1;\n")
-            
-                file.write(f"""               hyper_pipeline_noreset #(
+                file.write(
+                    f"               assign engines_fifo_response_merge_lane_in_signals_in[{engine_idx_l}][0].rd_en = 1'b1;\n"
+                )
+
+                file.write(
+                    f"""               hyper_pipeline_noreset #(
                    .STAGES({ENGINE_PIPELINE_STAGES}                            ),
                    .WIDTH ($bits(engines_response_merge_lane_in[{engine_idx_l}][0]) )
                ) inst_hyper_pipeline_engines_response_merge_lane_in_{engine_idx_l}_0 (
@@ -1541,15 +2772,18 @@ with open(output_file_lane_topology, "w") as file:
                    .dout  (engines_fifo_request_lane_out_signals_out[{engine_idx_l}])
                );
 
-""")
+"""
+                )
 
-    
                 for engine_merge in range(ENGINES_CONFIG_MERGE_WIDTH_ARRAY_L):
                     engine_merge_l = engine_merge
                     merge_count += 1
-                   
-                    file.write(f"               assign engines_fifo_response_merge_lane_in_signals_in[{engine_idx_l}][{engine_merge_l+1}].rd_en = 1'b1;\n")
-                    file.write(f"""               hyper_pipeline_noreset #(
+
+                    file.write(
+                        f"               assign engines_fifo_response_merge_lane_in_signals_in[{engine_idx_l}][{engine_merge_l+1}].rd_en = 1'b1;\n"
+                    )
+                    file.write(
+                        f"""               hyper_pipeline_noreset #(
                    .STAGES({ENGINE_PIPELINE_STAGES}                            ),
                    .WIDTH ($bits(engines_response_merge_lane_in[{engine_idx_l}][{engine_merge_l+1}]) )
                ) inst_hyper_pipeline_engines_response_merge_lane_in_{engine_idx_l}_{engine_merge_l+1} (
@@ -1567,13 +2801,15 @@ with open(output_file_lane_topology, "w") as file:
                    .dout  (fifo_response_lane_in_signals_out[{merge_count}] )
                );
 
-""")
+"""
+                    )
 
                 for engine_cast in range(ENGINES_CONFIG_CAST_WIDTH_ARRAY_L):
                     engine_cast_l = engine_cast
                     cast_count += 1
 
-                    file.write(f"""               hyper_pipeline_noreset #(
+                    file.write(
+                        f"""               hyper_pipeline_noreset #(
                    .STAGES({ENGINE_PIPELINE_STAGES}                            ),
                    .WIDTH ($bits(request_lane_out[{cast_count}]) )
                ) inst_hyper_pipeline_request_lane_out_{cast_count} (
@@ -1600,45 +2836,55 @@ with open(output_file_lane_topology, "w") as file:
                    .dout  (fifo_request_lane_out_signals_out[{cast_count}])
                );
 
-""")
+"""
+                    )
 
-
-            file.write(f"          end\n") 
+            file.write(f"          end\n")
             file.write(f"endgenerate\n")
-            file.write(f"\n\n") 
+            file.write(f"\n\n")
 
-    file.write(f"// total_luts={total_luts}\n\n")   
-                   
+    file.write(f"// total_luts={total_luts}\n\n")
+
 
 with open(output_file_lane_arbitration, "w") as file:
     for ID_BUNDLE in range(NUM_BUNDLES):
-        ENGINE_ARBITER_MEMORY_PIPELINE_STAGES=0
+        ENGINE_ARBITER_MEMORY_PIPELINE_STAGES = 0
         NUM_LANES = CU_BUNDLES_COUNT_ARRAY[ID_BUNDLE]
-        ENGINES_COUNT_ARRAY                  = CU_BUNDLES_LANES_ENGINES_COUNT_ARRAY[ID_BUNDLE]     
+        ENGINES_COUNT_ARRAY = CU_BUNDLES_LANES_ENGINES_COUNT_ARRAY[ID_BUNDLE]
 
-
-        LANES_CONFIG_ENGINE_ARBITER_NUM_MEMORY = CU_BUNDLES_CONFIG_ENGINE_ARBITER_NUM_MEMORY[ID_BUNDLE]
-        LANES_CONFIG_LANE_ARBITER_NUM_MEMORY = CU_BUNDLES_CONFIG_LANE_ARBITER_NUM_MEMORY[ID_BUNDLE]
+        LANES_CONFIG_ENGINE_ARBITER_NUM_MEMORY = (
+            CU_BUNDLES_CONFIG_ENGINE_ARBITER_NUM_MEMORY[ID_BUNDLE]
+        )
+        LANES_CONFIG_LANE_ARBITER_NUM_MEMORY = (
+            CU_BUNDLES_CONFIG_LANE_ARBITER_NUM_MEMORY[ID_BUNDLE]
+        )
 
         for ID_LANE in range(NUM_LANES):
 
             NUM_ENGINES = ENGINES_COUNT_ARRAY[ID_LANE]
-            ENGINES_CONFIG_ENGINE_ARBITER_NUM_MEMORY = LANES_CONFIG_ENGINE_ARBITER_NUM_MEMORY[ID_LANE]
-            ENGINES_CONFIG_LANE_ARBITER_NUM_MEMORY = LANES_CONFIG_LANE_ARBITER_NUM_MEMORY[ID_LANE]
+            ENGINES_CONFIG_ENGINE_ARBITER_NUM_MEMORY = (
+                LANES_CONFIG_ENGINE_ARBITER_NUM_MEMORY[ID_LANE]
+            )
+            ENGINES_CONFIG_LANE_ARBITER_NUM_MEMORY = (
+                LANES_CONFIG_LANE_ARBITER_NUM_MEMORY[ID_LANE]
+            )
 
             if ENGINES_CONFIG_LANE_ARBITER_NUM_MEMORY:
 
                 file.write("\n")
                 file.write(f"generate\n")
-                file.write(f"     if((ID_BUNDLE == {ID_BUNDLE}) && (ID_LANE == {ID_LANE}))\n")
-                file.write(f"          begin\n")  
+                file.write(
+                    f"     if((ID_BUNDLE == {ID_BUNDLE}) && (ID_LANE == {ID_LANE}))\n"
+                )
+                file.write(f"          begin\n")
 
-                REAL_ID_ENGINE = 0;
+                REAL_ID_ENGINE = 0
                 for ID_ENGINE in range(NUM_ENGINES):
                     MAP_ENGINE = ENGINES_CONFIG_ENGINE_ARBITER_NUM_MEMORY[ID_ENGINE]
-  
+
                     if MAP_ENGINE:
-                        file.write(f"""               hyper_pipeline_noreset #(
+                        file.write(
+                            f"""               hyper_pipeline_noreset #(
                    .STAGES({ENGINE_ARBITER_MEMORY_PIPELINE_STAGES}                            ),
                    .WIDTH ($bits(engine_arbiter_N_to_1_memory_request_in[{REAL_ID_ENGINE}]) )
                ) inst_hyper_pipeline_engine_arbiter_N_to_1_memory_request_in_{REAL_ID_ENGINE} (
@@ -1656,17 +2902,24 @@ with open(output_file_lane_arbitration, "w") as file:
                    .dout  (engines_fifo_request_memory_out_signals_in[{ID_ENGINE}].rd_en)
                );
 
-""")
+"""
+                        )
                         REAL_ID_ENGINE += 1
                     else:
-                        file.write(f"               assign engines_fifo_request_memory_out_signals_in[{ID_ENGINE}].rd_en  = 1'b0;\n")
+                        file.write(
+                            f"               assign engines_fifo_request_memory_out_signals_in[{ID_ENGINE}].rd_en  = 1'b0;\n"
+                        )
 
+                for ID_ENGINE in range(REAL_ID_ENGINE, NUM_ENGINES):
+                    file.write(
+                        f"               assign engine_arbiter_N_to_1_memory_request_in[{ID_ENGINE}] = 0;\n"
+                    )
+                    file.write(
+                        f"               assign engine_arbiter_N_to_1_memory_engine_arbiter_grant_out[{ID_ENGINE}] = 1'b0;\n"
+                    )
 
-                for ID_ENGINE in range(REAL_ID_ENGINE,NUM_ENGINES):
-                    file.write(f"               assign engine_arbiter_N_to_1_memory_request_in[{ID_ENGINE}] = 0;\n")
-                    file.write(f"               assign engine_arbiter_N_to_1_memory_engine_arbiter_grant_out[{ID_ENGINE}] = 1'b0;\n")
-
-                file.write(f"""               
+                file.write(
+                    f"""               
                 hyper_pipeline_noreset #(
                     .STAGES({ENGINE_ARBITER_MEMORY_PIPELINE_STAGES}                                                                ),
                     .WIDTH ($bits(engine_arbiter_N_to_1_memory_fifo_request_signals_in.rd_en))
@@ -1675,39 +2928,52 @@ with open(output_file_lane_arbitration, "w") as file:
                     .din   (fifo_request_memory_out_signals_in_reg.rd_en              ),
                     .dout  (engine_arbiter_N_to_1_memory_fifo_request_signals_in.rd_en)
                 );
-""")
-                file.write(f"          end\n") 
+"""
+                )
+                file.write(f"          end\n")
                 file.write(f"endgenerate\n")
-                file.write(f"\n\n") 
+                file.write(f"\n\n")
 
     for ID_BUNDLE in range(NUM_BUNDLES):
-        ENGINE_ARBITER_CONTROL_PIPELINE_STAGES=0
+        ENGINE_ARBITER_CONTROL_PIPELINE_STAGES = 0
         NUM_LANES = CU_BUNDLES_COUNT_ARRAY[ID_BUNDLE]
-        ENGINES_COUNT_ARRAY                  = CU_BUNDLES_LANES_ENGINES_COUNT_ARRAY[ID_BUNDLE]     
+        ENGINES_COUNT_ARRAY = CU_BUNDLES_LANES_ENGINES_COUNT_ARRAY[ID_BUNDLE]
 
-
-        LANES_CONFIG_ENGINE_ARBITER_NUM_CONTROL_REQUEST = CU_BUNDLES_CONFIG_ENGINE_ARBITER_NUM_CONTROL_REQUEST[ID_BUNDLE]
-        LANES_CONFIG_LANE_ARBITER_NUM_CONTROL_REQUEST = CU_BUNDLES_CONFIG_LANE_ARBITER_NUM_CONTROL_REQUEST[ID_BUNDLE]
+        LANES_CONFIG_ENGINE_ARBITER_NUM_CONTROL_REQUEST = (
+            CU_BUNDLES_CONFIG_ENGINE_ARBITER_NUM_CONTROL_REQUEST[ID_BUNDLE]
+        )
+        LANES_CONFIG_LANE_ARBITER_NUM_CONTROL_REQUEST = (
+            CU_BUNDLES_CONFIG_LANE_ARBITER_NUM_CONTROL_REQUEST[ID_BUNDLE]
+        )
 
         for ID_LANE in range(NUM_LANES):
 
             NUM_ENGINES = ENGINES_COUNT_ARRAY[ID_LANE]
-            ENGINES_CONFIG_ENGINE_ARBITER_NUM_CONTROL_REQUEST = LANES_CONFIG_ENGINE_ARBITER_NUM_CONTROL_REQUEST[ID_LANE]
-            ENGINES_CONFIG_LANE_ARBITER_NUM_CONTROL_REQUEST = LANES_CONFIG_LANE_ARBITER_NUM_CONTROL_REQUEST[ID_LANE]
+            ENGINES_CONFIG_ENGINE_ARBITER_NUM_CONTROL_REQUEST = (
+                LANES_CONFIG_ENGINE_ARBITER_NUM_CONTROL_REQUEST[ID_LANE]
+            )
+            ENGINES_CONFIG_LANE_ARBITER_NUM_CONTROL_REQUEST = (
+                LANES_CONFIG_LANE_ARBITER_NUM_CONTROL_REQUEST[ID_LANE]
+            )
 
             if ENGINES_CONFIG_LANE_ARBITER_NUM_CONTROL_REQUEST:
 
                 file.write("\n")
                 file.write(f"generate\n")
-                file.write(f"     if((ID_BUNDLE == {ID_BUNDLE}) && (ID_LANE == {ID_LANE}))\n")
-                file.write(f"          begin\n")  
+                file.write(
+                    f"     if((ID_BUNDLE == {ID_BUNDLE}) && (ID_LANE == {ID_LANE}))\n"
+                )
+                file.write(f"          begin\n")
 
-                REAL_ID_ENGINE = 0;
+                REAL_ID_ENGINE = 0
                 for ID_ENGINE in range(NUM_ENGINES):
-                    MAP_ENGINE = ENGINES_CONFIG_ENGINE_ARBITER_NUM_CONTROL_REQUEST[ID_ENGINE]
+                    MAP_ENGINE = ENGINES_CONFIG_ENGINE_ARBITER_NUM_CONTROL_REQUEST[
+                        ID_ENGINE
+                    ]
 
                     if MAP_ENGINE:
-                        file.write(f"""               hyper_pipeline_noreset #(
+                        file.write(
+                            f"""               hyper_pipeline_noreset #(
                    .STAGES({ENGINE_ARBITER_CONTROL_PIPELINE_STAGES}                            ),
                    .WIDTH ($bits(engine_arbiter_N_to_1_control_request_in[{REAL_ID_ENGINE}]) )
                ) inst_hyper_pipeline_engine_arbiter_N_to_1_control_request_in_{REAL_ID_ENGINE} (
@@ -1725,16 +2991,24 @@ with open(output_file_lane_arbitration, "w") as file:
                    .dout  (engines_fifo_request_control_out_signals_in[{ID_ENGINE}].rd_en)
                );
 
-""")
+"""
+                        )
                         REAL_ID_ENGINE += 1
                     else:
-                        file.write(f"               assign engines_fifo_request_control_out_signals_in[{ID_ENGINE}].rd_en  = 1'b0;\n")
-                
-                for ID_ENGINE in range(REAL_ID_ENGINE,NUM_ENGINES):
-                    file.write(f"               assign engine_arbiter_N_to_1_control_request_in[{ID_ENGINE}] = 0;\n")
-                    file.write(f"               assign engine_arbiter_N_to_1_control_engine_arbiter_grant_out[{ID_ENGINE}] = 1'b0;\n")
-               
-                file.write(f"""               
+                        file.write(
+                            f"               assign engines_fifo_request_control_out_signals_in[{ID_ENGINE}].rd_en  = 1'b0;\n"
+                        )
+
+                for ID_ENGINE in range(REAL_ID_ENGINE, NUM_ENGINES):
+                    file.write(
+                        f"               assign engine_arbiter_N_to_1_control_request_in[{ID_ENGINE}] = 0;\n"
+                    )
+                    file.write(
+                        f"               assign engine_arbiter_N_to_1_control_engine_arbiter_grant_out[{ID_ENGINE}] = 1'b0;\n"
+                    )
+
+                file.write(
+                    f"""               
                 hyper_pipeline_noreset #(
                     .STAGES({ENGINE_ARBITER_CONTROL_PIPELINE_STAGES}                                                                ),
                     .WIDTH ($bits(engine_arbiter_N_to_1_control_fifo_request_signals_in.rd_en))
@@ -1743,16 +3017,16 @@ with open(output_file_lane_arbitration, "w") as file:
                     .din   (fifo_request_control_out_signals_in_reg.rd_en              ),
                     .dout  (engine_arbiter_N_to_1_control_fifo_request_signals_in.rd_en)
                 );
-""")
-                file.write(f"          end\n") 
+"""
+                )
+                file.write(f"          end\n")
                 file.write(f"endgenerate\n")
-                file.write(f"\n\n") 
+                file.write(f"\n\n")
 
     # for ID_BUNDLE in range(NUM_BUNDLES):
 
     #     NUM_LANES = CU_BUNDLES_COUNT_ARRAY[ID_BUNDLE]
-    #     ENGINES_COUNT_ARRAY                  = CU_BUNDLES_LANES_ENGINES_COUNT_ARRAY[ID_BUNDLE]     
-
+    #     ENGINES_COUNT_ARRAY                  = CU_BUNDLES_LANES_ENGINES_COUNT_ARRAY[ID_BUNDLE]
 
     #     LANES_CONFIG_ENGINE_ARBITER_NUM_CONTROL_RESPONSE = CU_BUNDLES_CONFIG_ENGINE_ARBITER_NUM_CONTROL_RESPONSE[ID_BUNDLE]
     #     LANES_CONFIG_LANE_ARBITER_NUM_CONTROL_RESPONSE = CU_BUNDLES_CONFIG_LANE_ARBITER_NUM_CONTROL_RESPONSE[ID_BUNDLE]
@@ -1768,7 +3042,7 @@ with open(output_file_lane_arbitration, "w") as file:
     #             file.write("\n")
     #             file.write(f"generate\n")
     #             file.write(f"     if((ID_BUNDLE == {ID_BUNDLE}) && (ID_LANE == {ID_LANE}))\n")
-    #             file.write(f"          begin\n")  
+    #             file.write(f"          begin\n")
 
     #             REAL_ID_ENGINE = 0;
     #             for ID_ENGINE in range(NUM_ENGINES):
@@ -1787,31 +3061,36 @@ with open(output_file_lane_arbitration, "w") as file:
     #                 file.write(f"               assign engine_arbiter_1_to_N_control_fifo_response_signals_in[{ID_ENGINE}].rd_en = 1'b0;\n")
 
     #             file.write(f"               assign engine_arbiter_1_to_N_control_response_in = response_control_in_int;\n")
-    #             file.write(f"          end\n") 
+    #             file.write(f"          end\n")
     #             file.write(f"endgenerate\n")
-    #             file.write(f"\n\n") 
+    #             file.write(f"\n\n")
 
 
 with open(output_file_bundle_arbitration, "w") as file:
     for ID_BUNDLE in range(NUM_BUNDLES):
-        LANES_ARBITER_MEMORY_PIPELINE_STAGES=0
-        NUM_LANES = CU_BUNDLES_COUNT_ARRAY[ID_BUNDLE] 
-        LANES_CONFIG_BUNDLE_ARBITER_NUM_MEMORY = CU_BUNDLES_CONFIG_BUNDLE_ARBITER_NUM_MEMORY[ID_BUNDLE]
-        LANES_CONFIG_LANE_ARBITER_NUM_MEMORY = CU_BUNDLES_CONFIG_LANE_ARBITER_NUM_MEMORY[ID_BUNDLE]
+        LANES_ARBITER_MEMORY_PIPELINE_STAGES = 0
+        NUM_LANES = CU_BUNDLES_COUNT_ARRAY[ID_BUNDLE]
+        LANES_CONFIG_BUNDLE_ARBITER_NUM_MEMORY = (
+            CU_BUNDLES_CONFIG_BUNDLE_ARBITER_NUM_MEMORY[ID_BUNDLE]
+        )
+        LANES_CONFIG_LANE_ARBITER_NUM_MEMORY = (
+            CU_BUNDLES_CONFIG_LANE_ARBITER_NUM_MEMORY[ID_BUNDLE]
+        )
 
         if LANES_CONFIG_BUNDLE_ARBITER_NUM_MEMORY:
 
             file.write("\n")
             file.write(f"generate\n")
             file.write(f"     if(ID_BUNDLE == {ID_BUNDLE})\n")
-            file.write(f"          begin\n")  
+            file.write(f"          begin\n")
 
-            REAL_ID_LANE = 0;
+            REAL_ID_LANE = 0
             for ID_LANE in range(NUM_LANES):
                 MAP_LANE = LANES_CONFIG_LANE_ARBITER_NUM_MEMORY[ID_LANE]
 
                 if MAP_LANE:
-                    file.write(f"""               hyper_pipeline_noreset #(
+                    file.write(
+                        f"""               hyper_pipeline_noreset #(
                    .STAGES({LANES_ARBITER_MEMORY_PIPELINE_STAGES}                            ),
                    .WIDTH ($bits(lane_arbiter_N_to_1_memory_request_in[{REAL_ID_LANE}]) )
                ) inst_hyper_pipeline_lane_arbiter_N_to_1_memory_request_in_{REAL_ID_LANE} (
@@ -1829,23 +3108,30 @@ with open(output_file_bundle_arbitration, "w") as file:
                    .dout  (lanes_fifo_request_memory_out_signals_in[{ID_LANE}].rd_en)
                );
 
-""")
+"""
+                    )
                     # file.write(f"               always_ff @(posedge ap_clk) begin\n")
                     # file.write(f"                   lane_arbiter_N_to_1_memory_request_in[{REAL_ID_LANE}] <= lanes_request_memory_out[{ID_LANE}];\n")
                     # file.write(f"                   lanes_fifo_request_memory_out_signals_in[{ID_LANE}].rd_en  <= ~lane_arbiter_N_to_1_memory_fifo_request_signals_out.prog_full & lane_arbiter_N_to_1_memory_lane_arbiter_grant_out[{REAL_ID_LANE}];\n")
-                    # file.write(f"               end\n")   
+                    # file.write(f"               end\n")
                     # file.write(f"               assign lane_arbiter_N_to_1_memory_request_in[{REAL_ID_LANE}] = lanes_request_memory_out[{ID_LANE}];\n")
                     # file.write(f"               assign lanes_fifo_request_memory_out_signals_in[{ID_LANE}].rd_en  = ~lane_arbiter_N_to_1_memory_fifo_request_signals_out.prog_full & lane_arbiter_N_to_1_memory_lane_arbiter_grant_out[{REAL_ID_LANE}];\n")
                     REAL_ID_LANE += 1
                 else:
-                    file.write(f"               assign lanes_fifo_request_memory_out_signals_in[{ID_LANE}].rd_en  = 1'b0;\n")
-                  
+                    file.write(
+                        f"               assign lanes_fifo_request_memory_out_signals_in[{ID_LANE}].rd_en  = 1'b0;\n"
+                    )
 
-            for ID_LANE in range(REAL_ID_LANE,NUM_LANES):
-                file.write(f"               assign lane_arbiter_N_to_1_memory_request_in[{ID_LANE}] = 0;\n")
-                file.write(f"               assign lane_arbiter_N_to_1_memory_lane_arbiter_grant_out[{ID_LANE}] = 1'b0;\n")
+            for ID_LANE in range(REAL_ID_LANE, NUM_LANES):
+                file.write(
+                    f"               assign lane_arbiter_N_to_1_memory_request_in[{ID_LANE}] = 0;\n"
+                )
+                file.write(
+                    f"               assign lane_arbiter_N_to_1_memory_lane_arbiter_grant_out[{ID_LANE}] = 1'b0;\n"
+                )
 
-            file.write(f"""               
+            file.write(
+                f"""               
                 hyper_pipeline_noreset #(
                     .STAGES({LANES_ARBITER_MEMORY_PIPELINE_STAGES}                                                                ),
                     .WIDTH ($bits(lane_arbiter_N_to_1_memory_fifo_request_signals_in.rd_en))
@@ -1854,31 +3140,37 @@ with open(output_file_bundle_arbitration, "w") as file:
                     .din   (fifo_request_memory_out_signals_in_reg.rd_en              ),
                     .dout  (lane_arbiter_N_to_1_memory_fifo_request_signals_in.rd_en)
                 );
-""")   
+"""
+            )
             # file.write(f"               assign lane_arbiter_N_to_1_memory_fifo_request_signals_in.rd_en = fifo_request_memory_out_signals_in_reg.rd_en;\n")
-            file.write(f"          end\n") 
+            file.write(f"          end\n")
             file.write(f"endgenerate\n")
-            file.write(f"\n\n") 
+            file.write(f"\n\n")
 
     for ID_BUNDLE in range(NUM_BUNDLES):
-        LANES_ARBITER_CONTROL_PIPELINE_STAGES=0
-        NUM_LANES = CU_BUNDLES_COUNT_ARRAY[ID_BUNDLE] 
-        LANES_CONFIG_BUNDLE_ARBITER_NUM_CONTROL_REQUEST = CU_BUNDLES_CONFIG_BUNDLE_ARBITER_NUM_CONTROL_REQUEST[ID_BUNDLE]
-        LANES_CONFIG_LANE_ARBITER_NUM_CONTROL_REQUEST = CU_BUNDLES_CONFIG_LANE_ARBITER_NUM_CONTROL_REQUEST[ID_BUNDLE]
+        LANES_ARBITER_CONTROL_PIPELINE_STAGES = 0
+        NUM_LANES = CU_BUNDLES_COUNT_ARRAY[ID_BUNDLE]
+        LANES_CONFIG_BUNDLE_ARBITER_NUM_CONTROL_REQUEST = (
+            CU_BUNDLES_CONFIG_BUNDLE_ARBITER_NUM_CONTROL_REQUEST[ID_BUNDLE]
+        )
+        LANES_CONFIG_LANE_ARBITER_NUM_CONTROL_REQUEST = (
+            CU_BUNDLES_CONFIG_LANE_ARBITER_NUM_CONTROL_REQUEST[ID_BUNDLE]
+        )
 
         if LANES_CONFIG_BUNDLE_ARBITER_NUM_CONTROL_REQUEST:
 
             file.write("\n")
             file.write(f"generate\n")
             file.write(f"     if(ID_BUNDLE == {ID_BUNDLE})\n")
-            file.write(f"          begin\n")  
+            file.write(f"          begin\n")
 
-            REAL_ID_LANE = 0;
+            REAL_ID_LANE = 0
             for ID_LANE in range(NUM_LANES):
                 MAP_LANE = LANES_CONFIG_LANE_ARBITER_NUM_CONTROL_REQUEST[ID_LANE]
 
                 if MAP_LANE:
-                    file.write(f"""               hyper_pipeline_noreset #(
+                    file.write(
+                        f"""               hyper_pipeline_noreset #(
                    .STAGES({LANES_ARBITER_CONTROL_PIPELINE_STAGES}                            ),
                    .WIDTH ($bits(lane_arbiter_N_to_1_control_request_in[{REAL_ID_LANE}]) )
                ) inst_hyper_pipeline_lane_arbiter_N_to_1_control_request_in_{REAL_ID_LANE} (
@@ -1896,16 +3188,24 @@ with open(output_file_bundle_arbitration, "w") as file:
                    .dout  (lanes_fifo_request_control_out_signals_in[{ID_LANE}].rd_en)
                );
 
-""")
+"""
+                    )
                     REAL_ID_LANE += 1
                 else:
-                    file.write(f"               assign lanes_fifo_request_control_out_signals_in[{ID_LANE}].rd_en  = 1'b0;\n")
+                    file.write(
+                        f"               assign lanes_fifo_request_control_out_signals_in[{ID_LANE}].rd_en  = 1'b0;\n"
+                    )
 
-            for ID_LANE in range(REAL_ID_LANE,NUM_LANES):
-                file.write(f"               assign lane_arbiter_N_to_1_control_request_in[{ID_LANE}] = 0;\n")
-                file.write(f"               assign lane_arbiter_N_to_1_control_lane_arbiter_grant_out[{ID_LANE}] = 1'b0;\n")
+            for ID_LANE in range(REAL_ID_LANE, NUM_LANES):
+                file.write(
+                    f"               assign lane_arbiter_N_to_1_control_request_in[{ID_LANE}] = 0;\n"
+                )
+                file.write(
+                    f"               assign lane_arbiter_N_to_1_control_lane_arbiter_grant_out[{ID_LANE}] = 1'b0;\n"
+                )
 
-            file.write(f"""               
+            file.write(
+                f"""               
                 hyper_pipeline_noreset #(
                     .STAGES({LANES_ARBITER_CONTROL_PIPELINE_STAGES}                                                                ),
                     .WIDTH ($bits(lane_arbiter_N_to_1_control_fifo_request_signals_in.rd_en))
@@ -1914,15 +3214,16 @@ with open(output_file_bundle_arbitration, "w") as file:
                     .din   (fifo_request_control_out_signals_in_reg.rd_en              ),
                     .dout  (lane_arbiter_N_to_1_control_fifo_request_signals_in.rd_en)
                 );
-""")
+"""
+            )
 
-            file.write(f"          end\n") 
+            file.write(f"          end\n")
             file.write(f"endgenerate\n")
-            file.write(f"\n\n") 
+            file.write(f"\n\n")
 
     # for ID_BUNDLE in range(NUM_BUNDLES):
 
-    #     NUM_LANES = CU_BUNDLES_COUNT_ARRAY[ID_BUNDLE] 
+    #     NUM_LANES = CU_BUNDLES_COUNT_ARRAY[ID_BUNDLE]
     #     LANES_CONFIG_BUNDLE_ARBITER_NUM_CONTROL_RESPONSE  = CU_BUNDLES_CONFIG_BUNDLE_ARBITER_NUM_CONTROL_RESPONSE [ID_BUNDLE]
     #     LANES_CONFIG_LANE_ARBITER_NUM_CONTROL_RESPONSE  = CU_BUNDLES_CONFIG_LANE_ARBITER_NUM_CONTROL_RESPONSE [ID_BUNDLE]
 
@@ -1931,7 +3232,7 @@ with open(output_file_bundle_arbitration, "w") as file:
     #         file.write("\n")
     #         file.write(f"generate\n")
     #         file.write(f"     if(ID_BUNDLE == {ID_BUNDLE})\n")
-    #         file.write(f"          begin\n")  
+    #         file.write(f"          begin\n")
 
     #         REAL_ID_LANE = 0;
     #         for ID_LANE in range(NUM_LANES):
@@ -1948,30 +3249,30 @@ with open(output_file_bundle_arbitration, "w") as file:
 
     #         for ID_LANE in range(REAL_ID_LANE,NUM_LANES):
     #             file.write(f"               assign lane_arbiter_1_to_N_control_fifo_response_signals_in[{ID_LANE}].rd_en = 1'b0;\n")
-                   
 
     #         file.write(f"               assign lane_arbiter_1_to_N_control_response_in = response_control_in_int;\n")
-    #         file.write(f"          end\n") 
+    #         file.write(f"          end\n")
     #         file.write(f"endgenerate\n")
-    #         file.write(f"\n\n") 
+    #         file.write(f"\n\n")
 
 
 with open(output_file_cu_arbitration, "w") as file:
 
-    BUNDLE_ARBITER_MEMORY_PIPELINE_STAGES=0
+    BUNDLE_ARBITER_MEMORY_PIPELINE_STAGES = 0
     if CU_BUNDLES_CONFIG_CU_ARBITER_NUM_MEMORY:
 
         file.write("\n")
         file.write(f"generate\n")
         file.write(f"     if(ID_CU == 0)\n")
-        file.write(f"          begin\n")  
+        file.write(f"          begin\n")
 
-        REAL_ID_BUNDLE = 0;
+        REAL_ID_BUNDLE = 0
         for ID_BUNDLE in range(NUM_BUNDLES):
-            MAP_BUNDLE  = CU_BUNDLES_CONFIG_BUNDLE_ARBITER_NUM_MEMORY_TEMP[ID_BUNDLE]
+            MAP_BUNDLE = CU_BUNDLES_CONFIG_BUNDLE_ARBITER_NUM_MEMORY_TEMP[ID_BUNDLE]
 
             if MAP_BUNDLE:
-                file.write(f"""               hyper_pipeline_noreset #(
+                file.write(
+                    f"""               hyper_pipeline_noreset #(
                    .STAGES({BUNDLE_ARBITER_MEMORY_PIPELINE_STAGES}                            ),
                    .WIDTH ($bits(bundle_arbiter_memory_N_to_1_request_in[{REAL_ID_BUNDLE}]) )
                ) inst_hyper_pipeline_bundle_arbiter_memory_N_to_1_request_in_{REAL_ID_BUNDLE} (
@@ -1989,17 +3290,25 @@ with open(output_file_cu_arbitration, "w") as file:
                    .dout  (bundle_fifo_request_memory_out_signals_in[{ID_BUNDLE}].rd_en)
                );
 
-""")
+"""
+                )
 
                 REAL_ID_BUNDLE += 1
             else:
-                file.write(f"               assign bundle_fifo_request_memory_out_signals_in[{ID_BUNDLE}].rd_en  = 1'b0;\n")
-                
-        for ID_BUNDLE in range(REAL_ID_BUNDLE,NUM_BUNDLES):
-            file.write(f"               assign bundle_arbiter_memory_N_to_1_request_in[{ID_BUNDLE}] = 0;\n")
-            file.write(f"               assign bundle_arbiter_memory_N_to_1_arbiter_grant_out[{ID_BUNDLE}] = 1'b0;\n")
+                file.write(
+                    f"               assign bundle_fifo_request_memory_out_signals_in[{ID_BUNDLE}].rd_en  = 1'b0;\n"
+                )
 
-        file.write(f"""               
+        for ID_BUNDLE in range(REAL_ID_BUNDLE, NUM_BUNDLES):
+            file.write(
+                f"               assign bundle_arbiter_memory_N_to_1_request_in[{ID_BUNDLE}] = 0;\n"
+            )
+            file.write(
+                f"               assign bundle_arbiter_memory_N_to_1_arbiter_grant_out[{ID_BUNDLE}] = 1'b0;\n"
+            )
+
+        file.write(
+            f"""               
                 hyper_pipeline_noreset #(
                     .STAGES({BUNDLE_ARBITER_MEMORY_PIPELINE_STAGES}                                                                ),
                     .WIDTH ($bits(bundle_arbiter_memory_N_to_1_fifo_request_signals_in.rd_en))
@@ -2008,27 +3317,31 @@ with open(output_file_cu_arbitration, "w") as file:
                     .din   (fifo_request_memory_out_signals_in_reg.rd_en              ),
                     .dout  (bundle_arbiter_memory_N_to_1_fifo_request_signals_in.rd_en)
                 );
-""")
+"""
+        )
 
-        file.write(f"          end\n") 
+        file.write(f"          end\n")
         file.write(f"endgenerate\n")
-        file.write(f"\n\n") 
+        file.write(f"\n\n")
 
-    BUNDLE_ARBITER_CONTROL_PIPELINE_STAGES=0
+    BUNDLE_ARBITER_CONTROL_PIPELINE_STAGES = 0
     if CU_BUNDLES_CONFIG_CU_ARBITER_NUM_CONTROL_REQUEST:
 
         file.write("\n")
         file.write(f"generate\n")
         file.write(f"     if(ID_CU == 0)\n")
-        file.write(f"          begin\n")  
+        file.write(f"          begin\n")
 
-        REAL_ID_BUNDLE = 0;
+        REAL_ID_BUNDLE = 0
         for ID_BUNDLE in range(NUM_BUNDLES):
-            MAP_BUNDLE  = CU_BUNDLES_CONFIG_BUNDLE_ARBITER_NUM_CONTROL_REQUEST_TEMP[ID_BUNDLE]
+            MAP_BUNDLE = CU_BUNDLES_CONFIG_BUNDLE_ARBITER_NUM_CONTROL_REQUEST_TEMP[
+                ID_BUNDLE
+            ]
 
             if MAP_BUNDLE:
 
-                file.write(f"""               hyper_pipeline_noreset #(
+                file.write(
+                    f"""               hyper_pipeline_noreset #(
                    .STAGES({BUNDLE_ARBITER_CONTROL_PIPELINE_STAGES}                            ),
                    .WIDTH ($bits(bundle_arbiter_control_N_to_1_request_in[{REAL_ID_BUNDLE}]) )
                ) inst_hyper_pipeline_bundle_arbiter_control_N_to_1_request_in_{REAL_ID_BUNDLE} (
@@ -2046,17 +3359,25 @@ with open(output_file_cu_arbitration, "w") as file:
                    .dout  (bundle_fifo_request_control_out_signals_in[{ID_BUNDLE}].rd_en)
                );
 
-""")
+"""
+                )
 
                 REAL_ID_BUNDLE += 1
             else:
-                file.write(f"               assign bundle_fifo_request_control_out_signals_in[{ID_BUNDLE}].rd_en  = 1'b0;\n")
+                file.write(
+                    f"               assign bundle_fifo_request_control_out_signals_in[{ID_BUNDLE}].rd_en  = 1'b0;\n"
+                )
 
-        for ID_BUNDLE in range(REAL_ID_BUNDLE,NUM_BUNDLES):
-            file.write(f"               assign bundle_arbiter_control_N_to_1_request_in[{ID_BUNDLE}]  = 0;\n")
-            file.write(f"               assign bundle_arbiter_control_N_to_1_arbiter_grant_out[{ID_BUNDLE}]  = 1'b0;\n")
+        for ID_BUNDLE in range(REAL_ID_BUNDLE, NUM_BUNDLES):
+            file.write(
+                f"               assign bundle_arbiter_control_N_to_1_request_in[{ID_BUNDLE}]  = 0;\n"
+            )
+            file.write(
+                f"               assign bundle_arbiter_control_N_to_1_arbiter_grant_out[{ID_BUNDLE}]  = 1'b0;\n"
+            )
 
-        file.write(f"""               
+        file.write(
+            f"""               
                 hyper_pipeline_noreset #(
                     .STAGES({BUNDLE_ARBITER_CONTROL_PIPELINE_STAGES}                                                                ),
                     .WIDTH ($bits(bundle_arbiter_control_N_to_1_fifo_request_signals_in.rd_en))
@@ -2065,18 +3386,19 @@ with open(output_file_cu_arbitration, "w") as file:
                     .din   (fifo_request_control_out_signals_in_reg.rd_en              ),
                     .dout  (bundle_arbiter_control_N_to_1_fifo_request_signals_in.rd_en)
                 );
-""")
+"""
+        )
 
-        file.write(f"          end\n") 
+        file.write(f"          end\n")
         file.write(f"endgenerate\n")
-        file.write(f"\n\n") 
+        file.write(f"\n\n")
 
     # if CU_BUNDLES_CONFIG_CU_ARBITER_NUM_CONTROL_RESPONSE:
 
     #     file.write("\n")
     #     file.write(f"generate\n")
     #     file.write(f"     if(ID_CU == 0)\n")
-    #     file.write(f"          begin\n")  
+    #     file.write(f"          begin\n")
 
     #     REAL_ID_BUNDLE = 0;
     #     for ID_BUNDLE in range(NUM_BUNDLES):
@@ -2094,14 +3416,13 @@ with open(output_file_cu_arbitration, "w") as file:
     #     for ID_BUNDLE in range(REAL_ID_BUNDLE,NUM_BUNDLES):
     #         file.write(f"               assign bundle_arbiter_control_1_to_N_fifo_response_signals_in[{ID_BUNDLE}].rd_en = 1'b0;\n")
 
-
     #     file.write(f"               assign bundle_arbiter_control_1_to_N_response_in = response_control_in_int;\n")
-    #     file.write(f"          end\n") 
+    #     file.write(f"          end\n")
     #     file.write(f"endgenerate\n")
-    #     file.write(f"\n\n") 
+    #     file.write(f"\n\n")
 
 
-with open(output_file_afu_topology, 'w') as file:
+with open(output_file_afu_topology, "w") as file:
     output_lines = []
 
     parameters_template_optional = """
@@ -2281,50 +3602,89 @@ assign kernel_m{0:02d}_axi_lite_in      = 0;
    """
 
     for index, channel in enumerate(DISTINCT_CHANNELS):
-        output_lines.append(f"// --------------------------------------------------------------------------------------")
+        output_lines.append(
+            f"// --------------------------------------------------------------------------------------"
+        )
         output_lines.append(f"// Channel {index}")
-        output_lines.append(f"// --------------------------------------------------------------------------------------")
-        if (CHANNEL_CONFIG_L2_TYPE[index] != 2):
+        output_lines.append(
+            f"// --------------------------------------------------------------------------------------"
+        )
+        if CHANNEL_CONFIG_L2_TYPE[index] != 2:
             output_lines.append(parameters_template_optional.format(channel))
         output_lines.append(parameters_template_must.format(channel))
 
-    CACHE_MERGE_COUNT = 0;
-    CACHE_PORT_COUNT  = 0;
-    CACHE_PORT_INDEX  = 0;
-    CHANNEL_PORT_INDEX  = 0;
+    CACHE_MERGE_COUNT = 0
+    CACHE_PORT_COUNT = 0
+    CACHE_PORT_INDEX = 0
+    CHANNEL_PORT_INDEX = 0
     for index, channel in enumerate(DISTINCT_CHANNELS):
-        if (CHANNEL_CONFIG_L2_TYPE[index] != 2):
-            output_lines.append(f"// --------------------------------------------------------------------------------------")
+        if CHANNEL_CONFIG_L2_TYPE[index] != 2:
+            output_lines.append(
+                f"// --------------------------------------------------------------------------------------"
+            )
             output_lines.append(f"// Channel {index}")
-            output_lines.append(f"// --------------------------------------------------------------------------------------")
-            output_lines.append(assign_template_must.format(channel,index))
+            output_lines.append(
+                f"// --------------------------------------------------------------------------------------"
+            )
+            output_lines.append(assign_template_must.format(channel, index))
             if CHANNEL_CONFIG_AXI_PORT_FULL_BE[index]:
-                output_lines.append(assign_template_optional.format(channel,index))
+                output_lines.append(assign_template_optional.format(channel, index))
             else:
-                output_lines.append(assign_template_optional_default.format(channel,index))
+                output_lines.append(
+                    assign_template_optional_default.format(channel, index)
+                )
 
-            output_lines.append(module_template_pre.format(channel, CHANNEL_CONFIG_DATA_WIDTH_BE[index], CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index], CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],index))
-           
-            if (CHANNEL_CONFIG_L2_TYPE[index] == 1):
-                CACHE_PORT_COUNT  = CHANNEL_CONFIG_L2_MERGE[CACHE_MERGE_COUNT]
+            output_lines.append(
+                module_template_pre.format(
+                    channel,
+                    CHANNEL_CONFIG_DATA_WIDTH_BE[index],
+                    CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],
+                    CHANNEL_CONFIG_DATA_WIDTH_MID[index],
+                    CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],
+                    index,
+                )
+            )
+
+            if CHANNEL_CONFIG_L2_TYPE[index] == 1:
+                CACHE_PORT_COUNT = CHANNEL_CONFIG_L2_MERGE[CACHE_MERGE_COUNT]
                 for CACHE_PORT_INDEX in range(CACHE_PORT_COUNT):
-                    output_lines.append(module_template_ports.format(CACHE_PORT_INDEX,CHANNEL_PORT_INDEX))
+                    output_lines.append(
+                        module_template_ports.format(
+                            CACHE_PORT_INDEX, CHANNEL_PORT_INDEX
+                        )
+                    )
                     CHANNEL_PORT_INDEX = CHANNEL_PORT_INDEX + 1
             else:
-                output_lines.append(module_template_ports.format(0,channel))
-            
-            output_lines.append(module_template_post.format(channel, CHANNEL_CONFIG_DATA_WIDTH_BE[index], CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index], CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],index))
+                output_lines.append(module_template_ports.format(0, channel))
+
+            output_lines.append(
+                module_template_post.format(
+                    channel,
+                    CHANNEL_CONFIG_DATA_WIDTH_BE[index],
+                    CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],
+                    CHANNEL_CONFIG_DATA_WIDTH_MID[index],
+                    CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],
+                    index,
+                )
+            )
         else:
-            output_lines.append(module_template_remove.format(channel, CHANNEL_CONFIG_DATA_WIDTH_BE[index], CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index], CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],index))
-           
+            output_lines.append(
+                module_template_remove.format(
+                    channel,
+                    CHANNEL_CONFIG_DATA_WIDTH_BE[index],
+                    CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],
+                    CHANNEL_CONFIG_DATA_WIDTH_MID[index],
+                    CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],
+                    index,
+                )
+            )
 
     # Writing to the VHDL file
 
+    file.write("\n".join(output_lines))
 
-    file.write('\n'.join(output_lines))
 
-
-with open(output_file_afu_ports, 'w') as file:
+with open(output_file_afu_ports, "w") as file:
     output_lines = []
 
     ports_template_must = """
@@ -2372,14 +3732,14 @@ output logic [  M{0:02d}_AXI4_BE_QOS_W-1:0] m{0:02d}_axi_arqos  ,
     """
 
     for index, channel in enumerate(DISTINCT_CHANNELS):
-        if (CHANNEL_CONFIG_L2_TYPE[index] != 2):
+        if CHANNEL_CONFIG_L2_TYPE[index] != 2:
             output_lines.append(ports_template_must.format(channel))
             if CHANNEL_CONFIG_AXI_PORT_FULL_BE[index]:
                 output_lines.append(ports_template_optional.format(channel))
 
-    file.write('\n'.join(output_lines))
+    file.write("\n".join(output_lines))
 
-with open(output_file_top_wires, 'w') as file:
+with open(output_file_top_wires, "w") as file:
     output_lines = []
 
     wires_template_must = """
@@ -2426,14 +3786,14 @@ with open(output_file_top_wires, 'w') as file:
     """
 
     for index, channel in enumerate(DISTINCT_CHANNELS):
-        if (CHANNEL_CONFIG_L2_TYPE[index] != 2):
+        if CHANNEL_CONFIG_L2_TYPE[index] != 2:
             output_lines.append(wires_template_must.format(channel))
             if CHANNEL_CONFIG_AXI_PORT_FULL_BE[index]:
                 output_lines.append(wires_template_optional.format(channel))
 
-    file.write('\n'.join(output_lines))
+    file.write("\n".join(output_lines))
 
-with open(output_file_top_ports, 'w') as file:
+with open(output_file_top_ports, "w") as file:
     output_lines = []
 
     ports_template_must = """
@@ -2509,17 +3869,17 @@ output wire [                           4-1:0] m{0:02d}_axi_arqos        , // Ad
     """
 
     for index, channel in enumerate(DISTINCT_CHANNELS):
-        if (CHANNEL_CONFIG_L2_TYPE[index] != 2):
+        if CHANNEL_CONFIG_L2_TYPE[index] != 2:
             output_lines.append(ports_template_must.format(channel))
             if CHANNEL_CONFIG_AXI_PORT_FULL_BE[index]:
                 output_lines.append(ports_template_optional.format(channel))
             else:
                 output_lines.append(ports_template_optional_comment.format(channel))
 
-    file.write('\n'.join(output_lines))
+    file.write("\n".join(output_lines))
 
 
-with open(output_file_top_portmap, 'w') as file:
+with open(output_file_top_portmap, "w") as file:
     output_lines = []
 
     connection_template_must = """
@@ -2565,14 +3925,14 @@ with open(output_file_top_portmap, 'w') as file:
     """
 
     for index, channel in enumerate(DISTINCT_CHANNELS):
-        if (CHANNEL_CONFIG_L2_TYPE[index] != 2):
+        if CHANNEL_CONFIG_L2_TYPE[index] != 2:
             output_lines.append(connection_template_must.format(channel))
             if CHANNEL_CONFIG_AXI_PORT_FULL_BE[index]:
                 output_lines.append(connection_template_optional.format(channel))
 
-    file.write('\n'.join(output_lines))
+    file.write("\n".join(output_lines))
 
-with open(output_file_afu_portmap, 'w') as file:
+with open(output_file_afu_portmap, "w") as file:
     output_lines = []
 
     connection_template_must = """
@@ -2618,14 +3978,14 @@ with open(output_file_afu_portmap, 'w') as file:
     """
 
     for index, channel in enumerate(DISTINCT_CHANNELS):
-        if (CHANNEL_CONFIG_L2_TYPE[index] != 2):
+        if CHANNEL_CONFIG_L2_TYPE[index] != 2:
             output_lines.append(connection_template_must.format(channel))
             if CHANNEL_CONFIG_AXI_PORT_FULL_BE[index]:
                 output_lines.append(connection_template_optional.format(channel))
 
-    file.write('\n'.join(output_lines))
+    file.write("\n".join(output_lines))
 
-with open(output_file_slv_m_axi_vip_inst, 'w') as file:
+with open(output_file_slv_m_axi_vip_inst, "w") as file:
     output_lines = []
 
     module_template_must_pre = """
@@ -2682,19 +4042,19 @@ with open(output_file_slv_m_axi_vip_inst, 'w') as file:
         """
 
     for index, channel in enumerate(DISTINCT_CHANNELS):
-        if (CHANNEL_CONFIG_L2_TYPE[index] != 2):
+        if CHANNEL_CONFIG_L2_TYPE[index] != 2:
             output_lines.append(module_template_instance.format(channel))
 
     for index, channel in enumerate(DISTINCT_CHANNELS):
-        if (CHANNEL_CONFIG_L2_TYPE[index] != 2):
+        if CHANNEL_CONFIG_L2_TYPE[index] != 2:
             output_lines.append(module_template_must_pre.format(channel))
             if CHANNEL_CONFIG_AXI_PORT_FULL_BE[index]:
                 output_lines.append(module_template_optional.format(channel))
             output_lines.append(module_template_must_post.format(channel))
 
-    file.write('\n'.join(output_lines))
+    file.write("\n".join(output_lines))
 
-with open(output_file_slv_m_axi_vip_import, 'w') as file:
+with open(output_file_slv_m_axi_vip_import, "w") as file:
     output_lines = []
 
     module_template = """
@@ -2703,83 +4063,110 @@ with open(output_file_slv_m_axi_vip_import, 'w') as file:
         """
 
     for index, channel in enumerate(DISTINCT_CHANNELS):
-        if (CHANNEL_CONFIG_L2_TYPE[index] != 2):
+        if CHANNEL_CONFIG_L2_TYPE[index] != 2:
             output_lines.append(module_template.format(channel))
 
-    file.write('\n'.join(output_lines))
+    file.write("\n".join(output_lines))
 
 
 def generate_output_file_buffer_channels_tcl(output_file_name):
-  
+
     # Open output file for writing
     with open(output_file_name, "w") as file:
         current_address = 0x010  # Starting base address
 
-        CHANNEL_PORT_INDEX  = 0;
-        for index, ((buffer_name, properties), (buffer_name2, properties2)) in enumerate(zip(channels.items(), buffers.items())):
-            if (CHANNEL_CONFIG_L2_TYPE[int(properties[0])] == 2):
-                axi_interface = f"m{CHANNEL_PORT_INDEX:02d}_axi" 
+        CHANNEL_PORT_INDEX = 0
+        for index, (
+            (buffer_name, properties),
+            (buffer_name2, properties2),
+        ) in enumerate(zip(channels.items(), buffers.items())):
+            if CHANNEL_CONFIG_L2_TYPE[int(properties[0])] == 2:
+                axi_interface = f"m{CHANNEL_PORT_INDEX:02d}_axi"
                 size = int(properties[1])  # Size as specified in JSON
-                size_in_hex = (size // 8) + 4 # Convert size to equivalent hex value
+                size_in_hex = (size // 8) + 4  # Convert size to equivalent hex value
 
                 # Writing the TCL commands
-                file.write(f'''puts_reg_info "{buffer_name}:{properties2}" "Channel {properties[0]}" "0x{current_address:03X}" [expr {{{size}}}]
+                file.write(
+                    f"""puts_reg_info "{buffer_name}:{properties2}" "Channel {properties[0]}" "0x{current_address:03X}" [expr {{{size}}}]
       set reg      [ipx::add_register -quiet "{buffer_name}" $addr_block]
       set_property address_offset 0x{current_address:03X} $reg
       set_property size           [expr {{{size}}}]   $reg
       set regparam [ipx::add_register_parameter -quiet {{ASSOCIATED_BUSIF}} $reg] 
-      set_property value {axi_interface} $regparam \n\n''')
-            elif (CHANNEL_CONFIG_L2_TYPE[int(properties[0])] == 1):
-                axi_interface = f"m{int(properties[0]):02d}_axi" 
+      set_property value {axi_interface} $regparam \n\n"""
+                )
+            elif CHANNEL_CONFIG_L2_TYPE[int(properties[0])] == 1:
+                axi_interface = f"m{int(properties[0]):02d}_axi"
                 size = int(properties[1])  # Size as specified in JSON
-                size_in_hex = (size // 8) + 4 # Convert size to equivalent hex value
+                size_in_hex = (size // 8) + 4  # Convert size to equivalent hex value
 
                 # Writing the TCL commands
-                file.write(f'''puts_reg_info "{buffer_name}:{properties2}" "Channel {properties[0]}" "0x{current_address:03X}" [expr {{{size}}}]
+                file.write(
+                    f"""puts_reg_info "{buffer_name}:{properties2}" "Channel {properties[0]}" "0x{current_address:03X}" [expr {{{size}}}]
       set reg      [ipx::add_register -quiet "{buffer_name}" $addr_block]
       set_property address_offset 0x{current_address:03X} $reg
       set_property size           [expr {{{size}}}]   $reg
       set regparam [ipx::add_register_parameter -quiet {{ASSOCIATED_BUSIF}} $reg] 
-      set_property value {axi_interface} $regparam \n\n''')
+      set_property value {axi_interface} $regparam \n\n"""
+                )
                 CHANNEL_PORT_INDEX = int(properties[0])
             else:
-                axi_interface = f"m{int(properties[0]):02d}_axi" 
+                axi_interface = f"m{int(properties[0]):02d}_axi"
                 size = int(properties[1])  # Size as specified in JSON
-                size_in_hex = (size // 8) + 4 # Convert size to equivalent hex value
+                size_in_hex = (size // 8) + 4  # Convert size to equivalent hex value
 
                 # Writing the TCL commands
-                file.write(f'''puts_reg_info "{buffer_name}:{properties2}" "Channel {properties[0]}" "0x{current_address:03X}" [expr {{{size}}}]
+                file.write(
+                    f"""puts_reg_info "{buffer_name}:{properties2}" "Channel {properties[0]}" "0x{current_address:03X}" [expr {{{size}}}]
       set reg      [ipx::add_register -quiet "{buffer_name}" $addr_block]
       set_property address_offset 0x{current_address:03X} $reg
       set_property size           [expr {{{size}}}]   $reg
       set regparam [ipx::add_register_parameter -quiet {{ASSOCIATED_BUSIF}} $reg] 
-      set_property value {axi_interface} $regparam \n\n''')
+      set_property value {axi_interface} $regparam \n\n"""
+                )
 
             current_address += size_in_hex  # Increment the address based on the size
 
+
 generate_output_file_buffer_channels_tcl(output_file_buffer_channels_tcl)
+
 
 def generate_ipx_associate_commands_tcl(output_file_name):
 
     # Open output file for appending
     with open(output_file_name, "a") as file:
         for index, channel_num in enumerate(DISTINCT_CHANNELS):
-            if (CHANNEL_CONFIG_L2_TYPE[index] != 2):
-                file.write(f'ipx::associate_bus_interfaces -busif "m{channel_num:02d}_axi" -clock "ap_clk" $core >> $log_file\n')
-                file.write(f'set bifparam [ipx::add_bus_parameter DATA_WIDTH [ipx::get_bus_interfaces m{channel_num:02d}_axi -of_objects $core]]\n')
-                file.write(f'set_property value {CHANNEL_CONFIG_DATA_WIDTH_BE[index]} $bifparam\n')
-                file.write(f'set bifparam [ipx::add_bus_parameter ADDR_WIDTH [ipx::get_bus_interfaces m{channel_num:02d}_axi -of_objects $core]]\n')
-                file.write(f'set_property value {CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index]} $bifparam\n')
-                file.write(f'set bifparam [ipx::add_bus_parameter -quiet "MAX_BURST_LENGTH" [ipx::get_bus_interfaces m{channel_num:02d}_axi -of_objects $core]]\n')
-                file.write(f'set_property value        32           $bifparam\n')
-                file.write(f'set_property value_source constant     $bifparam\n')
-                file.write(f'set bifparam [ipx::add_bus_parameter -quiet "NUM_READ_OUTSTANDING" [ipx::get_bus_interfaces m{channel_num:02d}_axi -of_objects $core]]\n')
-                file.write(f'set_property value        32           $bifparam\n')
-                file.write(f'set_property value_source constant     $bifparam\n')
-                file.write(f'set bifparam [ipx::add_bus_parameter -quiet "NUM_WRITE_OUTSTANDING" [ipx::get_bus_interfaces m{channel_num:02d}_axi -of_objects $core]]\n')
-                file.write(f'set_property value        32           $bifparam\n')
-                file.write(f'set_property value_source constant     $bifparam\n')
-          
+            if CHANNEL_CONFIG_L2_TYPE[index] != 2:
+                file.write(
+                    f'ipx::associate_bus_interfaces -busif "m{channel_num:02d}_axi" -clock "ap_clk" $core >> $log_file\n'
+                )
+                file.write(
+                    f"set bifparam [ipx::add_bus_parameter DATA_WIDTH [ipx::get_bus_interfaces m{channel_num:02d}_axi -of_objects $core]]\n"
+                )
+                file.write(
+                    f"set_property value {CHANNEL_CONFIG_DATA_WIDTH_BE[index]} $bifparam\n"
+                )
+                file.write(
+                    f"set bifparam [ipx::add_bus_parameter ADDR_WIDTH [ipx::get_bus_interfaces m{channel_num:02d}_axi -of_objects $core]]\n"
+                )
+                file.write(
+                    f"set_property value {CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index]} $bifparam\n"
+                )
+                file.write(
+                    f'set bifparam [ipx::add_bus_parameter -quiet "MAX_BURST_LENGTH" [ipx::get_bus_interfaces m{channel_num:02d}_axi -of_objects $core]]\n'
+                )
+                file.write(f"set_property value        32           $bifparam\n")
+                file.write(f"set_property value_source constant     $bifparam\n")
+                file.write(
+                    f'set bifparam [ipx::add_bus_parameter -quiet "NUM_READ_OUTSTANDING" [ipx::get_bus_interfaces m{channel_num:02d}_axi -of_objects $core]]\n'
+                )
+                file.write(f"set_property value        32           $bifparam\n")
+                file.write(f"set_property value_source constant     $bifparam\n")
+                file.write(
+                    f'set bifparam [ipx::add_bus_parameter -quiet "NUM_WRITE_OUTSTANDING" [ipx::get_bus_interfaces m{channel_num:02d}_axi -of_objects $core]]\n'
+                )
+                file.write(f"set_property value        32           $bifparam\n")
+                file.write(f"set_property value_source constant     $bifparam\n")
+
 
 # Generate the ipx::associate_bus_interfaces commands
 generate_ipx_associate_commands_tcl(output_file_generate_ports_tcl)
@@ -2791,6 +4178,7 @@ generate_ipx_associate_commands_tcl(output_file_generate_ports_tcl)
 
 LEGAL_VALUES_SIZE = [32768, 65536, 131072, 262144, 524288, 1048576, 2097152, 4194304]
 
+
 def adjust_to_nearest_legal_cache_size(value):
     nearest_legal = value
     if value < 32768:
@@ -2799,11 +4187,12 @@ def adjust_to_nearest_legal_cache_size(value):
         # Find the nearest legal value
         nearest_legal = min(LEGAL_VALUES_SIZE, key=lambda x: abs(x - value))
 
-    
         # If the value is already legal, return it unchanged
     return nearest_legal
 
+
 LEGAL_VALUES_NUM_WAYS = [2, 4]
+
 
 def adjust_to_nearest_legal_cache_num_ways(value):
     nearest_legal = value
@@ -2812,7 +4201,7 @@ def adjust_to_nearest_legal_cache_num_ways(value):
     elif value not in LEGAL_VALUES_NUM_WAYS:
         # Find the nearest legal value
         nearest_legal = min(LEGAL_VALUES_NUM_WAYS, key=lambda x: abs(x - value))
-        
+
         # Return the nearest legal value
     return nearest_legal
 
@@ -2820,7 +4209,7 @@ def adjust_to_nearest_legal_cache_num_ways(value):
 with open(output_file_generate_m_axi_vip_tcl, "w") as file:
     output_lines = []
 
-    fill_m_axi_vip_tcl_template_vars="""
+    fill_m_axi_vip_tcl_template_vars = """
 # ----------------------------------------------------------------------------
 set BE_ADDR_WIDTH_M{0:02d}         {2}
 set BE_CACHE_DATA_WIDTH_M{0:02d}   {1}
@@ -2837,7 +4226,7 @@ set CU_CACHE_SIZE_B_M{0:02d}      {12}
 set LINE_CU_CACHE_DATA_WIDTH_M{0:02d} {3} 
 """
 
-    fill_m_axi_vip_tcl_template="""
+    fill_m_axi_vip_tcl_template = """
 # ----------------------------------------------------------------------------
 # generate axi slave vip
 # ----------------------------------------------------------------------------
@@ -2878,7 +4267,7 @@ export_ip_user_files -of_objects             [get_files ${{files_sources_xci}}] 
 export_simulation -of_objects [get_files ${{files_sources_xci}}] -directory ${{files_ip_user_files_dir}}/sim_scripts -ip_user_files_dir ${{files_ip_user_files_dir}} -ipstatic_source_dir ${{files_ip_user_files_dir}}/ipstatic -lib_map_path [list {{modelsim=${{files_cache_dir}}/compile_simlib/modelsim}} {{questa=${{files_cache_dir}}/compile_simlib/questa}} {{xcelium=${{files_cache_dir}}/compile_simlib/xcelium}} {{vcs=${{files_cache_dir}}/compile_simlib/vcs}} {{riviera=${{files_cache_dir}}/compile_simlib/riviera}}] -use_ip_compiled_libs -force >> $log_file
     """
 
-    fill_m_axi_vip_tcl_template_cache_pre="""
+    fill_m_axi_vip_tcl_template_cache_pre = """
 # ----------------------------------------------------------------------------
 # generate SYSTEM CACHE AXI_M{0:02d}
 # C_CACHE_SIZE    Cache size in bytes 32768, 65536, 131072, 262144, 524288, 1048576, 2097152, 4194304
@@ -2907,12 +4296,12 @@ set_property -dict [list                                                  \\
                     CONFIG.C_ENABLE_NON_SECURE {{1}}                        \\
                     CONFIG.C_ENABLE_ERROR_HANDLING {{1}}                    \\"""
 
-    fill_m_axi_vip_tcl_template_cache_mid="""                    CONFIG.C_ENABLE_CTRL {{{8}}}                            \\
+    fill_m_axi_vip_tcl_template_cache_mid = """                    CONFIG.C_ENABLE_CTRL {{{8}}}                            \\
                     CONFIG.C_ENABLE_STATISTICS {{2}}                        \\
                     CONFIG.C_S_AXI_CTRL_DATA_WIDTH {{64}}                   \\
                     CONFIG.C_ENABLE_VERSION_REGISTER {{0}}                  \\"""
 
-    fill_m_axi_vip_tcl_template_cache_ports="""                    CONFIG.C_S{0}_AXI_GEN_DATA_WIDTH ${{MID_CACHE_DATA_WIDTH_M{1:02d}}}\\
+    fill_m_axi_vip_tcl_template_cache_ports = """                    CONFIG.C_S{0}_AXI_GEN_DATA_WIDTH ${{MID_CACHE_DATA_WIDTH_M{1:02d}}}\\
                     CONFIG.C_S{0}_AXI_GEN_ADDR_WIDTH ${{MID_ADDR_WIDTH_M{1:02d}}}      \\
                     CONFIG.C_S{0}_AXI_GEN_FORCE_READ_ALLOCATE {{1}}           \\
                     CONFIG.C_S{0}_AXI_GEN_PROHIBIT_READ_ALLOCATE {{0}}        \\
@@ -2923,7 +4312,7 @@ set_property -dict [list                                                  \\
                     CONFIG.C_S{0}_AXI_GEN_FORCE_WRITE_BUFFER {{1}}            \\
                     CONFIG.C_S{0}_AXI_GEN_PROHIBIT_WRITE_BUFFER {{0}}         \\"""
 
-    fill_m_axi_vip_tcl_template_cache_post="""                    CONFIG.C_NUM_WAYS ${{SYSTEM_CACHE_NUM_WAYS_M{0:02d}}}            \\
+    fill_m_axi_vip_tcl_template_cache_post = """                    CONFIG.C_NUM_WAYS ${{SYSTEM_CACHE_NUM_WAYS_M{0:02d}}}            \\
                     CONFIG.C_CACHE_TAG_MEMORY_TYPE {{Automatic}}            \\
                     CONFIG.C_CACHE_DATA_MEMORY_TYPE {{{7}}}                 \\
                     CONFIG.C_CACHE_LRU_MEMORY_TYPE {{Automatic}}            \\
@@ -2940,7 +4329,7 @@ export_ip_user_files -of_objects             [get_files ${{files_sources_xci}}] 
 export_simulation -of_objects [get_files ${{files_sources_xci}}] -directory ${{files_ip_user_files_dir}}/sim_scripts -ip_user_files_dir ${{files_ip_user_files_dir}} -ipstatic_source_dir ${{files_ip_user_files_dir}}/ipstatic -lib_map_path [list {{modelsim=${{files_cache_dir}}/compile_simlib/modelsim}} {{questa=${{files_cache_dir}}/compile_simlib/questa}} {{xcelium=${{files_cache_dir}}/compile_simlib/xcelium}} {{vcs=${{files_cache_dir}}/compile_simlib/vcs}} {{riviera=${{files_cache_dir}}/compile_simlib/riviera}}] -use_ip_compiled_libs -force >> $log_file
     """
 
-    fill_m_axi_vip_tcl_template_cu_cache_pre="""
+    fill_m_axi_vip_tcl_template_cu_cache_pre = """
 # ----------------------------------------------------------------------------
 # generate SYSTEM CACHE AXI_M{0:02d}
 # C_CACHE_SIZE    Cache size in bytes 32768, 65536, 131072, 262144, 524288, 1048576, 2097152, 4194304
@@ -2969,12 +4358,12 @@ set_property -dict [list                                                  \\
                     CONFIG.C_ENABLE_NON_SECURE {{1}}                        \\
                     CONFIG.C_ENABLE_ERROR_HANDLING {{1}}                    \\"""
 
-    fill_m_axi_vip_tcl_template_cu_cache_mid="""                    CONFIG.C_ENABLE_CTRL {{{8}}}                            \\
+    fill_m_axi_vip_tcl_template_cu_cache_mid = """                    CONFIG.C_ENABLE_CTRL {{{8}}}                            \\
                     CONFIG.C_ENABLE_STATISTICS {{2}}                        \\
                     CONFIG.C_S_AXI_CTRL_DATA_WIDTH {{64}}                   \\
                     CONFIG.C_ENABLE_VERSION_REGISTER {{0}}                  \\"""
 
-    fill_m_axi_vip_tcl_template_cu_cache_post="""                    CONFIG.C_NUM_WAYS ${{CU_CACHE_NUM_WAYS_M{0:02d}}}            \\
+    fill_m_axi_vip_tcl_template_cu_cache_post = """                    CONFIG.C_NUM_WAYS ${{CU_CACHE_NUM_WAYS_M{0:02d}}}            \\
                     CONFIG.C_S0_AXI_GEN_DATA_WIDTH ${{FE_CACHE_DATA_WIDTH_M{0:02d}}}\\
                     CONFIG.C_S0_AXI_GEN_ADDR_WIDTH ${{FE_ADDR_WIDTH_M{0:02d}}}      \\
                     CONFIG.C_S0_AXI_GEN_FORCE_READ_ALLOCATE {{1}}           \\
@@ -3001,7 +4390,7 @@ export_ip_user_files -of_objects             [get_files ${{files_sources_xci}}] 
 export_simulation -of_objects [get_files ${{files_sources_xci}}] -directory ${{files_ip_user_files_dir}}/sim_scripts -ip_user_files_dir ${{files_ip_user_files_dir}} -ipstatic_source_dir ${{files_ip_user_files_dir}}/ipstatic -lib_map_path [list {{modelsim=${{files_cache_dir}}/compile_simlib/modelsim}} {{questa=${{files_cache_dir}}/compile_simlib/questa}} {{xcelium=${{files_cache_dir}}/compile_simlib/xcelium}} {{vcs=${{files_cache_dir}}/compile_simlib/vcs}} {{riviera=${{files_cache_dir}}/compile_simlib/riviera}}] -use_ip_compiled_libs -force >> $log_file
     """
 
-    fill_m_axi_vip_tcl_template_slice_post="""
+    fill_m_axi_vip_tcl_template_slice_post = """
 # ----------------------------------------------------------------------------
 # Generate AXI_M{0:02d} Register Slice
 # ----------------------------------------------------------------------------
@@ -3077,7 +4466,7 @@ export_ip_user_files -of_objects             [get_files ${{files_sources_xci}}] 
 export_simulation -of_objects [get_files ${{files_sources_xci}}] -directory ${{files_ip_user_files_dir}}/sim_scripts -ip_user_files_dir ${{files_ip_user_files_dir}} -ipstatic_source_dir ${{files_ip_user_files_dir}}/ipstatic -lib_map_path [list {{modelsim=${{files_cache_dir}}/compile_simlib/modelsim}} {{questa=${{files_cache_dir}}/compile_simlib/questa}} {{xcelium=${{files_cache_dir}}/compile_simlib/xcelium}} {{vcs=${{files_cache_dir}}/compile_simlib/vcs}} {{riviera=${{files_cache_dir}}/compile_simlib/riviera}}] -use_ip_compiled_libs -force >> $log_file
     """
 
-    fill_m_axi_vip_tcl_template_ctrl_post="""
+    fill_m_axi_vip_tcl_template_ctrl_post = """
 # ----------------------------------------------------------------------------
 # Generate AXI_LITE{0:02d} Register Slice
 # ----------------------------------------------------------------------------
@@ -3113,7 +4502,7 @@ export_simulation -of_objects [get_files ${{files_sources_xci}}] -directory ${{f
   
  """
 
-    fill_m_axi_vip_tcl_template_axi_lite_to_axi4_post="""
+    fill_m_axi_vip_tcl_template_axi_lite_to_axi4_post = """
 # ----------------------------------------------------------------------------
 # Generate AXI_LITE{0:02d} Register Slice
 # ----------------------------------------------------------------------------
@@ -3145,63 +4534,207 @@ export_simulation -of_objects [get_files ${{files_sources_xci}}] -directory ${{f
   
  """
 
-    CACHE_MERGE_COUNT = 0;
-    CACHE_PORT_COUNT  = 0;
-    CACHE_PORT_INDEX  = 0;
-    CHANNEL_PORT_INDEX  = 0;
+    CACHE_MERGE_COUNT = 0
+    CACHE_PORT_COUNT = 0
+    CACHE_PORT_INDEX = 0
+    CHANNEL_PORT_INDEX = 0
     for index, channel in enumerate(DISTINCT_CHANNELS):
-        output_lines.append(fill_m_axi_vip_tcl_template_vars.format(channel,CHANNEL_CONFIG_DATA_WIDTH_BE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index],CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],adjust_to_nearest_legal_cache_size(CACHE_CONFIG_L2_SIZE[index]), adjust_to_nearest_legal_cache_num_ways(CACHE_CONFIG_L2_NUM_WAYS[index]), CACHE_CONFIG_L2_RAM[index], CACHE_CONFIG_L2_CTRL[index], CHANNEL_CONFIG_ADDRESS_WIDTH_FE[index],CHANNEL_CONFIG_DATA_WIDTH_FE[index],adjust_to_nearest_legal_cache_num_ways(CACHE_CONFIG_L1_NUM_WAYS[index]), adjust_to_nearest_legal_cache_size(CACHE_CONFIG_L1_SIZE[index]), CHANNEL_CONFIG_AXI_PORT_FULL_BE[index]))
-      
+        output_lines.append(
+            fill_m_axi_vip_tcl_template_vars.format(
+                channel,
+                CHANNEL_CONFIG_DATA_WIDTH_BE[index],
+                CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],
+                CHANNEL_CONFIG_DATA_WIDTH_MID[index],
+                CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],
+                adjust_to_nearest_legal_cache_size(CACHE_CONFIG_L2_SIZE[index]),
+                adjust_to_nearest_legal_cache_num_ways(CACHE_CONFIG_L2_NUM_WAYS[index]),
+                CACHE_CONFIG_L2_RAM[index],
+                CACHE_CONFIG_L2_CTRL[index],
+                CHANNEL_CONFIG_ADDRESS_WIDTH_FE[index],
+                CHANNEL_CONFIG_DATA_WIDTH_FE[index],
+                adjust_to_nearest_legal_cache_num_ways(CACHE_CONFIG_L1_NUM_WAYS[index]),
+                adjust_to_nearest_legal_cache_size(CACHE_CONFIG_L1_SIZE[index]),
+                CHANNEL_CONFIG_AXI_PORT_FULL_BE[index],
+            )
+        )
+
     for index, channel in enumerate(DISTINCT_CHANNELS):
-        output_lines.append(fill_m_axi_vip_tcl_template.format(channel,CHANNEL_CONFIG_DATA_WIDTH_BE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index],CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],adjust_to_nearest_legal_cache_size(CACHE_CONFIG_L2_SIZE[index]), adjust_to_nearest_legal_cache_num_ways(CACHE_CONFIG_L2_NUM_WAYS[index]), CACHE_CONFIG_L2_RAM[index], CACHE_CONFIG_L2_CTRL[index], CHANNEL_CONFIG_ADDRESS_WIDTH_FE[index],CHANNEL_CONFIG_DATA_WIDTH_FE[index],adjust_to_nearest_legal_cache_num_ways(CACHE_CONFIG_L1_NUM_WAYS[index]), adjust_to_nearest_legal_cache_size(CACHE_CONFIG_L1_SIZE[index]), CHANNEL_CONFIG_AXI_PORT_FULL_BE[index]))
-        
-        if (CHANNEL_CONFIG_L2_TYPE[index] == 1):
-            output_lines.append(fill_m_axi_vip_tcl_template_cache_pre.format(channel,CHANNEL_CONFIG_DATA_WIDTH_BE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index],CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],adjust_to_nearest_legal_cache_size(CACHE_CONFIG_L2_SIZE[index]), adjust_to_nearest_legal_cache_num_ways(CACHE_CONFIG_L2_NUM_WAYS[index]), CACHE_CONFIG_L2_RAM[index], CACHE_CONFIG_L2_CTRL[index], CHANNEL_CONFIG_L2_MERGE[CACHE_MERGE_COUNT]))
+        output_lines.append(
+            fill_m_axi_vip_tcl_template.format(
+                channel,
+                CHANNEL_CONFIG_DATA_WIDTH_BE[index],
+                CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],
+                CHANNEL_CONFIG_DATA_WIDTH_MID[index],
+                CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],
+                adjust_to_nearest_legal_cache_size(CACHE_CONFIG_L2_SIZE[index]),
+                adjust_to_nearest_legal_cache_num_ways(CACHE_CONFIG_L2_NUM_WAYS[index]),
+                CACHE_CONFIG_L2_RAM[index],
+                CACHE_CONFIG_L2_CTRL[index],
+                CHANNEL_CONFIG_ADDRESS_WIDTH_FE[index],
+                CHANNEL_CONFIG_DATA_WIDTH_FE[index],
+                adjust_to_nearest_legal_cache_num_ways(CACHE_CONFIG_L1_NUM_WAYS[index]),
+                adjust_to_nearest_legal_cache_size(CACHE_CONFIG_L1_SIZE[index]),
+                CHANNEL_CONFIG_AXI_PORT_FULL_BE[index],
+            )
+        )
+
+        if CHANNEL_CONFIG_L2_TYPE[index] == 1:
+            output_lines.append(
+                fill_m_axi_vip_tcl_template_cache_pre.format(
+                    channel,
+                    CHANNEL_CONFIG_DATA_WIDTH_BE[index],
+                    CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],
+                    CHANNEL_CONFIG_DATA_WIDTH_MID[index],
+                    CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],
+                    adjust_to_nearest_legal_cache_size(CACHE_CONFIG_L2_SIZE[index]),
+                    adjust_to_nearest_legal_cache_num_ways(
+                        CACHE_CONFIG_L2_NUM_WAYS[index]
+                    ),
+                    CACHE_CONFIG_L2_RAM[index],
+                    CACHE_CONFIG_L2_CTRL[index],
+                    CHANNEL_CONFIG_L2_MERGE[CACHE_MERGE_COUNT],
+                )
+            )
             CACHE_MERGE_COUNT = CACHE_MERGE_COUNT + 1
         else:
-            output_lines.append(fill_m_axi_vip_tcl_template_cache_pre.format(channel,CHANNEL_CONFIG_DATA_WIDTH_BE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index],CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],adjust_to_nearest_legal_cache_size(CACHE_CONFIG_L2_SIZE[index]), adjust_to_nearest_legal_cache_num_ways(CACHE_CONFIG_L2_NUM_WAYS[index]), CACHE_CONFIG_L2_RAM[index], CACHE_CONFIG_L2_CTRL[index], 1))
-     
-        if(int(CACHE_CONFIG_L2_CTRL[index])):
-            output_lines.append(fill_m_axi_vip_tcl_template_cache_mid.format(channel,CHANNEL_CONFIG_DATA_WIDTH_BE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index],CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],adjust_to_nearest_legal_cache_size(CACHE_CONFIG_L2_SIZE[index]), adjust_to_nearest_legal_cache_num_ways(CACHE_CONFIG_L2_NUM_WAYS[index]), CACHE_CONFIG_L2_RAM[index], CACHE_CONFIG_L2_CTRL[index]))
-        
-        if (CHANNEL_CONFIG_L2_TYPE[index] == 1):
-            CACHE_PORT_COUNT  = CHANNEL_CONFIG_L2_MERGE[CACHE_MERGE_COUNT-1]
+            output_lines.append(
+                fill_m_axi_vip_tcl_template_cache_pre.format(
+                    channel,
+                    CHANNEL_CONFIG_DATA_WIDTH_BE[index],
+                    CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],
+                    CHANNEL_CONFIG_DATA_WIDTH_MID[index],
+                    CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],
+                    adjust_to_nearest_legal_cache_size(CACHE_CONFIG_L2_SIZE[index]),
+                    adjust_to_nearest_legal_cache_num_ways(
+                        CACHE_CONFIG_L2_NUM_WAYS[index]
+                    ),
+                    CACHE_CONFIG_L2_RAM[index],
+                    CACHE_CONFIG_L2_CTRL[index],
+                    1,
+                )
+            )
+
+        if int(CACHE_CONFIG_L2_CTRL[index]):
+            output_lines.append(
+                fill_m_axi_vip_tcl_template_cache_mid.format(
+                    channel,
+                    CHANNEL_CONFIG_DATA_WIDTH_BE[index],
+                    CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],
+                    CHANNEL_CONFIG_DATA_WIDTH_MID[index],
+                    CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],
+                    adjust_to_nearest_legal_cache_size(CACHE_CONFIG_L2_SIZE[index]),
+                    adjust_to_nearest_legal_cache_num_ways(
+                        CACHE_CONFIG_L2_NUM_WAYS[index]
+                    ),
+                    CACHE_CONFIG_L2_RAM[index],
+                    CACHE_CONFIG_L2_CTRL[index],
+                )
+            )
+
+        if CHANNEL_CONFIG_L2_TYPE[index] == 1:
+            CACHE_PORT_COUNT = CHANNEL_CONFIG_L2_MERGE[CACHE_MERGE_COUNT - 1]
             for CACHE_PORT_INDEX in range(CACHE_PORT_COUNT):
-                output_lines.append(fill_m_axi_vip_tcl_template_cache_ports.format(CACHE_PORT_INDEX,CHANNEL_PORT_INDEX))
+                output_lines.append(
+                    fill_m_axi_vip_tcl_template_cache_ports.format(
+                        CACHE_PORT_INDEX, CHANNEL_PORT_INDEX
+                    )
+                )
                 CHANNEL_PORT_INDEX = CHANNEL_PORT_INDEX + 1
         else:
-            output_lines.append(fill_m_axi_vip_tcl_template_cache_ports.format(0,channel))
+            output_lines.append(
+                fill_m_axi_vip_tcl_template_cache_ports.format(0, channel)
+            )
 
-        output_lines.append(fill_m_axi_vip_tcl_template_cache_post.format(channel,CHANNEL_CONFIG_DATA_WIDTH_BE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index],CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],adjust_to_nearest_legal_cache_size(CACHE_CONFIG_L2_SIZE[index]), adjust_to_nearest_legal_cache_num_ways(CACHE_CONFIG_L2_NUM_WAYS[index]), CACHE_CONFIG_L2_RAM[index], CACHE_CONFIG_L2_CTRL[index]))
-        
-        output_lines.append(fill_m_axi_vip_tcl_template_cu_cache_pre.format(channel,CHANNEL_CONFIG_DATA_WIDTH_MID[index],CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],CHANNEL_CONFIG_DATA_WIDTH_FE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_FE[index],adjust_to_nearest_legal_cache_size(CACHE_CONFIG_L1_SIZE[index]), adjust_to_nearest_legal_cache_num_ways(CACHE_CONFIG_L1_NUM_WAYS[index]), CACHE_CONFIG_L1_RAM[index]))
-        output_lines.append(fill_m_axi_vip_tcl_template_cu_cache_post.format(channel,CHANNEL_CONFIG_DATA_WIDTH_MID[index],CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],CHANNEL_CONFIG_DATA_WIDTH_FE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_FE[index],adjust_to_nearest_legal_cache_size(CACHE_CONFIG_L1_SIZE[index]), adjust_to_nearest_legal_cache_num_ways(CACHE_CONFIG_L1_NUM_WAYS[index]), CACHE_CONFIG_L1_RAM[index]))
-       
-        output_lines.append(fill_m_axi_vip_tcl_template_slice_post.format(channel,CHANNEL_CONFIG_DATA_WIDTH_BE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index],CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],adjust_to_nearest_legal_cache_size(CACHE_CONFIG_L2_SIZE[index]), adjust_to_nearest_legal_cache_num_ways(CACHE_CONFIG_L2_NUM_WAYS[index]), CACHE_CONFIG_L2_RAM[index], CACHE_CONFIG_L2_CTRL[index]))
-        if(int(CACHE_CONFIG_L2_CTRL[index])):
-            output_lines.append(fill_m_axi_vip_tcl_template_ctrl_post.format(channel,CHANNEL_CONFIG_DATA_WIDTH_BE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index],CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],adjust_to_nearest_legal_cache_size(CACHE_CONFIG_L2_SIZE[index]), adjust_to_nearest_legal_cache_num_ways(CACHE_CONFIG_L2_NUM_WAYS[index]), CACHE_CONFIG_L2_RAM[index], CACHE_CONFIG_L2_CTRL[index]))
+        output_lines.append(
+            fill_m_axi_vip_tcl_template_cache_post.format(
+                channel,
+                CHANNEL_CONFIG_DATA_WIDTH_BE[index],
+                CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],
+                CHANNEL_CONFIG_DATA_WIDTH_MID[index],
+                CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],
+                adjust_to_nearest_legal_cache_size(CACHE_CONFIG_L2_SIZE[index]),
+                adjust_to_nearest_legal_cache_num_ways(CACHE_CONFIG_L2_NUM_WAYS[index]),
+                CACHE_CONFIG_L2_RAM[index],
+                CACHE_CONFIG_L2_CTRL[index],
+            )
+        )
+
+        output_lines.append(
+            fill_m_axi_vip_tcl_template_cu_cache_pre.format(
+                channel,
+                CHANNEL_CONFIG_DATA_WIDTH_MID[index],
+                CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],
+                CHANNEL_CONFIG_DATA_WIDTH_FE[index],
+                CHANNEL_CONFIG_ADDRESS_WIDTH_FE[index],
+                adjust_to_nearest_legal_cache_size(CACHE_CONFIG_L1_SIZE[index]),
+                adjust_to_nearest_legal_cache_num_ways(CACHE_CONFIG_L1_NUM_WAYS[index]),
+                CACHE_CONFIG_L1_RAM[index],
+            )
+        )
+        output_lines.append(
+            fill_m_axi_vip_tcl_template_cu_cache_post.format(
+                channel,
+                CHANNEL_CONFIG_DATA_WIDTH_MID[index],
+                CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],
+                CHANNEL_CONFIG_DATA_WIDTH_FE[index],
+                CHANNEL_CONFIG_ADDRESS_WIDTH_FE[index],
+                adjust_to_nearest_legal_cache_size(CACHE_CONFIG_L1_SIZE[index]),
+                adjust_to_nearest_legal_cache_num_ways(CACHE_CONFIG_L1_NUM_WAYS[index]),
+                CACHE_CONFIG_L1_RAM[index],
+            )
+        )
+
+        output_lines.append(
+            fill_m_axi_vip_tcl_template_slice_post.format(
+                channel,
+                CHANNEL_CONFIG_DATA_WIDTH_BE[index],
+                CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],
+                CHANNEL_CONFIG_DATA_WIDTH_MID[index],
+                CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],
+                adjust_to_nearest_legal_cache_size(CACHE_CONFIG_L2_SIZE[index]),
+                adjust_to_nearest_legal_cache_num_ways(CACHE_CONFIG_L2_NUM_WAYS[index]),
+                CACHE_CONFIG_L2_RAM[index],
+                CACHE_CONFIG_L2_CTRL[index],
+            )
+        )
+        if int(CACHE_CONFIG_L2_CTRL[index]):
+            output_lines.append(
+                fill_m_axi_vip_tcl_template_ctrl_post.format(
+                    channel,
+                    CHANNEL_CONFIG_DATA_WIDTH_BE[index],
+                    CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],
+                    CHANNEL_CONFIG_DATA_WIDTH_MID[index],
+                    CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],
+                    adjust_to_nearest_legal_cache_size(CACHE_CONFIG_L2_SIZE[index]),
+                    adjust_to_nearest_legal_cache_num_ways(
+                        CACHE_CONFIG_L2_NUM_WAYS[index]
+                    ),
+                    CACHE_CONFIG_L2_RAM[index],
+                    CACHE_CONFIG_L2_CTRL[index],
+                )
+            )
         # output_lines.append(fill_m_axi_vip_tcl_template_axi_lite_to_axi4_post.format(channel,CHANNEL_CONFIG_DATA_WIDTH_BE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index],CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],CACHE_CONFIG_L2_SIZE[index], CACHE_CONFIG_L2_NUM_WAYS[index], CACHE_CONFIG_L2_RAM[index], CACHE_CONFIG_L2_CTRL[index]))
-    
-    file.write('\n'.join(output_lines))
+
+    file.write("\n".join(output_lines))
 
 
 # ----------------------------------------------------------------------------
 # Generate FIFO
 # ----------------------------------------------------------------------------
 
-# Size (bits) ALUOpsConfigurationPayload: 74 
-# Size (bits) CacheRequestPayload: 177 
-# Size (bits) ControlPacketPayload: 26 
-# Size (bits) CSRIndexConfigurationPayload: 353 
-# Size (bits) EnginePacketFullPayload: 233 
-# Size (bits) EnginePacketPayload: 170 
-# Size (bits) FilterCondConfigurationPayload: 96 
-# Size (bits) MemoryPacketRequestPayload: 107 
-# Size (bits) MemoryPacketResponsePayload: 64 
-# Size (bits) MergeDataConfigurationPayload: 8 
-# Size (bits) ParallelReadWriteConfigurationPayload: 744 
-# Size (bits) ReadWriteConfigurationPayload: 176 
-# Size (bits) SetOpsConfigurationPayload: 8 
+# Size (bits) ALUOpsConfigurationPayload: 74
+# Size (bits) CacheRequestPayload: 177
+# Size (bits) ControlPacketPayload: 26
+# Size (bits) CSRIndexConfigurationPayload: 353
+# Size (bits) EnginePacketFullPayload: 233
+# Size (bits) EnginePacketPayload: 170
+# Size (bits) FilterCondConfigurationPayload: 96
+# Size (bits) MemoryPacketRequestPayload: 107
+# Size (bits) MemoryPacketResponsePayload: 64
+# Size (bits) MergeDataConfigurationPayload: 8
+# Size (bits) ParallelReadWriteConfigurationPayload: 744
+# Size (bits) ReadWriteConfigurationPayload: 176
+# Size (bits) SetOpsConfigurationPayload: 8
 
 # print (CU_BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_MEMORY) MemoryPacketRequestPayload width
 # print (CU_BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_ENGINE) EnginePacketPayload width
@@ -3227,62 +4760,157 @@ export_simulation -of_objects [get_files ${{files_sources_xci}}] -directory ${{f
 # Define the data types and their configurations
 data_types_pr_engine_packet = {
     "ALUOpsConfigurationPayload": [
-        {"fifo_type": "std", "width": 74, "configurations": [{"depth": 16, "prog_full": 8}]},
-        {"fifo_type": "fwft", "width": 74, "configurations": []}
+        {
+            "fifo_type": "std",
+            "width": 74,
+            "configurations": [{"depth": 16, "prog_full": 8}],
+        },
+        {"fifo_type": "fwft", "width": 74, "configurations": []},
     ],
     "CSRIndexConfigurationPayload": [
-        {"fifo_type": "std", "width": 353, "configurations": [{"depth": 16, "prog_full": 8}, {"depth": 64, "prog_full": 48}]},
-        {"fifo_type": "fwft", "width": 353, "configurations": []}
+        {
+            "fifo_type": "std",
+            "width": 353,
+            "configurations": [
+                {"depth": 16, "prog_full": 8},
+                {"depth": 64, "prog_full": 48},
+            ],
+        },
+        {"fifo_type": "fwft", "width": 353, "configurations": []},
     ],
     "FilterCondConfigurationPayload": [
-        {"fifo_type": "std", "width": 96, "configurations": [{"depth": 16, "prog_full": 8}]},
-        {"fifo_type": "fwft", "width": 96, "configurations": []}
+        {
+            "fifo_type": "std",
+            "width": 96,
+            "configurations": [{"depth": 16, "prog_full": 8}],
+        },
+        {"fifo_type": "fwft", "width": 96, "configurations": []},
     ],
     "MergeDataConfigurationPayload": [
-        {"fifo_type": "std", "width": 8, "configurations": [{"depth": 16, "prog_full": 8}]},
-        {"fifo_type": "fwft", "width": 8, "configurations": []}
+        {
+            "fifo_type": "std",
+            "width": 8,
+            "configurations": [{"depth": 16, "prog_full": 8}],
+        },
+        {"fifo_type": "fwft", "width": 8, "configurations": []},
     ],
     "ParallelReadWriteConfigurationPayload": [
-        {"fifo_type": "std", "width": 744, "configurations": [{"depth": 16, "prog_full": 8}]},
-        {"fifo_type": "fwft", "width": 744, "configurations": []}
+        {
+            "fifo_type": "std",
+            "width": 744,
+            "configurations": [{"depth": 16, "prog_full": 8}],
+        },
+        {"fifo_type": "fwft", "width": 744, "configurations": []},
     ],
     "ReadWriteConfigurationPayload": [
-        {"fifo_type": "std", "width": 176, "configurations": [{"depth": 16, "prog_full": 8}]},
-        {"fifo_type": "fwft", "width": 176, "configurations": []}
+        {
+            "fifo_type": "std",
+            "width": 176,
+            "configurations": [{"depth": 16, "prog_full": 8}],
+        },
+        {"fifo_type": "fwft", "width": 176, "configurations": []},
     ],
     "SetOpsConfigurationPayload": [
-        {"fifo_type": "std", "width": 8, "configurations": [{"depth": 16, "prog_full": 8}]},
-        {"fifo_type": "fwft", "width": 8, "configurations": []}
+        {
+            "fifo_type": "std",
+            "width": 8,
+            "configurations": [{"depth": 16, "prog_full": 8}],
+        },
+        {"fifo_type": "fwft", "width": 8, "configurations": []},
     ],
     "CacheRequestPayload": [
-        {"fifo_type": "std", "width": 177, "configurations": [{"depth": 64, "prog_full": 32}]},
-        {"fifo_type": "fwft", "width": 177, "configurations": [{"depth": 64, "prog_full": 32}]}
+        {
+            "fifo_type": "std",
+            "width": 177,
+            "configurations": [{"depth": 64, "prog_full": 32}],
+        },
+        {
+            "fifo_type": "fwft",
+            "width": 177,
+            "configurations": [{"depth": 64, "prog_full": 32}],
+        },
     ],
     "ControlPacketPayload": [
-        {"fifo_type": "std", "width": 26, "configurations": [{"depth": 16, "prog_full": 12}, {"depth": 32, "prog_full": 27}]},
-        {"fifo_type": "fwft", "width": 26, "configurations": []}
+        {
+            "fifo_type": "std",
+            "width": 26,
+            "configurations": [
+                {"depth": 16, "prog_full": 12},
+                {"depth": 32, "prog_full": 27},
+            ],
+        },
+        {"fifo_type": "fwft", "width": 26, "configurations": []},
     ],
     "EnginePacketFullPayload": [
-        {"fifo_type": "std", "width": 233, "configurations": [{"depth": 32, "prog_full": 6}, {"depth": 32, "prog_full": 9}, {"depth": 32, "prog_full": 5}]},
-        {"fifo_type": "fwft", "width": 233, "configurations": [{"depth": 16, "prog_full": 8}]}
+        {
+            "fifo_type": "std",
+            "width": 233,
+            "configurations": [
+                {"depth": 32, "prog_full": 6},
+                {"depth": 32, "prog_full": 9},
+                {"depth": 32, "prog_full": 5},
+            ],
+        },
+        {
+            "fifo_type": "fwft",
+            "width": 233,
+            "configurations": [{"depth": 16, "prog_full": 8}],
+        },
     ],
     "EnginePacketPayload": [
-        {"fifo_type": "std", "width": 170, "configurations": [{"depth": 16, "prog_full": 12}, {"depth": 32, "prog_full": 6}, {"depth": 32, "prog_full": 9}, {"depth": 32, "prog_full": 27}, {"depth": 32, "prog_full": 5}, {"depth": 64, "prog_full": 16}, {"depth": 64, "prog_full": 32}, {"depth": 64, "prog_full": 48}]},
-        {"fifo_type": "fwft", "width": 170, "configurations": [{"depth": 32, "prog_full": 27}, {"depth": 64, "prog_full": 32}]}
+        {
+            "fifo_type": "std",
+            "width": 170,
+            "configurations": [
+                {"depth": 16, "prog_full": 12},
+                {"depth": 32, "prog_full": 6},
+                {"depth": 32, "prog_full": 9},
+                {"depth": 32, "prog_full": 27},
+                {"depth": 32, "prog_full": 5},
+                {"depth": 64, "prog_full": 16},
+                {"depth": 64, "prog_full": 32},
+                {"depth": 64, "prog_full": 48},
+            ],
+        },
+        {
+            "fifo_type": "fwft",
+            "width": 170,
+            "configurations": [
+                {"depth": 32, "prog_full": 27},
+                {"depth": 64, "prog_full": 32},
+            ],
+        },
     ],
     "MemoryPacketRequestPayload": [
-        {"fifo_type": "std", "width": 107, "configurations": [{"depth": 16, "prog_full": 8},  {"depth": 16, "prog_full": 12},{"depth": 32, "prog_full": 27},{"depth": 32, "prog_full": 16}]},
-        {"fifo_type": "fwft", "width": 107, "configurations": []}
+        {
+            "fifo_type": "std",
+            "width": 107,
+            "configurations": [
+                {"depth": 16, "prog_full": 8},
+                {"depth": 16, "prog_full": 12},
+                {"depth": 32, "prog_full": 27},
+                {"depth": 32, "prog_full": 16},
+            ],
+        },
+        {"fifo_type": "fwft", "width": 107, "configurations": []},
     ],
     "MemoryPacketResponsePayload": [
-        {"fifo_type": "std", "width": 64, "configurations": [{"depth": 16, "prog_full": 12}, {"depth": 64, "prog_full": 32}]},
-        {"fifo_type": "fwft", "width": 64, "configurations": []}
+        {
+            "fifo_type": "std",
+            "width": 64,
+            "configurations": [
+                {"depth": 16, "prog_full": 12},
+                {"depth": 64, "prog_full": 32},
+            ],
+        },
+        {"fifo_type": "fwft", "width": 64, "configurations": []},
     ],
     "MemoryStreamRequestPayload": [
         {"fifo_type": "std", "width": 32, "configurations": []},
-        {"fifo_type": "fwft", "width": 32, "configurations": []}
-    ]
+        {"fifo_type": "fwft", "width": 32, "configurations": []},
+    ],
 }
+
 
 def clog2(x):
     if x > 0:
@@ -3290,8 +4918,10 @@ def clog2(x):
     else:
         return 0
 
+
 def calculate_prog_full(depth):
     return depth // 2
+
 
 def flatten_list(nested_list):
     flat_list = []
@@ -3302,6 +4932,7 @@ def flatten_list(nested_list):
             flat_list.append(item)
     return flat_list
 
+
 def flatten_list(nested_list):
     if isinstance(nested_list, int):  # Directly handle single integer values
         yield nested_list
@@ -3311,6 +4942,7 @@ def flatten_list(nested_list):
                 yield from flatten_list(item)
             else:
                 yield item
+
 
 def update_configurations(fifo_depths, data_types, data_type_key, fifo_type):
     for depth in fifo_depths:
@@ -3325,107 +4957,255 @@ def update_configurations(fifo_depths, data_types, data_type_key, fifo_type):
         # Append the new configuration
         # data_types[data_type_key].append({"width": None, "configurations": [{"depth": new_depth, "prog_full": new_prog_full}]})
         if "std" == fifo_type:
-            data_types[data_type_key][0]["configurations"].append({"depth": new_depth, "prog_full": new_prog_full})
+            data_types[data_type_key][0]["configurations"].append(
+                {"depth": new_depth, "prog_full": new_prog_full}
+            )
 
         if "fwft" == fifo_type:
-            data_types[data_type_key][1]["configurations"].append({"depth": new_depth, "prog_full": new_prog_full})
+            data_types[data_type_key][1]["configurations"].append(
+                {"depth": new_depth, "prog_full": new_prog_full}
+            )
 
-CU_BUNDLES_CONFIG_FIFO_ARBITER_SIZE_MEMORY_CACHE_RESPONSE  = NUM_CHANNELS_TOP * 32
-CU_BUNDLES_CONFIG_FIFO_ARBITER_SIZE_MEMORY_CACHE_REQUEST   = NUM_CHANNELS_TOP * 32
-CU_BUNDLES_CONFIG_FIFO_ARBITER_SIZE_MEMORY_KERNEL_REQUEST  = 2 * 32
+
+CU_BUNDLES_CONFIG_FIFO_ARBITER_SIZE_MEMORY_CACHE_RESPONSE = NUM_CHANNELS_TOP * 32
+CU_BUNDLES_CONFIG_FIFO_ARBITER_SIZE_MEMORY_CACHE_REQUEST = NUM_CHANNELS_TOP * 32
+CU_BUNDLES_CONFIG_FIFO_ARBITER_SIZE_MEMORY_KERNEL_REQUEST = 2 * 32
 C_BURST_LEN = 32
 C_MAX_OUTSTANDING = 2
-CU_BUNDLES_CONFIG_FIFO_ARBITER_SIZE_STREAM_CACHE_REQUEST  = (2 ** (clog2(C_BURST_LEN*(C_MAX_OUTSTANDING+1))))
+CU_BUNDLES_CONFIG_FIFO_ARBITER_SIZE_STREAM_CACHE_REQUEST = 2 ** (
+    clog2(C_BURST_LEN * (C_MAX_OUTSTANDING + 1))
+)
 # Flatten each configuration list into a single list
-flattened_cache_memory_response = list(flatten_list(CU_BUNDLES_CONFIG_FIFO_ARBITER_SIZE_MEMORY_CACHE_RESPONSE))
-flattened_cache_memory_request  = list(flatten_list(CU_BUNDLES_CONFIG_FIFO_ARBITER_SIZE_MEMORY_CACHE_REQUEST))
-flattened_kernel_memory_request = list(flatten_list(CU_BUNDLES_CONFIG_FIFO_ARBITER_SIZE_MEMORY_KERNEL_REQUEST))
-flattened_stream_memory_request = list(flatten_list(CU_BUNDLES_CONFIG_FIFO_ARBITER_SIZE_STREAM_CACHE_REQUEST))
+flattened_cache_memory_response = list(
+    flatten_list(CU_BUNDLES_CONFIG_FIFO_ARBITER_SIZE_MEMORY_CACHE_RESPONSE)
+)
+flattened_cache_memory_request = list(
+    flatten_list(CU_BUNDLES_CONFIG_FIFO_ARBITER_SIZE_MEMORY_CACHE_REQUEST)
+)
+flattened_kernel_memory_request = list(
+    flatten_list(CU_BUNDLES_CONFIG_FIFO_ARBITER_SIZE_MEMORY_KERNEL_REQUEST)
+)
+flattened_stream_memory_request = list(
+    flatten_list(CU_BUNDLES_CONFIG_FIFO_ARBITER_SIZE_STREAM_CACHE_REQUEST)
+)
 
 # Update configurations for each flattened list
-update_configurations(flattened_cache_memory_response, data_types_pr_engine_packet, "MemoryPacketResponsePayload","std")
-update_configurations(flattened_cache_memory_response, data_types_pr_engine_packet, "MemoryPacketResponsePayload","fwft")
+update_configurations(
+    flattened_cache_memory_response,
+    data_types_pr_engine_packet,
+    "MemoryPacketResponsePayload",
+    "std",
+)
+update_configurations(
+    flattened_cache_memory_response,
+    data_types_pr_engine_packet,
+    "MemoryPacketResponsePayload",
+    "fwft",
+)
 
-update_configurations(flattened_cache_memory_request, data_types_pr_engine_packet, "MemoryPacketRequestPayload","std")
-update_configurations(flattened_cache_memory_request, data_types_pr_engine_packet, "MemoryPacketRequestPayload","fwft")
+update_configurations(
+    flattened_cache_memory_request,
+    data_types_pr_engine_packet,
+    "MemoryPacketRequestPayload",
+    "std",
+)
+update_configurations(
+    flattened_cache_memory_request,
+    data_types_pr_engine_packet,
+    "MemoryPacketRequestPayload",
+    "fwft",
+)
 
-update_configurations(flattened_kernel_memory_request, data_types_pr_engine_packet, "MemoryPacketResponsePayload","std")
+update_configurations(
+    flattened_kernel_memory_request,
+    data_types_pr_engine_packet,
+    "MemoryPacketResponsePayload",
+    "std",
+)
 
-update_configurations(flattened_stream_memory_request, data_types_pr_engine_packet, "MemoryStreamRequestPayload","std")
-update_configurations(flattened_stream_memory_request, data_types_pr_engine_packet, "MemoryStreamRequestPayload","fwft")
+update_configurations(
+    flattened_stream_memory_request,
+    data_types_pr_engine_packet,
+    "MemoryStreamRequestPayload",
+    "std",
+)
+update_configurations(
+    flattened_stream_memory_request,
+    data_types_pr_engine_packet,
+    "MemoryStreamRequestPayload",
+    "fwft",
+)
 # Flatten each configuration list into a single list
-flattened_lane_memory = list(flatten_list(CU_BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_MEMORY))
-flattened_bundle_memory = list(flatten_list(CU_BUNDLES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_MEMORY))
+flattened_lane_memory = list(
+    flatten_list(CU_BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_MEMORY)
+)
+flattened_bundle_memory = list(
+    flatten_list(CU_BUNDLES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_MEMORY)
+)
 flattened_cu_memory = list(flatten_list(CU_BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_MEMORY))
 
 # Update configurations for each flattened list
-update_configurations(flattened_lane_memory, data_types_pr_engine_packet, "MemoryPacketRequestPayload","std")
-update_configurations(flattened_lane_memory, data_types_pr_engine_packet, "MemoryPacketRequestPayload","fwft")
+update_configurations(
+    flattened_lane_memory,
+    data_types_pr_engine_packet,
+    "MemoryPacketRequestPayload",
+    "std",
+)
+update_configurations(
+    flattened_lane_memory,
+    data_types_pr_engine_packet,
+    "MemoryPacketRequestPayload",
+    "fwft",
+)
 
-update_configurations(flattened_bundle_memory, data_types_pr_engine_packet, "MemoryPacketRequestPayload","std")
-update_configurations(flattened_bundle_memory, data_types_pr_engine_packet, "MemoryPacketRequestPayload","fwft")
+update_configurations(
+    flattened_bundle_memory,
+    data_types_pr_engine_packet,
+    "MemoryPacketRequestPayload",
+    "std",
+)
+update_configurations(
+    flattened_bundle_memory,
+    data_types_pr_engine_packet,
+    "MemoryPacketRequestPayload",
+    "fwft",
+)
 
-update_configurations(flattened_cu_memory, data_types_pr_engine_packet, "MemoryPacketRequestPayload","std")
-update_configurations(flattened_cu_memory, data_types_pr_engine_packet, "MemoryPacketRequestPayload","fwft")
+update_configurations(
+    flattened_cu_memory,
+    data_types_pr_engine_packet,
+    "MemoryPacketRequestPayload",
+    "std",
+)
+update_configurations(
+    flattened_cu_memory,
+    data_types_pr_engine_packet,
+    "MemoryPacketRequestPayload",
+    "fwft",
+)
 # Flatten each configuration list into a single list
-flattened_lane_engine = list(flatten_list(CU_BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_ENGINE))
-flattened_bundle_engine = list(flatten_list(CU_BUNDLES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_ENGINE))
+flattened_lane_engine = list(
+    flatten_list(CU_BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_ENGINE)
+)
+flattened_bundle_engine = list(
+    flatten_list(CU_BUNDLES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_ENGINE)
+)
 flattened_cu_engine = list(flatten_list(CU_BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_ENGINE))
 
 # Update configurations for each flattened list
-update_configurations(flattened_lane_engine, data_types_pr_engine_packet, "EnginePacketPayload","std")
-update_configurations(flattened_lane_engine, data_types_pr_engine_packet, "EnginePacketPayload","fwft")
+update_configurations(
+    flattened_lane_engine, data_types_pr_engine_packet, "EnginePacketPayload", "std"
+)
+update_configurations(
+    flattened_lane_engine, data_types_pr_engine_packet, "EnginePacketPayload", "fwft"
+)
 
-update_configurations(flattened_bundle_engine, data_types_pr_engine_packet, "EnginePacketPayload","std")
-update_configurations(flattened_bundle_engine, data_types_pr_engine_packet, "EnginePacketPayload","fwft")
+update_configurations(
+    flattened_bundle_engine, data_types_pr_engine_packet, "EnginePacketPayload", "std"
+)
+update_configurations(
+    flattened_bundle_engine, data_types_pr_engine_packet, "EnginePacketPayload", "fwft"
+)
 
-update_configurations(flattened_cu_engine, data_types_pr_engine_packet, "EnginePacketPayload","std")
-update_configurations(flattened_cu_engine, data_types_pr_engine_packet, "EnginePacketPayload","fwft")
+update_configurations(
+    flattened_cu_engine, data_types_pr_engine_packet, "EnginePacketPayload", "std"
+)
+update_configurations(
+    flattened_cu_engine, data_types_pr_engine_packet, "EnginePacketPayload", "fwft"
+)
 
 # Flatten each configuration list into a single list
-flattened_lane_control_response = list(flatten_list(CU_BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_CONTROL_RESPONSE))
-flattened_bundle_control_response = list(flatten_list(CU_BUNDLES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_CONTROL_RESPONSE))
-flattened_cu_control_response = list(flatten_list(CU_BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_CONTROL_RESPONSE))
+flattened_lane_control_response = list(
+    flatten_list(CU_BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_CONTROL_RESPONSE)
+)
+flattened_bundle_control_response = list(
+    flatten_list(CU_BUNDLES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_CONTROL_RESPONSE)
+)
+flattened_cu_control_response = list(
+    flatten_list(CU_BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_CONTROL_RESPONSE)
+)
 # Flatten each configuration list into a single list
-flattened_lane_control_request = list(flatten_list(CU_BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_CONTROL_REQUEST))
-flattened_bundle_control_request = list(flatten_list(CU_BUNDLES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_CONTROL_REQUEST))
-flattened_cu_control_request = list(flatten_list(CU_BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_CONTROL_REQUEST))
+flattened_lane_control_request = list(
+    flatten_list(CU_BUNDLES_CONFIG_LANE_FIFO_ARBITER_SIZE_CONTROL_REQUEST)
+)
+flattened_bundle_control_request = list(
+    flatten_list(CU_BUNDLES_CONFIG_BUNDLE_FIFO_ARBITER_SIZE_CONTROL_REQUEST)
+)
+flattened_cu_control_request = list(
+    flatten_list(CU_BUNDLES_CONFIG_CU_FIFO_ARBITER_SIZE_CONTROL_REQUEST)
+)
 
 # Update configurations for each flattened list
-update_configurations(flattened_lane_control_response, data_types_pr_engine_packet, "ControlPacketPayload","fwft")
-update_configurations(flattened_bundle_control_response, data_types_pr_engine_packet, "ControlPacketPayload","fwft")
-update_configurations(flattened_cu_control_response, data_types_pr_engine_packet, "ControlPacketPayload","fwft")
+update_configurations(
+    flattened_lane_control_response,
+    data_types_pr_engine_packet,
+    "ControlPacketPayload",
+    "fwft",
+)
+update_configurations(
+    flattened_bundle_control_response,
+    data_types_pr_engine_packet,
+    "ControlPacketPayload",
+    "fwft",
+)
+update_configurations(
+    flattened_cu_control_response,
+    data_types_pr_engine_packet,
+    "ControlPacketPayload",
+    "fwft",
+)
 
 # Update configurations for each flattened list
-update_configurations(flattened_lane_control_request, data_types_pr_engine_packet, "ControlPacketPayload","std")
-update_configurations(flattened_bundle_control_request, data_types_pr_engine_packet, "ControlPacketPayload","std")
-update_configurations(flattened_cu_control_request, data_types_pr_engine_packet, "ControlPacketPayload","std")
+update_configurations(
+    flattened_lane_control_request,
+    data_types_pr_engine_packet,
+    "ControlPacketPayload",
+    "std",
+)
+update_configurations(
+    flattened_bundle_control_request,
+    data_types_pr_engine_packet,
+    "ControlPacketPayload",
+    "std",
+)
+update_configurations(
+    flattened_cu_control_request,
+    data_types_pr_engine_packet,
+    "ControlPacketPayload",
+    "std",
+)
 
 # Tracking for generated FIFOs to avoid duplication
 generated_fifos = set()
 generated_reference_fifos = []
+
+
 def determine_fifo_mem_type(depth, width, fifo_type):
     size = depth * width  # Calculate total FIFO size in bits
     # Thresholds for decision making (in bits)
     shift_register_threshold = 32 * 16  # Example threshold for shift registers
     distributed_ram_threshold = 512 * 32  # Example threshold for distributed RAM
-    block_ram_threshold = 2048 * 32  # Example threshold for starting to consider BRAM over distributed RAM
-    
+    block_ram_threshold = (
+        2048 * 32
+    )  # Example threshold for starting to consider BRAM over distributed RAM
+
     # Decision logic based on size
     if size <= shift_register_threshold:
         if fifo_type == "fwft":
-            return "Common_Clock_Distributed_RAM","false"
+            return "Common_Clock_Distributed_RAM", "false"
         else:
-            return "Common_Clock_Shift_Register","false"
+            return "Common_Clock_Shift_Register", "false"
     elif size <= distributed_ram_threshold:
-        return "Common_Clock_Distributed_RAM","false"
+        return "Common_Clock_Distributed_RAM", "false"
     elif size <= block_ram_threshold:
         if depth > 512:
-                return "Common_Clock_Builtin_FIFO","true"
+            return "Common_Clock_Builtin_FIFO", "true"
         else:
-                return "Common_Clock_Block_RAM","false"
+            return "Common_Clock_Block_RAM", "false"
     else:
-        return "Built-in FIFO"  # Assume built-in FIFO for very large or specialized needs
+        return (
+            "Built-in FIFO"  # Assume built-in FIFO for very large or specialized needs
+        )
 
 
 def determine_fifo_type(fifo_type):
@@ -3433,6 +5213,7 @@ def determine_fifo_type(fifo_type):
         return "First_Word_Fall_Through"
     else:
         return "Standard_FIFO"
+
 
 def fill_and_generate_fifo_tcl(data_types):
     for data_type, configs in data_types.items():
@@ -3442,8 +5223,12 @@ def fill_and_generate_fifo_tcl(data_types):
             fifo_perf_opt = determine_fifo_type(fifo_type)
             for conf in config["configurations"]:
                 depth = conf["depth"]
-                prog_full = conf["prog_full"]  # Use 'prog_full' as per the updated data structure
-                fifo_mem_type, reg_embed = determine_fifo_mem_type(depth, width, fifo_type)
+                prog_full = conf[
+                    "prog_full"
+                ]  # Use 'prog_full' as per the updated data structure
+                fifo_mem_type, reg_embed = determine_fifo_mem_type(
+                    depth, width, fifo_type
+                )
 
                 # Generate a unique identifier for each FIFO configuration
                 fifo_id = f"{width}_{depth}_{prog_full}_{fifo_mem_type}_{fifo_type}"
@@ -3452,21 +5237,24 @@ def fill_and_generate_fifo_tcl(data_types):
                 if fifo_id in generated_fifos:
                     # print(f"Skipping generation for FIFO with ID: {fifo_id} (Already generated)")
                     continue
-                
+
                 module_name = f"fifo_generator_ip_{width}x{depth}x{prog_full}_{fifo_mem_type.lower().replace('_', '')}_{fifo_perf_opt.lower().replace('_', '')}"
                 # Mark this FIFO configuration as generated
                 generated_fifos.add(fifo_id)
                 # During FIFO generation tracking, add details like this:
-                generated_reference_fifos.append({
-                    "module_name": module_name,
-                    "width": width,
-                    "depth": depth,
-                    "prog_full": prog_full,
-                    "fifo_mem_type": fifo_mem_type,
-                    "fifo_type": fifo_type,
-                    "fifo_perf_opt": fifo_perf_opt,
-                    "reg_embed": reg_embed,
-                })
+                generated_reference_fifos.append(
+                    {
+                        "module_name": module_name,
+                        "width": width,
+                        "depth": depth,
+                        "prog_full": prog_full,
+                        "fifo_mem_type": fifo_mem_type,
+                        "fifo_type": fifo_type,
+                        "fifo_perf_opt": fifo_perf_opt,
+                        "reg_embed": reg_embed,
+                    }
+                )
+
 
 # TCL template with placeholders for formatting
 fill_fifo_tcl_template_post = """
@@ -3593,17 +5381,17 @@ fifo_template_default = """
 endgenerate"""
 
 fifo_count = 0
-fill_fifo_wrapper_topology.append(fifo_template_pre)        
+fill_fifo_wrapper_topology.append(fifo_template_pre)
 if XPM_FIFO_ENABLE == "0":
     fifo_count = 0
     total_fifo_count = len(generated_reference_fifos)
     # Generate the instantiation code for each engine and append it to the list
     for fifo_config in generated_reference_fifos:
-        fifo_count += 1;
-        fifo_threshold = fifo_config["depth"]-fifo_config["prog_full"]
+        fifo_count += 1
+        fifo_threshold = fifo_config["depth"] - fifo_config["prog_full"]
         filled_template = fill_fifo_tcl_template_post.format(
-            fifo_count = fifo_count,
-            total_fifo_count = total_fifo_count,
+            fifo_count=fifo_count,
+            total_fifo_count=total_fifo_count,
             fifo_type=fifo_config["fifo_type"],
             fifo_perf_opt=fifo_config["fifo_perf_opt"],
             fifo_mem_type=fifo_config["fifo_mem_type"],
@@ -3621,12 +5409,14 @@ if XPM_FIFO_ENABLE == "0":
     for fifo_config in generated_reference_fifos:
         fifo_count += 1
         filled_fifo_wrapper_topology = fifo_template_mid.format(
-            fifo_count = fifo_count,
+            fifo_count=fifo_count,
             fifo_type=fifo_config["fifo_type"],
             width=fifo_config["width"],
             depth=fifo_config["depth"],
-            full_threshold=fifo_config["prog_full"],  # Use 'prog_full' for 'PROG_THRESH'
-            module_name=fifo_config["module_name"]
+            full_threshold=fifo_config[
+                "prog_full"
+            ],  # Use 'prog_full' for 'PROG_THRESH'
+            module_name=fifo_config["module_name"],
         )
         fill_fifo_wrapper_topology.append(filled_fifo_wrapper_topology)
 
@@ -3636,19 +5426,19 @@ else:
     fill_fifo_wrapper_topology.append(fifo_template_default_2)
 
 # Write the accumulated VHDL code to the specified output file
-with open(output_file_fifo_wrapper_topology, 'w') as vh_file:
-    vh_file.write('\n'.join(fill_fifo_wrapper_topology))
+with open(output_file_fifo_wrapper_topology, "w") as vh_file:
+    vh_file.write("\n".join(fill_fifo_wrapper_topology))
 
 # ----------------------------------------------------------------------------
 # generate fill_fifo_wrapper_topology lib
 # ----------------------------------------------------------------------------
 # {0}/{1}/hdl/fifo_generator_v13_2_vhsyn_rfs.vhd
 # {0}/{1}/hdl/blk_mem_gen_v8_4_vhsyn_rfs.vhd
-fill_fifo_filelist_xsim_ip_vhdl_template="""
+fill_fifo_filelist_xsim_ip_vhdl_template = """
 {0}/{1}/hdl/fifo_generator_v13_2_rfs.vhd
    """
 
-fill_fifo_filelist_xsim_ip_v_pre= """
+fill_fifo_filelist_xsim_ip_v_pre = """
 {0}/{1}/hdl/fifo_generator_v13_2_rfs.v
 {0}/{1}/simulation/fifo_generator_vlog_beh.v
 """
@@ -3661,21 +5451,27 @@ fill_fifo_filelist_xsim_ip_vhdl = []
 
 if XPM_FIFO_ENABLE == "0":
     first_fifo_config = generated_reference_fifos[0]
-    fill_fifo_filelist_xsim_ip_v.append(fill_fifo_filelist_xsim_ip_v_pre.format(output_folder_path_vip,first_fifo_config["module_name"]))
-    fill_fifo_filelist_xsim_ip_vhdl.append(fill_fifo_filelist_xsim_ip_vhdl_template.format(output_folder_path_vip,first_fifo_config["module_name"]))
+    fill_fifo_filelist_xsim_ip_v.append(
+        fill_fifo_filelist_xsim_ip_v_pre.format(
+            output_folder_path_vip, first_fifo_config["module_name"]
+        )
+    )
+    fill_fifo_filelist_xsim_ip_vhdl.append(
+        fill_fifo_filelist_xsim_ip_vhdl_template.format(
+            output_folder_path_vip, first_fifo_config["module_name"]
+        )
+    )
     for fifo_config in generated_reference_fifos:
         module_name = fifo_config["module_name"]
         paths = fill_fifo_filelist_xsim_ip_v_template.format(
-            output_folder_path_vip,
-            module_name,
-            module_name
+            output_folder_path_vip, module_name, module_name
         )
         # Append the generated paths to the accumulator
         fill_fifo_filelist_xsim_ip_v.append(paths)
 
 # Combine all generated paths into a single string
-fill_fifo_filelist_xsim_ip_v = ''.join(fill_fifo_filelist_xsim_ip_v)
-fill_fifo_filelist_xsim_ip_vhdl = ''.join(fill_fifo_filelist_xsim_ip_vhdl)
+fill_fifo_filelist_xsim_ip_v = "".join(fill_fifo_filelist_xsim_ip_v)
+fill_fifo_filelist_xsim_ip_vhdl = "".join(fill_fifo_filelist_xsim_ip_vhdl)
 
 
 # ----------------------------------------------------------------------------
@@ -3684,70 +5480,152 @@ fill_fifo_filelist_xsim_ip_vhdl = ''.join(fill_fifo_filelist_xsim_ip_vhdl)
 with open(output_file_filelist_xsim_ip_vhdl_f, "w") as file:
     output_lines = []
 
-    fill_filelist_xsim_ip_vhdl_template_once="""
+    fill_filelist_xsim_ip_vhdl_template_once = """
 {5}/m{0:02d}_axi_system_cache_be{1}x{2}_mid{3}x{4}/hdl/system_cache_v5_0_vh_rfs.vhd
   """
-    fill_filelist_xsim_ip_vhdl_template="""
+    fill_filelist_xsim_ip_vhdl_template = """
 {5}/m{0:02d}_axi_system_cache_be{1}x{2}_mid{3}x{4}/sim/m{0:02d}_axi_system_cache_be{1}x{2}_mid{3}x{4}.vhd
 {5}/m{0:02d}_axi_cu_cache_mid{3}x{4}_fe{7}x{8}/sim/m{0:02d}_axi_cu_cache_mid{3}x{4}_fe{7}x{8}.vhd
   """
 
     for index, channel in enumerate(DISTINCT_CHANNELS):
-        if(index==0):
-            output_lines.append(fill_filelist_xsim_ip_vhdl_template_once.format(channel,CHANNEL_CONFIG_DATA_WIDTH_BE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index],CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],output_folder_path_vip ,KERNEL_NAME))
-        output_lines.append(fill_filelist_xsim_ip_vhdl_template.format(channel,CHANNEL_CONFIG_DATA_WIDTH_BE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index],CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],output_folder_path_vip ,KERNEL_NAME,CHANNEL_CONFIG_DATA_WIDTH_FE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_FE[index]))
+        if index == 0:
+            output_lines.append(
+                fill_filelist_xsim_ip_vhdl_template_once.format(
+                    channel,
+                    CHANNEL_CONFIG_DATA_WIDTH_BE[index],
+                    CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],
+                    CHANNEL_CONFIG_DATA_WIDTH_MID[index],
+                    CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],
+                    output_folder_path_vip,
+                    KERNEL_NAME,
+                )
+            )
+        output_lines.append(
+            fill_filelist_xsim_ip_vhdl_template.format(
+                channel,
+                CHANNEL_CONFIG_DATA_WIDTH_BE[index],
+                CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],
+                CHANNEL_CONFIG_DATA_WIDTH_MID[index],
+                CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],
+                output_folder_path_vip,
+                KERNEL_NAME,
+                CHANNEL_CONFIG_DATA_WIDTH_FE[index],
+                CHANNEL_CONFIG_ADDRESS_WIDTH_FE[index],
+            )
+        )
 
-    output_lines.append(fill_filelist_xsim_ip_vhdl_template.format(channel,CHANNEL_CONFIG_DATA_WIDTH_BE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index],CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],output_folder_path_vip ,KERNEL_NAME,CHANNEL_CONFIG_DATA_WIDTH_FE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_FE[index]))
+    output_lines.append(
+        fill_filelist_xsim_ip_vhdl_template.format(
+            channel,
+            CHANNEL_CONFIG_DATA_WIDTH_BE[index],
+            CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],
+            CHANNEL_CONFIG_DATA_WIDTH_MID[index],
+            CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],
+            output_folder_path_vip,
+            KERNEL_NAME,
+            CHANNEL_CONFIG_DATA_WIDTH_FE[index],
+            CHANNEL_CONFIG_ADDRESS_WIDTH_FE[index],
+        )
+    )
     output_lines.append(fill_fifo_filelist_xsim_ip_vhdl)
-    file.write('\n'.join(output_lines))
+    file.write("\n".join(output_lines))
 
 
 with open(output_file_filelist_xsim_ip_sv_f, "w") as file:
     output_lines = []
 
-    output_lines.append(f"{output_folder_path_vip}/control_{KERNEL_NAME}_vip/sim/control_{KERNEL_NAME}_vip_pkg.sv")
-    output_lines.append(f"{output_folder_path_vip}/control_{KERNEL_NAME}_vip/sim/control_{KERNEL_NAME}_vip.sv")
-    output_lines.append(f"{output_folder_path_vip}/control_{KERNEL_NAME}_vip/hdl/axi_vip_v1_1_vl_rfs.sv")
+    output_lines.append(
+        f"{output_folder_path_vip}/control_{KERNEL_NAME}_vip/sim/control_{KERNEL_NAME}_vip_pkg.sv"
+    )
+    output_lines.append(
+        f"{output_folder_path_vip}/control_{KERNEL_NAME}_vip/sim/control_{KERNEL_NAME}_vip.sv"
+    )
+    output_lines.append(
+        f"{output_folder_path_vip}/control_{KERNEL_NAME}_vip/hdl/axi_vip_v1_1_vl_rfs.sv"
+    )
 
-    fill_file_filelist_xsim_ip_sv_template="""
+    fill_file_filelist_xsim_ip_sv_template = """
 {5}/slv_m{0:02d}_axi_vip/sim/slv_m{0:02d}_axi_vip_pkg.sv
 {5}/slv_m{0:02d}_axi_vip/sim/slv_m{0:02d}_axi_vip.sv
   """
 
     for index, channel in enumerate(DISTINCT_CHANNELS):
-        output_lines.append(fill_file_filelist_xsim_ip_sv_template.format(channel,CHANNEL_CONFIG_DATA_WIDTH_BE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index],CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],output_folder_path_vip ,KERNEL_NAME))
+        output_lines.append(
+            fill_file_filelist_xsim_ip_sv_template.format(
+                channel,
+                CHANNEL_CONFIG_DATA_WIDTH_BE[index],
+                CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],
+                CHANNEL_CONFIG_DATA_WIDTH_MID[index],
+                CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],
+                output_folder_path_vip,
+                KERNEL_NAME,
+            )
+        )
 
-    file.write('\n'.join(output_lines))
+    file.write("\n".join(output_lines))
 
 
 with open(output_file_filelist_xsim_ip_v_f, "w") as file:
     output_lines = []
 
-    output_lines.append(f"{output_folder_path_vip}/control_{KERNEL_NAME}_vip/hdl/axi_infrastructure_v1_1_vl_rfs.v")
+    output_lines.append(
+        f"{output_folder_path_vip}/control_{KERNEL_NAME}_vip/hdl/axi_infrastructure_v1_1_vl_rfs.v"
+    )
 
-    fill_file_filelist_xsim_ip_v_template_once="""
+    fill_file_filelist_xsim_ip_v_template_once = """
 {5}/m{0:02d}_axi_register_slice_be_{1}x{2}/hdl/axi_register_slice_v2_1_vl_rfs.v
    """
 
-    fill_file_filelist_xsim_ip_v_template="""
+    fill_file_filelist_xsim_ip_v_template = """
 {5}/m{0:02d}_axi_register_slice_be_{1}x{2}/sim/m{0:02d}_axi_register_slice_be_{1}x{2}.v
 {5}/m{0:02d}_axi_register_slice_mid_{3}x{4}/sim/m{0:02d}_axi_register_slice_mid_{3}x{4}.v
    """
 
-    fill_file_filelist_xsim_ip_v_template_axi_lite="""
+    fill_file_filelist_xsim_ip_v_template_axi_lite = """
 {5}/m{0:02d}_axi_lite_register_slice_mid_64x17/sim/m{0:02d}_axi_lite_register_slice_mid_64x17.v
    """
     for index, channel in enumerate(DISTINCT_CHANNELS):
-        if(index==0):
-            output_lines.append(fill_file_filelist_xsim_ip_v_template_once.format(channel,CHANNEL_CONFIG_DATA_WIDTH_BE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index],CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],output_folder_path_vip ,KERNEL_NAME))
-        if(int(CACHE_CONFIG_L2_CTRL[index])):
-            output_lines.append(fill_file_filelist_xsim_ip_v_template_axi_lite.format(channel,CHANNEL_CONFIG_DATA_WIDTH_BE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index],CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],output_folder_path_vip ,KERNEL_NAME))
-        output_lines.append(fill_file_filelist_xsim_ip_v_template.format(channel,CHANNEL_CONFIG_DATA_WIDTH_BE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index],CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],output_folder_path_vip ,KERNEL_NAME))
-   
+        if index == 0:
+            output_lines.append(
+                fill_file_filelist_xsim_ip_v_template_once.format(
+                    channel,
+                    CHANNEL_CONFIG_DATA_WIDTH_BE[index],
+                    CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],
+                    CHANNEL_CONFIG_DATA_WIDTH_MID[index],
+                    CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],
+                    output_folder_path_vip,
+                    KERNEL_NAME,
+                )
+            )
+        if int(CACHE_CONFIG_L2_CTRL[index]):
+            output_lines.append(
+                fill_file_filelist_xsim_ip_v_template_axi_lite.format(
+                    channel,
+                    CHANNEL_CONFIG_DATA_WIDTH_BE[index],
+                    CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],
+                    CHANNEL_CONFIG_DATA_WIDTH_MID[index],
+                    CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],
+                    output_folder_path_vip,
+                    KERNEL_NAME,
+                )
+            )
+        output_lines.append(
+            fill_file_filelist_xsim_ip_v_template.format(
+                channel,
+                CHANNEL_CONFIG_DATA_WIDTH_BE[index],
+                CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],
+                CHANNEL_CONFIG_DATA_WIDTH_MID[index],
+                CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],
+                output_folder_path_vip,
+                KERNEL_NAME,
+            )
+        )
+
     output_lines.append(fill_fifo_filelist_xsim_ip_v)
     output_lines.append(f"{XILINX_VIVADO}/data/verilog/src/glbl.v")
-    
-    file.write('\n'.join(output_lines))
+
+    file.write("\n".join(output_lines))
 
 
 # ----------------------------------------------------------------------------
@@ -3948,7 +5826,6 @@ with open(output_file_slv_m_axi_vip_func, "w") as file:
         endtask
             """
 
-
     backdoor_fill_memories_pre = """
         task automatic backdoor_fill_memories();
             /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -3978,36 +5855,36 @@ with open(output_file_slv_m_axi_vip_func, "w") as file:
             """
 
     for index, channel in enumerate(DISTINCT_CHANNELS):
-        if (CHANNEL_CONFIG_L2_TYPE[index] != 2):
+        if CHANNEL_CONFIG_L2_TYPE[index] != 2:
             output_lines.append(fill_memory_template.format(channel))
 
     output_lines.append(start_vips_pre)
     for index, channel in enumerate(DISTINCT_CHANNELS):
-        if (CHANNEL_CONFIG_L2_TYPE[index] != 2):
+        if CHANNEL_CONFIG_L2_TYPE[index] != 2:
             output_lines.append(start_vips_mid.format(channel))
     output_lines.append(start_vips_end)
 
     output_lines.append(slv_no_backpressure_wready_pre)
     for index, channel in enumerate(DISTINCT_CHANNELS):
-        if (CHANNEL_CONFIG_L2_TYPE[index] != 2):
+        if CHANNEL_CONFIG_L2_TYPE[index] != 2:
             output_lines.append(slv_no_backpressure_wready_mid.format(channel))
     output_lines.append(slv_no_backpressure_wready_end)
 
     output_lines.append(slv_random_backpressure_wready_pre)
     for index, channel in enumerate(DISTINCT_CHANNELS):
-        if (CHANNEL_CONFIG_L2_TYPE[index] != 2):
+        if CHANNEL_CONFIG_L2_TYPE[index] != 2:
             output_lines.append(slv_random_backpressure_wready_mid.format(channel))
     output_lines.append(slv_random_backpressure_wready_end)
 
     output_lines.append(slv_no_delay_rvalid_pre)
     for index, channel in enumerate(DISTINCT_CHANNELS):
-        if (CHANNEL_CONFIG_L2_TYPE[index] != 2):
+        if CHANNEL_CONFIG_L2_TYPE[index] != 2:
             output_lines.append(slv_no_delay_rvalid_mid.format(channel))
     output_lines.append(slv_no_delay_rvalid_end)
 
     output_lines.append(slv_random_delay_rvalid_pre)
     for index, channel in enumerate(DISTINCT_CHANNELS):
-        if (CHANNEL_CONFIG_L2_TYPE[index] != 2):
+        if CHANNEL_CONFIG_L2_TYPE[index] != 2:
             output_lines.append(slv_random_delay_rvalid_mid.format(channel))
     output_lines.append(slv_random_delay_rvalid_end)
 
@@ -4016,34 +5893,49 @@ with open(output_file_slv_m_axi_vip_func, "w") as file:
     #     output_lines.append(backdoor_fill_memories_mid.format(int(properties[0]), buffer_name, index))
     # output_lines.append(backdoor_fill_memories_end)
 
-    CHANNEL_PORT_INDEX  = 0;
+    CHANNEL_PORT_INDEX = 0
     output_lines.append(backdoor_buffer_fill_memories_pre)
-    for index, ((buffer_name, properties), (buffer_name2, properties2)) in enumerate(zip(channels.items(), buffers.items())):
+    for index, ((buffer_name, properties), (buffer_name2, properties2)) in enumerate(
+        zip(channels.items(), buffers.items())
+    ):
         if index == 9:
             continue  # Skip the iteration if the index is 9
-        if (CHANNEL_CONFIG_L2_TYPE[int(properties[0])] == 2):
-            output_lines.append(backdoor_buffer_fill_memories_mid.format(CHANNEL_PORT_INDEX, buffer_name2, properties2, CHANNEL_PORT_INDEX))
-        elif (CHANNEL_CONFIG_L2_TYPE[int(properties[0])] == 1):
-            output_lines.append(backdoor_buffer_fill_memories_mid.format(int(properties[0]), buffer_name2, properties2, int(properties[0])))
+        if CHANNEL_CONFIG_L2_TYPE[int(properties[0])] == 2:
+            output_lines.append(
+                backdoor_buffer_fill_memories_mid.format(
+                    CHANNEL_PORT_INDEX, buffer_name2, properties2, CHANNEL_PORT_INDEX
+                )
+            )
+        elif CHANNEL_CONFIG_L2_TYPE[int(properties[0])] == 1:
+            output_lines.append(
+                backdoor_buffer_fill_memories_mid.format(
+                    int(properties[0]), buffer_name2, properties2, int(properties[0])
+                )
+            )
             CHANNEL_PORT_INDEX = int(properties[0])
         else:
-            output_lines.append(backdoor_buffer_fill_memories_mid.format(int(properties[0]), buffer_name2, properties2, int(properties[0])))
+            output_lines.append(
+                backdoor_buffer_fill_memories_mid.format(
+                    int(properties[0]), buffer_name2, properties2, int(properties[0])
+                )
+            )
 
     output_lines.append(backdoor_buffer_fill_memories_end)
-    
-    file.write('\n'.join(output_lines))
 
+    file.write("\n".join(output_lines))
 
 
 with open(output_file_slv_m_axi_vip_dump, "w") as file:
     output_lines = []
-    
+
     backdoor_buffer_dump_memories_pre = """
             /////////////////////////////////////////////////////////////////////////////////////////////////
             // Backdoor dumpe the memory with the content.
             """
 
-    backdoor_buffer_dump_memories_declare = """           bit [M{0:02d}_AXI4_FE_DATA_W/8-1:0][8-1:0] {2}[];"""
+    backdoor_buffer_dump_memories_declare = (
+        """           bit [M{0:02d}_AXI4_FE_DATA_W/8-1:0][8-1:0] {2}[];"""
+    )
 
     backdoor_buffer_dump_memories_assign = """           {2}  = new [graph.mem_{2}];"""
 
@@ -4053,45 +5945,87 @@ with open(output_file_slv_m_axi_vip_dump, "w") as file:
             /////////////////////////////////////////////////////////////////////////////////////////////////
             """
 
-    CHANNEL_PORT_INDEX  = 0;
+    CHANNEL_PORT_INDEX = 0
     output_lines.append(backdoor_buffer_dump_memories_pre)
-    
-    for index, ((buffer_name, properties), (buffer_name2, properties2)) in enumerate(zip(channels.items(), buffers.items())):
-        if index == 9:
-            continue  # Skip the iteration if the index is 9
-        if (CHANNEL_CONFIG_L2_TYPE[int(properties[0])] == 2):
-            output_lines.append(backdoor_buffer_dump_memories_declare.format(CHANNEL_PORT_INDEX, buffer_name2, properties2, CHANNEL_PORT_INDEX))
-        elif (CHANNEL_CONFIG_L2_TYPE[int(properties[0])] == 1):
-            output_lines.append(backdoor_buffer_dump_memories_declare.format(int(properties[0]), buffer_name2, properties2, int(properties[0])))
-            CHANNEL_PORT_INDEX = int(properties[0])
-        else:
-            output_lines.append(backdoor_buffer_dump_memories_declare.format(int(properties[0]), buffer_name2, properties2, int(properties[0])))
 
-    for index, ((buffer_name, properties), (buffer_name2, properties2)) in enumerate(zip(channels.items(), buffers.items())):
+    for index, ((buffer_name, properties), (buffer_name2, properties2)) in enumerate(
+        zip(channels.items(), buffers.items())
+    ):
         if index == 9:
             continue  # Skip the iteration if the index is 9
-        if (CHANNEL_CONFIG_L2_TYPE[int(properties[0])] == 2):
-            output_lines.append(backdoor_buffer_dump_memories_assign.format(CHANNEL_PORT_INDEX, buffer_name2, properties2, CHANNEL_PORT_INDEX))
-        elif (CHANNEL_CONFIG_L2_TYPE[int(properties[0])] == 1):
-            output_lines.append(backdoor_buffer_dump_memories_assign.format(int(properties[0]), buffer_name2, properties2, int(properties[0])))
+        if CHANNEL_CONFIG_L2_TYPE[int(properties[0])] == 2:
+            output_lines.append(
+                backdoor_buffer_dump_memories_declare.format(
+                    CHANNEL_PORT_INDEX, buffer_name2, properties2, CHANNEL_PORT_INDEX
+                )
+            )
+        elif CHANNEL_CONFIG_L2_TYPE[int(properties[0])] == 1:
+            output_lines.append(
+                backdoor_buffer_dump_memories_declare.format(
+                    int(properties[0]), buffer_name2, properties2, int(properties[0])
+                )
+            )
             CHANNEL_PORT_INDEX = int(properties[0])
         else:
-            output_lines.append(backdoor_buffer_dump_memories_assign.format(int(properties[0]), buffer_name2, properties2, int(properties[0])))
+            output_lines.append(
+                backdoor_buffer_dump_memories_declare.format(
+                    int(properties[0]), buffer_name2, properties2, int(properties[0])
+                )
+            )
 
-    for index, ((buffer_name, properties), (buffer_name2, properties2)) in enumerate(zip(channels.items(), buffers.items())):
+    for index, ((buffer_name, properties), (buffer_name2, properties2)) in enumerate(
+        zip(channels.items(), buffers.items())
+    ):
         if index == 9:
             continue  # Skip the iteration if the index is 9
-        if (CHANNEL_CONFIG_L2_TYPE[int(properties[0])] == 2):
-            output_lines.append(backdoor_buffer_dump_memories_call.format(CHANNEL_PORT_INDEX, buffer_name2, properties2, CHANNEL_PORT_INDEX))
-        elif (CHANNEL_CONFIG_L2_TYPE[int(properties[0])] == 1):
-            output_lines.append(backdoor_buffer_dump_memories_call.format(int(properties[0]), buffer_name2, properties2, int(properties[0])))
+        if CHANNEL_CONFIG_L2_TYPE[int(properties[0])] == 2:
+            output_lines.append(
+                backdoor_buffer_dump_memories_assign.format(
+                    CHANNEL_PORT_INDEX, buffer_name2, properties2, CHANNEL_PORT_INDEX
+                )
+            )
+        elif CHANNEL_CONFIG_L2_TYPE[int(properties[0])] == 1:
+            output_lines.append(
+                backdoor_buffer_dump_memories_assign.format(
+                    int(properties[0]), buffer_name2, properties2, int(properties[0])
+                )
+            )
             CHANNEL_PORT_INDEX = int(properties[0])
         else:
-            output_lines.append(backdoor_buffer_dump_memories_call.format(int(properties[0]), buffer_name2, properties2, int(properties[0])))
+            output_lines.append(
+                backdoor_buffer_dump_memories_assign.format(
+                    int(properties[0]), buffer_name2, properties2, int(properties[0])
+                )
+            )
+
+    for index, ((buffer_name, properties), (buffer_name2, properties2)) in enumerate(
+        zip(channels.items(), buffers.items())
+    ):
+        if index == 9:
+            continue  # Skip the iteration if the index is 9
+        if CHANNEL_CONFIG_L2_TYPE[int(properties[0])] == 2:
+            output_lines.append(
+                backdoor_buffer_dump_memories_call.format(
+                    CHANNEL_PORT_INDEX, buffer_name2, properties2, CHANNEL_PORT_INDEX
+                )
+            )
+        elif CHANNEL_CONFIG_L2_TYPE[int(properties[0])] == 1:
+            output_lines.append(
+                backdoor_buffer_dump_memories_call.format(
+                    int(properties[0]), buffer_name2, properties2, int(properties[0])
+                )
+            )
+            CHANNEL_PORT_INDEX = int(properties[0])
+        else:
+            output_lines.append(
+                backdoor_buffer_dump_memories_call.format(
+                    int(properties[0]), buffer_name2, properties2, int(properties[0])
+                )
+            )
 
     output_lines.append(backdoor_buffer_dump_memories_end)
-    
-    file.write('\n'.join(output_lines))
+
+    file.write("\n".join(output_lines))
 
 
 # Write to VHDL file
@@ -4106,7 +6040,7 @@ with open(output_file_set_top_parameters, "w") as file:
     for index, channel in enumerate(DISTINCT_CHANNELS):
         output_lines.append(ports_template.format(channel))
 
-    file.write('\n'.join(output_lines))
+    file.write("\n".join(output_lines))
 
 
 # Write to VHDL file
@@ -4120,9 +6054,15 @@ with open(output_file_testbench_parameters, "w") as file:
         """
 
     for index, channel in enumerate(DISTINCT_CHANNELS):
-        output_lines.append(ports_template.format(channel,CHANNEL_CONFIG_DATA_WIDTH_BE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index]))
+        output_lines.append(
+            ports_template.format(
+                channel,
+                CHANNEL_CONFIG_DATA_WIDTH_BE[index],
+                CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],
+            )
+        )
 
-    file.write('\n'.join(output_lines))
+    file.write("\n".join(output_lines))
 
 
 check_and_clean_file(output_file_pkg_mxx_axi4_fe)
@@ -4135,7 +6075,7 @@ check_and_clean_file(output_file_pkg_mxx_axi4_be)
 with open(output_file_pkg_mxx_axi4_be, "w") as file:
     output_lines = []
 
-    fill_file_pkg_mxx_axi4_be_pre="""
+    fill_file_pkg_mxx_axi4_be_pre = """
 //
 // -----------------------------------------------------------------------------
 // Copyright (c) 2021-2022 All rights reserved
@@ -4156,7 +6096,7 @@ parameter S_AXI_BE_DATA_WIDTH      = 32;
 
   """
 
-    fill_file_pkg_mxx_axi4_be_mid="""
+    fill_file_pkg_mxx_axi4_be_mid = """
 parameter M{0:02d}_AXI4_BE_ADDR_W   = {2}                 ;
 parameter M{0:02d}_AXI4_BE_DATA_W   = {1}                 ;
 parameter M{0:02d}_AXI4_BE_STRB_W   = M{0:02d}_AXI4_BE_DATA_W / 8;
@@ -4382,7 +6322,7 @@ endfunction : swap_endianness_cacheline_m{0:02d}_axi_be
 
   """
 
-    fill_file_pkg_mxx_axi4_lite_be_mid="""
+    fill_file_pkg_mxx_axi4_lite_be_mid = """
 
 // --------------------------------------------------------------------------------------
 // AXI4 Lite 
@@ -4408,23 +6348,35 @@ typedef m{0:02d}_axi_lite_resp_t S{0:02d}_AXI4_LITE_BE_RESP_T;
 
   """
 
-    fill_file_pkg_mxx_axi4_be_end="""
+    fill_file_pkg_mxx_axi4_be_end = """
 endpackage
   """
 
     output_lines.append(fill_file_pkg_mxx_axi4_be_pre)
     for index, channel in enumerate(DISTINCT_CHANNELS):
-        output_lines.append(fill_file_pkg_mxx_axi4_be_mid.format(channel,CHANNEL_CONFIG_DATA_WIDTH_BE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index]))
-        output_lines.append(fill_file_pkg_mxx_axi4_lite_be_mid.format(channel,CHANNEL_CONFIG_DATA_WIDTH_BE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index]))
+        output_lines.append(
+            fill_file_pkg_mxx_axi4_be_mid.format(
+                channel,
+                CHANNEL_CONFIG_DATA_WIDTH_BE[index],
+                CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],
+            )
+        )
+        output_lines.append(
+            fill_file_pkg_mxx_axi4_lite_be_mid.format(
+                channel,
+                CHANNEL_CONFIG_DATA_WIDTH_BE[index],
+                CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],
+            )
+        )
     output_lines.append(fill_file_pkg_mxx_axi4_be_end)
 
-    file.write('\n'.join(output_lines))
+    file.write("\n".join(output_lines))
 
 
 with open(output_file_pkg_mxx_axi4_mid, "w") as file:
     output_lines = []
 
-    fill_file_pkg_mxx_axi4_mid_pre="""
+    fill_file_pkg_mxx_axi4_mid_pre = """
 //
 // -----------------------------------------------------------------------------
 // Copyright (c) 2021-2022 All rights reserved
@@ -4445,7 +6397,7 @@ parameter S_AXI_MID_DATA_WIDTH      = 32;
 
   """
 
-    fill_file_pkg_mxx_axi4_mid_mid="""
+    fill_file_pkg_mxx_axi4_mid_mid = """
 parameter M{0:02d}_AXI4_MID_ADDR_W   = {2}                 ;
 parameter M{0:02d}_AXI4_MID_DATA_W   = {1}                 ;
 parameter M{0:02d}_AXI4_MID_STRB_W   = M{0:02d}_AXI4_MID_DATA_W / 8;
@@ -4671,7 +6623,7 @@ endfunction : swap_endianness_cacheline_m{0:02d}_axi_mid
 
   """
 
-    fill_file_pkg_mxx_axi4_lite_mid_mid="""
+    fill_file_pkg_mxx_axi4_lite_mid_mid = """
 
 // --------------------------------------------------------------------------------------
 // AXI4 Lite 
@@ -4697,23 +6649,35 @@ typedef m{0:02d}_axi_lite_resp_t S{0:02d}_AXI4_LITE_MID_RESP_T;
 
   """
 
-    fill_file_pkg_mxx_axi4_mid_end="""
+    fill_file_pkg_mxx_axi4_mid_end = """
 endpackage
   """
 
     output_lines.append(fill_file_pkg_mxx_axi4_mid_pre)
     for index, channel in enumerate(DISTINCT_CHANNELS):
-        output_lines.append(fill_file_pkg_mxx_axi4_mid_mid.format(channel,CHANNEL_CONFIG_DATA_WIDTH_MID[index],CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index]))
-        output_lines.append(fill_file_pkg_mxx_axi4_lite_mid_mid.format(channel,CHANNEL_CONFIG_DATA_WIDTH_MID[index],CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index]))
+        output_lines.append(
+            fill_file_pkg_mxx_axi4_mid_mid.format(
+                channel,
+                CHANNEL_CONFIG_DATA_WIDTH_MID[index],
+                CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],
+            )
+        )
+        output_lines.append(
+            fill_file_pkg_mxx_axi4_lite_mid_mid.format(
+                channel,
+                CHANNEL_CONFIG_DATA_WIDTH_MID[index],
+                CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],
+            )
+        )
     output_lines.append(fill_file_pkg_mxx_axi4_mid_end)
 
-    file.write('\n'.join(output_lines))
+    file.write("\n".join(output_lines))
 
 
 with open(output_file_pkg_mxx_axi4_fe, "w") as file:
     output_lines = []
 
-    fill_file_pkg_mxx_axi4_fe_pre="""
+    fill_file_pkg_mxx_axi4_fe_pre = """
 //
 // -----------------------------------------------------------------------------
 // Copyright (c) 2021-2022 All rights reserved
@@ -4734,7 +6698,7 @@ parameter S_AXI_FE_DATA_WIDTH      = 32;
 
   """
 
-    fill_file_pkg_mxx_axi4_fe_mid="""
+    fill_file_pkg_mxx_axi4_fe_mid = """
 parameter M{0:02d}_AXI4_FE_ADDR_W   = {2}                 ;
 parameter M{0:02d}_AXI4_FE_DATA_W   = {1}                 ;
 parameter M{0:02d}_AXI4_FE_STRB_W   = M{0:02d}_AXI4_FE_DATA_W / 8;
@@ -4960,7 +6924,7 @@ endfunction : swap_endianness_cacheline_m{0:02d}_axi_fe
 
   """
 
-    fill_file_pkg_mxx_axi4_lite_fe_mid="""
+    fill_file_pkg_mxx_axi4_lite_fe_mid = """
 
 // --------------------------------------------------------------------------------------
 // AXI4 Lite 
@@ -4986,22 +6950,36 @@ typedef m{0:02d}_axi_lite_resp_t S{0:02d}_AXI4_LITE_FE_RESP_T;
 
   """
 
-    fill_file_pkg_mxx_axi4_fe_end="""
+    fill_file_pkg_mxx_axi4_fe_end = """
 endpackage
   """
 
     output_lines.append(fill_file_pkg_mxx_axi4_fe_pre)
     for index, channel in enumerate(DISTINCT_CHANNELS):
-        output_lines.append(fill_file_pkg_mxx_axi4_fe_mid.format(channel,CHANNEL_CONFIG_DATA_WIDTH_FE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_FE[index], formatted_datetime))
-        output_lines.append(fill_file_pkg_mxx_axi4_lite_fe_mid.format(channel,CHANNEL_CONFIG_DATA_WIDTH_FE[index],CHANNEL_CONFIG_ADDRESS_WIDTH_FE[index], formatted_datetime))
+        output_lines.append(
+            fill_file_pkg_mxx_axi4_fe_mid.format(
+                channel,
+                CHANNEL_CONFIG_DATA_WIDTH_FE[index],
+                CHANNEL_CONFIG_ADDRESS_WIDTH_FE[index],
+                formatted_datetime,
+            )
+        )
+        output_lines.append(
+            fill_file_pkg_mxx_axi4_lite_fe_mid.format(
+                channel,
+                CHANNEL_CONFIG_DATA_WIDTH_FE[index],
+                CHANNEL_CONFIG_ADDRESS_WIDTH_FE[index],
+                formatted_datetime,
+            )
+        )
     output_lines.append(fill_file_pkg_mxx_axi4_fe_end)
 
-    file.write('\n'.join(output_lines))
+    file.write("\n".join(output_lines))
 
 
 fill_mxx_axi_register_slice_be_wrapper_module = []
 
-fill_mxx_axi_register_slice_be_wrapper_pre="""
+fill_mxx_axi_register_slice_be_wrapper_pre = """
 // -----------------------------------------------------------------------------
 //
 //      "GLay: A Vertex Centric Re-Configurable Graph Processing Overlay"
@@ -5019,7 +6997,7 @@ fill_mxx_axi_register_slice_be_wrapper_pre="""
 `include "global_package.vh"
 """
 
-fill_mxx_axi_register_slice_be_wrapper="""
+fill_mxx_axi_register_slice_be_wrapper = """
 
 module m{0:02d}_axi_register_slice_be_{1}x{2}_wrapper (
   // System Signals
@@ -5175,20 +7153,36 @@ endmodule : m{0:02d}_axi_register_slice_be_{1}x{2}_wrapper
   """
 
 
-output_file_mxx_axi_register_slice_be_wrapper = os.path.join(output_folder_path_slice,f"mxx_axi_register_slice_be_wrapper.sv")
+output_file_mxx_axi_register_slice_be_wrapper = os.path.join(
+    output_folder_path_slice, f"mxx_axi_register_slice_be_wrapper.sv"
+)
 check_and_clean_file(output_file_mxx_axi_register_slice_be_wrapper)
 
 with open(output_file_mxx_axi_register_slice_be_wrapper, "w") as file:
-    fill_mxx_axi_register_slice_be_wrapper_module.append(fill_mxx_axi_register_slice_be_wrapper_pre.format(channel, CHANNEL_CONFIG_DATA_WIDTH_BE[index], CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index], formatted_datetime))
+    fill_mxx_axi_register_slice_be_wrapper_module.append(
+        fill_mxx_axi_register_slice_be_wrapper_pre.format(
+            channel,
+            CHANNEL_CONFIG_DATA_WIDTH_BE[index],
+            CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],
+            formatted_datetime,
+        )
+    )
     for index, channel in enumerate(DISTINCT_CHANNELS):
-        fill_mxx_axi_register_slice_be_wrapper_module.append(fill_mxx_axi_register_slice_be_wrapper.format(channel, CHANNEL_CONFIG_DATA_WIDTH_BE[index], CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index], formatted_datetime))
-    
-    file.write('\n'.join(fill_mxx_axi_register_slice_be_wrapper_module))
+        fill_mxx_axi_register_slice_be_wrapper_module.append(
+            fill_mxx_axi_register_slice_be_wrapper.format(
+                channel,
+                CHANNEL_CONFIG_DATA_WIDTH_BE[index],
+                CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],
+                formatted_datetime,
+            )
+        )
+
+    file.write("\n".join(fill_mxx_axi_register_slice_be_wrapper_module))
 
 
-fill_mxx_axi_register_slice_mid_wrapper_module=[]
+fill_mxx_axi_register_slice_mid_wrapper_module = []
 
-fill_mxx_axi_register_slice_mid_wrapper_pre="""
+fill_mxx_axi_register_slice_mid_wrapper_pre = """
 // -----------------------------------------------------------------------------
 //
 //      "GLay: A Vertex Centric Re-Configurable Graph Processing Overlay"
@@ -5206,7 +7200,7 @@ fill_mxx_axi_register_slice_mid_wrapper_pre="""
 `include "global_package.vh"
   """
 
-fill_mxx_axi_register_slice_mid_wrapper="""
+fill_mxx_axi_register_slice_mid_wrapper = """
 
 module m{0:02d}_axi_register_slice_mid_{1}x{2}_wrapper (
   // System Signals
@@ -5361,19 +7355,35 @@ endmodule : m{0:02d}_axi_register_slice_mid_{1}x{2}_wrapper
 
   """
 
-output_file_mxx_axi_register_slice_mid_wrapper = os.path.join(output_folder_path_slice,f"mxx_axi_register_slice_mid_wrapper.sv")
+output_file_mxx_axi_register_slice_mid_wrapper = os.path.join(
+    output_folder_path_slice, f"mxx_axi_register_slice_mid_wrapper.sv"
+)
 check_and_clean_file(output_file_mxx_axi_register_slice_mid_wrapper)
 
 with open(output_file_mxx_axi_register_slice_mid_wrapper, "w") as file:
-    fill_mxx_axi_register_slice_mid_wrapper_module.append(fill_mxx_axi_register_slice_mid_wrapper_pre.format(channel, CHANNEL_CONFIG_DATA_WIDTH_MID[index], CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index], formatted_datetime))
+    fill_mxx_axi_register_slice_mid_wrapper_module.append(
+        fill_mxx_axi_register_slice_mid_wrapper_pre.format(
+            channel,
+            CHANNEL_CONFIG_DATA_WIDTH_MID[index],
+            CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],
+            formatted_datetime,
+        )
+    )
     for index, channel in enumerate(DISTINCT_CHANNELS):
-        fill_mxx_axi_register_slice_mid_wrapper_module.append(fill_mxx_axi_register_slice_mid_wrapper.format(channel, CHANNEL_CONFIG_DATA_WIDTH_MID[index], CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index], formatted_datetime))
-    
-    file.write('\n'.join(fill_mxx_axi_register_slice_mid_wrapper_module))
+        fill_mxx_axi_register_slice_mid_wrapper_module.append(
+            fill_mxx_axi_register_slice_mid_wrapper.format(
+                channel,
+                CHANNEL_CONFIG_DATA_WIDTH_MID[index],
+                CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],
+                formatted_datetime,
+            )
+        )
+
+    file.write("\n".join(fill_mxx_axi_register_slice_mid_wrapper_module))
 
 fill_mxx_axi_lite_register_slice_mid_wrapper_module = []
 
-fill_mxx_axi_lite_register_slice_mid_wrapper_pre="""
+fill_mxx_axi_lite_register_slice_mid_wrapper_pre = """
 // -----------------------------------------------------------------------------
 //
 //      "GLay: A Vertex Centric Re-Configurable Graph Processing Overlay"
@@ -5391,7 +7401,7 @@ fill_mxx_axi_lite_register_slice_mid_wrapper_pre="""
 `include "global_package.vh"
 """
 
-fill_mxx_axi_lite_register_slice_mid_wrapper="""
+fill_mxx_axi_lite_register_slice_mid_wrapper = """
 
 module m{0:02d}_axi_lite_register_slice_mid_{1}x{2}_wrapper (
   // System Signals
@@ -5467,21 +7477,31 @@ endmodule : m{0:02d}_axi_lite_register_slice_mid_{1}x{2}_wrapper
   """
 
 
-output_file_mxx_axi_lite_register_slice_mid_wrapper = os.path.join(output_folder_path_slice,f"mxx_axi_lite_register_slice_mid_wrapper.sv")
+output_file_mxx_axi_lite_register_slice_mid_wrapper = os.path.join(
+    output_folder_path_slice, f"mxx_axi_lite_register_slice_mid_wrapper.sv"
+)
 check_and_clean_file(output_file_mxx_axi_lite_register_slice_mid_wrapper)
 
 with open(output_file_mxx_axi_lite_register_slice_mid_wrapper, "w") as file:
-    fill_mxx_axi_lite_register_slice_mid_wrapper_module.append(fill_mxx_axi_lite_register_slice_mid_wrapper_pre.format(channel, 64, 17, formatted_datetime))
+    fill_mxx_axi_lite_register_slice_mid_wrapper_module.append(
+        fill_mxx_axi_lite_register_slice_mid_wrapper_pre.format(
+            channel, 64, 17, formatted_datetime
+        )
+    )
     for index, channel in enumerate(DISTINCT_CHANNELS):
-        if(int(CACHE_CONFIG_L2_CTRL[index])):
-            fill_mxx_axi_lite_register_slice_mid_wrapper_module.append(fill_mxx_axi_lite_register_slice_mid_wrapper.format(channel, 64, 17, formatted_datetime))
-    
-    file.write('\n'.join(fill_mxx_axi_lite_register_slice_mid_wrapper_module))
+        if int(CACHE_CONFIG_L2_CTRL[index]):
+            fill_mxx_axi_lite_register_slice_mid_wrapper_module.append(
+                fill_mxx_axi_lite_register_slice_mid_wrapper.format(
+                    channel, 64, 17, formatted_datetime
+                )
+            )
+
+    file.write("\n".join(fill_mxx_axi_lite_register_slice_mid_wrapper_module))
 
 
 fill_kernel_mxx_axi_system_cache_wrapper_module = []
 
-fill_kernel_mxx_axi_system_cache_wrapper_header="""
+fill_kernel_mxx_axi_system_cache_wrapper_header = """
 // -----------------------------------------------------------------------------
 //
 //      "GLay: A Vertex Centric Re-Configurable Graph Processing Overlay"
@@ -5499,21 +7519,21 @@ fill_kernel_mxx_axi_system_cache_wrapper_header="""
 `include "global_package.vh"
 """
 
-fill_kernel_mxx_axi_system_cache_wrapper_pre="""
+fill_kernel_mxx_axi_system_cache_wrapper_pre = """
 
 module kernel_m{0:02d}_axi_system_cache_be{1}x{2}_mid{3}x{4}_wrapper (
   // System Signals
   input  logic                                  ap_clk            ,
   input  logic                                  areset            ,
   """
-fill_kernel_mxx_axi_system_cache_wrapper_ports="""
+fill_kernel_mxx_axi_system_cache_wrapper_ports = """
   output M{1:02d}_AXI4_MID_SlaveReadInterfaceOutput  s{0}_axi_read_out    ,
   input  M{1:02d}_AXI4_MID_SlaveReadInterfaceInput   s{0}_axi_read_in     ,
   output M{1:02d}_AXI4_MID_SlaveWriteInterfaceOutput s{0}_axi_write_out   ,
   input  M{1:02d}_AXI4_MID_SlaveWriteInterfaceInput  s{0}_axi_write_in    ,
   """
 
-fill_kernel_mxx_axi_system_cache_wrapper_mid="""
+fill_kernel_mxx_axi_system_cache_wrapper_mid = """
   input  M{0:02d}_AXI4_BE_MasterReadInterfaceInput   m_axi_read_in     ,
   output M{0:02d}_AXI4_BE_MasterReadInterfaceOutput  m_axi_read_out    ,
   input  M{0:02d}_AXI4_BE_MasterWriteInterfaceInput  m_axi_write_in    ,
@@ -5564,7 +7584,7 @@ assign m_axi_read_out.arregion    = 0;
 
 m{0:02d}_axi_system_cache_be{1}x{2}_mid{3}x{4} inst_m{0:02d}_axi_system_cache_be{1}x{2}_mid{3}x{4} (
   """
-fill_kernel_mxx_axi_system_cache_wrapper_portmaps="""
+fill_kernel_mxx_axi_system_cache_wrapper_portmaps = """
   .S{0}_AXI_GEN_ARUSER (0                           ),
   .S{0}_AXI_GEN_AWUSER (0                           ),
   .S{0}_AXI_GEN_RVALID (s{0}_axi_read_out.rvalid       ), // Output Read channel valid
@@ -5606,7 +7626,7 @@ fill_kernel_mxx_axi_system_cache_wrapper_portmaps="""
   .S{0}_AXI_GEN_BREADY (s{0}_axi_write_in.bready       ), // Input Write response channel ready
   """
 
-fill_kernel_mxx_axi_system_cache_wrapper_post="""
+fill_kernel_mxx_axi_system_cache_wrapper_post = """
   .M0_AXI_RVALID     (m_axi_read_in.rvalid        ), // Input Read channel valid
   .M0_AXI_ARREADY    (m_axi_read_in.arready       ), // Input Read Address read channel ready
   .M0_AXI_RLAST      (m_axi_read_in.rlast         ), // Input Read channel last word
@@ -5648,7 +7668,7 @@ fill_kernel_mxx_axi_system_cache_wrapper_post="""
   .M0_AXI_BREADY     (m_axi_write_out.bready      ),  // Output Write response channel ready
     """
 
-fill_kernel_mxx_axi_system_cache_wrapper_ctrl="""
+fill_kernel_mxx_axi_system_cache_wrapper_ctrl = """
   .S_AXI_CTRL_AWADDR (s_axi_lite_in.aw.addr       ), // : IN STD_LOGIC_VECTOR(16 DOWNTO 0);
   .S_AXI_CTRL_AWPROT (s_axi_lite_in.aw.prot       ), // : IN STD_LOGIC_VECTOR(2 DOWNTO 0);
   .S_AXI_CTRL_AWVALID(s_axi_lite_in.aw_valid      ), // : IN STD_LOGIC;
@@ -5669,7 +7689,7 @@ fill_kernel_mxx_axi_system_cache_wrapper_ctrl="""
   .S_AXI_CTRL_RREADY (s_axi_lite_in.r_ready       ), // : IN STD_LOGIC;
     """
 
-fill_kernel_mxx_axi_system_cache_wrapper_post_if="""
+fill_kernel_mxx_axi_system_cache_wrapper_post_if = """
   .ACLK              (ap_clk                      ),
   .ARESETN           (areset_system_cache         ),
   .Initializing      (cache_setup_signal_int      )
@@ -5679,7 +7699,7 @@ endmodule : kernel_m{0:02d}_axi_system_cache_be{1}x{2}_mid{3}x{4}_wrapper
 
 """
 
-fill_kernel_mxx_axi_system_cache_wrapper_post_else="""
+fill_kernel_mxx_axi_system_cache_wrapper_post_else = """
   .ACLK              (ap_clk                      ),
   .ARESETN           (areset_system_cache         ),
   .Initializing      (cache_setup_signal_int      )    
@@ -5691,50 +7711,126 @@ endmodule : kernel_m{0:02d}_axi_system_cache_be{1}x{2}_mid{3}x{4}_wrapper
 
 """
 
-output_file_kernel_mxx_axi_system_cache_wrapper = os.path.join(output_folder_path_kernel,f"kernel_mxx_axi_system_cache_wrapper.sv")
+output_file_kernel_mxx_axi_system_cache_wrapper = os.path.join(
+    output_folder_path_kernel, f"kernel_mxx_axi_system_cache_wrapper.sv"
+)
 check_and_clean_file(output_file_kernel_mxx_axi_system_cache_wrapper)
 
 with open(output_file_kernel_mxx_axi_system_cache_wrapper, "w") as file:
-    fill_kernel_mxx_axi_system_cache_wrapper_module.append(fill_kernel_mxx_axi_system_cache_wrapper_header.format(channel, CHANNEL_CONFIG_DATA_WIDTH_BE[index], CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index], CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],formatted_datetime))
-    
-    CACHE_MERGE_COUNT = 0;
-    CACHE_PORT_COUNT  = 0;
-    CACHE_PORT_INDEX  = 0;
-    CHANNEL_PORT_INDEX  = 0;
-    
+    fill_kernel_mxx_axi_system_cache_wrapper_module.append(
+        fill_kernel_mxx_axi_system_cache_wrapper_header.format(
+            channel,
+            CHANNEL_CONFIG_DATA_WIDTH_BE[index],
+            CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],
+            CHANNEL_CONFIG_DATA_WIDTH_MID[index],
+            CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],
+            formatted_datetime,
+        )
+    )
+
+    CACHE_MERGE_COUNT = 0
+    CACHE_PORT_COUNT = 0
+    CACHE_PORT_INDEX = 0
+    CHANNEL_PORT_INDEX = 0
+
     for index, channel in enumerate(DISTINCT_CHANNELS):
-        fill_kernel_mxx_axi_system_cache_wrapper_module.append(fill_kernel_mxx_axi_system_cache_wrapper_pre.format(channel, CHANNEL_CONFIG_DATA_WIDTH_BE[index], CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index], CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],formatted_datetime))
-        
-        if (CHANNEL_CONFIG_L2_TYPE[index] == 1):
-            CACHE_PORT_COUNT  = CHANNEL_CONFIG_L2_MERGE[CACHE_MERGE_COUNT]
+        fill_kernel_mxx_axi_system_cache_wrapper_module.append(
+            fill_kernel_mxx_axi_system_cache_wrapper_pre.format(
+                channel,
+                CHANNEL_CONFIG_DATA_WIDTH_BE[index],
+                CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],
+                CHANNEL_CONFIG_DATA_WIDTH_MID[index],
+                CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],
+                formatted_datetime,
+            )
+        )
+
+        if CHANNEL_CONFIG_L2_TYPE[index] == 1:
+            CACHE_PORT_COUNT = CHANNEL_CONFIG_L2_MERGE[CACHE_MERGE_COUNT]
             for CACHE_PORT_INDEX in range(CACHE_PORT_COUNT):
-                fill_kernel_mxx_axi_system_cache_wrapper_module.append(fill_kernel_mxx_axi_system_cache_wrapper_ports.format(CACHE_PORT_INDEX,CHANNEL_PORT_INDEX))
+                fill_kernel_mxx_axi_system_cache_wrapper_module.append(
+                    fill_kernel_mxx_axi_system_cache_wrapper_ports.format(
+                        CACHE_PORT_INDEX, CHANNEL_PORT_INDEX
+                    )
+                )
                 CHANNEL_PORT_INDEX = CHANNEL_PORT_INDEX + 1
         else:
-            fill_kernel_mxx_axi_system_cache_wrapper_module.append(fill_kernel_mxx_axi_system_cache_wrapper_ports.format(0,channel))
+            fill_kernel_mxx_axi_system_cache_wrapper_module.append(
+                fill_kernel_mxx_axi_system_cache_wrapper_ports.format(0, channel)
+            )
 
-        fill_kernel_mxx_axi_system_cache_wrapper_module.append(fill_kernel_mxx_axi_system_cache_wrapper_mid.format(channel, CHANNEL_CONFIG_DATA_WIDTH_BE[index], CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index], CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],formatted_datetime))
-       
-        if (CHANNEL_CONFIG_L2_TYPE[index] == 1):
-            CACHE_PORT_COUNT  = CHANNEL_CONFIG_L2_MERGE[CACHE_MERGE_COUNT]
+        fill_kernel_mxx_axi_system_cache_wrapper_module.append(
+            fill_kernel_mxx_axi_system_cache_wrapper_mid.format(
+                channel,
+                CHANNEL_CONFIG_DATA_WIDTH_BE[index],
+                CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],
+                CHANNEL_CONFIG_DATA_WIDTH_MID[index],
+                CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],
+                formatted_datetime,
+            )
+        )
+
+        if CHANNEL_CONFIG_L2_TYPE[index] == 1:
+            CACHE_PORT_COUNT = CHANNEL_CONFIG_L2_MERGE[CACHE_MERGE_COUNT]
             for CACHE_PORT_INDEX in range(CACHE_PORT_COUNT):
-                fill_kernel_mxx_axi_system_cache_wrapper_module.append(fill_kernel_mxx_axi_system_cache_wrapper_portmaps.format(CACHE_PORT_INDEX))
+                fill_kernel_mxx_axi_system_cache_wrapper_module.append(
+                    fill_kernel_mxx_axi_system_cache_wrapper_portmaps.format(
+                        CACHE_PORT_INDEX
+                    )
+                )
         else:
-            fill_kernel_mxx_axi_system_cache_wrapper_module.append(fill_kernel_mxx_axi_system_cache_wrapper_portmaps.format(0))
+            fill_kernel_mxx_axi_system_cache_wrapper_module.append(
+                fill_kernel_mxx_axi_system_cache_wrapper_portmaps.format(0)
+            )
 
-        fill_kernel_mxx_axi_system_cache_wrapper_module.append(fill_kernel_mxx_axi_system_cache_wrapper_post.format(channel, CHANNEL_CONFIG_DATA_WIDTH_BE[index], CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index], CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],formatted_datetime))
-      
-        if(int(CACHE_CONFIG_L2_CTRL[index])):
-            fill_kernel_mxx_axi_system_cache_wrapper_module.append(fill_kernel_mxx_axi_system_cache_wrapper_ctrl.format(channel, CHANNEL_CONFIG_DATA_WIDTH_BE[index], CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index], CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],formatted_datetime))
-            fill_kernel_mxx_axi_system_cache_wrapper_module.append(fill_kernel_mxx_axi_system_cache_wrapper_post_if.format(channel, CHANNEL_CONFIG_DATA_WIDTH_BE[index], CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index], CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],formatted_datetime))
+        fill_kernel_mxx_axi_system_cache_wrapper_module.append(
+            fill_kernel_mxx_axi_system_cache_wrapper_post.format(
+                channel,
+                CHANNEL_CONFIG_DATA_WIDTH_BE[index],
+                CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],
+                CHANNEL_CONFIG_DATA_WIDTH_MID[index],
+                CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],
+                formatted_datetime,
+            )
+        )
+
+        if int(CACHE_CONFIG_L2_CTRL[index]):
+            fill_kernel_mxx_axi_system_cache_wrapper_module.append(
+                fill_kernel_mxx_axi_system_cache_wrapper_ctrl.format(
+                    channel,
+                    CHANNEL_CONFIG_DATA_WIDTH_BE[index],
+                    CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],
+                    CHANNEL_CONFIG_DATA_WIDTH_MID[index],
+                    CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],
+                    formatted_datetime,
+                )
+            )
+            fill_kernel_mxx_axi_system_cache_wrapper_module.append(
+                fill_kernel_mxx_axi_system_cache_wrapper_post_if.format(
+                    channel,
+                    CHANNEL_CONFIG_DATA_WIDTH_BE[index],
+                    CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],
+                    CHANNEL_CONFIG_DATA_WIDTH_MID[index],
+                    CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],
+                    formatted_datetime,
+                )
+            )
         else:
-            fill_kernel_mxx_axi_system_cache_wrapper_module.append(fill_kernel_mxx_axi_system_cache_wrapper_post_else.format(channel, CHANNEL_CONFIG_DATA_WIDTH_BE[index], CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],CHANNEL_CONFIG_DATA_WIDTH_MID[index], CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],formatted_datetime))
-     
-    file.write('\n'.join(fill_kernel_mxx_axi_system_cache_wrapper_module))
+            fill_kernel_mxx_axi_system_cache_wrapper_module.append(
+                fill_kernel_mxx_axi_system_cache_wrapper_post_else.format(
+                    channel,
+                    CHANNEL_CONFIG_DATA_WIDTH_BE[index],
+                    CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],
+                    CHANNEL_CONFIG_DATA_WIDTH_MID[index],
+                    CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],
+                    formatted_datetime,
+                )
+            )
+
+    file.write("\n".join(fill_kernel_mxx_axi_system_cache_wrapper_module))
 
 
-
-with open(output_file_kernel_cu_topology, 'w') as file:
+with open(output_file_kernel_cu_topology, "w") as file:
     output_lines = []
 
     output_file_kernel_cu_topology_template = """
@@ -5881,16 +7977,43 @@ endgenerate
     """
 
     for index, channel in enumerate(DISTINCT_CHANNELS):
-        output_lines.append(output_file_kernel_cu_topology_template.format(channel, index,CHANNEL_CONFIG_DATA_WIDTH_MID[index], CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],CHANNEL_CONFIG_DATA_WIDTH_FE[index], CHANNEL_CONFIG_ADDRESS_WIDTH_FE[index]))
-        if(int(CACHE_CONFIG_L2_CTRL[index])):
-            output_lines.append(output_file_axi_lite_ctrl_template_if.format(channel, index,CHANNEL_CONFIG_DATA_WIDTH_MID[index], CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],CHANNEL_CONFIG_DATA_WIDTH_FE[index], CHANNEL_CONFIG_ADDRESS_WIDTH_FE[index]))
+        output_lines.append(
+            output_file_kernel_cu_topology_template.format(
+                channel,
+                index,
+                CHANNEL_CONFIG_DATA_WIDTH_MID[index],
+                CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],
+                CHANNEL_CONFIG_DATA_WIDTH_FE[index],
+                CHANNEL_CONFIG_ADDRESS_WIDTH_FE[index],
+            )
+        )
+        if int(CACHE_CONFIG_L2_CTRL[index]):
+            output_lines.append(
+                output_file_axi_lite_ctrl_template_if.format(
+                    channel,
+                    index,
+                    CHANNEL_CONFIG_DATA_WIDTH_MID[index],
+                    CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],
+                    CHANNEL_CONFIG_DATA_WIDTH_FE[index],
+                    CHANNEL_CONFIG_ADDRESS_WIDTH_FE[index],
+                )
+            )
         else:
-            output_lines.append(output_file_axi_lite_ctrl_template_else.format(channel, index,CHANNEL_CONFIG_DATA_WIDTH_MID[index], CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],CHANNEL_CONFIG_DATA_WIDTH_FE[index], CHANNEL_CONFIG_ADDRESS_WIDTH_FE[index]))
-          
-    file.write('\n'.join(output_lines))
+            output_lines.append(
+                output_file_axi_lite_ctrl_template_else.format(
+                    channel,
+                    index,
+                    CHANNEL_CONFIG_DATA_WIDTH_MID[index],
+                    CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],
+                    CHANNEL_CONFIG_DATA_WIDTH_FE[index],
+                    CHANNEL_CONFIG_ADDRESS_WIDTH_FE[index],
+                )
+            )
+
+    file.write("\n".join(output_lines))
 
 
-with open(output_file_kernel_cu_ports, 'w') as file:
+with open(output_file_kernel_cu_ports, "w") as file:
     output_lines = []
 
     output_file_kernel_cu_ports_template = """
@@ -5903,12 +8026,19 @@ with open(output_file_kernel_cu_ports, 'w') as file:
     """
 
     for index, channel in enumerate(DISTINCT_CHANNELS):
-        output_lines.append(output_file_kernel_cu_ports_template.format(channel, index,CHANNEL_CONFIG_DATA_WIDTH_MID[index], CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index]))
+        output_lines.append(
+            output_file_kernel_cu_ports_template.format(
+                channel,
+                index,
+                CHANNEL_CONFIG_DATA_WIDTH_MID[index],
+                CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],
+            )
+        )
 
-    file.write('\n'.join(output_lines))
+    file.write("\n".join(output_lines))
 
 
-with open(output_file_kernel_cu_portmap, 'w') as file:
+with open(output_file_kernel_cu_portmap, "w") as file:
     output_lines = []
 
     output_file_kernel_cu_portmap_template = """
@@ -5921,9 +8051,16 @@ with open(output_file_kernel_cu_portmap, 'w') as file:
 .m{0:02d}_axi_lite_out(kernel_m{0:02d}_axi_lite_out),
     """
     for index, channel in enumerate(DISTINCT_CHANNELS):
-        output_lines.append(output_file_kernel_cu_portmap_template.format(channel, index,CHANNEL_CONFIG_DATA_WIDTH_MID[index], CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index]))
+        output_lines.append(
+            output_file_kernel_cu_portmap_template.format(
+                channel,
+                index,
+                CHANNEL_CONFIG_DATA_WIDTH_MID[index],
+                CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],
+            )
+        )
 
-    file.write('\n'.join(output_lines))
+    file.write("\n".join(output_lines))
 
 if int(PAUSE_FILE_GENERATION):
     print("MSG: Pause CU cache/buffer module generation.")
@@ -5932,7 +8069,7 @@ if int(PAUSE_FILE_GENERATION):
 
 fill_cu_mxx_axi_cu_cache_wrapper_module = []
 
-fill_cu_mxx_axi_cu_cache_wrapper_pre="""
+fill_cu_mxx_axi_cu_cache_wrapper_pre = """
 // -----------------------------------------------------------------------------
 //
 //      "GLay: A Vertex Centric Re-Configurable Graph Processing Overlay"
@@ -5950,7 +8087,7 @@ fill_cu_mxx_axi_cu_cache_wrapper_pre="""
 `include "global_package.vh"
 """
 
-fill_cu_mxx_axi_cu_cache_wrapper="""
+fill_cu_mxx_axi_cu_cache_wrapper = """
 
 module m{0:02d}_axi_cu_cache_mid{1}x{2}_fe{3}x{4}_wrapper #(
   parameter FIFO_WRITE_DEPTH = 64,
@@ -6350,7 +8487,7 @@ endmodule : m{0:02d}_axi_cu_cache_mid{1}x{2}_fe{3}x{4}_wrapper
   """
 
 
-fill_cu_mxx_axi_cu_cache_wrapper_v2 ="""
+fill_cu_mxx_axi_cu_cache_wrapper_v2 = """
 
 module m{0:02d}_axi_cu_cache_mid{1}x{2}_fe{3}x{4}_wrapper #(
   parameter FIFO_WRITE_DEPTH = 64,
@@ -6761,24 +8898,61 @@ end
   endmodule : m{0:02d}_axi_cu_cache_mid{1}x{2}_fe{3}x{4}_wrapper
   """
 
-output_file_cu_mxx_axi_cu_cache_wrapper = os.path.join(output_folder_path_cu,f"cu_mxx_axi_cu_cache_wrapper.sv")
+output_file_cu_mxx_axi_cu_cache_wrapper = os.path.join(
+    output_folder_path_cu, f"cu_mxx_axi_cu_cache_wrapper.sv"
+)
 check_and_clean_file(output_file_cu_mxx_axi_cu_cache_wrapper)
 
 with open(output_file_cu_mxx_axi_cu_cache_wrapper, "w") as file:
-    fill_cu_mxx_axi_cu_cache_wrapper_module.append(fill_cu_mxx_axi_cu_cache_wrapper_pre.format(channel, CHANNEL_CONFIG_DATA_WIDTH_MID[index], CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],CHANNEL_CONFIG_DATA_WIDTH_FE[index], CHANNEL_CONFIG_ADDRESS_WIDTH_FE[index],CACHE_CONFIG_L1_SIZE[index], CACHE_CONFIG_L1_NUM_WAYS[index], CACHE_CONFIG_L1_PREFETCH[index],formatted_datetime))
+    fill_cu_mxx_axi_cu_cache_wrapper_module.append(
+        fill_cu_mxx_axi_cu_cache_wrapper_pre.format(
+            channel,
+            CHANNEL_CONFIG_DATA_WIDTH_MID[index],
+            CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],
+            CHANNEL_CONFIG_DATA_WIDTH_FE[index],
+            CHANNEL_CONFIG_ADDRESS_WIDTH_FE[index],
+            CACHE_CONFIG_L1_SIZE[index],
+            CACHE_CONFIG_L1_NUM_WAYS[index],
+            CACHE_CONFIG_L1_PREFETCH[index],
+            formatted_datetime,
+        )
+    )
     for index, channel in enumerate(DISTINCT_CHANNELS):
-        if(CHANNEL_CONFIG_L1_TYPE[index] == 1):
-            fill_cu_mxx_axi_cu_cache_wrapper_module.append(fill_cu_mxx_axi_cu_cache_wrapper_v2.format(channel, CHANNEL_CONFIG_DATA_WIDTH_MID[index], CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],CHANNEL_CONFIG_DATA_WIDTH_FE[index], CHANNEL_CONFIG_ADDRESS_WIDTH_FE[index],CACHE_CONFIG_L1_SIZE[index], CACHE_CONFIG_L1_NUM_WAYS[index], CACHE_CONFIG_L1_PREFETCH[index],formatted_datetime))
+        if CHANNEL_CONFIG_L1_TYPE[index] == 1:
+            fill_cu_mxx_axi_cu_cache_wrapper_module.append(
+                fill_cu_mxx_axi_cu_cache_wrapper_v2.format(
+                    channel,
+                    CHANNEL_CONFIG_DATA_WIDTH_MID[index],
+                    CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],
+                    CHANNEL_CONFIG_DATA_WIDTH_FE[index],
+                    CHANNEL_CONFIG_ADDRESS_WIDTH_FE[index],
+                    CACHE_CONFIG_L1_SIZE[index],
+                    CACHE_CONFIG_L1_NUM_WAYS[index],
+                    CACHE_CONFIG_L1_PREFETCH[index],
+                    formatted_datetime,
+                )
+            )
         else:
-            fill_cu_mxx_axi_cu_cache_wrapper_module.append(fill_cu_mxx_axi_cu_cache_wrapper.format(channel, CHANNEL_CONFIG_DATA_WIDTH_MID[index], CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],CHANNEL_CONFIG_DATA_WIDTH_FE[index], CHANNEL_CONFIG_ADDRESS_WIDTH_FE[index],CACHE_CONFIG_L1_SIZE[index], CACHE_CONFIG_L1_NUM_WAYS[index], CACHE_CONFIG_L1_PREFETCH[index],formatted_datetime))
-    
-    file.write('\n'.join(fill_cu_mxx_axi_cu_cache_wrapper_module))
+            fill_cu_mxx_axi_cu_cache_wrapper_module.append(
+                fill_cu_mxx_axi_cu_cache_wrapper.format(
+                    channel,
+                    CHANNEL_CONFIG_DATA_WIDTH_MID[index],
+                    CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],
+                    CHANNEL_CONFIG_DATA_WIDTH_FE[index],
+                    CHANNEL_CONFIG_ADDRESS_WIDTH_FE[index],
+                    CACHE_CONFIG_L1_SIZE[index],
+                    CACHE_CONFIG_L1_NUM_WAYS[index],
+                    CACHE_CONFIG_L1_PREFETCH[index],
+                    formatted_datetime,
+                )
+            )
+
+    file.write("\n".join(fill_cu_mxx_axi_cu_cache_wrapper_module))
 
 
+fill_cu_mxx_axi_cu_stream_wrapper_module = []
 
-fill_cu_mxx_axi_cu_stream_wrapper_module=[]
-
-fill_cu_mxx_axi_cu_stream_wrapper_pre="""
+fill_cu_mxx_axi_cu_stream_wrapper_pre = """
 // -----------------------------------------------------------------------------
 //
 //      "GLay: A Vertex Centric Re-Configurable Graph Processing Overlay"
@@ -6796,7 +8970,7 @@ fill_cu_mxx_axi_cu_stream_wrapper_pre="""
 `include "global_package.vh"
 """
 
-fill_cu_mxx_axi_cu_stream_wrapper="""
+fill_cu_mxx_axi_cu_stream_wrapper = """
 
 module m{0:02d}_axi_cu_stream_mid{1}x{2}_fe{3}x{4}_wrapper #(
   parameter NUM_CHANNELS_READ = 1 ,
@@ -7248,20 +9422,40 @@ module m{0:02d}_axi_cu_stream_mid{1}x{2}_fe{3}x{4}_wrapper #(
   endmodule : m{0:02d}_axi_cu_stream_mid{1}x{2}_fe{3}x{4}_wrapper
   """
 
-output_file_cu_mxx_axi_cu_stream_wrapper = os.path.join(output_folder_path_cu,f"cu_mxx_axi_cu_stream_wrapper.sv")
+output_file_cu_mxx_axi_cu_stream_wrapper = os.path.join(
+    output_folder_path_cu, f"cu_mxx_axi_cu_stream_wrapper.sv"
+)
 check_and_clean_file(output_file_cu_mxx_axi_cu_stream_wrapper)
 
 with open(output_file_cu_mxx_axi_cu_stream_wrapper, "w") as file:
-    fill_cu_mxx_axi_cu_stream_wrapper_module.append(fill_cu_mxx_axi_cu_stream_wrapper_pre.format(channel, CHANNEL_CONFIG_DATA_WIDTH_MID[index], CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],CHANNEL_CONFIG_DATA_WIDTH_FE[index], CHANNEL_CONFIG_ADDRESS_WIDTH_FE[index],formatted_datetime))
+    fill_cu_mxx_axi_cu_stream_wrapper_module.append(
+        fill_cu_mxx_axi_cu_stream_wrapper_pre.format(
+            channel,
+            CHANNEL_CONFIG_DATA_WIDTH_MID[index],
+            CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],
+            CHANNEL_CONFIG_DATA_WIDTH_FE[index],
+            CHANNEL_CONFIG_ADDRESS_WIDTH_FE[index],
+            formatted_datetime,
+        )
+    )
     for index, channel in enumerate(DISTINCT_CHANNELS):
-        fill_cu_mxx_axi_cu_stream_wrapper_module.append(fill_cu_mxx_axi_cu_stream_wrapper.format(channel, CHANNEL_CONFIG_DATA_WIDTH_MID[index], CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],CHANNEL_CONFIG_DATA_WIDTH_FE[index], CHANNEL_CONFIG_ADDRESS_WIDTH_FE[index],formatted_datetime))
-    
-    file.write('\n'.join(fill_cu_mxx_axi_cu_stream_wrapper_module))
+        fill_cu_mxx_axi_cu_stream_wrapper_module.append(
+            fill_cu_mxx_axi_cu_stream_wrapper.format(
+                channel,
+                CHANNEL_CONFIG_DATA_WIDTH_MID[index],
+                CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],
+                CHANNEL_CONFIG_DATA_WIDTH_FE[index],
+                CHANNEL_CONFIG_ADDRESS_WIDTH_FE[index],
+                formatted_datetime,
+            )
+        )
+
+    file.write("\n".join(fill_cu_mxx_axi_cu_stream_wrapper_module))
 
 
 fill_cu_mxx_axi_cu_sram_wrapper_module = []
 
-fill_cu_mxx_axi_cu_sram_wrapper_pre="""
+fill_cu_mxx_axi_cu_sram_wrapper_pre = """
 // -----------------------------------------------------------------------------
 //
 //      "GLay: A Vertex Centric Re-Configurable Graph Processing Overlay"
@@ -7279,7 +9473,7 @@ fill_cu_mxx_axi_cu_sram_wrapper_pre="""
 `include "global_package.vh"
 """
 
-fill_cu_mxx_axi_cu_sram_wrapper="""
+fill_cu_mxx_axi_cu_sram_wrapper = """
 
 module m{0:02d}_axi_cu_sram_mid{1}x{2}_fe{3}x{4}_wrapper #(
   parameter FIFO_WRITE_DEPTH = 64,
@@ -7626,29 +9820,55 @@ endmodule : m{0:02d}_axi_cu_sram_mid{1}x{2}_fe{3}x{4}_wrapper
   """
 
 
-output_file_cu_mxx_axi_cu_sram_wrapper = os.path.join(output_folder_path_cu,f"cu_mxx_axi_cu_sram_wrapper.sv")
+output_file_cu_mxx_axi_cu_sram_wrapper = os.path.join(
+    output_folder_path_cu, f"cu_mxx_axi_cu_sram_wrapper.sv"
+)
 check_and_clean_file(output_file_cu_mxx_axi_cu_sram_wrapper)
 
 with open(output_file_cu_mxx_axi_cu_sram_wrapper, "w") as file:
-    fill_cu_mxx_axi_cu_sram_wrapper_module.append(fill_cu_mxx_axi_cu_sram_wrapper_pre.format(channel, CHANNEL_CONFIG_DATA_WIDTH_MID[index], CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],CHANNEL_CONFIG_DATA_WIDTH_FE[index], CHANNEL_CONFIG_ADDRESS_WIDTH_FE[index],CACHE_CONFIG_L1_SIZE[index], CACHE_CONFIG_L1_NUM_WAYS[index], CACHE_CONFIG_L1_PREFETCH[index],formatted_datetime))
+    fill_cu_mxx_axi_cu_sram_wrapper_module.append(
+        fill_cu_mxx_axi_cu_sram_wrapper_pre.format(
+            channel,
+            CHANNEL_CONFIG_DATA_WIDTH_MID[index],
+            CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],
+            CHANNEL_CONFIG_DATA_WIDTH_FE[index],
+            CHANNEL_CONFIG_ADDRESS_WIDTH_FE[index],
+            CACHE_CONFIG_L1_SIZE[index],
+            CACHE_CONFIG_L1_NUM_WAYS[index],
+            CACHE_CONFIG_L1_PREFETCH[index],
+            formatted_datetime,
+        )
+    )
     for index, channel in enumerate(DISTINCT_CHANNELS):
-        fill_cu_mxx_axi_cu_sram_wrapper_module.append(fill_cu_mxx_axi_cu_sram_wrapper.format(channel, CHANNEL_CONFIG_DATA_WIDTH_MID[index], CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],CHANNEL_CONFIG_DATA_WIDTH_FE[index], CHANNEL_CONFIG_ADDRESS_WIDTH_FE[index],CACHE_CONFIG_L1_SIZE[index], CACHE_CONFIG_L1_NUM_WAYS[index], CACHE_CONFIG_L1_PREFETCH[index],formatted_datetime))
-    
-    file.write('\n'.join(fill_cu_mxx_axi_cu_sram_wrapper_module))
+        fill_cu_mxx_axi_cu_sram_wrapper_module.append(
+            fill_cu_mxx_axi_cu_sram_wrapper.format(
+                channel,
+                CHANNEL_CONFIG_DATA_WIDTH_MID[index],
+                CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],
+                CHANNEL_CONFIG_DATA_WIDTH_FE[index],
+                CHANNEL_CONFIG_ADDRESS_WIDTH_FE[index],
+                CACHE_CONFIG_L1_SIZE[index],
+                CACHE_CONFIG_L1_NUM_WAYS[index],
+                CACHE_CONFIG_L1_PREFETCH[index],
+                formatted_datetime,
+            )
+        )
 
-
+    file.write("\n".join(fill_cu_mxx_axi_cu_sram_wrapper_module))
 
 
 fill_engine_template_topology = []
 
-    # Header for the VHDL instantiation section
-fill_engine_template_topology.append("""// --------------------------------------------------------------------------------------
+# Header for the VHDL instantiation section
+fill_engine_template_topology.append(
+    """// --------------------------------------------------------------------------------------
 // Generate Engine - instant
 // --------------------------------------------------------------------------------------
 generate
-    case (ENGINES_CONFIG)""")
+    case (ENGINES_CONFIG)"""
+)
 
-    # Template for each engine instantiation
+# Template for each engine instantiation
 engine_template_mid = """
         {index}       : begin
 // --------------------------------------------------------------------------------------
@@ -7849,19 +10069,25 @@ engine_template_post = """
 for engine_name, properties in engine_properties.items():
     index = properties[0]  # Assuming the first element is the index for the switch case
     if "ENGINE_MERGE_DATA" in engine_name:
-        instantiation_code = engine_template_merge.format(index=index, engine_name=engine_name.lower())
-    else: 
-        instantiation_code = engine_template_mid.format(index=index, engine_name=engine_name.lower())
+        instantiation_code = engine_template_merge.format(
+            index=index, engine_name=engine_name.lower()
+        )
+    else:
+        instantiation_code = engine_template_mid.format(
+            index=index, engine_name=engine_name.lower()
+        )
     fill_engine_template_topology.append(instantiation_code)
 
 # Closing the generate-case structure
-instantiation_code = engine_template_post.format(index=index, engine_name=engine_name.lower())
+instantiation_code = engine_template_post.format(
+    index=index, engine_name=engine_name.lower()
+)
 fill_engine_template_topology.append(instantiation_code)
 fill_engine_template_topology.append("    endcase\nendgenerate")
 
 # Write the accumulated VHDL code to the specified output file
-with open(output_file_engine_template_topology, 'w') as vh_file:
-    vh_file.write('\n'.join(fill_engine_template_topology))
+with open(output_file_engine_template_topology, "w") as vh_file:
+    vh_file.write("\n".join(fill_engine_template_topology))
 
 
 engine_template_pre = """

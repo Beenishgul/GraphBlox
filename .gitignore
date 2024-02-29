@@ -1,5 +1,9 @@
 *.err
 *.log
+logs
+node_modules
+package-lock.json
+package.json
 .vscode
 .Xil
 00_make/params.sh

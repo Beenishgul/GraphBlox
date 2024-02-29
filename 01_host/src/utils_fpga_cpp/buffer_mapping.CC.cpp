@@ -1,5 +1,5 @@
 #include "glayenv.hpp"
-void GLAYGraphCSRxrtBufferHandlePerKernel::mapGLAYOverlayProgramBuffersCC(struct GraphCSR *graph)
+void GLAYxrtBufferHandlePerKernel::mapGLAYOverlayProgramBuffersCC(struct GraphCSR *graph)
 {
 // --------------------------------------------------------------------------------------
 // Name ENGINE_CSR_INDEX              ID 0    mapping 2    cycles 8    None-NONE ( 0 )-( graph->num_vertices )
