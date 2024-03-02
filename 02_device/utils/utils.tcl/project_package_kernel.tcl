@@ -149,7 +149,7 @@ if {[catch {exec python3 ${XCI_XDC_PythonScriptPath} ${ACTIVE_PARAMS_SH_DIR}} re
 puts "[color 4 "                        Add design sources into project ${KERNEL_NAME}"]" 
 add_filelist_if_exists sources_1 ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${KERNEL_NAME}_filelist_package.vh.f $log_file
 add_filelist_if_exists sources_1 ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${KERNEL_NAME}_filelist_package.src.f $log_file
-# add_filelist_if_exists sources_1 ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${KERNEL_NAME}_filelist_package.xci.f $log_file
+add_filelist_if_exists sources_1 ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${KERNEL_NAME}_filelist_package.xci.f $log_file
 # add_filelist_if_exists sources_1 ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${KERNEL_NAME}_filelist_package.xdc.f $log_file
 
 puts "[color 4 "                        Add design sources into sim_1 ${KERNEL_NAME}"]" 
