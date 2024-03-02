@@ -23,9 +23,9 @@ fi
 # GRAPH_SUIT=$6
 # GRAPH_NAME=$7
 
-PARAMS_SH_DIR=$1
+ACTIVE_PARAMS_SH_DIR=$1
 
-source ${PARAMS_SH_DIR}
+source ${ACTIVE_PARAMS_SH_DIR}
 
 pkgs="pkg"
 engines="engines"

@@ -3,9 +3,9 @@
 # =========================================================
 # create ip project with part name in command line argvs
 # =========================================================
-set PARAMS_TCL_DIR                  [lindex $argv 0]
+set ACTIVE_PARAMS_TCL_DIR                  [lindex $argv 0]
 
-source ${PARAMS_TCL_DIR}
+source ${ACTIVE_PARAMS_TCL_DIR}
 
 set package_full_dir ${APP_DIR_ACTIVE}/${VIVADO_PACKAGE_DIR}
 set log_file         ${package_full_dir}/generate_${KERNEL_NAME}_xsim.log

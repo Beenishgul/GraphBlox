@@ -18,9 +18,9 @@
 # =========================================================
 # create ip project with part name in command line argvs
 # =========================================================
-set PARAMS_TCL_DIR                  [lindex $argv 0]
+set ACTIVE_PARAMS_TCL_DIR                  [lindex $argv 0]
 
-source ${PARAMS_TCL_DIR}
+source ${ACTIVE_PARAMS_TCL_DIR}
 
 set package_full_dir ${APP_DIR_ACTIVE}/${VIVADO_PACKAGE_DIR}
 set log_file         ${package_full_dir}/generate_${KERNEL_NAME}_package.log
@@ -130,7 +130,7 @@ set vitis_dir $::env(XILINX_VITIS)
 # Add IP and design sources into project
 # =========================================================
 puts "[color 4 "                        Add VIP into project"]"
-set argv [list ${PARAMS_TCL_DIR} ${package_full_dir}]
+set argv [list ${ACTIVE_PARAMS_TCL_DIR} ${package_full_dir}]
 set argc 2
 source ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${UTILS_TCL}/project_generate_vip.tcl 
 
@@ -196,12 +196,12 @@ set_property -name {STEPS.PLACE_DESIGN.ARGS.MORE OPTIONS} -value {-retiming} -ob
 set_property AUTO_RQS 1 [get_runs impl_1]
 set_property AUTO_RQS.SUGGESTION_RUN impl_1 [get_runs synth_1]
 
-set argv [list ${PARAMS_TCL_DIR}]
+set argv [list ${ACTIVE_PARAMS_TCL_DIR}]
 set argc 1
 source ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${UTILS_TCL}/project_all_impl.tcl >> $log_file
 
 puts "[color 4 "                        Create IDR implementation strategies: i_impl_strategies"]"
-set argv [list ${PARAMS_TCL_DIR}]
+set argv [list ${ACTIVE_PARAMS_TCL_DIR}]
 set argc 1
 source ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${UTILS_TCL}/project_all_idr_impl.tcl >> $log_file
 
@@ -268,7 +268,7 @@ puts "[color 4 "                        Associate AXIS interface with clock"]"
 ipx::associate_bus_interfaces -busif "s_axi_control"  -clock "ap_clk" $core >> $log_file
 
 puts "[color 4 "                        Associate AXI interface with clock"]" 
-set argv [list ${PARAMS_TCL_DIR} $core]
+set argv [list ${ACTIVE_PARAMS_TCL_DIR} $core]
 set argc 2
 source ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${UTILS_TCL}/project_generate_m_axi_ports.tcl 
 
@@ -396,7 +396,7 @@ puts "[color 3 "                        (Name, Offsets, Descriptions, and Size)"
 
 puts "[color 4 "                        Set RTL kernel (${KERNEL_NAME}) registers property"]" 
 
-set argv [list ${PARAMS_TCL_DIR} $addr_block]
+set argv [list ${ACTIVE_PARAMS_TCL_DIR} $addr_block]
 set argc 2
 source ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${UTILS_TCL}/project_map_buffers_m_axi_ports.tcl 
 
