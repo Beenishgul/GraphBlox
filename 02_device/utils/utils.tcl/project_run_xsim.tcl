@@ -51,8 +51,8 @@ open_project ${KERNEL_PROJECT_PKG_XPR}
 # update_filelist_if_exists sim_1 ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${KERNEL_NAME}_filelist_xsim.ip.sv.f $log_file
 # update_filelist_if_exists sim_1 ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${KERNEL_NAME}_filelist_xsim.ip.vhdl.f $log_file
 
-puts "[color 4 "                        INFO: Update compile order: sim_1"]"
-update_compile_order -fileset sim_1 >> $log_file
+# puts "[color 4 "                        INFO: Update compile order: sim_1"]"
+# update_compile_order -fileset sim_1 >> $log_file
 
 if {${SIMULATION_MODE} == 0} {
   launch_simulation -simset sim_1 -mode behavioral
