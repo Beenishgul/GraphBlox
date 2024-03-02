@@ -15,10 +15,10 @@
 # limitations under the License.
 #
 # set the device part from command line argvs
-set PARAMS_TCL_DIR                  [lindex $argv 0]
+set ACTIVE_PARAMS_TCL_DIR                  [lindex $argv 0]
 set package_full_dir                [lindex $argv 1]
 
-source ${PARAMS_TCL_DIR}
+source ${ACTIVE_PARAMS_TCL_DIR}
 
 # set package_full_dir ${APP_DIR_ACTIVE}/${VIVADO_PACKAGE_DIR}
 set log_file         ${package_full_dir}/generate_${KERNEL_NAME}_ip.log
@@ -124,7 +124,7 @@ if {[checkXciFileExists ${files_sources_xci}]} {
 }
 
 puts "[color 4 "                        Add VIP into project"]"
-set argv [list ${PARAMS_TCL_DIR} ${package_full_dir} ${log_file} ${vivado_dir} ${vitis_dir}]
+set argv [list ${ACTIVE_PARAMS_TCL_DIR} ${package_full_dir} ${log_file} ${vivado_dir} ${vitis_dir}]
 set argc 5
 source ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${UTILS_TCL}/project_generate_m_axi_vip.tcl 
 

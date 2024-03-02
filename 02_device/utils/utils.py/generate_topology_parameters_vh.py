@@ -5749,7 +5749,7 @@ def determine_fifo_mem_type(depth, width, fifo_type):
         else:
             return "Common_Clock_Block_RAM", "false"
     else:
-        return "Built-in FIFO", "true"  # Assume built-in FIFO for very large or specialized needs
+        return "Common_Clock_Builtin_FIFO", "true"  # Assume built-in FIFO for very large or specialized needs
     
 def determine_fifo_type(fifo_type):
     if fifo_type == "fwft":
@@ -5806,32 +5806,35 @@ fill_fifo_tcl_template_post = """
 puts "[color 2 "                        Generate ({fifo_count}/{total_fifo_count}) FIFO {fifo_perf_opt} Width: {width}  Depth: {depth} Prog_full : {full_threshold} {fifo_mem_type}"]"
 
 set module_name {module_name}
-create_ip -name fifo_generator          \\
-          -vendor xilinx.com            \\
-          -library ip                   \\
-          -version 13.*                 \\
-          -module_name ${{module_name}}   >> $log_file
-          
-set_property -dict [list \\
-                      CONFIG.Fifo_Implementation {{{fifo_mem_type}}} \\
-                      CONFIG.Input_Data_Width {{{width}}} \\
-                      CONFIG.Input_Depth {{{depth}}} \\
-                      CONFIG.Performance_Options {{{fifo_perf_opt}}} \\
-                      CONFIG.Programmable_Full_Type {{Single_Programmable_Full_Threshold_Constant}} \\
-                      CONFIG.Use_Embedded_Registers {{{reg_embed}}} \\
-                      CONFIG.Full_Threshold_Assert_Value {{{full_threshold}}} \\
-                      CONFIG.Valid_Flag {{true}} \\
-                    ] [get_ips ${{module_name}}]
-
 set files_sources_xci ${{package_full_dir}}/${{KERNEL_NAME}}/${{KERNEL_NAME}}.srcs/sources_1/ip/${{module_name}}/${{module_name}}.xci
-set files_ip_user_files_dir     ${{package_full_dir}}/${{KERNEL_NAME}}/${{KERNEL_NAME}}.ip_user_files
-set files_cache_dir     ${{package_full_dir}}/${{KERNEL_NAME}}/${{KERNEL_NAME}}.cache
-set_property generate_synth_checkpoint false [get_files ${{files_sources_xci}}]
-generate_target {{instantiation_template}}     [get_files ${{files_sources_xci}}] >> $log_file
-# catch {{ config_ip_cache -export [get_ips -all ${{module_name}}] }}
-generate_target all                          [get_files ${{files_sources_xci}}] >> $log_file
-export_ip_user_files -of_objects             [get_files ${{files_sources_xci}}] -no_script -force >> $log_file
-export_simulation -of_objects [get_files ${{files_sources_xci}}] -directory ${{files_ip_user_files_dir}}/sim_scripts -ip_user_files_dir ${{files_ip_user_files_dir}} -ipstatic_source_dir ${{files_ip_user_files_dir}}/ipstatic -lib_map_path [list {{modelsim=${{files_cache_dir}}/compile_simlib/modelsim}} {{questa=${{files_cache_dir}}/compile_simlib/questa}} {{xcelium=${{files_cache_dir}}/compile_simlib/xcelium}} {{vcs=${{files_cache_dir}}/compile_simlib/vcs}} {{riviera=${{files_cache_dir}}/compile_simlib/riviera}}] -use_ip_compiled_libs -force >> $log_file
+
+if {{[checkXciFileExistsIP ${{files_sources_xci}}]}} {{
+    create_ip -name fifo_generator          \\
+              -vendor xilinx.com            \\
+              -library ip                   \\
+              -version 13.*                 \\
+              -module_name ${{module_name}}   >> $log_file
+              
+    set_property -dict [list \\
+                          CONFIG.Fifo_Implementation {{{fifo_mem_type}}} \\
+                          CONFIG.Input_Data_Width {{{width}}} \\
+                          CONFIG.Input_Depth {{{depth}}} \\
+                          CONFIG.Performance_Options {{{fifo_perf_opt}}} \\
+                          CONFIG.Programmable_Full_Type {{Single_Programmable_Full_Threshold_Constant}} \\
+                          CONFIG.Use_Embedded_Registers {{{reg_embed}}} \\
+                          CONFIG.Full_Threshold_Assert_Value {{{full_threshold}}} \\
+                          CONFIG.Valid_Flag {{true}} \\
+                        ] [get_ips ${{module_name}}]
+
+    set files_ip_user_files_dir     ${{package_full_dir}}/${{KERNEL_NAME}}/${{KERNEL_NAME}}.ip_user_files
+    set files_cache_dir     ${{package_full_dir}}/${{KERNEL_NAME}}/${{KERNEL_NAME}}.cache
+    set_property generate_synth_checkpoint false [get_files ${{files_sources_xci}}]
+    generate_target {{instantiation_template}}     [get_files ${{files_sources_xci}}] >> $log_file
+    # catch {{ config_ip_cache -export [get_ips -all ${{module_name}}] }}
+    generate_target all                          [get_files ${{files_sources_xci}}] >> $log_file
+    export_ip_user_files -of_objects             [get_files ${{files_sources_xci}}] -no_script -force >> $log_file
+    export_simulation -of_objects [get_files ${{files_sources_xci}}] -directory ${{files_ip_user_files_dir}}/sim_scripts -ip_user_files_dir ${{files_ip_user_files_dir}} -ipstatic_source_dir ${{files_ip_user_files_dir}}/ipstatic -lib_map_path [list {{modelsim=${{files_cache_dir}}/compile_simlib/modelsim}} {{questa=${{files_cache_dir}}/compile_simlib/questa}} {{xcelium=${{files_cache_dir}}/compile_simlib/xcelium}} {{vcs=${{files_cache_dir}}/compile_simlib/vcs}} {{riviera=${{files_cache_dir}}/compile_simlib/riviera}}] -use_ip_compiled_libs -force >> $log_file
+}}
 """
 
 if XPM_FIFO_ENABLE == "0":

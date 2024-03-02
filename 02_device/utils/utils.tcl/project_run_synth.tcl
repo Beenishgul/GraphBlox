@@ -3,9 +3,9 @@
 # =========================================================
 # create ip project with part name in command line argvs
 # =========================================================
-set PARAMS_TCL_DIR                  [lindex $argv 0]
+set ACTIVE_PARAMS_TCL_DIR                  [lindex $argv 0]
 
-source ${PARAMS_TCL_DIR}
+source ${ACTIVE_PARAMS_TCL_DIR}
 # =========================================================
 
 if {${VIVADO_GUI_FLAG} == "YES"} {

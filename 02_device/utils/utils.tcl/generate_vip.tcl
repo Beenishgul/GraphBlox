@@ -15,9 +15,9 @@
 # limitations under the License.
 #
 # set the device part from command line argvs
-set PARAMS_TCL_DIR                  [lindex $argv 0]
+set ACTIVE_PARAMS_TCL_DIR                  [lindex $argv 0]
 
-source ${PARAMS_TCL_DIR}
+source ${ACTIVE_PARAMS_TCL_DIR}
 
 set package_full_dir ${APP_DIR_ACTIVE}/${VIVADO_VIP_DIR}
 set log_file         ${package_full_dir}/generate_${KERNEL_NAME}_vip.log
@@ -80,7 +80,7 @@ set_property target_language  Verilog   [current_project]  >> $log_file
 set_property target_simulator XSim      [current_project]  >> $log_file
 
 puts "[color 4 "                        Add VIP into project"]"
-set argv [list ${PARAMS_TCL_DIR} ${package_full_dir}]
+set argv [list ${ACTIVE_PARAMS_TCL_DIR} ${package_full_dir}]
 set argc 2
 source ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${UTILS_TCL}/project_generate_vip.tcl 
 

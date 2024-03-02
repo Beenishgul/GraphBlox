@@ -1,7 +1,7 @@
 #!/usr/bin/tclsh
-set PARAMS_TCL_DIR                  [lindex $argv 0]
+set ACTIVE_PARAMS_TCL_DIR                  [lindex $argv 0]
 
-source ${PARAMS_TCL_DIR}
+source ${ACTIVE_PARAMS_TCL_DIR}
 
 puts "========================================================="
 puts "\[[color 2 "Project Report ${KERNEL_NAME} IPs....."]\] [color 1 "START!"]"

@@ -29,9 +29,9 @@
 # XILINX_CTRL_MODE=$5
 # UTILS_TCL=$6
 
-PARAMS_SH_DIR=$1
+ACTIVE_PARAMS_SH_DIR=$1
 
-source ${PARAMS_SH_DIR}
+source ${ACTIVE_PARAMS_SH_DIR}
 
 generate_compile_filelist_f () {
 
