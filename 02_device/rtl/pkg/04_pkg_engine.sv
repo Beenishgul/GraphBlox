@@ -417,7 +417,7 @@ typedef struct packed{
 
 typedef struct packed{
     logic                                        [ENGINE_PACKET_DATA_NUM_FIELDS-1:0] lane_mask  ;
-    logic                                        [ENGINE_PACKET_DATA_NUM_FIELDS-1:0] cast_mask ;
+    logic                                        [ENGINE_PACKET_DATA_NUM_FIELDS-1:0] cast_mask  ;
     logic                                        [ENGINE_PACKET_DATA_NUM_FIELDS-1:0] merge_mask ;
     ParallelReadWriteConfigurationParameterField [ENGINE_PACKET_DATA_NUM_FIELDS-1:0] param_field;
     ParallelReadWriteConfigurationMeta           [ENGINE_PACKET_DATA_NUM_FIELDS-1:0] meta       ;
@@ -482,27 +482,27 @@ typedef struct packed{
     CUSetupEngineConfigurationPayload payload;
 } CUSetupEngineConfiguration;
 
-endpackage
-
-
 // --------------------------------------------------------------------------------------
 // Automata\_NFA\_Engine
 // --------------------------------------------------------------------------------------
 // Forward the data in a lane and operate if condition is true
 // Keeps the original meta data for that lane
 
-    typedef enum logic[12:0] {
-        ENGINE_AUTOMATA_NFA_GEN_RESET              = 1 << 0,
-        ENGINE_AUTOMATA_NFA_GEN_IDLE               = 1 << 1,
-        ENGINE_AUTOMATA_NFA_GEN_SETUP_MEMORY_IDLE  = 1 << 2,
-        ENGINE_AUTOMATA_NFA_GEN_SETUP_MEMORY_TRANS = 1 << 3,
-        ENGINE_AUTOMATA_NFA_GEN_SETUP_MEMORY       = 1 << 4,
-        ENGINE_AUTOMATA_NFA_GEN_START_TRANS        = 1 << 5,
-        ENGINE_AUTOMATA_NFA_GEN_START              = 1 << 6,
-        ENGINE_AUTOMATA_NFA_GEN_PAUSE_TRANS        = 1 << 7,
-        ENGINE_AUTOMATA_NFA_GEN_BREAK_TRANS        = 1 << 8,
-        ENGINE_AUTOMATA_NFA_GEN_BREAK              = 1 << 9,
-        ENGINE_AUTOMATA_NFA_GEN_BUSY               = 1 << 10,
-        ENGINE_AUTOMATA_NFA_GEN_BUSY_TRANS         = 1 << 11,
-        ENGINE_AUTOMATA_NFA_GEN_PAUSE              = 1 << 12
-    } engine_automata_nfa_generator_state;
+typedef enum logic[12:0] {
+    ENGINE_AUTOMATA_NFA_GEN_RESET              = 1 << 0,
+    ENGINE_AUTOMATA_NFA_GEN_IDLE               = 1 << 1,
+    ENGINE_AUTOMATA_NFA_GEN_SETUP_MEMORY_IDLE  = 1 << 2,
+    ENGINE_AUTOMATA_NFA_GEN_SETUP_MEMORY_TRANS = 1 << 3,
+    ENGINE_AUTOMATA_NFA_GEN_SETUP_MEMORY       = 1 << 4,
+    ENGINE_AUTOMATA_NFA_GEN_START_TRANS        = 1 << 5,
+    ENGINE_AUTOMATA_NFA_GEN_START              = 1 << 6,
+    ENGINE_AUTOMATA_NFA_GEN_PAUSE_TRANS        = 1 << 7,
+    ENGINE_AUTOMATA_NFA_GEN_BREAK_TRANS        = 1 << 8,
+    ENGINE_AUTOMATA_NFA_GEN_BREAK              = 1 << 9,
+    ENGINE_AUTOMATA_NFA_GEN_BUSY               = 1 << 10,
+    ENGINE_AUTOMATA_NFA_GEN_BUSY_TRANS         = 1 << 11,
+    ENGINE_AUTOMATA_NFA_GEN_PAUSE              = 1 << 12
+} engine_automata_nfa_generator_state;
+
+endpackage
+

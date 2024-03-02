@@ -117,6 +117,9 @@ $(shell echo 'XILINX_MAX_THREADS=$(XILINX_MAX_THREADS)' >> $(PARAMS_SH_DIR))
 $(shell echo 'XILINX_NUM_KERNELS=$(XILINX_NUM_KERNELS)' >> $(PARAMS_SH_DIR))
 $(shell echo 'XILINX_VITIS_DIR=$(XILINX_VITIS_DIR)' >> $(PARAMS_SH_DIR))
 $(shell echo 'XILINX_VIVADO_DIR=$(XILINX_VIVADO_DIR)' >> $(PARAMS_SH_DIR))
+$(shell echo 'ACTIVE_PARAMS_SH_DIR=$(ACTIVE_PARAMS_SH_DIR)' >> $(PARAMS_SH_DIR))
+$(shell echo 'ACTIVE_PARAMS_TCL_DIR=$(ACTIVE_PARAMS_TCL_DIR)' >> $(PARAMS_SH_DIR))
+$(shell echo 'SIMULATION_MODE=$(SIMULATION_MODE)' >> $(PARAMS_SH_DIR))
 
 # =========================================================
 #                        TCL ARGS                    
@@ -236,3 +239,6 @@ $(shell echo 'set XILINX_MAX_THREADS $(XILINX_MAX_THREADS)' >> $(PARAMS_TCL_DIR)
 $(shell echo 'set XILINX_NUM_KERNELS $(XILINX_NUM_KERNELS)' >> $(PARAMS_TCL_DIR))
 $(shell echo 'set XILINX_VITIS_DIR $(XILINX_VITIS_DIR)' >> $(PARAMS_TCL_DIR))
 $(shell echo 'set XILINX_VIVADO_DIR $(XILINX_VIVADO_DIR)' >> $(PARAMS_TCL_DIR))
+$(shell echo 'set ACTIVE_PARAMS_SH_DIR $(ACTIVE_PARAMS_SH_DIR)' >> $(PARAMS_TCL_DIR))
+$(shell echo 'set ACTIVE_PARAMS_TCL_DIR $(ACTIVE_PARAMS_TCL_DIR)' >> $(PARAMS_TCL_DIR))
+$(shell echo 'set SIMULATION_MODE $(SIMULATION_MODE)' >> $(PARAMS_TCL_DIR))

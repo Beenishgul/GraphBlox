@@ -134,6 +134,18 @@ set argv [list ${PARAMS_TCL_DIR} ${package_full_dir}]
 set argc 2
 source ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${UTILS_TCL}/project_generate_vip.tcl 
 
+# Construct the path to the Python script
+set XCI_XDC_PythonScriptPath "${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${UTILS_PYTHON}/generate_xci_xdc_filelist_f.py"
+
+# Use catch to handle any errors that occur during execution
+if {[catch {exec python3 ${XCI_XDC_PythonScriptPath} ${ACTIVE_PARAMS_SH_DIR}} result]} {
+    # If an error occurs, print the error message
+    puts "An error occurred in the Python command: $result ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${UTILS_PYTHON}/generate_xci_xdc_filelist_f.py"
+} else {
+    # If the command succeeds, you can use the result if needed
+    puts "[color 4 "                        Add design XCI/XDC into project ${KERNEL_NAME}"]" 
+}
+
 puts "[color 4 "                        Add design sources into project ${KERNEL_NAME}"]" 
 add_filelist_if_exists sources_1 ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${KERNEL_NAME}_filelist_package.vh.f $log_file
 add_filelist_if_exists sources_1 ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${KERNEL_NAME}_filelist_package.src.f $log_file
@@ -145,9 +157,10 @@ add_filelist_if_exists sim_1 ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${KERNEL_NAME
 add_filelist_if_exists sim_1 ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${KERNEL_NAME}_filelist_xsim.sv.f $log_file
 add_filelist_if_exists sim_1 ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${KERNEL_NAME}_filelist_xsim.vhdl.f $log_file
 add_filelist_if_exists sim_1 ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${KERNEL_NAME}_filelist_xsim.vh.f $log_file
-# add_filelist_if_exists sim_1 ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${KERNEL_NAME}_filelist_xsim.ip.v.f $log_file
-# add_filelist_if_exists sim_1 ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${KERNEL_NAME}_filelist_xsim.ip.sv.f $log_file
-# add_filelist_if_exists sim_1 ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${KERNEL_NAME}_filelist_xsim.ip.vhdl.f $log_file
+add_filelist_if_exists sim_1 ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${KERNEL_NAME}_filelist_package.xci.f $log_file
+add_filelist_if_exists sim_1 ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${KERNEL_NAME}_filelist_xsim.ip.v.f $log_file
+add_filelist_if_exists sim_1 ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${KERNEL_NAME}_filelist_xsim.ip.sv.f $log_file
+add_filelist_if_exists sim_1 ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${KERNEL_NAME}_filelist_xsim.ip.vhdl.f $log_file
 
 puts "[color 4 "                        Add design xdc into constrs_1"]" 
 add_filelist_if_exists constrs_1 ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${KERNEL_NAME}_filelist_package.xdc.f $log_file

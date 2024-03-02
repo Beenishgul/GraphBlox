@@ -4226,6 +4226,19 @@ set CU_CACHE_SIZE_B_M{0:02d}      {12}
 set LINE_CU_CACHE_DATA_WIDTH_M{0:02d} {3} 
 """
 
+    fill_proc_template_vars = """
+# Procedure to check if a .xci file exists in a given directory
+proc checkXciFileExistsIP {{xciFilePath}} {{
+    # Use glob to search for .xci files
+    if {{[llength [glob -nocomplain $xciFilePath]] == 0}} {{
+        return 1
+    }} else {{
+        return 0
+    }}
+}}
+
+"""
+
     fill_m_axi_vip_tcl_template = """
 # ----------------------------------------------------------------------------
 # generate axi slave vip
@@ -4233,38 +4246,42 @@ set LINE_CU_CACHE_DATA_WIDTH_M{0:02d} {3}
 puts "[color 2 "                        Generate AXI_M{0:02d} VIP Slave"]" 
 
 set module_name slv_m{0:02d}_axi_vip
-create_ip -name axi_vip                 \\
-          -vendor xilinx.com            \\
-          -library ip                   \\
-          -version 1.*                  \\
-          -module_name ${{module_name}}   >> $log_file
-          
-set_property -dict [list \\
-                    CONFIG.INTERFACE_MODE {{SLAVE}}                     \\
-                    CONFIG.PROTOCOL {{AXI4}}                            \\
-                    CONFIG.ADDR_WIDTH ${{BE_ADDR_WIDTH_M{0:02d}}}       \\
-                    CONFIG.DATA_WIDTH ${{BE_CACHE_DATA_WIDTH_M{0:02d}}} \\
-                    CONFIG.HAS_WSTRB {{1}}                              \\
-                    CONFIG.SUPPORTS_NARROW {{0}}                        \\
-                    CONFIG.HAS_REGION {{0}}                             \\
-                    CONFIG.HAS_LOCK {{{13}}}                               \\
-                    CONFIG.HAS_CACHE {{{13}}}                              \\
-                    CONFIG.HAS_BURST {{{13}}}                              \\
-                    CONFIG.HAS_QOS {{{13}}}                                \\
-                    CONFIG.HAS_PROT {{{13}}}                               \\
-                    CONFIG.HAS_SIZE {{{13}}}                               \\
-                    CONFIG.ID_WIDTH   {{{13}}}                             \\
-                    ] [get_ips ${{module_name}}]
-
 set files_sources_xci ${{package_full_dir}}/${{KERNEL_NAME}}/${{KERNEL_NAME}}.srcs/sources_1/ip/${{module_name}}/${{module_name}}.xci
-set files_ip_user_files_dir     ${{package_full_dir}}/${{KERNEL_NAME}}/${{KERNEL_NAME}}.ip_user_files
-set files_cache_dir     ${{package_full_dir}}/${{KERNEL_NAME}}/${{KERNEL_NAME}}.cache
-set_property generate_synth_checkpoint false [get_files ${{files_sources_xci}}]
-generate_target {{instantiation_template}}     [get_files ${{files_sources_xci}}] >> $log_file
-# catch {{ config_ip_cache -export [get_ips -all ${{module_name}}] }}
-generate_target all                          [get_files ${{files_sources_xci}}] >> $log_file
-export_ip_user_files -of_objects             [get_files ${{files_sources_xci}}] -no_script -force >> $log_file
-export_simulation -of_objects [get_files ${{files_sources_xci}}] -directory ${{files_ip_user_files_dir}}/sim_scripts -ip_user_files_dir ${{files_ip_user_files_dir}} -ipstatic_source_dir ${{files_ip_user_files_dir}}/ipstatic -lib_map_path [list {{modelsim=${{files_cache_dir}}/compile_simlib/modelsim}} {{questa=${{files_cache_dir}}/compile_simlib/questa}} {{xcelium=${{files_cache_dir}}/compile_simlib/xcelium}} {{vcs=${{files_cache_dir}}/compile_simlib/vcs}} {{riviera=${{files_cache_dir}}/compile_simlib/riviera}}] -use_ip_compiled_libs -force >> $log_file
+
+if {{[checkXciFileExistsIP ${{files_sources_xci}}]}} {{
+    create_ip -name axi_vip                 \\
+              -vendor xilinx.com            \\
+              -library ip                   \\
+              -version 1.*                  \\
+              -module_name ${{module_name}}   >> $log_file
+              
+    set_property -dict [list \\
+                        CONFIG.INTERFACE_MODE {{SLAVE}}                     \\
+                        CONFIG.PROTOCOL {{AXI4}}                            \\
+                        CONFIG.ADDR_WIDTH ${{BE_ADDR_WIDTH_M{0:02d}}}       \\
+                        CONFIG.DATA_WIDTH ${{BE_CACHE_DATA_WIDTH_M{0:02d}}} \\
+                        CONFIG.HAS_WSTRB {{1}}                              \\
+                        CONFIG.SUPPORTS_NARROW {{0}}                        \\
+                        CONFIG.HAS_REGION {{0}}                             \\
+                        CONFIG.HAS_LOCK {{{13}}}                               \\
+                        CONFIG.HAS_CACHE {{{13}}}                              \\
+                        CONFIG.HAS_BURST {{{13}}}                              \\
+                        CONFIG.HAS_QOS {{{13}}}                                \\
+                        CONFIG.HAS_PROT {{{13}}}                               \\
+                        CONFIG.HAS_SIZE {{{13}}}                               \\
+                        CONFIG.ID_WIDTH   {{{13}}}                             \\
+                        ] [get_ips ${{module_name}}]
+
+
+    set files_ip_user_files_dir     ${{package_full_dir}}/${{KERNEL_NAME}}/${{KERNEL_NAME}}.ip_user_files
+    set files_cache_dir     ${{package_full_dir}}/${{KERNEL_NAME}}/${{KERNEL_NAME}}.cache
+    set_property generate_synth_checkpoint false [get_files ${{files_sources_xci}}]
+    generate_target {{instantiation_template}}     [get_files ${{files_sources_xci}}] >> $log_file
+    # catch {{ config_ip_cache -export [get_ips -all ${{module_name}}] }}
+    generate_target all                          [get_files ${{files_sources_xci}}] >> $log_file
+    export_ip_user_files -of_objects             [get_files ${{files_sources_xci}}] -no_script -force >> $log_file
+    export_simulation -of_objects [get_files ${{files_sources_xci}}] -directory ${{files_ip_user_files_dir}}/sim_scripts -ip_user_files_dir ${{files_ip_user_files_dir}} -ipstatic_source_dir ${{files_ip_user_files_dir}}/ipstatic -lib_map_path [list {{modelsim=${{files_cache_dir}}/compile_simlib/modelsim}} {{questa=${{files_cache_dir}}/compile_simlib/questa}} {{xcelium=${{files_cache_dir}}/compile_simlib/xcelium}} {{vcs=${{files_cache_dir}}/compile_simlib/vcs}} {{riviera=${{files_cache_dir}}/compile_simlib/riviera}}] -use_ip_compiled_libs -force >> $log_file
+}}
     """
 
     fill_m_axi_vip_tcl_template_cache_pre = """
@@ -4277,56 +4294,58 @@ puts "[color 2 "                        Generate AXI_M{0:02d} Kernel Cache \\[{7
 puts "[color 2 "                                     Back-End: Data width: ${{BE_CACHE_DATA_WIDTH_M{0:02d}}}bits | Address width: ${{BE_ADDR_WIDTH_M{0:02d}}}bits"]" 
 puts "[color 2 "                                      Mid-End: Data width: ${{MID_CACHE_DATA_WIDTH_M{0:02d}}}bits | Address width: ${{MID_ADDR_WIDTH_M{0:02d}}}bits"]" 
 
-
-
 set module_name m{0:02d}_axi_system_cache_be{1}x{2}_mid{3}x{4}
-create_ip -name system_cache            \\
-          -vendor xilinx.com            \\
-          -library ip                   \\
-          -version 5.*                  \\
-          -module_name ${{module_name}}   >> $log_file
+set files_sources_xci ${{package_full_dir}}/${{KERNEL_NAME}}/${{KERNEL_NAME}}.srcs/sources_1/ip/${{module_name}}/${{module_name}}.xci
 
-set_property -dict [list                                                  \\
-                    CONFIG.C_CACHE_DATA_WIDTH ${{LINE_CACHE_DATA_WIDTH_M{0:02d}}}    \\
-                    CONFIG.C_CACHE_SIZE  ${{SYSTEM_CACHE_SIZE_B_M{0:02d}}}           \\
-                    CONFIG.C_M0_AXI_ADDR_WIDTH ${{BE_ADDR_WIDTH_M{0:02d}}}           \\
-                    CONFIG.C_M0_AXI_DATA_WIDTH ${{BE_CACHE_DATA_WIDTH_M{0:02d}}}     \\
-                    CONFIG.C_NUM_GENERIC_PORTS {{{9}}}                      \\
-                    CONFIG.C_NUM_OPTIMIZED_PORTS {{0}}                      \\
-                    CONFIG.C_ENABLE_NON_SECURE {{1}}                        \\
-                    CONFIG.C_ENABLE_ERROR_HANDLING {{1}}                    \\"""
+if {{[checkXciFileExistsIP ${{files_sources_xci}}]}} {{
+    create_ip -name system_cache            \\
+              -vendor xilinx.com            \\
+              -library ip                   \\
+              -version 5.*                  \\
+              -module_name ${{module_name}}   >> $log_file
+
+    set_property -dict [list                                                  \\
+                        CONFIG.C_CACHE_DATA_WIDTH ${{LINE_CACHE_DATA_WIDTH_M{0:02d}}}    \\
+                        CONFIG.C_CACHE_SIZE  ${{SYSTEM_CACHE_SIZE_B_M{0:02d}}}           \\
+                        CONFIG.C_M0_AXI_ADDR_WIDTH ${{BE_ADDR_WIDTH_M{0:02d}}}           \\
+                        CONFIG.C_M0_AXI_DATA_WIDTH ${{BE_CACHE_DATA_WIDTH_M{0:02d}}}     \\
+                        CONFIG.C_NUM_GENERIC_PORTS {{{9}}}                      \\
+                        CONFIG.C_NUM_OPTIMIZED_PORTS {{0}}                      \\
+                        CONFIG.C_ENABLE_NON_SECURE {{1}}                        \\
+                        CONFIG.C_ENABLE_ERROR_HANDLING {{1}}                    \\"""
 
     fill_m_axi_vip_tcl_template_cache_mid = """                    CONFIG.C_ENABLE_CTRL {{{8}}}                            \\
-                    CONFIG.C_ENABLE_STATISTICS {{2}}                        \\
-                    CONFIG.C_S_AXI_CTRL_DATA_WIDTH {{64}}                   \\
-                    CONFIG.C_ENABLE_VERSION_REGISTER {{0}}                  \\"""
+                        CONFIG.C_ENABLE_STATISTICS {{2}}                        \\
+                        CONFIG.C_S_AXI_CTRL_DATA_WIDTH {{64}}                   \\
+                        CONFIG.C_ENABLE_VERSION_REGISTER {{0}}                  \\"""
 
     fill_m_axi_vip_tcl_template_cache_ports = """                    CONFIG.C_S{0}_AXI_GEN_DATA_WIDTH ${{MID_CACHE_DATA_WIDTH_M{1:02d}}}\\
-                    CONFIG.C_S{0}_AXI_GEN_ADDR_WIDTH ${{MID_ADDR_WIDTH_M{1:02d}}}      \\
-                    CONFIG.C_S{0}_AXI_GEN_FORCE_READ_ALLOCATE {{1}}           \\
-                    CONFIG.C_S{0}_AXI_GEN_PROHIBIT_READ_ALLOCATE {{0}}        \\
-                    CONFIG.C_S{0}_AXI_GEN_FORCE_WRITE_ALLOCATE {{1}}          \\
-                    CONFIG.C_S{0}_AXI_GEN_PROHIBIT_WRITE_ALLOCATE {{0}}       \\
-                    CONFIG.C_S{0}_AXI_GEN_FORCE_READ_BUFFER {{1}}             \\
-                    CONFIG.C_S{0}_AXI_GEN_PROHIBIT_READ_BUFFER {{0}}          \\
-                    CONFIG.C_S{0}_AXI_GEN_FORCE_WRITE_BUFFER {{1}}            \\
-                    CONFIG.C_S{0}_AXI_GEN_PROHIBIT_WRITE_BUFFER {{0}}         \\"""
+                        CONFIG.C_S{0}_AXI_GEN_ADDR_WIDTH ${{MID_ADDR_WIDTH_M{1:02d}}}      \\
+                        CONFIG.C_S{0}_AXI_GEN_FORCE_READ_ALLOCATE {{1}}           \\
+                        CONFIG.C_S{0}_AXI_GEN_PROHIBIT_READ_ALLOCATE {{0}}        \\
+                        CONFIG.C_S{0}_AXI_GEN_FORCE_WRITE_ALLOCATE {{1}}          \\
+                        CONFIG.C_S{0}_AXI_GEN_PROHIBIT_WRITE_ALLOCATE {{0}}       \\
+                        CONFIG.C_S{0}_AXI_GEN_FORCE_READ_BUFFER {{1}}             \\
+                        CONFIG.C_S{0}_AXI_GEN_PROHIBIT_READ_BUFFER {{0}}          \\
+                        CONFIG.C_S{0}_AXI_GEN_FORCE_WRITE_BUFFER {{1}}            \\
+                        CONFIG.C_S{0}_AXI_GEN_PROHIBIT_WRITE_BUFFER {{0}}         \\"""
 
     fill_m_axi_vip_tcl_template_cache_post = """                    CONFIG.C_NUM_WAYS ${{SYSTEM_CACHE_NUM_WAYS_M{0:02d}}}            \\
-                    CONFIG.C_CACHE_TAG_MEMORY_TYPE {{Automatic}}            \\
-                    CONFIG.C_CACHE_DATA_MEMORY_TYPE {{{7}}}                 \\
-                    CONFIG.C_CACHE_LRU_MEMORY_TYPE {{Automatic}}            \\
-                    ] [get_ips ${{module_name}}] >> $log_file
+                        CONFIG.C_CACHE_TAG_MEMORY_TYPE {{Automatic}}            \\
+                        CONFIG.C_CACHE_DATA_MEMORY_TYPE {{{7}}}                 \\
+                        CONFIG.C_CACHE_LRU_MEMORY_TYPE {{Automatic}}            \\
+                        ] [get_ips ${{module_name}}] >> $log_file
 
-set files_sources_xci ${{package_full_dir}}/${{KERNEL_NAME}}/${{KERNEL_NAME}}.srcs/sources_1/ip/${{module_name}}/${{module_name}}.xci
-set files_ip_user_files_dir     ${{package_full_dir}}/${{KERNEL_NAME}}/${{KERNEL_NAME}}.ip_user_files
-set files_cache_dir     ${{package_full_dir}}/${{KERNEL_NAME}}/${{KERNEL_NAME}}.cache
-set_property generate_synth_checkpoint false [get_files ${{files_sources_xci}}]
-generate_target {{instantiation_template}}     [get_files ${{files_sources_xci}}] >> $log_file
-# catch {{ config_ip_cache -export [get_ips -all ${{module_name}}] }}
-generate_target all                          [get_files ${{files_sources_xci}}] >> $log_file
-export_ip_user_files -of_objects             [get_files ${{files_sources_xci}}] -no_script -force >> $log_file
-export_simulation -of_objects [get_files ${{files_sources_xci}}] -directory ${{files_ip_user_files_dir}}/sim_scripts -ip_user_files_dir ${{files_ip_user_files_dir}} -ipstatic_source_dir ${{files_ip_user_files_dir}}/ipstatic -lib_map_path [list {{modelsim=${{files_cache_dir}}/compile_simlib/modelsim}} {{questa=${{files_cache_dir}}/compile_simlib/questa}} {{xcelium=${{files_cache_dir}}/compile_simlib/xcelium}} {{vcs=${{files_cache_dir}}/compile_simlib/vcs}} {{riviera=${{files_cache_dir}}/compile_simlib/riviera}}] -use_ip_compiled_libs -force >> $log_file
+
+    set files_ip_user_files_dir     ${{package_full_dir}}/${{KERNEL_NAME}}/${{KERNEL_NAME}}.ip_user_files
+    set files_cache_dir     ${{package_full_dir}}/${{KERNEL_NAME}}/${{KERNEL_NAME}}.cache
+    set_property generate_synth_checkpoint false [get_files ${{files_sources_xci}}]
+    generate_target {{instantiation_template}}     [get_files ${{files_sources_xci}}] >> $log_file
+    # catch {{ config_ip_cache -export [get_ips -all ${{module_name}}] }}
+    generate_target all                          [get_files ${{files_sources_xci}}] >> $log_file
+    export_ip_user_files -of_objects             [get_files ${{files_sources_xci}}] -no_script -force >> $log_file
+    export_simulation -of_objects [get_files ${{files_sources_xci}}] -directory ${{files_ip_user_files_dir}}/sim_scripts -ip_user_files_dir ${{files_ip_user_files_dir}} -ipstatic_source_dir ${{files_ip_user_files_dir}}/ipstatic -lib_map_path [list {{modelsim=${{files_cache_dir}}/compile_simlib/modelsim}} {{questa=${{files_cache_dir}}/compile_simlib/questa}} {{xcelium=${{files_cache_dir}}/compile_simlib/xcelium}} {{vcs=${{files_cache_dir}}/compile_simlib/vcs}} {{riviera=${{files_cache_dir}}/compile_simlib/riviera}}] -use_ip_compiled_libs -force >> $log_file
+}}
     """
 
     fill_m_axi_vip_tcl_template_cu_cache_pre = """
@@ -4342,52 +4361,55 @@ puts "[color 2 "                                    Front-End: Data width: ${{FE
 
 
 set module_name m{0:02d}_axi_cu_cache_mid{1}x{2}_fe{3}x{4}
-create_ip -name system_cache            \\
-          -vendor xilinx.com            \\
-          -library ip                   \\
-          -version 5.*                  \\
-          -module_name ${{module_name}}   >> $log_file
+set files_sources_xci ${{package_full_dir}}/${{KERNEL_NAME}}/${{KERNEL_NAME}}.srcs/sources_1/ip/${{module_name}}/${{module_name}}.xci
 
-set_property -dict [list                                                  \\
-                    CONFIG.C_CACHE_DATA_WIDTH ${{LINE_CU_CACHE_DATA_WIDTH_M{0:02d}}}    \\
-                    CONFIG.C_CACHE_SIZE  ${{CU_CACHE_SIZE_B_M{0:02d}}}           \\
-                    CONFIG.C_M0_AXI_ADDR_WIDTH ${{MID_ADDR_WIDTH_M{0:02d}}}           \\
-                    CONFIG.C_M0_AXI_DATA_WIDTH ${{MID_CACHE_DATA_WIDTH_M{0:02d}}}     \\
-                    CONFIG.C_NUM_GENERIC_PORTS {{1}}                        \\
-                    CONFIG.C_NUM_OPTIMIZED_PORTS {{0}}                      \\
-                    CONFIG.C_ENABLE_NON_SECURE {{1}}                        \\
-                    CONFIG.C_ENABLE_ERROR_HANDLING {{1}}                    \\"""
+    if {{[checkXciFileExistsIP ${{files_sources_xci}}]}} {{
+    create_ip -name system_cache            \\
+              -vendor xilinx.com            \\
+              -library ip                   \\
+              -version 5.*                  \\
+              -module_name ${{module_name}}   >> $log_file
+
+    set_property -dict [list                                                  \\
+                        CONFIG.C_CACHE_DATA_WIDTH ${{LINE_CU_CACHE_DATA_WIDTH_M{0:02d}}}    \\
+                        CONFIG.C_CACHE_SIZE  ${{CU_CACHE_SIZE_B_M{0:02d}}}           \\
+                        CONFIG.C_M0_AXI_ADDR_WIDTH ${{MID_ADDR_WIDTH_M{0:02d}}}           \\
+                        CONFIG.C_M0_AXI_DATA_WIDTH ${{MID_CACHE_DATA_WIDTH_M{0:02d}}}     \\
+                        CONFIG.C_NUM_GENERIC_PORTS {{1}}                        \\
+                        CONFIG.C_NUM_OPTIMIZED_PORTS {{0}}                      \\
+                        CONFIG.C_ENABLE_NON_SECURE {{1}}                        \\
+                        CONFIG.C_ENABLE_ERROR_HANDLING {{1}}                    \\"""
 
     fill_m_axi_vip_tcl_template_cu_cache_mid = """                    CONFIG.C_ENABLE_CTRL {{{8}}}                            \\
-                    CONFIG.C_ENABLE_STATISTICS {{2}}                        \\
-                    CONFIG.C_S_AXI_CTRL_DATA_WIDTH {{64}}                   \\
-                    CONFIG.C_ENABLE_VERSION_REGISTER {{0}}                  \\"""
+                        CONFIG.C_ENABLE_STATISTICS {{2}}                        \\
+                        CONFIG.C_S_AXI_CTRL_DATA_WIDTH {{64}}                   \\
+                        CONFIG.C_ENABLE_VERSION_REGISTER {{0}}                  \\"""
 
     fill_m_axi_vip_tcl_template_cu_cache_post = """                    CONFIG.C_NUM_WAYS ${{CU_CACHE_NUM_WAYS_M{0:02d}}}            \\
-                    CONFIG.C_S0_AXI_GEN_DATA_WIDTH ${{FE_CACHE_DATA_WIDTH_M{0:02d}}}\\
-                    CONFIG.C_S0_AXI_GEN_ADDR_WIDTH ${{FE_ADDR_WIDTH_M{0:02d}}}      \\
-                    CONFIG.C_S0_AXI_GEN_FORCE_READ_ALLOCATE {{1}}           \\
-                    CONFIG.C_S0_AXI_GEN_PROHIBIT_READ_ALLOCATE {{0}}        \\
-                    CONFIG.C_S0_AXI_GEN_FORCE_WRITE_ALLOCATE {{1}}          \\
-                    CONFIG.C_S0_AXI_GEN_PROHIBIT_WRITE_ALLOCATE {{0}}       \\
-                    CONFIG.C_S0_AXI_GEN_FORCE_READ_BUFFER {{1}}             \\
-                    CONFIG.C_S0_AXI_GEN_PROHIBIT_READ_BUFFER {{0}}          \\
-                    CONFIG.C_S0_AXI_GEN_FORCE_WRITE_BUFFER {{1}}            \\
-                    CONFIG.C_S0_AXI_GEN_PROHIBIT_WRITE_BUFFER {{0}}         \\
-                    CONFIG.C_CACHE_TAG_MEMORY_TYPE {{Automatic}}            \\
-                    CONFIG.C_CACHE_DATA_MEMORY_TYPE {{{7}}}           \\
-                    CONFIG.C_CACHE_LRU_MEMORY_TYPE {{Automatic}}            \\
-                    ] [get_ips ${{module_name}}] >> $log_file
+                        CONFIG.C_S0_AXI_GEN_DATA_WIDTH ${{FE_CACHE_DATA_WIDTH_M{0:02d}}}\\
+                        CONFIG.C_S0_AXI_GEN_ADDR_WIDTH ${{FE_ADDR_WIDTH_M{0:02d}}}      \\
+                        CONFIG.C_S0_AXI_GEN_FORCE_READ_ALLOCATE {{1}}           \\
+                        CONFIG.C_S0_AXI_GEN_PROHIBIT_READ_ALLOCATE {{0}}        \\
+                        CONFIG.C_S0_AXI_GEN_FORCE_WRITE_ALLOCATE {{1}}          \\
+                        CONFIG.C_S0_AXI_GEN_PROHIBIT_WRITE_ALLOCATE {{0}}       \\
+                        CONFIG.C_S0_AXI_GEN_FORCE_READ_BUFFER {{1}}             \\
+                        CONFIG.C_S0_AXI_GEN_PROHIBIT_READ_BUFFER {{0}}          \\
+                        CONFIG.C_S0_AXI_GEN_FORCE_WRITE_BUFFER {{1}}            \\
+                        CONFIG.C_S0_AXI_GEN_PROHIBIT_WRITE_BUFFER {{0}}         \\
+                        CONFIG.C_CACHE_TAG_MEMORY_TYPE {{Automatic}}            \\
+                        CONFIG.C_CACHE_DATA_MEMORY_TYPE {{{7}}}           \\
+                        CONFIG.C_CACHE_LRU_MEMORY_TYPE {{Automatic}}            \\
+                        ] [get_ips ${{module_name}}] >> $log_file
 
-set files_sources_xci ${{package_full_dir}}/${{KERNEL_NAME}}/${{KERNEL_NAME}}.srcs/sources_1/ip/${{module_name}}/${{module_name}}.xci
-set files_ip_user_files_dir     ${{package_full_dir}}/${{KERNEL_NAME}}/${{KERNEL_NAME}}.ip_user_files
-set files_cache_dir     ${{package_full_dir}}/${{KERNEL_NAME}}/${{KERNEL_NAME}}.cache
-set_property generate_synth_checkpoint false [get_files ${{files_sources_xci}}]
-generate_target {{instantiation_template}}     [get_files ${{files_sources_xci}}] >> $log_file
-# catch {{ config_ip_cache -export [get_ips -all ${{module_name}}] }}
-generate_target all                          [get_files ${{files_sources_xci}}] >> $log_file
-export_ip_user_files -of_objects             [get_files ${{files_sources_xci}}] -no_script -force >> $log_file
-export_simulation -of_objects [get_files ${{files_sources_xci}}] -directory ${{files_ip_user_files_dir}}/sim_scripts -ip_user_files_dir ${{files_ip_user_files_dir}} -ipstatic_source_dir ${{files_ip_user_files_dir}}/ipstatic -lib_map_path [list {{modelsim=${{files_cache_dir}}/compile_simlib/modelsim}} {{questa=${{files_cache_dir}}/compile_simlib/questa}} {{xcelium=${{files_cache_dir}}/compile_simlib/xcelium}} {{vcs=${{files_cache_dir}}/compile_simlib/vcs}} {{riviera=${{files_cache_dir}}/compile_simlib/riviera}}] -use_ip_compiled_libs -force >> $log_file
+    set files_ip_user_files_dir     ${{package_full_dir}}/${{KERNEL_NAME}}/${{KERNEL_NAME}}.ip_user_files
+    set files_cache_dir     ${{package_full_dir}}/${{KERNEL_NAME}}/${{KERNEL_NAME}}.cache
+    set_property generate_synth_checkpoint false [get_files ${{files_sources_xci}}]
+    generate_target {{instantiation_template}}     [get_files ${{files_sources_xci}}] >> $log_file
+    # catch {{ config_ip_cache -export [get_ips -all ${{module_name}}] }}
+    generate_target all                          [get_files ${{files_sources_xci}}] >> $log_file
+    export_ip_user_files -of_objects             [get_files ${{files_sources_xci}}] -no_script -force >> $log_file
+    export_simulation -of_objects [get_files ${{files_sources_xci}}] -directory ${{files_ip_user_files_dir}}/sim_scripts -ip_user_files_dir ${{files_ip_user_files_dir}} -ipstatic_source_dir ${{files_ip_user_files_dir}}/ipstatic -lib_map_path [list {{modelsim=${{files_cache_dir}}/compile_simlib/modelsim}} {{questa=${{files_cache_dir}}/compile_simlib/questa}} {{xcelium=${{files_cache_dir}}/compile_simlib/xcelium}} {{vcs=${{files_cache_dir}}/compile_simlib/vcs}} {{riviera=${{files_cache_dir}}/compile_simlib/riviera}}] -use_ip_compiled_libs -force >> $log_file
+}}
     """
 
     fill_m_axi_vip_tcl_template_slice_post = """
@@ -4397,36 +4419,39 @@ export_simulation -of_objects [get_files ${{files_sources_xci}}] -directory ${{f
 puts "[color 2 "                        Generate AXI_M{0:02d} Register Slice Mid-end {3}x{4}"]" 
 
 set module_name m{0:02d}_axi_register_slice_mid_{3}x{4}
-create_ip -name axi_register_slice      \\
-          -vendor xilinx.com            \\
-          -library ip                   \\
-          -version 2.*                  \\
-          -module_name ${{module_name}}   >> $log_file
-          
-set_property -dict [list                                                      \\
-                      CONFIG.ADDR_WIDTH ${{MID_ADDR_WIDTH_M{0:02d}}}           \\
-                      CONFIG.DATA_WIDTH ${{MID_CACHE_DATA_WIDTH_M{0:02d}}}     \\
-                      CONFIG.ID_WIDTH {{1}}                   \\
-                      CONFIG.READ_WRITE_MODE {{READ_WRITE}}   \\
-                      CONFIG.MAX_BURST_LENGTH {{32}}            \\
-                      CONFIG.NUM_READ_OUTSTANDING {{32}}        \\
-                      CONFIG.NUM_WRITE_OUTSTANDING {{32}}       \\
-                      CONFIG.REG_AR {{15}}                    \\
-                      CONFIG.REG_AW {{15}}                    \\
-                      CONFIG.REG_B {{15}}                     \\
-                      CONFIG.REG_R {{15}}                     \\
-                      CONFIG.REG_W {{15}}                     \\
-                      CONFIG.USE_AUTOPIPELINING {{1}}         \\
-                    ] [get_ips ${{module_name}}]
-
 set files_sources_xci ${{package_full_dir}}/${{KERNEL_NAME}}/${{KERNEL_NAME}}.srcs/sources_1/ip/${{module_name}}/${{module_name}}.xci
-set files_ip_user_files_dir     ${{package_full_dir}}/${{KERNEL_NAME}}/${{KERNEL_NAME}}.ip_user_files
-set files_cache_dir     ${{package_full_dir}}/${{KERNEL_NAME}}/${{KERNEL_NAME}}.cache
-set_property generate_synth_checkpoint false [get_files ${{files_sources_xci}}]
-generate_target {{instantiation_template}}     [get_files ${{files_sources_xci}}] >> $log_file
-generate_target all                          [get_files ${{files_sources_xci}}] >> $log_file
-export_ip_user_files -of_objects             [get_files ${{files_sources_xci}}] -no_script -force >> $log_file
-export_simulation -of_objects [get_files ${{files_sources_xci}}] -directory ${{files_ip_user_files_dir}}/sim_scripts -ip_user_files_dir ${{files_ip_user_files_dir}} -ipstatic_source_dir ${{files_ip_user_files_dir}}/ipstatic -lib_map_path [list {{modelsim=${{files_cache_dir}}/compile_simlib/modelsim}} {{questa=${{files_cache_dir}}/compile_simlib/questa}} {{xcelium=${{files_cache_dir}}/compile_simlib/xcelium}} {{vcs=${{files_cache_dir}}/compile_simlib/vcs}} {{riviera=${{files_cache_dir}}/compile_simlib/riviera}}] -use_ip_compiled_libs -force >> $log_file
+
+if {{[checkXciFileExistsIP ${{files_sources_xci}}]}} {{
+    create_ip -name axi_register_slice      \\
+              -vendor xilinx.com            \\
+              -library ip                   \\
+              -version 2.*                  \\
+              -module_name ${{module_name}}   >> $log_file
+              
+    set_property -dict [list                                                      \\
+                          CONFIG.ADDR_WIDTH ${{MID_ADDR_WIDTH_M{0:02d}}}           \\
+                          CONFIG.DATA_WIDTH ${{MID_CACHE_DATA_WIDTH_M{0:02d}}}     \\
+                          CONFIG.ID_WIDTH {{1}}                   \\
+                          CONFIG.READ_WRITE_MODE {{READ_WRITE}}   \\
+                          CONFIG.MAX_BURST_LENGTH {{32}}            \\
+                          CONFIG.NUM_READ_OUTSTANDING {{32}}        \\
+                          CONFIG.NUM_WRITE_OUTSTANDING {{32}}       \\
+                          CONFIG.REG_AR {{15}}                    \\
+                          CONFIG.REG_AW {{15}}                    \\
+                          CONFIG.REG_B {{15}}                     \\
+                          CONFIG.REG_R {{15}}                     \\
+                          CONFIG.REG_W {{15}}                     \\
+                          CONFIG.USE_AUTOPIPELINING {{1}}         \\
+                        ] [get_ips ${{module_name}}]
+
+    set files_ip_user_files_dir     ${{package_full_dir}}/${{KERNEL_NAME}}/${{KERNEL_NAME}}.ip_user_files
+    set files_cache_dir     ${{package_full_dir}}/${{KERNEL_NAME}}/${{KERNEL_NAME}}.cache
+    set_property generate_synth_checkpoint false [get_files ${{files_sources_xci}}]
+    generate_target {{instantiation_template}}     [get_files ${{files_sources_xci}}] >> $log_file
+    generate_target all                          [get_files ${{files_sources_xci}}] >> $log_file
+    export_ip_user_files -of_objects             [get_files ${{files_sources_xci}}] -no_script -force >> $log_file
+    export_simulation -of_objects [get_files ${{files_sources_xci}}] -directory ${{files_ip_user_files_dir}}/sim_scripts -ip_user_files_dir ${{files_ip_user_files_dir}} -ipstatic_source_dir ${{files_ip_user_files_dir}}/ipstatic -lib_map_path [list {{modelsim=${{files_cache_dir}}/compile_simlib/modelsim}} {{questa=${{files_cache_dir}}/compile_simlib/questa}} {{xcelium=${{files_cache_dir}}/compile_simlib/xcelium}} {{vcs=${{files_cache_dir}}/compile_simlib/vcs}} {{riviera=${{files_cache_dir}}/compile_simlib/riviera}}] -use_ip_compiled_libs -force >> $log_file
+}}
 
 # ----------------------------------------------------------------------------
 # Generate AXI_M{0:02d} Register Slice
@@ -4434,36 +4459,40 @@ export_simulation -of_objects [get_files ${{files_sources_xci}}] -directory ${{f
 puts "[color 2 "                        Generate AXI_M{0:02d} Register Slice Back-end {1}x{2}"]" 
 
 set module_name m{0:02d}_axi_register_slice_be_{1}x{2}
-create_ip -name axi_register_slice      \\
-          -vendor xilinx.com            \\
-          -library ip                   \\
-          -version 2.*                  \\
-          -module_name ${{module_name}}   >> $log_file
-          
-set_property -dict [list                                                          \\
-                      CONFIG.ADDR_WIDTH ${{BE_ADDR_WIDTH_M{0:02d}}}               \\
-                      CONFIG.DATA_WIDTH ${{BE_CACHE_DATA_WIDTH_M{0:02d}}}         \\
-                      CONFIG.ID_WIDTH {{1}}                                       \\
-                      CONFIG.READ_WRITE_MODE {{READ_WRITE}}                       \\
-                      CONFIG.MAX_BURST_LENGTH {{32}}            \\
-                      CONFIG.NUM_READ_OUTSTANDING {{32}}        \\
-                      CONFIG.NUM_WRITE_OUTSTANDING {{32}}       \\
-                      CONFIG.REG_AR {{15}}                    \\
-                      CONFIG.REG_AW {{15}}                    \\
-                      CONFIG.REG_B {{15}}                     \\
-                      CONFIG.REG_R {{15}}                     \\
-                      CONFIG.REG_W {{15}}                     \\
-                      CONFIG.USE_AUTOPIPELINING {{1}}         \\
-                    ] [get_ips ${{module_name}}]
-
 set files_sources_xci ${{package_full_dir}}/${{KERNEL_NAME}}/${{KERNEL_NAME}}.srcs/sources_1/ip/${{module_name}}/${{module_name}}.xci
-set files_ip_user_files_dir     ${{package_full_dir}}/${{KERNEL_NAME}}/${{KERNEL_NAME}}.ip_user_files
-set files_cache_dir     ${{package_full_dir}}/${{KERNEL_NAME}}/${{KERNEL_NAME}}.cache
-set_property generate_synth_checkpoint false [get_files ${{files_sources_xci}}]
-generate_target {{instantiation_template}}     [get_files ${{files_sources_xci}}] >> $log_file
-generate_target all                          [get_files ${{files_sources_xci}}] >> $log_file
-export_ip_user_files -of_objects             [get_files ${{files_sources_xci}}] -no_script -force >> $log_file
-export_simulation -of_objects [get_files ${{files_sources_xci}}] -directory ${{files_ip_user_files_dir}}/sim_scripts -ip_user_files_dir ${{files_ip_user_files_dir}} -ipstatic_source_dir ${{files_ip_user_files_dir}}/ipstatic -lib_map_path [list {{modelsim=${{files_cache_dir}}/compile_simlib/modelsim}} {{questa=${{files_cache_dir}}/compile_simlib/questa}} {{xcelium=${{files_cache_dir}}/compile_simlib/xcelium}} {{vcs=${{files_cache_dir}}/compile_simlib/vcs}} {{riviera=${{files_cache_dir}}/compile_simlib/riviera}}] -use_ip_compiled_libs -force >> $log_file
+
+if {{[checkXciFileExistsIP ${{files_sources_xci}}]}} {{
+    create_ip -name axi_register_slice      \\
+              -vendor xilinx.com            \\
+              -library ip                   \\
+              -version 2.*                  \\
+              -module_name ${{module_name}}   >> $log_file
+              
+    set_property -dict [list                                                          \\
+                          CONFIG.ADDR_WIDTH ${{BE_ADDR_WIDTH_M{0:02d}}}               \\
+                          CONFIG.DATA_WIDTH ${{BE_CACHE_DATA_WIDTH_M{0:02d}}}         \\
+                          CONFIG.ID_WIDTH {{1}}                                       \\
+                          CONFIG.READ_WRITE_MODE {{READ_WRITE}}                       \\
+                          CONFIG.MAX_BURST_LENGTH {{32}}            \\
+                          CONFIG.NUM_READ_OUTSTANDING {{32}}        \\
+                          CONFIG.NUM_WRITE_OUTSTANDING {{32}}       \\
+                          CONFIG.REG_AR {{15}}                    \\
+                          CONFIG.REG_AW {{15}}                    \\
+                          CONFIG.REG_B {{15}}                     \\
+                          CONFIG.REG_R {{15}}                     \\
+                          CONFIG.REG_W {{15}}                     \\
+                          CONFIG.USE_AUTOPIPELINING {{1}}         \\
+                        ] [get_ips ${{module_name}}]
+
+    set files_sources_xci ${{package_full_dir}}/${{KERNEL_NAME}}/${{KERNEL_NAME}}.srcs/sources_1/ip/${{module_name}}/${{module_name}}.xci
+    set files_ip_user_files_dir     ${{package_full_dir}}/${{KERNEL_NAME}}/${{KERNEL_NAME}}.ip_user_files
+    set files_cache_dir     ${{package_full_dir}}/${{KERNEL_NAME}}/${{KERNEL_NAME}}.cache
+    set_property generate_synth_checkpoint false [get_files ${{files_sources_xci}}]
+    generate_target {{instantiation_template}}     [get_files ${{files_sources_xci}}] >> $log_file
+    generate_target all                          [get_files ${{files_sources_xci}}] >> $log_file
+    export_ip_user_files -of_objects             [get_files ${{files_sources_xci}}] -no_script -force >> $log_file
+    export_simulation -of_objects [get_files ${{files_sources_xci}}] -directory ${{files_ip_user_files_dir}}/sim_scripts -ip_user_files_dir ${{files_ip_user_files_dir}} -ipstatic_source_dir ${{files_ip_user_files_dir}}/ipstatic -lib_map_path [list {{modelsim=${{files_cache_dir}}/compile_simlib/modelsim}} {{questa=${{files_cache_dir}}/compile_simlib/questa}} {{xcelium=${{files_cache_dir}}/compile_simlib/xcelium}} {{vcs=${{files_cache_dir}}/compile_simlib/vcs}} {{riviera=${{files_cache_dir}}/compile_simlib/riviera}}] -use_ip_compiled_libs -force >> $log_file
+}}
     """
 
     fill_m_axi_vip_tcl_template_ctrl_post = """
@@ -4473,33 +4502,35 @@ export_simulation -of_objects [get_files ${{files_sources_xci}}] -directory ${{f
 puts "[color 2 "                        Generate AXI_LITE_M{0:02d} Register Slice Back-end 64x17"]" 
 
 set module_name m{0:02d}_axi_lite_register_slice_mid_64x17
-create_ip -name axi_register_slice      \\
-          -vendor xilinx.com            \\
-          -library ip                   \\
-          -version 2.*                  \\
-          -module_name ${{module_name}}   >> $log_file
-          
-set_property -dict [list                                                          \\
-                      CONFIG.ADDR_WIDTH {{17}}                                    \\
-                      CONFIG.DATA_WIDTH {{64}}                                    \\
-                      CONFIG.PROTOCOL  {{AXI4LITE}}                               \\
-                      CONFIG.READ_WRITE_MODE {{READ_WRITE}}                       \\
-                      CONFIG.REG_AR {{7}}                     \\
-                      CONFIG.REG_AW {{7}}                     \\
-                      CONFIG.REG_B {{7}}                      \\
-                      CONFIG.REG_R {{7}}                      \\
-                      CONFIG.REG_W {{7}}                      \\
-                    ] [get_ips ${{module_name}}]
-
 set files_sources_xci ${{package_full_dir}}/${{KERNEL_NAME}}/${{KERNEL_NAME}}.srcs/sources_1/ip/${{module_name}}/${{module_name}}.xci
-set files_ip_user_files_dir     ${{package_full_dir}}/${{KERNEL_NAME}}/${{KERNEL_NAME}}.ip_user_files
-set files_cache_dir     ${{package_full_dir}}/${{KERNEL_NAME}}/${{KERNEL_NAME}}.cache
-set_property generate_synth_checkpoint false [get_files ${{files_sources_xci}}]
-generate_target {{instantiation_template}}     [get_files ${{files_sources_xci}}] >> $log_file
-generate_target all                          [get_files ${{files_sources_xci}}] >> $log_file
-export_ip_user_files -of_objects             [get_files ${{files_sources_xci}}] -no_script -force >> $log_file
-export_simulation -of_objects [get_files ${{files_sources_xci}}] -directory ${{files_ip_user_files_dir}}/sim_scripts -ip_user_files_dir ${{files_ip_user_files_dir}} -ipstatic_source_dir ${{files_ip_user_files_dir}}/ipstatic -lib_map_path [list {{modelsim=${{files_cache_dir}}/compile_simlib/modelsim}} {{questa=${{files_cache_dir}}/compile_simlib/questa}} {{xcelium=${{files_cache_dir}}/compile_simlib/xcelium}} {{vcs=${{files_cache_dir}}/compile_simlib/vcs}} {{riviera=${{files_cache_dir}}/compile_simlib/riviera}}] -use_ip_compiled_libs -force >> $log_file
-  
+
+if {{[checkXciFileExistsIP ${{files_sources_xci}}]}} {{
+    create_ip -name axi_register_slice      \\
+              -vendor xilinx.com            \\
+              -library ip                   \\
+              -version 2.*                  \\
+              -module_name ${{module_name}}   >> $log_file
+              
+    set_property -dict [list                                                          \\
+                          CONFIG.ADDR_WIDTH {{17}}                                    \\
+                          CONFIG.DATA_WIDTH {{64}}                                    \\
+                          CONFIG.PROTOCOL  {{AXI4LITE}}                               \\
+                          CONFIG.READ_WRITE_MODE {{READ_WRITE}}                       \\
+                          CONFIG.REG_AR {{7}}                     \\
+                          CONFIG.REG_AW {{7}}                     \\
+                          CONFIG.REG_B {{7}}                      \\
+                          CONFIG.REG_R {{7}}                      \\
+                          CONFIG.REG_W {{7}}                      \\
+                        ] [get_ips ${{module_name}}]
+
+    set files_ip_user_files_dir     ${{package_full_dir}}/${{KERNEL_NAME}}/${{KERNEL_NAME}}.ip_user_files
+    set files_cache_dir     ${{package_full_dir}}/${{KERNEL_NAME}}/${{KERNEL_NAME}}.cache
+    set_property generate_synth_checkpoint false [get_files ${{files_sources_xci}}]
+    generate_target {{instantiation_template}}     [get_files ${{files_sources_xci}}] >> $log_file
+    generate_target all                          [get_files ${{files_sources_xci}}] >> $log_file
+    export_ip_user_files -of_objects             [get_files ${{files_sources_xci}}] -no_script -force >> $log_file
+    export_simulation -of_objects [get_files ${{files_sources_xci}}] -directory ${{files_ip_user_files_dir}}/sim_scripts -ip_user_files_dir ${{files_ip_user_files_dir}} -ipstatic_source_dir ${{files_ip_user_files_dir}}/ipstatic -lib_map_path [list {{modelsim=${{files_cache_dir}}/compile_simlib/modelsim}} {{questa=${{files_cache_dir}}/compile_simlib/questa}} {{xcelium=${{files_cache_dir}}/compile_simlib/xcelium}} {{vcs=${{files_cache_dir}}/compile_simlib/vcs}} {{riviera=${{files_cache_dir}}/compile_simlib/riviera}}] -use_ip_compiled_libs -force >> $log_file
+}}  
  """
 
     fill_m_axi_vip_tcl_template_axi_lite_to_axi4_post = """
@@ -4509,29 +4540,32 @@ export_simulation -of_objects [get_files ${{files_sources_xci}}] -directory ${{f
 puts "[color 2 "                        Generate AXI_LITE_M{0:02d} To AXI4 32x32"]" 
 
 set module_name m{0:02d}_axi_lite_to_axi4_32x32
-create_ip -name axi_protocol_converter      \\
-          -vendor xilinx.com            \\
-          -library ip                   \\
-          -version 2.*                  \\
-          -module_name ${{module_name}}   >> $log_file
-          
-set_property -dict [list                                                          \\
-                        CONFIG.ADDR_WIDTH {{32}} \\
-                        CONFIG.DATA_WIDTH {{32}} \\
-                        CONFIG.MI_PROTOCOL {{AXI4}} \\
-                        CONFIG.SI_PROTOCOL {{AXI4LITE}} \\
-                        CONFIG.TRANSLATION_MODE {{2}} \\
-                    ] [get_ips ${{module_name}}]
-
 set files_sources_xci ${{package_full_dir}}/${{KERNEL_NAME}}/${{KERNEL_NAME}}.srcs/sources_1/ip/${{module_name}}/${{module_name}}.xci
-set files_ip_user_files_dir     ${{package_full_dir}}/${{KERNEL_NAME}}/${{KERNEL_NAME}}.ip_user_files
-set files_cache_dir     ${{package_full_dir}}/${{KERNEL_NAME}}/${{KERNEL_NAME}}.cache
-set_property generate_synth_checkpoint false [get_files ${{files_sources_xci}}]
-generate_target {{instantiation_template}}     [get_files ${{files_sources_xci}}] >> $log_file
-generate_target all                          [get_files ${{files_sources_xci}}] >> $log_file
-export_ip_user_files -of_objects             [get_files ${{files_sources_xci}}] -no_script -force >> $log_file
-export_simulation -of_objects [get_files ${{files_sources_xci}}] -directory ${{files_ip_user_files_dir}}/sim_scripts -ip_user_files_dir ${{files_ip_user_files_dir}} -ipstatic_source_dir ${{files_ip_user_files_dir}}/ipstatic -lib_map_path [list {{modelsim=${{files_cache_dir}}/compile_simlib/modelsim}} {{questa=${{files_cache_dir}}/compile_simlib/questa}} {{xcelium=${{files_cache_dir}}/compile_simlib/xcelium}} {{vcs=${{files_cache_dir}}/compile_simlib/vcs}} {{riviera=${{files_cache_dir}}/compile_simlib/riviera}}] -use_ip_compiled_libs -force >> $log_file
-  
+
+if {{[checkXciFileExistsIP ${{files_sources_xci}}]}} {{
+    create_ip -name axi_protocol_converter      \\
+              -vendor xilinx.com            \\
+              -library ip                   \\
+              -version 2.*                  \\
+              -module_name ${{module_name}}   >> $log_file
+              
+    set_property -dict [list                                                          \\
+                            CONFIG.ADDR_WIDTH {{32}} \\
+                            CONFIG.DATA_WIDTH {{32}} \\
+                            CONFIG.MI_PROTOCOL {{AXI4}} \\
+                            CONFIG.SI_PROTOCOL {{AXI4LITE}} \\
+                            CONFIG.TRANSLATION_MODE {{2}} \\
+                        ] [get_ips ${{module_name}}]
+
+    set files_sources_xci ${{package_full_dir}}/${{KERNEL_NAME}}/${{KERNEL_NAME}}.srcs/sources_1/ip/${{module_name}}/${{module_name}}.xci
+    set files_ip_user_files_dir     ${{package_full_dir}}/${{KERNEL_NAME}}/${{KERNEL_NAME}}.ip_user_files
+    set files_cache_dir     ${{package_full_dir}}/${{KERNEL_NAME}}/${{KERNEL_NAME}}.cache
+    set_property generate_synth_checkpoint false [get_files ${{files_sources_xci}}]
+    generate_target {{instantiation_template}}     [get_files ${{files_sources_xci}}] >> $log_file
+    generate_target all                          [get_files ${{files_sources_xci}}] >> $log_file
+    export_ip_user_files -of_objects             [get_files ${{files_sources_xci}}] -no_script -force >> $log_file
+    export_simulation -of_objects [get_files ${{files_sources_xci}}] -directory ${{files_ip_user_files_dir}}/sim_scripts -ip_user_files_dir ${{files_ip_user_files_dir}} -ipstatic_source_dir ${{files_ip_user_files_dir}}/ipstatic -lib_map_path [list {{modelsim=${{files_cache_dir}}/compile_simlib/modelsim}} {{questa=${{files_cache_dir}}/compile_simlib/questa}} {{xcelium=${{files_cache_dir}}/compile_simlib/xcelium}} {{vcs=${{files_cache_dir}}/compile_simlib/vcs}} {{riviera=${{files_cache_dir}}/compile_simlib/riviera}}] -use_ip_compiled_libs -force >> $log_file
+}}    
  """
 
     CACHE_MERGE_COUNT = 0
@@ -4557,6 +4591,25 @@ export_simulation -of_objects [get_files ${{files_sources_xci}}] -directory ${{f
                 CHANNEL_CONFIG_AXI_PORT_FULL_BE[index],
             )
         )
+
+    output_lines.append(
+        fill_proc_template_vars.format(
+            channel,
+            CHANNEL_CONFIG_DATA_WIDTH_BE[index],
+            CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],
+            CHANNEL_CONFIG_DATA_WIDTH_MID[index],
+            CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],
+            adjust_to_nearest_legal_cache_size(CACHE_CONFIG_L2_SIZE[index]),
+            adjust_to_nearest_legal_cache_num_ways(CACHE_CONFIG_L2_NUM_WAYS[index]),
+            CACHE_CONFIG_L2_RAM[index],
+            CACHE_CONFIG_L2_CTRL[index],
+            CHANNEL_CONFIG_ADDRESS_WIDTH_FE[index],
+            CHANNEL_CONFIG_DATA_WIDTH_FE[index],
+            adjust_to_nearest_legal_cache_num_ways(CACHE_CONFIG_L1_NUM_WAYS[index]),
+            adjust_to_nearest_legal_cache_size(CACHE_CONFIG_L1_SIZE[index]),
+            CHANNEL_CONFIG_AXI_PORT_FULL_BE[index],
+        )
+    )
 
     for index, channel in enumerate(DISTINCT_CHANNELS):
         output_lines.append(
@@ -5061,6 +5114,7 @@ if ALGORITHM_NAME == "BFS":
 else:
     data_types_active_engine_packet = data_types_pr_engine_packet
 
+
 def clog2(x):
     if x > 0:
         return math.ceil(math.log2(x))
@@ -5246,14 +5300,23 @@ update_configurations(
     flattened_lane_engine, data_types_active_engine_packet, "EnginePacketPayload", "std"
 )
 update_configurations(
-    flattened_lane_engine, data_types_active_engine_packet, "EnginePacketPayload", "fwft"
+    flattened_lane_engine,
+    data_types_active_engine_packet,
+    "EnginePacketPayload",
+    "fwft",
 )
 
 update_configurations(
-    flattened_bundle_engine, data_types_active_engine_packet, "EnginePacketPayload", "std"
+    flattened_bundle_engine,
+    data_types_active_engine_packet,
+    "EnginePacketPayload",
+    "std",
 )
 update_configurations(
-    flattened_bundle_engine, data_types_active_engine_packet, "EnginePacketPayload", "fwft"
+    flattened_bundle_engine,
+    data_types_active_engine_packet,
+    "EnginePacketPayload",
+    "fwft",
 )
 
 update_configurations(

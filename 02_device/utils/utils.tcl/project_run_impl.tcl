@@ -21,12 +21,14 @@ open_project ${KERNEL_PROJECT_PKG_XPR}
 # launch_runs synth_1
 # wait_on_runs synth_1
 
-# reset_run impl_1
-# launch_runs impl_1 -to_step write_bitstream
-# wait_on_runs impl_1
+reset_run impl_1
+launch_runs impl_1 -to_step write_bitstream
+wait_on_runs impl_1
 
-foreach impl_strategy [list [lindex [get_runs impl*] ${XILINX_IMPL_STRATEGY}]] { 
-  reset_run $impl_strategy
-  launch_runs $impl_strategy -to_step write_bitstream -jobs $XILINX_JOBS_STRATEGY
-  wait_on_runs $impl_strategy 
-}
+# Optionally, you can also close the project after completion
+close_project
+# foreach impl_strategy [list [lindex [get_runs impl*] ${XILINX_IMPL_STRATEGY}]] { 
+#   reset_run $impl_strategy
+#   launch_runs $impl_strategy -to_step write_bitstream -jobs $XILINX_JOBS_STRATEGY
+#   wait_on_runs $impl_strategy 
+# }

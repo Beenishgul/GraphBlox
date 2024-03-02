@@ -29,6 +29,8 @@ PARAMS_SH_DIR=$1
 
 source ${PARAMS_SH_DIR}
 
+
+CFG_FILE_NAME_XDC="${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${KERNEL_NAME}_filelist_package.xdc.f"
 CFG_FILE_NAME_XCI="${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${KERNEL_NAME}_filelist_package.xci.f"
 
 rm_xci_filelist_f () {
@@ -57,6 +59,7 @@ newtext=""
 echo "$newtext" > ${CFG_FILE_NAME_XCI}
 
 generate_xci_filelist_f ${APP_DIR_ACTIVE}/${VIVADO_VIP_DIR}/${KERNEL_NAME}/${KERNEL_NAME}.srcs/sources_1/ip/ ${CFG_FILE_NAME_XCI} "xci"
+generate_xci_filelist_f ${APP_DIR_ACTIVE}/${VIVADO_VIP_DIR}/${KERNEL_NAME}/${KERNEL_NAME}.gen/sources_1/ip/ ${CFG_FILE_NAME_XDC} "xdc"
 
 newtext=""
 echo $newtext >> ${CFG_FILE_NAME_XCI}
