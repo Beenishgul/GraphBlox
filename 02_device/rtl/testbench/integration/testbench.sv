@@ -1097,7 +1097,7 @@ module __KERNEL___testbench ();
             /////////////////////////////////////////////////////////////////////////////////////////////////
 
             bit choose_pressure_type = 0;
-        bit axis_choose_pressure_type = 0;
+        bit         axis_choose_pressure_type = 0;
         bit [0-1:0] axis_tlast_received          ;
 
         GraphCSR graph;
@@ -1215,6 +1215,107 @@ module __KERNEL___testbench ();
             initialize__ALGORITHM_NAME__auxiliary_struct(graph);
         endfunction : read_files_graphCSR
 
+        typedef struct {
+            string graph_suit   ;
+            string graph_name   ;
+            string file_bin_type;
+        } GraphInitTuple;
+
+        // localparam int NUM_GRAPHS = 5; // Adjust based on actual needs
+        // GraphInitTuple graphInitParams_TEST[NUM_GRAPHS] = '{
+        //     {"TEST", "v500_e500"   , "graph.bin"},
+        //     {"TEST", "v529_e3500"  , "graph.bin"},
+        //     {"TEST", "v1000_e10000", "graph.bin"},
+        //     {"TEST", "v1024_e4096" , "graph.bin"},
+        //     {"TEST", "v8192_e32768", "graph.bin"}
+        // };
+
+        localparam int NUM_GRAPHS = 1; // Adjust based on actual needs
+        GraphInitTuple graphInitParams_TEST[NUM_GRAPHS] = '{
+            {"TEST", "v500_e500", "graph.bin"}
+        };
+
+        function automatic void initialize_GraphCSR_Tuple (ref GraphCSR graph, GraphInitTuple graphInitParams, input integer unsigned source = _ROOT_);
+            /////////////////////////////////////////////////////////////////////////////////////////////////
+            // Backdoor read the files then send to backdoor memory with the content.
+
+            string in_degree_path = $sformatf("_GRAPH_DIR_/%0s/%1s/%2s.in_degree", graphInitParams.graph_suit, graphInitParams.graph_name, graphInitParams.file_bin_type);
+            string out_degree_path = $sformatf("_GRAPH_DIR_/%0s/%1s/%2s.out_degree", graphInitParams.graph_suit, graphInitParams.graph_name, graphInitParams.file_bin_type);
+            string edges_idx_path = $sformatf("_GRAPH_DIR_/%0s/%1s/%2s.edges_idx", graphInitParams.graph_suit, graphInitParams.graph_name, graphInitParams.file_bin_type);
+            string edges_array_src_path = $sformatf("_GRAPH_DIR_/%0s/%1s/%2s.edges_array_src", graphInitParams.graph_suit, graphInitParams.graph_name, graphInitParams.file_bin_type);
+            string edges_array_dest_path = $sformatf("_GRAPH_DIR_/%0s/%1s/%2s.edges_array_dest", graphInitParams.graph_suit, graphInitParams.graph_name, graphInitParams.file_bin_type);
+
+            graph.graph_name = graphInitParams.graph_name;
+
+            graph.file_ptr_overlay_program = $fopen("_FULL_SRC_IP_DIR_OVERLAY_/_ARCHITECTURE_/_CAPABILITY_/_CAPABILITY_.ol/_ALGORITHM_NAME_.ol", "r");
+            if(graph.file_ptr_overlay_program) $display("File was opened successfully : %0d",graph.file_ptr_overlay_program);
+            else                   $display("MSG: File was NOT opened successfully : %0d",graph.file_ptr_overlay_program);
+
+            graph.file_ptr_in_degree = $fopen(in_degree_path, "r");
+            if(graph.file_ptr_in_degree) $display("File was opened successfully : %0d",graph.file_ptr_in_degree);
+            else                   $display("MSG: File was NOT opened successfully : %0d",graph.file_ptr_in_degree);
+
+            graph.file_ptr_out_degree = $fopen(out_degree_path, "r");
+            if(graph.file_ptr_out_degree) $display("File was opened successfully : %0d",graph.file_ptr_out_degree);
+            else                    $display("MSG: File was NOT opened successfully : %0d",graph.file_ptr_out_degree);
+
+            graph.file_ptr_edges_idx = $fopen(edges_idx_path, "r");
+            if(graph.file_ptr_edges_idx) $display("File was opened successfully : %0d",graph.file_ptr_edges_idx);
+            else                   $display("MSG: File was NOT opened successfully : %0d",graph.file_ptr_edges_idx);
+
+            graph.file_ptr_edges_array_src = $fopen(edges_array_src_path, "r");
+            if(graph.file_ptr_edges_array_src) $display("File was opened successfully : %0d",graph.file_ptr_edges_array_src);
+            else                         $display("MSG: File was NOT opened successfully : %0d",graph.file_ptr_edges_array_src);
+
+            graph.file_ptr_edges_array_dest= $fopen(edges_array_dest_path, "r");
+            if(graph.file_ptr_edges_array_dest) $display("File was opened successfully : %0d",graph.file_ptr_edges_array_dest);
+            else                          $display("MSG: File was NOT opened successfully : %0d",graph.file_ptr_edges_array_dest);
+
+            graph.file_error =      $fscanf(graph.file_ptr_out_degree, "%d\n",graph.num_vertices);
+            graph.file_error =      $fscanf(graph.file_ptr_edges_array_src, "%d\n",graph.num_edges);
+
+            graph.bfs_source = source;
+
+            graph.num_auxiliary_1 = graph.num_vertices;
+            graph.num_auxiliary_2 = graph.num_vertices;
+
+            graph.mem_overlay_program = int'(buffer_9_ptr[M00_AXI4_FE_DATA_W-1:1] + SYSTEM_CACHE_SIZE_ITERAIONS); // cachelines
+
+            graph.mem_num_vertices = ((graph.num_vertices*M00_AXI4_FE_DATA_W) + (M00_AXI4_FE_DATA_W-1) )/ (M00_AXI4_FE_DATA_W);
+            graph.mem_num_edges = ((graph.num_edges*M00_AXI4_FE_DATA_W) + (M00_AXI4_FE_DATA_W-1) )/ (M00_AXI4_FE_DATA_W);
+
+            graph.mem_edges_idx       = graph.mem_num_vertices ;
+            graph.mem_in_degree       = graph.mem_num_vertices ;
+            graph.mem_out_degree      = graph.mem_num_vertices ;
+
+            graph.mem_edges_array_src   = ((graph.num_edges*M01_AXI4_FE_DATA_W) + (M01_AXI4_FE_DATA_W-1) )/ (M01_AXI4_FE_DATA_W);
+            graph.mem_edges_array_dest  = ((graph.num_edges*M01_AXI4_FE_DATA_W) + (M01_AXI4_FE_DATA_W-1) )/ (M01_AXI4_FE_DATA_W);
+            graph.mem_edges_array_weight= ((graph.num_edges*M01_AXI4_FE_DATA_W) + (M01_AXI4_FE_DATA_W-1) )/ (M01_AXI4_FE_DATA_W);
+
+            graph.mem_auxiliary_1 = ((graph.num_auxiliary_1*M00_AXI4_FE_DATA_W*2) + (M00_AXI4_FE_DATA_W-1) )/ (M00_AXI4_FE_DATA_W);
+            graph.mem_auxiliary_2 = ((graph.num_auxiliary_2*M00_AXI4_FE_DATA_W*2) + (M00_AXI4_FE_DATA_W-1) )/ (M00_AXI4_FE_DATA_W);
+
+            graph.out_degree   = new [graph.mem_num_vertices];
+            graph.in_degree    = new [graph.mem_num_vertices];
+            graph.edges_idx    = new [graph.mem_num_vertices];
+            graph.auxiliary_1  = new [graph.mem_auxiliary_1];
+            graph.auxiliary_2  = new [graph.mem_auxiliary_2];
+            graph.edges_array_src = new [graph.mem_edges_array_src];
+            graph.edges_array_dest= new [graph.mem_edges_array_dest];
+            graph.overlay_program = new [graph.mem_overlay_program];
+
+            read_files_graphCSR(graph);
+
+            $fclose(graph.file_ptr_overlay_program);
+            $fclose(graph.file_ptr_in_degree);
+            $fclose(graph.file_ptr_out_degree);
+            $fclose(graph.file_ptr_edges_idx);
+            $fclose(graph.file_ptr_edges_array_src);
+            $fclose(graph.file_ptr_edges_array_dest);
+
+            graph.display();
+        endfunction
+
         function automatic void initalize_GraphCSR (ref GraphCSR graph, input integer unsigned source = _ROOT_);
             /////////////////////////////////////////////////////////////////////////////////////////////////
             // Backdoor read the files then send to backdoor memory with the content.
@@ -1292,9 +1393,10 @@ module __KERNEL___testbench ();
         /////////////////////////////////////////////////////////////////////////////////////////////////
         // Set up the __KERNEL__ for operation and set the __KERNEL__ START bit.
         // The task will poll the DONE bit and check the results when complete.
-        task automatic multiple_iteration(input integer unsigned num_trials, output bit error_found, ref GraphCSR graph);
+        task automatic multiple_iteration(input integer unsigned num_trials, output bit error_found);
+            GraphCSR graph;
             error_found = 0;
-
+            graph = new();
             $display("Starting: multiple_iteration");
             for (integer unsigned trial = 0; trial < num_trials; trial++) begin
 
@@ -1342,9 +1444,10 @@ module __KERNEL___testbench ();
             end
         endtask
 
-        task automatic multiple_iteration_MEMCPY(input integer unsigned num_trials, output bit error_found, ref GraphCSR graph);
+        task automatic multiple_iteration_MEMCPY(input integer unsigned num_trials, output bit error_found);
+            GraphCSR graph;
             error_found = 0;
-
+            graph = new();
             $display("Starting: multiple_iteration MEMCPY");
             for (integer unsigned trial = 0; trial < num_trials; trial++) begin
 
@@ -1392,9 +1495,10 @@ module __KERNEL___testbench ();
             end
         endtask
 
-        task automatic multiple_iteration_AUTOMATA(input integer unsigned num_trials, output bit error_found, ref GraphCSR graph);
+        task automatic multiple_iteration_AUTOMATA(input integer unsigned num_trials, output bit error_found);
+            GraphCSR graph;
             error_found = 0;
-
+            graph = new();
             $display("Starting: multiple_iteration AUTOMATA");
             for (integer unsigned trial = 0; trial < num_trials; trial++) begin
 
@@ -1442,9 +1546,10 @@ module __KERNEL___testbench ();
             end
         endtask
 
-        task automatic multiple_iteration_PR(input integer unsigned num_trials, output bit error_found, ref GraphCSR graph);
+        task automatic multiple_iteration_PR(input integer unsigned num_trials, output bit error_found);
+            GraphCSR graph;
             error_found = 0;
-
+            graph = new();
             for (integer unsigned trial = 0; trial < num_trials; trial++) begin
 
                 $display("Starting - PR Trial: %0d / %0d", trial+1, num_trials);
@@ -1460,7 +1565,7 @@ module __KERNEL___testbench ();
                 endcase
                 // slv_random_backpressure_wready();
                 // slv_random_delay_rvalid();
-                
+
                 set_scalar_registers();
                 set_memory_pointers();
                 initalize_GraphCSR (graph);
@@ -1493,11 +1598,12 @@ module __KERNEL___testbench ();
             end
         endtask
 
-        task automatic multiple_iteration_CC(input integer unsigned num_trials, output bit error_found, ref GraphCSR graph);
+        task automatic multiple_iteration_CC(input integer unsigned num_trials, output bit error_found);
+            GraphCSR graph;
             integer unsigned trial = 0;
             integer unsigned iter  = 0;
             error_found = 0;
-
+            graph = new();
             for (int trial = 0; trial < num_trials; trial++) begin
                 graph.bfs_source = trial;
                 graph.debug_counter_1 = 0;
@@ -1518,7 +1624,7 @@ module __KERNEL___testbench ();
                 if(trial == 0)
                     initalize_GraphCSR (graph);
                 else
-                    initalize_GraphCSR (graph, trial);
+                    initalize_GraphCSR (graph);
 
                 $display("Starting - CC Trial: %0d / %0d", trial, num_trials);
                 $display("Starting - Iteration: %0d - Components: %0d", iter, graph.debug_counter_2);
@@ -1581,9 +1687,10 @@ module __KERNEL___testbench ();
         endtask
 
 
-        task automatic multiple_iteration_TC(input integer unsigned num_trials, output bit error_found, ref GraphCSR graph);
+        task automatic multiple_iteration_TC(input integer unsigned num_trials, output bit error_found);
+            GraphCSR graph;
             error_found = 0;
-
+            graph = new();
             $display("Starting: multiple_iteration TC");
             for (integer unsigned trial = 0; trial < num_trials; trial++) begin
 
@@ -1631,68 +1738,42 @@ module __KERNEL___testbench ();
             end
         endtask
 
-        task automatic multiple_iteration_BFS(input integer unsigned num_trials, output bit error_found, ref GraphCSR graph);
-            integer unsigned trial = 0;
-            integer unsigned iter  = 0;
+        localparam int     NUM_SOURCES              = 4              ; // Example, adjust based on actual needs
+        integer            sources    [NUM_SOURCES] = '{1, 3, 543, 2}; // Initialize the array with your specific source values
+
+        task automatic multiple_iteration_BFS(input integer unsigned num_trials, output bit error_found);
+            GraphCSR graph;
+            integer unsigned trial;
+            integer unsigned iter;
+
             error_found = 0;
+            graph = new();
+            foreach (graphInitParams_TEST[i]) begin
+                iter  = 0;
+                trial = 0;
+                for (int trial = 0; trial < num_trials; trial++) begin
+                    graph.bfs_source = trial;
+                    graph.debug_counter_1 = 1;
 
-            for (int trial = 0; trial < num_trials; trial++) begin
-                graph.bfs_source = trial;
-                graph.debug_counter_1 = 1;
+                    // RAND_WREADY_PRESSURE_FAILED : assert(std::randomize(choose_pressure_type));
+                    // case(choose_pressure_type)
+                    //     0 : slv_no_backpressure_wready();
+                    //     1 : slv_random_backpressure_wready();
+                    // endcase
+                    // RAND_RVALID_PRESSURE_FAILED : assert(std::randomize(choose_pressure_type));
+                    // case(choose_pressure_type)
+                    //     0 : slv_no_delay_rvalid();
+                    //     1 : slv_random_delay_rvalid();
+                    // endcase
+                    slv_random_backpressure_wready();
+                    slv_random_delay_rvalid();
+                    if(trial == 0)
+                        initialize_GraphCSR_Tuple (graph, graphInitParams_TEST[i]);
+                    else
+                        initialize_GraphCSR_Tuple (graph, graphInitParams_TEST[i], trial);
 
-                // RAND_WREADY_PRESSURE_FAILED : assert(std::randomize(choose_pressure_type));
-                // case(choose_pressure_type)
-                //     0 : slv_no_backpressure_wready();
-                //     1 : slv_random_backpressure_wready();
-                // endcase
-                // RAND_RVALID_PRESSURE_FAILED : assert(std::randomize(choose_pressure_type));
-                // case(choose_pressure_type)
-                //     0 : slv_no_delay_rvalid();
-                //     1 : slv_random_delay_rvalid();
-                // endcase
-                slv_random_backpressure_wready();
-                slv_random_delay_rvalid();
-                if(trial == 0)
-                    initalize_GraphCSR (graph);
-                else
-                    initalize_GraphCSR (graph, trial);
-
-                $display("Starting - BFS Trial: %0d / %0d - Source: %0d", trial, num_trials, graph.bfs_source);
-                $display("Starting - Iteration: %0d - Frontier: %0d", iter, graph.debug_counter_1);
-                set_scalar_registers();
-                set_memory_pointers();
-                backdoor_buffer_fill_memories(graph);
-                // Check that __KERNEL__ is IDLE before starting.
-                poll_idle_register();
-                ///////////////////////////////////////////////////////////////////////////
-                //Start transfers
-                blocking_write_register(KRNL_CTRL_REG_ADDR, CTRL_START_MASK);
-
-                ctrl.wait_drivers_idle();
-
-                poll_ready_register();
-
-                poll_done_register();
-
-                ///////////////////////////////////////////////////////////////////////////
-                error_found |= check___KERNEL___result(graph)   ;
-
-                $display("Starting - Multiple Iterations:");
-                while (graph.debug_counter_1) begin
-                    RAND_WREADY_PRESSURE_FAILED_ITER : assert(std::randomize(choose_pressure_type));
-                    case(choose_pressure_type)
-                        0 : slv_no_backpressure_wready();
-                        1 : slv_random_backpressure_wready();
-                    endcase
-                    RAND_RVALID_PRESSURE_FAILED_ITER : assert(std::randomize(choose_pressure_type));
-                    case(choose_pressure_type)
-                        0 : slv_no_delay_rvalid();
-                        1 : slv_random_delay_rvalid();
-                    endcase
-                    // slv_random_backpressure_wready();
-                    // slv_random_delay_rvalid();
-                    update_BFS_auxiliary_struct(graph);
-                    $display("Starting - Iteration: %0d - Frontier: %0d", iter+1, graph.debug_counter_1);
+                    $display("Starting - BFS Trial: %0d / %0d - Source: %0d", trial, num_trials, graph.bfs_source);
+                    $display("Starting - Iteration: %0d - Frontier: %0d", iter, graph.debug_counter_1);
                     set_scalar_registers();
                     set_memory_pointers();
                     backdoor_buffer_fill_memories(graph);
@@ -1710,12 +1791,47 @@ module __KERNEL___testbench ();
 
                     ///////////////////////////////////////////////////////////////////////////
                     error_found |= check___KERNEL___result(graph)   ;
-                    if(graph.debug_counter_1 == 0)
-                        break;
-                    iter++;
+
+                    $display("Starting - Multiple Iterations:");
+                    while (graph.debug_counter_1) begin
+                        RAND_WREADY_PRESSURE_FAILED_ITER : assert(std::randomize(choose_pressure_type));
+                        case(choose_pressure_type)
+                            0 : slv_no_backpressure_wready();
+                            1 : slv_random_backpressure_wready();
+                        endcase
+                        RAND_RVALID_PRESSURE_FAILED_ITER : assert(std::randomize(choose_pressure_type));
+                        case(choose_pressure_type)
+                            0 : slv_no_delay_rvalid();
+                            1 : slv_random_delay_rvalid();
+                        endcase
+                        // slv_random_backpressure_wready();
+                        // slv_random_delay_rvalid();
+                        update_BFS_auxiliary_struct(graph);
+                        $display("Starting - Iteration: %0d - Frontier: %0d", iter+1, graph.debug_counter_1);
+                        set_scalar_registers();
+                        set_memory_pointers();
+                        backdoor_buffer_fill_memories(graph);
+                        // Check that __KERNEL__ is IDLE before starting.
+                        poll_idle_register();
+                        ///////////////////////////////////////////////////////////////////////////
+                        //Start transfers
+                        blocking_write_register(KRNL_CTRL_REG_ADDR, CTRL_START_MASK);
+
+                        ctrl.wait_drivers_idle();
+
+                        poll_ready_register();
+
+                        poll_done_register();
+
+                        ///////////////////////////////////////////////////////////////////////////
+                        error_found |= check___KERNEL___result(graph)   ;
+                        if(graph.debug_counter_1 == 0)
+                            break;
+                        iter++;
+                    end
+                    update_BFS_auxiliary_struct(graph);
+                    $display("Finished - Iteration: %0d - Frontier: %0d", iter+1, graph.debug_counter_1);
                 end
-                update_BFS_auxiliary_struct(graph);
-                $display("Finished - Iteration: %0d - Frontier: %0d", iter+1, graph.debug_counter_1);
             end
         endtask
 
@@ -1723,7 +1839,6 @@ module __KERNEL___testbench ();
 //Instantiate AXI4 LITE VIP
         initial begin : STIMULUS
             printDataTypeSizes();
-            graph = new();
 
             #200000;
             start_vips();
@@ -1743,7 +1858,7 @@ module __KERNEL___testbench ();
             // enable_interrupts();
             disable_interrupts();
             #1000
-                multiple_iteration__ALGORITHM_NAME_(_NUM_TRIALS_, error_found, graph);
+                multiple_iteration__ALGORITHM_NAME_(_NUM_TRIALS_, error_found);
 
             if (error_found == 1) begin
                 $display( "ERROR: Test Failed!");

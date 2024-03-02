@@ -36,6 +36,16 @@ proc color {foreground text} {
     return [exec tput setaf $foreground]$text[exec tput sgr0]
 }
 
+# Procedure to check if a .xci file exists in a given directory
+proc checkXciFileExists {xciFilePath} {
+    # Use glob to search for .xci files
+    if {[llength [glob -nocomplain $xciFilePath]] == 0} {
+        return 1
+    } else {
+        return 0
+    }
+}
+
 # ----------------------------------------------------------------------------
 # Generate ${KERNEL_NAME} IPs..... START!
 # ----------------------------------------------------------------------------
@@ -77,36 +87,41 @@ set_property target_simulator XSim    [current_project]
 puts "[color 2 "                        Generate AXI VIP Master"]" 
 
 set module_name control_${KERNEL_NAME}_vip
-create_ip -name axi_vip                 \
-          -vendor xilinx.com            \
-          -library ip                   \
-          -version 1.*                  \
-          -module_name ${module_name}   >> $log_file
-          
-set_property -dict [list \
-                    CONFIG.INTERFACE_MODE {MASTER}              \
-                    CONFIG.PROTOCOL {AXI4LITE}                  \
-                    CONFIG.ADDR_WIDTH {12}                      \
-                    CONFIG.DATA_WIDTH {32}                      \
-                    CONFIG.SUPPORTS_NARROW {0}                  \
-                    CONFIG.HAS_BURST {0}                        \
-                    CONFIG.HAS_LOCK {0}                         \
-                    CONFIG.HAS_CACHE {0}                        \
-                    CONFIG.HAS_REGION {0}                       \
-                    CONFIG.HAS_QOS {0}                          \
-                    CONFIG.HAS_PROT {0}                         \
-                    CONFIG.HAS_WSTRB {1}                        \
-                    ] [get_ips ${module_name}]
-
 set files_sources_xci ${package_full_dir}/${KERNEL_NAME}/${KERNEL_NAME}.srcs/sources_1/ip/${module_name}/${module_name}.xci
-set files_ip_user_files_dir     ${package_full_dir}/${KERNEL_NAME}/${KERNEL_NAME}.ip_user_files
-set files_cache_dir     ${package_full_dir}/${KERNEL_NAME}/${KERNEL_NAME}.cache
-set_property generate_synth_checkpoint false [get_files ${files_sources_xci}]
-generate_target {instantiation_template}     [get_files ${files_sources_xci}] >> $log_file
-# catch { config_ip_cache -export [get_ips -all ${module_name}] }
-generate_target all                          [get_files ${files_sources_xci}] >> $log_file
-export_ip_user_files -of_objects             [get_files ${files_sources_xci}] -no_script -force >> $log_file
-export_simulation -of_objects [get_files ${files_sources_xci}] -directory ${files_ip_user_files_dir}/sim_scripts -ip_user_files_dir ${files_ip_user_files_dir} -ipstatic_source_dir ${files_ip_user_files_dir}/ipstatic -lib_map_path [list {modelsim=${files_cache_dir}/compile_simlib/modelsim} {questa=${files_cache_dir}/compile_simlib/questa} {xcelium=${files_cache_dir}/compile_simlib/xcelium} {vcs=${files_cache_dir}/compile_simlib/vcs} {riviera=${files_cache_dir}/compile_simlib/riviera}] -use_ip_compiled_libs -force >> $log_file
+
+# Call the procedure to check for .xci file existence
+if {[checkXciFileExists ${files_sources_xci}]} {
+    create_ip -name axi_vip                 \
+              -vendor xilinx.com            \
+              -library ip                   \
+              -version 1.*                  \
+              -module_name ${module_name}   >> $log_file
+              
+    set_property -dict [list \
+                        CONFIG.INTERFACE_MODE {MASTER}              \
+                        CONFIG.PROTOCOL {AXI4LITE}                  \
+                        CONFIG.ADDR_WIDTH {12}                      \
+                        CONFIG.DATA_WIDTH {32}                      \
+                        CONFIG.SUPPORTS_NARROW {0}                  \
+                        CONFIG.HAS_BURST {0}                        \
+                        CONFIG.HAS_LOCK {0}                         \
+                        CONFIG.HAS_CACHE {0}                        \
+                        CONFIG.HAS_REGION {0}                       \
+                        CONFIG.HAS_QOS {0}                          \
+                        CONFIG.HAS_PROT {0}                         \
+                        CONFIG.HAS_WSTRB {1}                        \
+                        ] [get_ips ${module_name}]
+
+
+    set files_ip_user_files_dir     ${package_full_dir}/${KERNEL_NAME}/${KERNEL_NAME}.ip_user_files
+    set files_cache_dir     ${package_full_dir}/${KERNEL_NAME}/${KERNEL_NAME}.cache
+    set_property generate_synth_checkpoint false [get_files ${files_sources_xci}]
+    generate_target {instantiation_template}     [get_files ${files_sources_xci}] >> $log_file
+    # catch { config_ip_cache -export [get_ips -all ${module_name}] }
+    generate_target all                          [get_files ${files_sources_xci}] >> $log_file
+    export_ip_user_files -of_objects             [get_files ${files_sources_xci}] -no_script -force >> $log_file
+    export_simulation -of_objects [get_files ${files_sources_xci}] -directory ${files_ip_user_files_dir}/sim_scripts -ip_user_files_dir ${files_ip_user_files_dir} -ipstatic_source_dir ${files_ip_user_files_dir}/ipstatic -lib_map_path [list {modelsim=${files_cache_dir}/compile_simlib/modelsim} {questa=${files_cache_dir}/compile_simlib/questa} {xcelium=${files_cache_dir}/compile_simlib/xcelium} {vcs=${files_cache_dir}/compile_simlib/vcs} {riviera=${files_cache_dir}/compile_simlib/riviera}] -use_ip_compiled_libs -force >> $log_file
+}
 
 puts "[color 4 "                        Add VIP into project"]"
 set argv [list ${PARAMS_TCL_DIR} ${package_full_dir} ${log_file} ${vivado_dir} ${vitis_dir}]
