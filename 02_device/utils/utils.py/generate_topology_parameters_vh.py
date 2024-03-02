@@ -5109,11 +5109,349 @@ data_types_bfs_engine_packet = {
     ],
 }
 
+# Size (bits) ALUOpsConfigurationPayload: 76 
+# Size (bits) CacheRequestPayload: 179 
+# Size (bits) ControlPacketPayload: 28 
+# Size (bits) CSRIndexConfigurationPayload: 355 
+# Size (bits) EnginePacketFullPayload: 237 
+# Size (bits) EnginePacketPayload: 174 
+# Size (bits) FilterCondConfigurationPayload: 100 
+# Size (bits) MemoryPacketRequestPayload: 109 
+# Size (bits) MemoryPacketResponsePayload: 66 
+# Size (bits) MergeDataConfigurationPayload: 8 
+# Size (bits) ParallelReadWriteConfigurationPayload: 752 
+# Size (bits) ReadWriteConfigurationPayload: 178 
+# Size (bits) SetOpsConfigurationPayload: 8 
+# Define the data types and their configurations
+data_types_cc_engine_packet = {
+    "ALUOpsConfigurationPayload": [
+        {
+            "fifo_type": "std",
+            "width": 76,
+            "configurations": [{"depth": 16, "prog_full": 8}],
+        },
+        {"fifo_type": "fwft", "width": 76, "configurations": []},
+    ],
+    "CSRIndexConfigurationPayload": [
+        {
+            "fifo_type": "std",
+            "width": 355,
+            "configurations": [
+                {"depth": 16, "prog_full": 8},
+                {"depth": 64, "prog_full": 48},
+            ],
+        },
+        {"fifo_type": "fwft", "width": 355, "configurations": []},
+    ],
+    "FilterCondConfigurationPayload": [
+        {
+            "fifo_type": "std",
+            "width": 100,
+            "configurations": [{"depth": 16, "prog_full": 8}],
+        },
+        {"fifo_type": "fwft", "width": 100, "configurations": []},
+    ],
+    "MergeDataConfigurationPayload": [
+        {
+            "fifo_type": "std",
+            "width": 8,
+            "configurations": [{"depth": 16, "prog_full": 8}],
+        },
+        {"fifo_type": "fwft", "width": 8, "configurations": []},
+    ],
+    "ParallelReadWriteConfigurationPayload": [
+        {
+            "fifo_type": "std",
+            "width": 752,
+            "configurations": [{"depth": 16, "prog_full": 8}],
+        },
+        {"fifo_type": "fwft", "width": 752, "configurations": []},
+    ],
+    "ReadWriteConfigurationPayload": [
+        {
+            "fifo_type": "std",
+            "width": 178,
+            "configurations": [{"depth": 16, "prog_full": 8}],
+        },
+        {"fifo_type": "fwft", "width": 178, "configurations": []},
+    ],
+    "SetOpsConfigurationPayload": [
+        {
+            "fifo_type": "std",
+            "width": 8,
+            "configurations": [{"depth": 16, "prog_full": 8}],
+        },
+        {"fifo_type": "fwft", "width": 8, "configurations": []},
+    ],
+    "CacheRequestPayload": [
+        {
+            "fifo_type": "std",
+            "width": 179,
+            "configurations": [{"depth": 64, "prog_full": 32}],
+        },
+        {
+            "fifo_type": "fwft",
+            "width": 179,
+            "configurations": [{"depth": 64, "prog_full": 32}],
+        },
+    ],
+    "ControlPacketPayload": [
+        {
+            "fifo_type": "std",
+            "width": 28,
+            "configurations": [
+                {"depth": 16, "prog_full": 12},
+                {"depth": 32, "prog_full": 27},
+            ],
+        },
+        {"fifo_type": "fwft", "width": 28, "configurations": []},
+    ],
+    "EnginePacketFullPayload": [
+        {
+            "fifo_type": "std",
+            "width": 237,
+            "configurations": [
+                {"depth": 32, "prog_full": 6},
+                {"depth": 32, "prog_full": 9},
+                {"depth": 32, "prog_full": 5},
+            ],
+        },
+        {
+            "fifo_type": "fwft",
+            "width": 237,
+            "configurations": [{"depth": 16, "prog_full": 8}],
+        },
+    ],
+    "EnginePacketPayload": [
+        {
+            "fifo_type": "std",
+            "width": 174,
+            "configurations": [
+                {"depth": 16, "prog_full": 12},
+                {"depth": 32, "prog_full": 6},
+                {"depth": 32, "prog_full": 9},
+                {"depth": 32, "prog_full": 27},
+                {"depth": 32, "prog_full": 5},
+                {"depth": 64, "prog_full": 16},
+                {"depth": 64, "prog_full": 32},
+                {"depth": 64, "prog_full": 48},
+            ],
+        },
+        {
+            "fifo_type": "fwft",
+            "width": 174,
+            "configurations": [
+                {"depth": 32, "prog_full": 27},
+                {"depth": 64, "prog_full": 32},
+            ],
+        },
+    ],
+    "MemoryPacketRequestPayload": [
+        {
+            "fifo_type": "std",
+            "width": 109,
+            "configurations": [
+                {"depth": 16, "prog_full": 8},
+                {"depth": 16, "prog_full": 12},
+                {"depth": 32, "prog_full": 27},
+                {"depth": 32, "prog_full": 16},
+            ],
+        },
+        {"fifo_type": "fwft", "width": 109, "configurations": []},
+    ],
+    "MemoryPacketResponsePayload": [
+        {
+            "fifo_type": "std",
+            "width": 66,
+            "configurations": [
+                {"depth": 16, "prog_full": 12},
+                {"depth": 64, "prog_full": 32},
+            ],
+        },
+        {"fifo_type": "fwft", "width": 66, "configurations": []},
+    ],
+    "MemoryStreamRequestPayload": [
+        {"fifo_type": "std", "width": 32, "configurations": []},
+        {"fifo_type": "fwft", "width": 32, "configurations": []},
+    ],
+}
+
+
+# Size (bits) ALUOpsConfigurationPayload: 76 
+# Size (bits) CacheRequestPayload: 179 
+# Size (bits) ControlPacketPayload: 29 
+# Size (bits) CSRIndexConfigurationPayload: 355 
+# Size (bits) EnginePacketFullPayload: 238 
+# Size (bits) EnginePacketPayload: 175 
+# Size (bits) FilterCondConfigurationPayload: 100 
+# Size (bits) MemoryPacketRequestPayload: 109 
+# Size (bits) MemoryPacketResponsePayload: 66 
+# Size (bits) MergeDataConfigurationPayload: 8 
+# Size (bits) ParallelReadWriteConfigurationPayload: 756 
+# Size (bits) ReadWriteConfigurationPayload: 178 
+# Size (bits) SetOpsConfigurationPayload: 8 
+# Define the data types and their configurations
+data_types_tc_engine_packet = {
+    "ALUOpsConfigurationPayload": [
+        {
+            "fifo_type": "std",
+            "width": 76,
+            "configurations": [{"depth": 16, "prog_full": 8}],
+        },
+        {"fifo_type": "fwft", "width": 76, "configurations": []},
+    ],
+    "CSRIndexConfigurationPayload": [
+        {
+            "fifo_type": "std",
+            "width": 355,
+            "configurations": [
+                {"depth": 16, "prog_full": 8},
+                {"depth": 64, "prog_full": 48},
+            ],
+        },
+        {"fifo_type": "fwft", "width": 355, "configurations": []},
+    ],
+    "FilterCondConfigurationPayload": [
+        {
+            "fifo_type": "std",
+            "width": 100,
+            "configurations": [{"depth": 16, "prog_full": 8}],
+        },
+        {"fifo_type": "fwft", "width": 100, "configurations": []},
+    ],
+    "MergeDataConfigurationPayload": [
+        {
+            "fifo_type": "std",
+            "width": 8,
+            "configurations": [{"depth": 16, "prog_full": 8}],
+        },
+        {"fifo_type": "fwft", "width": 8, "configurations": []},
+    ],
+    "ParallelReadWriteConfigurationPayload": [
+        {
+            "fifo_type": "std",
+            "width": 756,
+            "configurations": [{"depth": 16, "prog_full": 8}],
+        },
+        {"fifo_type": "fwft", "width": 756, "configurations": []},
+    ],
+    "ReadWriteConfigurationPayload": [
+        {
+            "fifo_type": "std",
+            "width": 178,
+            "configurations": [{"depth": 16, "prog_full": 8}],
+        },
+        {"fifo_type": "fwft", "width": 178, "configurations": []},
+    ],
+    "SetOpsConfigurationPayload": [
+        {
+            "fifo_type": "std",
+            "width": 8,
+            "configurations": [{"depth": 16, "prog_full": 8}],
+        },
+        {"fifo_type": "fwft", "width": 8, "configurations": []},
+    ],
+    "CacheRequestPayload": [
+        {
+            "fifo_type": "std",
+            "width": 179,
+            "configurations": [{"depth": 64, "prog_full": 32}],
+        },
+        {
+            "fifo_type": "fwft",
+            "width": 179,
+            "configurations": [{"depth": 64, "prog_full": 32}],
+        },
+    ],
+    "ControlPacketPayload": [
+        {
+            "fifo_type": "std",
+            "width": 29,
+            "configurations": [
+                {"depth": 16, "prog_full": 12},
+                {"depth": 32, "prog_full": 27},
+            ],
+        },
+        {"fifo_type": "fwft", "width": 29, "configurations": []},
+    ],
+    "EnginePacketFullPayload": [
+        {
+            "fifo_type": "std",
+            "width": 238,
+            "configurations": [
+                {"depth": 32, "prog_full": 6},
+                {"depth": 32, "prog_full": 9},
+                {"depth": 32, "prog_full": 5},
+            ],
+        },
+        {
+            "fifo_type": "fwft",
+            "width": 238,
+            "configurations": [{"depth": 16, "prog_full": 8}],
+        },
+    ],
+    "EnginePacketPayload": [
+        {
+            "fifo_type": "std",
+            "width": 175,
+            "configurations": [
+                {"depth": 16, "prog_full": 12},
+                {"depth": 32, "prog_full": 6},
+                {"depth": 32, "prog_full": 9},
+                {"depth": 32, "prog_full": 27},
+                {"depth": 32, "prog_full": 5},
+                {"depth": 64, "prog_full": 16},
+                {"depth": 64, "prog_full": 32},
+                {"depth": 64, "prog_full": 48},
+            ],
+        },
+        {
+            "fifo_type": "fwft",
+            "width": 175,
+            "configurations": [
+                {"depth": 32, "prog_full": 27},
+                {"depth": 64, "prog_full": 32},
+            ],
+        },
+    ],
+    "MemoryPacketRequestPayload": [
+        {
+            "fifo_type": "std",
+            "width": 109,
+            "configurations": [
+                {"depth": 16, "prog_full": 8},
+                {"depth": 16, "prog_full": 12},
+                {"depth": 32, "prog_full": 27},
+                {"depth": 32, "prog_full": 16},
+            ],
+        },
+        {"fifo_type": "fwft", "width": 109, "configurations": []},
+    ],
+    "MemoryPacketResponsePayload": [
+        {
+            "fifo_type": "std",
+            "width": 66,
+            "configurations": [
+                {"depth": 16, "prog_full": 12},
+                {"depth": 64, "prog_full": 32},
+            ],
+        },
+        {"fifo_type": "fwft", "width": 66, "configurations": []},
+    ],
+    "MemoryStreamRequestPayload": [
+        {"fifo_type": "std", "width": 32, "configurations": []},
+        {"fifo_type": "fwft", "width": 32, "configurations": []},
+    ],
+}
+
 if ALGORITHM_NAME == "BFS":
     data_types_active_engine_packet = data_types_bfs_engine_packet
+elif ALGORITHM_NAME == "CC":
+    data_types_active_engine_packet = data_types_cc_engine_packet
+elif ALGORITHM_NAME == "TC":
+    data_types_active_engine_packet = data_types_tc_engine_packet
 else:
     data_types_active_engine_packet = data_types_pr_engine_packet
-
 
 def clog2(x):
     if x > 0:
@@ -5121,10 +5459,8 @@ def clog2(x):
     else:
         return 0
 
-
 def calculate_prog_full(depth):
     return depth // 2
-
 
 def flatten_list(nested_list):
     flat_list = []
@@ -5135,7 +5471,6 @@ def flatten_list(nested_list):
             flat_list.append(item)
     return flat_list
 
-
 def flatten_list(nested_list):
     if isinstance(nested_list, int):  # Directly handle single integer values
         yield nested_list
@@ -5145,7 +5480,6 @@ def flatten_list(nested_list):
                 yield from flatten_list(item)
             else:
                 yield item
-
 
 def update_configurations(fifo_depths, data_types, data_type_key, fifo_type):
     for depth in fifo_depths:
@@ -5415,17 +5749,13 @@ def determine_fifo_mem_type(depth, width, fifo_type):
         else:
             return "Common_Clock_Block_RAM", "false"
     else:
-        return (
-            "Built-in FIFO"  # Assume built-in FIFO for very large or specialized needs
-        )
-
-
+        return "Built-in FIFO", "true"  # Assume built-in FIFO for very large or specialized needs
+    
 def determine_fifo_type(fifo_type):
     if fifo_type == "fwft":
         return "First_Word_Fall_Through"
     else:
         return "Standard_FIFO"
-
 
 def fill_and_generate_fifo_tcl(data_types):
     for data_type, configs in data_types.items():
@@ -5438,6 +5768,7 @@ def fill_and_generate_fifo_tcl(data_types):
                 prog_full = conf[
                     "prog_full"
                 ]  # Use 'prog_full' as per the updated data structure
+
                 fifo_mem_type, reg_embed = determine_fifo_mem_type(
                     depth, width, fifo_type
                 )
@@ -5466,7 +5797,6 @@ def fill_and_generate_fifo_tcl(data_types):
                         "reg_embed": reg_embed,
                     }
                 )
-
 
 # TCL template with placeholders for formatting
 fill_fifo_tcl_template_post = """
@@ -5504,8 +5834,9 @@ export_ip_user_files -of_objects             [get_files ${{files_sources_xci}}] 
 export_simulation -of_objects [get_files ${{files_sources_xci}}] -directory ${{files_ip_user_files_dir}}/sim_scripts -ip_user_files_dir ${{files_ip_user_files_dir}} -ipstatic_source_dir ${{files_ip_user_files_dir}}/ipstatic -lib_map_path [list {{modelsim=${{files_cache_dir}}/compile_simlib/modelsim}} {{questa=${{files_cache_dir}}/compile_simlib/questa}} {{xcelium=${{files_cache_dir}}/compile_simlib/xcelium}} {{vcs=${{files_cache_dir}}/compile_simlib/vcs}} {{riviera=${{files_cache_dir}}/compile_simlib/riviera}}] -use_ip_compiled_libs -force >> $log_file
 """
 
-# Execute the function with the defined data types and the template
-fill_and_generate_fifo_tcl(data_types_active_engine_packet)
+if XPM_FIFO_ENABLE == "0":
+    # Execute the function with the defined data types and the template
+    fill_and_generate_fifo_tcl(data_types_active_engine_packet)
 
 # ----------------------------------------------------------------------------
 # generate fill_fifo_wrapper_topology

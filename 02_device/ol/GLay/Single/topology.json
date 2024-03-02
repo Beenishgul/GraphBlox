@@ -603,6 +603,11 @@
             "1": "aggressive",
             "2": "sweep_all",
             "3": "spread_logic"
+        }, 
+        "xpm_fifo": {
+            "0": "generator",
+            "1": "xpm fwft as base",
+            "2": "xpm auto"
         }
     },
     "cu_properties": {
