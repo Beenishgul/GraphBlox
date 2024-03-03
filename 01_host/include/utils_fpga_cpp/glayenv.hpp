@@ -10,9 +10,9 @@
 #include <vector>
 
 // XRT includes
-#include "xrt/xrt_bo.h"
-#include "xrt/xrt_device.h"
-#include "xrt/xrt_kernel.h"
+#include "experimental/xrt_bo.h"
+#include "experimental/xrt_device.h"
+#include "experimental/xrt_kernel.h"
 #include <experimental/xrt_ip.h>
 #include <experimental/xrt_xclbin.h>
 
@@ -51,7 +51,9 @@ public:
   int numThreads;
   int overlay_algorithm;
   int overlay_program_entries;
+  int cu_id;
   std::string kernelName;
+  std::string kernelNameFull;
   std::string overlayPath;
   std::string xclbinPath;
   std::vector<uint32_t> overlay_program;

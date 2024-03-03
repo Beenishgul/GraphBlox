@@ -15,7 +15,7 @@
 # limitations under the License.
 #
 
-
+# add_wave {{/pfm_top_wrapper/pfm_top_i/pfm_dynamic_inst/glay_kernel_1}} 
 log_wave -r *
 run all
 exit

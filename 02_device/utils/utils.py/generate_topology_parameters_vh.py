@@ -5773,6 +5773,9 @@ def fill_and_generate_fifo_tcl(data_types):
                     depth, width, fifo_type
                 )
 
+                if XPM_FIFO_ENABLE == "3" and fifo_mem_type != "Common_Clock_Builtin_FIFO":
+                    continue
+
                 # Generate a unique identifier for each FIFO configuration
                 fifo_id = f"{width}_{depth}_{prog_full}_{fifo_mem_type}_{fifo_type}"
 
@@ -5837,7 +5840,7 @@ if {{[checkXciFileExistsIP ${{files_sources_xci}}]}} {{
 }}
 """
 
-if XPM_FIFO_ENABLE == "0":
+if XPM_FIFO_ENABLE == "0" or XPM_FIFO_ENABLE == "3":
     # Execute the function with the defined data types and the template
     fill_and_generate_fifo_tcl(data_types_active_engine_packet)
 
@@ -6009,7 +6012,7 @@ endgenerate"""
 
 fifo_count = 0
 fill_fifo_wrapper_topology.append(fifo_template_pre)
-if XPM_FIFO_ENABLE == "0":
+if XPM_FIFO_ENABLE == "0" or XPM_FIFO_ENABLE == "3":
     fifo_count = 0
     total_fifo_count = len(generated_reference_fifos)
     # Generate the instantiation code for each engine and append it to the list

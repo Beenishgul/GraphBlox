@@ -40,7 +40,10 @@ xrtGLAYHandle::xrtGLAYHandle(struct Arguments *arguments) {
   cacheSize = arguments->cache_size;
   numThreads = arguments->ker_numThreads;
   overlay_algorithm = arguments->algorithm;
+  cu_id = arguments->cu_id;
   overlay_program_entries = 0; // Will be set in readGLAYDeviceEntriesFromFile
+  kernelNameFull =
+      kernelName + ":{" + kernelName + "_" + std::to_string(cu_id + 1) + "}";
 
   setupGLAYDevice();
 }
@@ -57,15 +60,18 @@ void xrtGLAYHandle::setupGLAYDevice() {
   xclbinUUID = deviceHandle.load_xclbin(xclbinPath);
   xclbinHandle = xrt::xclbin(xclbinPath);
 
-  for (auto &kernel : xclbinHandle.get_kernels()) {
-    if (kernel.get_name() == kernelName) {
-      cuHandles = kernel.get_cus();
+  if (ctrlMode == 0) {
+    for (auto &kernel : xclbinHandle.get_kernels()) {
+      if (kernel.get_name() == kernelNameFull) {
+        cuHandles = kernel.get_cus();
+      }
     }
-  }
 
-  if (cuHandles.empty())
-    throw std::runtime_error(std::string("IP ") + kernelName +
-                             std::string(" not found in the provided xclbin"));
+    if (cuHandles.empty())
+      throw std::runtime_error(
+          std::string("IP ") + kernelName +
+          std::string(" not found in the provided xclbin"));
+  }
 
   for (auto &mem : xclbinHandle.get_mems()) {
     if (mem.get_used()) {
@@ -76,18 +82,15 @@ void xrtGLAYHandle::setupGLAYDevice() {
 
   switch (ctrlMode) {
   case 0:
-    ipHandle = xrt::ip(deviceHandle, xclbinUUID, kernelName);
+    ipHandle = xrt::ip(deviceHandle, xclbinUUID, kernelNameFull.c_str());
     break;
   case 1:
-    kernelHandle = xrt::kernel(deviceHandle, xclbinUUID, kernelName,
-                               xrt::kernel::cu_access_mode::exclusive);
-    break;
   case 2:
-    kernelHandle = xrt::kernel(deviceHandle, xclbinUUID, kernelName,
-                               xrt::kernel::cu_access_mode::exclusive);
+    kernelHandle =
+        xrt::kernel(deviceHandle, xclbinUUID, kernelNameFull.c_str());
     break;
   default:
-    ipHandle = xrt::ip(deviceHandle, xclbinUUID, kernelName);
+    ipHandle = xrt::ip(deviceHandle, xclbinUUID, kernelNameFull.c_str());
     break;
   }
 }
@@ -142,6 +145,7 @@ void xrtGLAYHandle::printGLAYDevice() const {
 
   printf("KERNEL::CACHE::SIZE             [%d]\n", cacheSize);
   printf("KERNEL::NAME                    [%s]\n", kernelName.c_str());
+  printf("KERNEL::NAME::FULL              [%s]\n", kernelNameFull.c_str());
   printf("KERNEL::THREADS::NUM            [%d]\n", numThreads);
   printf("KERNEL::XCLBIN::PATH            [%s]\n", xclbinPath.c_str());
   printf("KERNEL::ENDIAN::READ            [%d]\n", endian_read);
@@ -152,15 +156,18 @@ void xrtGLAYHandle::printGLAYDevice() const {
   printf("OVERLAY::PROGRAM_ENTRIES        [%d]\n", overlay_program_entries);
   printf("OVERLAY::PATH                   [%s]\n", overlayPath.c_str());
   printf("-----------------------------------------------------\n");
-  printf("KERNEL::ARGUMENTS::OFFSETS:     [%ld]\n",
-         cuHandles[0].get_args().size());
-  printf("-----------------------------------------------------\n");
-  uint32_t i = 0;
-  for (auto it : cuHandles[0].get_args()) {
-    printf("ARG[%u]-[0x%03lX]\n", i, it.get_offset());
-    i++;
+
+  if (ctrlMode == 0) {
+    printf("KERNEL::ARGUMENTS::OFFSETS:     [%ld]\n",
+           cuHandles[0].get_args().size());
+    printf("-----------------------------------------------------\n");
+    uint32_t i = 0;
+    for (auto it : cuHandles[0].get_args()) {
+      printf("ARG[%u]-[0x%03lX]\n", i, it.get_offset());
+      i++;
+    }
+    printf("-----------------------------------------------------\n");
   }
-  printf("-----------------------------------------------------\n");
 }
 
 // ********************************************************************************************
@@ -284,6 +291,9 @@ void GLAYxrtBufferHandlePerKernel::SetSyncBuffersBasedOnString(
 
 void GLAYxrtBufferHandlePerKernel::assignGraphtoXRTBufferSize(
     struct GraphCSR *graph, struct GraphAuxiliary *graphAuxiliary) {
+
+  printf("IP::START::GLAYxrtBufferHandlePerKernel::"
+         "assignGraphtoXRTBufferSize\n");
   if (xrt_buffers_num <= 10) // Adjust based on actual size
   {
     overlay_program_entries = glayHandle->overlay_program_entries;
@@ -302,8 +312,8 @@ void GLAYxrtBufferHandlePerKernel::assignGraphtoXRTBufferSize(
   } else {
     // Handle error or invalid `xrt_buffers_num` value
   }
-
-  // prinGraphtoXRTBufferSize();
+  printf("IP::DONE::GLAYxrtBufferHandlePerKernel::"
+         "assignGraphtoXRTBufferSize\n");
 }
 
 void GLAYxrtBufferHandlePerKernel::prinGraphtoXRTBufferSize() const {

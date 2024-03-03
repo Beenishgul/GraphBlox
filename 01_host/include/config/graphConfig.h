@@ -51,6 +51,7 @@ struct Arguments
     // GLay Xilinx Parameters
 
     char *kernel_name;
+    int cu_id;
     int device_index;
     char *xclbin_path;
     char *overlay_path;
