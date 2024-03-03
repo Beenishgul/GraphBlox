@@ -63,11 +63,11 @@ The design has been verified with the following software/hardware environment an
       * Ubuntu 20.04 (See [Additional Requirements for Ubuntu](#cpu-dependencies))
       * GCC 9
   * Alveo U280: xilinx_u280_xdma_201920_3
-    * XRT: 2.11.634
-    * Vitis: 2021.1
+    * XRT: 2.15.634
+    * Vitis: 2023.1
     * Operating Systems:
-      * Ubuntu 18.04 (See [Additional Requirements for Ubuntu](#cpu-dependencies))
-      * GCC 7
+      * Ubuntu 22.04 (See [Additional Requirements for Ubuntu](#cpu-dependencies))
+      * GCC 9
 * Perl package installed for Verilog simulation (**required**)
 
 ## CPU Dependencies
