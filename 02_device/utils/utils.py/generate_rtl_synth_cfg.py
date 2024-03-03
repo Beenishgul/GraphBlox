@@ -239,7 +239,7 @@ def generate_kernel_and_memory_config(
                     break
 
     connectivity_configs = ["[connectivity]"]
-    nk_line = f"nk={kernel_name}:{num_kernels}:" + ",".join(
+    nk_line = f"nk={kernel_name}:{num_kernels}:" + ".".join(
         [f"{kernel_name}_{i+1}" for i in range(num_kernels)]
     )
     connectivity_configs.append(nk_line)

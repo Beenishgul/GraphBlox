@@ -93,7 +93,7 @@ struct Arguments *argumentsNew()
     arguments->endian_write = 0;
     arguments->flush_cache = 1;
     arguments->bankGroupIndex = 0;
-
+    arguments->cu_id = 0;
     return arguments;
 
 }

@@ -380,10 +380,8 @@ int main(int argc, char **argv) {
     arguments->sort = 1;
 
   arguments->ctrl_mode = 0;
-  struct GraphAuxiliary *graphAuxiliary =
-      (struct GraphAuxiliary *)my_malloc(sizeof(struct GraphAuxiliary));
-  struct GraphCSR *graph =
-      (struct GraphCSR *)generateGraphDataStructure(arguments);
+  struct GraphAuxiliary *graphAuxiliary =(struct GraphAuxiliary *)my_malloc(sizeof(struct GraphAuxiliary));
+  struct GraphCSR *graph =(struct GraphCSR *)generateGraphDataStructure(arguments);
 
   switch (arguments->algorithm) {
   case 0: // bfs
