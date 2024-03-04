@@ -304,7 +304,14 @@ CFG_FILE_NAME = f"{APP_DIR_ACTIVE}/{UTILS_DIR_ACTIVE}/{KERNEL_NAME}_rtl_{TARGET}
 # Define configuration variables for each XILINX_IMPL_STRATEGY
 XILINX_IMPL_STRATEGY_0 = f"""
 [advanced]
-param=compiler.skipTimingCheckAndFrequencyScaling=1
+param=compiler.skipTimingCheckAndFrequencyScaling=0
+param=compiler.multiStrategiesWaitOnAllRuns=1
+
+[vivado]
+impl.strategies=ALL
+impl.jobs={XILINX_JOBS_STRATEGY}
+synth.jobs={XILINX_JOBS_STRATEGY}
+param=general.maxThreads={XILINX_MAX_THREADS}
 """
 
 XILINX_IMPL_STRATEGY_1 = f"""
@@ -488,7 +495,7 @@ if TARGET == "hw_emu":
 # """
 config += "\n"
 
-if DESIGN_FREQ_SCALE == "0" or TARGET == "hw_emu":
+if DESIGN_FREQ_SCALE == "0":
     config += "[clock]\n"
     config += f"defaultFreqHz={DESIGN_FREQ_HZ}\n\n"
 

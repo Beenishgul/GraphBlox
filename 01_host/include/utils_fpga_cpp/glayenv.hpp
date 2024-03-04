@@ -30,6 +30,14 @@ extern "C" {
 }
 #endif
 
+// #define DEBUG_LOG 0
+
+#ifdef DEBUG_LOG
+#define DEBUG_PRINT(...) printf(__VA_ARGS__)
+#else
+#define DEBUG_PRINT(...) (void)0
+#endif
+
 // ********************************************************************************************
 // ***************                      XRT Device Management **************
 // ********************************************************************************************
@@ -67,7 +75,7 @@ public:
   xrt::xclbin xclbinHandle;
   xrt::xclbin::mem mem_used;
   // xrt::ip::interrupt interruptHandle;
-  
+
   // Constructor to initialize the device with arguments
   xrtGLAYHandle(struct Arguments *arguments);
   // Destructor to clean up resources if necessary
