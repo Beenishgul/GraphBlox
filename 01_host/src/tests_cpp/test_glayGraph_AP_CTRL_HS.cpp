@@ -380,16 +380,19 @@ int main(int argc, char **argv) {
     arguments->sort = 1;
 
   arguments->ctrl_mode = 1;
-  struct GraphAuxiliary *graphAuxiliary =(struct GraphAuxiliary *)my_malloc(sizeof(struct GraphAuxiliary));
-  struct GraphCSR *graph =(struct GraphCSR *)generateGraphDataStructure(arguments);
+  struct GraphAuxiliary *graphAuxiliary =
+      (struct GraphAuxiliary *)my_malloc(sizeof(struct GraphAuxiliary));
+  struct GraphCSR *graph =
+      (struct GraphCSR *)generateGraphDataStructure(arguments);
 
   switch (arguments->algorithm) {
   case 0: // bfs
   {
-    struct BFSStats *stats = runBreadthFirstSearchAlgorithm(arguments, graph);
+    // struct BFSStats *stats = runBreadthFirstSearchAlgorithm(arguments,
+    // graph);
     initialize_BFS_auxiliary_struct(graph, graphAuxiliary, arguments);
     multiple_iteration_BFS(graph, graphAuxiliary, arguments, timer);
-    freeBFSStats(stats);
+    // freeBFSStats(stats);
   } break;
   case 1: // pagerank
   {
@@ -444,7 +447,6 @@ int main(int argc, char **argv) {
   // {
   //     printf("%u \n", static_cast<uint32_t
   //     *>(graphAuxiliary->auxiliary_2)[i]);
-
   // }
   // printf(" -----------------------------------------------------\n");
   // closeGLAYUserManaged();
@@ -469,6 +471,7 @@ void multiple_iteration_PR(struct GraphCSR *graph,
       new GLAYxrtBufferHandlePerKernel(arguments, graph, graphAuxiliary);
   glayGraphCSRxrtBufferHandlePerKernel->setupGLAY();
   glayGraphCSRxrtBufferHandlePerKernel->printGLAYxrtBufferHandlePerKernel();
+  printf("-----------------------------------------------------\n");
   printf(" setupGLAYUserManaged\n");
   printf("-----------------------------------------------------\n");
 
@@ -498,10 +501,11 @@ void multiple_iteration_PR(struct GraphCSR *graph,
   printf("| %-9f | \n", Seconds(timer));
   printf(" -----------------------------------------------------\n");
   for (uint32_t i = 0; i < graph->num_vertices; i++) {
-    printf("%u \n", static_cast<uint32_t *>(
-                        graphAuxiliary->auxiliary_2)[i + graph->num_vertices]);
+    DEBUG_PRINT("%u \n",
+                static_cast<uint32_t *>(
+                    graphAuxiliary->auxiliary_2)[i + graph->num_vertices]);
   }
-  printf(" -----------------------------------------------------\n");
+  DEBUG_PRINT(" -----------------------------------------------------\n");
 }
 
 void multiple_iteration_TC(struct GraphCSR *graph,
@@ -545,10 +549,11 @@ void multiple_iteration_TC(struct GraphCSR *graph,
   printf("| %-9f | \n", Seconds(timer));
   printf(" -----------------------------------------------------\n");
   for (uint32_t i = 0; i < graph->num_vertices; i++) {
-    printf("%u \n", static_cast<uint32_t *>(
-                        graphAuxiliary->auxiliary_2)[i + graph->num_vertices]);
+    DEBUG_PRINT("%u \n",
+                static_cast<uint32_t *>(
+                    graphAuxiliary->auxiliary_2)[i + graph->num_vertices]);
   }
-  printf(" -----------------------------------------------------\n");
+  DEBUG_PRINT(" -----------------------------------------------------\n");
 
   count = static_cast<uint32_t *>(graphAuxiliary->auxiliary_2)[1];
   printf("| count %-9u | \n", count);
@@ -600,7 +605,8 @@ void multiple_iteration_BFS(struct GraphCSR *graph,
     printf("| %-9f | \n", Seconds(timer));
     printf(" -----------------------------------------------------\n");
     for (uint32_t i = 0; i < graph->num_vertices; i++) {
-      printf("%u \n", static_cast<uint32_t *>(graphAuxiliary->auxiliary_1)[i]);
+      DEBUG_PRINT("%u \n",
+                  static_cast<uint32_t *>(graphAuxiliary->auxiliary_1)[i]);
       frontier += static_cast<uint32_t *>(
           graphAuxiliary->auxiliary_2)[graph->num_vertices + i];
       static_cast<uint32_t *>(
@@ -659,7 +665,8 @@ void multiple_iteration_CC(struct GraphCSR *graph,
     printf("| %-9f | \n", Seconds(timer));
     printf(" -----------------------------------------------------\n");
     for (uint32_t i = 0; i < graph->num_vertices; i++) {
-      printf("%u \n", static_cast<uint32_t *>(graphAuxiliary->auxiliary_1)[i]);
+      DEBUG_PRINT("%u \n",
+                  static_cast<uint32_t *>(graphAuxiliary->auxiliary_1)[i]);
     }
     change = static_cast<uint32_t *>(graphAuxiliary->auxiliary_2)[1];
     printf("| change %-9u | \n", change);
@@ -834,7 +841,7 @@ void initialize_BFS_auxiliary_struct(struct GraphCSR *graph,
 void free_auxiliary_struct(struct GraphAuxiliary *graphAuxiliary) {
   if (graphAuxiliary) {
     if (graphAuxiliary->auxiliary_1) {
-      free(graphAuxiliary->auxiliary_2); // Use free for memory allocated with
+      free(graphAuxiliary->auxiliary_1); // Use free for memory allocated with
                                          // aligned_alloc
     }
     if (graphAuxiliary->auxiliary_2) {
