@@ -386,10 +386,10 @@ int main(int argc, char **argv) {
   switch (arguments->algorithm) {
   case 0: // bfs
   {
-    struct BFSStats *stats = runBreadthFirstSearchAlgorithm(arguments, graph);
+    // struct BFSStats *stats = runBreadthFirstSearchAlgorithm(arguments, graph);
     initialize_BFS_auxiliary_struct(graph, graphAuxiliary, arguments);
     multiple_iteration_BFS(graph, graphAuxiliary, arguments, timer);
-    freeBFSStats(stats);
+    // freeBFSStats(stats);
   } break;
   case 1: // pagerank
   {
