@@ -84,7 +84,7 @@ void xrtGLAYHandle::setupGLAYDevice() {
   case 1:
   case 2:
     kernelHandle = xrt::kernel(deviceHandle, xclbinUUID, kernelNameFull.c_str(),
-                               xrt::kernel::cu_access_mode::shared);
+                               xrt::kernel::cu_access_mode::exclusive);
     break;
   default:
     ipHandle = xrt::ip(deviceHandle, xclbinUUID, kernelNameFull.c_str());

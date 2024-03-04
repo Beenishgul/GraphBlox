@@ -30,7 +30,7 @@ extern "C" {
 }
 #endif
 
-// #define DEBUG_LOG 0
+#define DEBUG_LOG 1
 
 #ifdef DEBUG_LOG
 #define DEBUG_PRINT(...) printf(__VA_ARGS__)
