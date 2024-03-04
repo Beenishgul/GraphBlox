@@ -60,18 +60,15 @@ void xrtGLAYHandle::setupGLAYDevice() {
   xclbinUUID = deviceHandle.load_xclbin(xclbinPath);
   xclbinHandle = xrt::xclbin(xclbinPath);
 
-  if (ctrlMode == 0) {
-    for (auto &kernel : xclbinHandle.get_kernels()) {
-      if (kernel.get_name() == kernelNameFull) {
-        cuHandles = kernel.get_cus();
-      }
+  for (auto &kernel : xclbinHandle.get_kernels()) {
+    if (kernel.get_name() == kernelName) {
+      cuHandles = kernel.get_cus();
     }
-
-    if (cuHandles.empty())
-      throw std::runtime_error(
-          std::string("IP ") + kernelName +
-          std::string(" not found in the provided xclbin"));
   }
+
+  if (cuHandles.empty())
+    throw std::runtime_error(std::string("IP ") + kernelName +
+                             std::string(" not found in the provided xclbin"));
 
   for (auto &mem : xclbinHandle.get_mems()) {
     if (mem.get_used()) {
@@ -87,7 +84,7 @@ void xrtGLAYHandle::setupGLAYDevice() {
   case 1:
   case 2:
     kernelHandle =
-        xrt::kernel(deviceHandle, xclbinUUID, kernelNameFull.c_str());
+        xrt::kernel(deviceHandle, xclbinUUID, kernelNameFull.c_str(), xrt::kernel::cu_access_mode::shared);
     break;
   default:
     ipHandle = xrt::ip(deviceHandle, xclbinUUID, kernelNameFull.c_str());
@@ -156,18 +153,15 @@ void xrtGLAYHandle::printGLAYDevice() const {
   printf("OVERLAY::PROGRAM_ENTRIES        [%d]\n", overlay_program_entries);
   printf("OVERLAY::PATH                   [%s]\n", overlayPath.c_str());
   printf("-----------------------------------------------------\n");
-
-  if (ctrlMode == 0) {
-    printf("KERNEL::ARGUMENTS::OFFSETS:     [%ld]\n",
-           cuHandles[0].get_args().size());
-    printf("-----------------------------------------------------\n");
-    uint32_t i = 0;
-    for (auto it : cuHandles[0].get_args()) {
-      printf("ARG[%u]-[0x%03lX]\n", i, it.get_offset());
-      i++;
-    }
-    printf("-----------------------------------------------------\n");
+  printf("KERNEL::ARGUMENTS::OFFSETS:     [%ld]\n",
+         cuHandles[cu_id].get_args().size());
+  printf("-----------------------------------------------------\n");
+  uint32_t i = 0;
+  for (auto it : cuHandles[cu_id].get_args()) {
+    printf("ARG[%u]-[0x%03lX]\n", i, it.get_offset());
+    i++;
   }
+  printf("-----------------------------------------------------\n");
 }
 
 // ********************************************************************************************
@@ -391,7 +385,7 @@ int GLAYxrtBufferHandlePerKernel::readGLAYDeviceToHostBuffersPerKernel() {
 
 int GLAYxrtBufferHandlePerKernel::
     writeRegistersAddressGLAYHostToDeviceBuffersPerKernel() {
-  auto args = glayHandle->cuHandles[0].get_args();
+  auto args = glayHandle->cuHandles[glayHandle->cu_id].get_args();
   printf("IP::START::GLAYxrtBufferHandlePerKernel::"
          "writeRegistersAddressGLAYHostToDeviceBuffersPerKernel");
   for (int i = 0; i < xrt_buffers_num; i++) {

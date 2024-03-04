@@ -1232,7 +1232,7 @@ module __KERNEL___testbench ();
 
         localparam int NUM_GRAPHS = 1; // Adjust based on actual needs
         GraphInitTuple graphInitParams_TEST[NUM_GRAPHS] = '{
-            {"TEST", "v500_e500", "graph.bin"}
+            {"TEST", "v300_e2730", "graph.wbin"}
         };
 
         function automatic void initialize_GraphCSR_Tuple (ref GraphCSR graph, GraphInitTuple graphInitParams, input integer unsigned source = _ROOT_);
