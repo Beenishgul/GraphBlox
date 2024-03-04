@@ -354,8 +354,13 @@ int GLAYxrtBufferHandlePerKernel::writeGLAYHostToDeviceBuffersPerKernel() {
          "writeGLAYHostToDeviceBuffersPerKernel\n");
   for (int i = 0; i < xrt_buffers_num; i++) {
     xrt_buffer_object[i].write(xrt_buffer_host[i], xrt_buffer_size[i], 0);
+    printf("WRITE::XCL_BO_SYNC_BO_TO_DEVICE xrt_buffer_object[%d] "
+           "xrt_buffer_size[%ld]\n",
+           i, xrt_buffer_size[i]);
+  }
+  for (int i = 0; i < xrt_buffers_num; i++) {
     xrt_buffer_object[i].sync(XCL_BO_SYNC_BO_TO_DEVICE, xrt_buffer_size[i], 0);
-    printf("WRITE::SYNC::XCL_BO_SYNC_BO_TO_DEVICE xrt_buffer_object[%d] "
+    printf("SYNC::XCL_BO_SYNC_BO_TO_DEVICE xrt_buffer_object[%d] "
            "xrt_buffer_size[%ld]\n",
            i, xrt_buffer_size[i]);
   }

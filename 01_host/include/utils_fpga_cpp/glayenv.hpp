@@ -66,7 +66,8 @@ public:
   xrt::uuid xclbinUUID;
   xrt::xclbin xclbinHandle;
   xrt::xclbin::mem mem_used;
-
+  // xrt::ip::interrupt interruptHandle;
+  
   // Constructor to initialize the device with arguments
   xrtGLAYHandle(struct Arguments *arguments);
   // Destructor to clean up resources if necessary
