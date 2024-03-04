@@ -615,7 +615,7 @@
         "synth_strategy" : "1",
         "frequency"      : "300000000",
         "frequency_scale": "1",
-        "ctrl_mode"      : "AP_CTRL_HS",
+        "ctrl_mode"      : "USER_MANAGED",
         "num_kernels"    : "4",
         "xpm_fifo"       : "3",
         "slr_percent"    : [33, 33, 33, 0],
