@@ -83,8 +83,8 @@ void xrtGLAYHandle::setupGLAYDevice() {
     break;
   case 1:
   case 2:
-    kernelHandle =
-        xrt::kernel(deviceHandle, xclbinUUID, kernelNameFull.c_str(), xrt::kernel::cu_access_mode::shared);
+    kernelHandle = xrt::kernel(deviceHandle, xclbinUUID, kernelNameFull.c_str(),
+                               xrt::kernel::cu_access_mode::shared);
     break;
   default:
     ipHandle = xrt::ip(deviceHandle, xclbinUUID, kernelNameFull.c_str());
@@ -115,53 +115,55 @@ void xrtGLAYHandle::readGLAYDeviceEntriesFromFile() {
 }
 
 void xrtGLAYHandle::printGLAYDevice() const {
-  printf("\n-----------------------------------------------------\n");
-  printf("DEVICE::BDF                     [%s]\n",
-         deviceHandle.get_info<xrt::info::device::bdf>().c_str());
-  printf("DEVICE::INDEX                   [%u]\n", deviceIndex);
-  printf("DEVICE::MAX_CLOCK_FREQUENCY_MHZ [%ld]\n",
-         deviceHandle.get_info<xrt::info::device::max_clock_frequency_mhz>());
-  printf("DEVICE::NAME                    [%s]\n",
-         deviceHandle.get_info<xrt::info::device::name>().c_str());
-  printf("\n-----------------------------------------------------\n");
+  DEBUG_PRINT("\n-----------------------------------------------------\n");
+  DEBUG_PRINT("DEVICE::BDF                     [%s]\n",
+              deviceHandle.get_info<xrt::info::device::bdf>().c_str());
+  DEBUG_PRINT("DEVICE::INDEX                   [%u]\n", deviceIndex);
+  DEBUG_PRINT(
+      "DEVICE::MAX_CLOCK_FREQUENCY_MHZ [%ld]\n",
+      deviceHandle.get_info<xrt::info::device::max_clock_frequency_mhz>());
+  DEBUG_PRINT("DEVICE::NAME                    [%s]\n",
+              deviceHandle.get_info<xrt::info::device::name>().c_str());
+  DEBUG_PRINT("\n-----------------------------------------------------\n");
 
   switch (ctrlMode) {
   case 0: // UserManaged
-    printf("KERNEL::CONTROL::MODE           [USER_MANAGED]\n");
+    DEBUG_PRINT("KERNEL::CONTROL::MODE           [USER_MANAGED]\n");
     break;
   case 1: // CtrlHS
-    printf("KERNEL::CONTROL::MODE           [AP_CTRL_HS]\n");
+    DEBUG_PRINT("KERNEL::CONTROL::MODE           [AP_CTRL_HS]\n");
     break;
   case 2: // CtrlChain
-    printf("KERNEL::CONTROL::MODE           [AP_CTRL_CHAIN]\n");
+    DEBUG_PRINT("KERNEL::CONTROL::MODE           [AP_CTRL_CHAIN]\n");
     break;
   default:
-    printf("KERNEL::CONTROL::MODE           [USER_MANAGED]\n");
+    DEBUG_PRINT("KERNEL::CONTROL::MODE           [USER_MANAGED]\n");
     break;
   }
 
-  printf("KERNEL::CACHE::SIZE             [%d]\n", cacheSize);
-  printf("KERNEL::NAME                    [%s]\n", kernelName.c_str());
-  printf("KERNEL::NAME::FULL              [%s]\n", kernelNameFull.c_str());
-  printf("KERNEL::THREADS::NUM            [%d]\n", numThreads);
-  printf("KERNEL::XCLBIN::PATH            [%s]\n", xclbinPath.c_str());
-  printf("KERNEL::ENDIAN::READ            [%d]\n", endian_read);
-  printf("KERNEL::ENDIAN::WRITE           [%d]\n", endian_write);
-  printf("KERNEL::FLUSH::ENABLE           [%d]\n", flush_enable);
-  printf("-----------------------------------------------------\n");
-  printf("OVERLAY::ALGORITHM              [%d]\n", overlay_algorithm);
-  printf("OVERLAY::PROGRAM_ENTRIES        [%d]\n", overlay_program_entries);
-  printf("OVERLAY::PATH                   [%s]\n", overlayPath.c_str());
-  printf("-----------------------------------------------------\n");
-  printf("KERNEL::ARGUMENTS::OFFSETS:     [%ld]\n",
-         cuHandles[cu_id].get_args().size());
-  printf("-----------------------------------------------------\n");
+  DEBUG_PRINT("KERNEL::CACHE::SIZE             [%d]\n", cacheSize);
+  DEBUG_PRINT("KERNEL::NAME                    [%s]\n", kernelName.c_str());
+  DEBUG_PRINT("KERNEL::NAME::FULL              [%s]\n", kernelNameFull.c_str());
+  DEBUG_PRINT("KERNEL::THREADS::NUM            [%d]\n", numThreads);
+  DEBUG_PRINT("KERNEL::XCLBIN::PATH            [%s]\n", xclbinPath.c_str());
+  DEBUG_PRINT("KERNEL::ENDIAN::READ            [%d]\n", endian_read);
+  DEBUG_PRINT("KERNEL::ENDIAN::WRITE           [%d]\n", endian_write);
+  DEBUG_PRINT("KERNEL::FLUSH::ENABLE           [%d]\n", flush_enable);
+  DEBUG_PRINT("-----------------------------------------------------\n");
+  DEBUG_PRINT("OVERLAY::ALGORITHM              [%d]\n", overlay_algorithm);
+  DEBUG_PRINT("OVERLAY::PROGRAM_ENTRIES        [%d]\n",
+              overlay_program_entries);
+  DEBUG_PRINT("OVERLAY::PATH                   [%s]\n", overlayPath.c_str());
+  DEBUG_PRINT("-----------------------------------------------------\n");
+  DEBUG_PRINT("KERNEL::ARGUMENTS::OFFSETS:     [%ld]\n",
+              cuHandles[cu_id].get_args().size());
+  DEBUG_PRINT("-----------------------------------------------------\n");
   uint32_t i = 0;
   for (auto it : cuHandles[cu_id].get_args()) {
-    printf("ARG[%u]-[0x%03lX]\n", i, it.get_offset());
+    DEBUG_PRINT("ARG[%u]-[0x%03lX]\n", i, it.get_offset());
     i++;
   }
-  printf("-----------------------------------------------------\n");
+  DEBUG_PRINT("-----------------------------------------------------\n");
 }
 
 // ********************************************************************************************
@@ -178,8 +180,8 @@ GLAYxrtBufferHandlePerKernel::GLAYxrtBufferHandlePerKernel(
   glayHandle = new xrtGLAYHandle(arguments);
 
   if (glayHandle == NULL) {
-    printf("193::ERROR::GLAYxrtBufferHandlePerKernel::glayHandle = new "
-           "xrtGLAYHandle(arguments);\n");
+    DEBUG_PRINT("183::ERROR::GLAYxrtBufferHandlePerKernel::glayHandle = new "
+                "xrtGLAYHandle(arguments);\n");
   } else {
     glayHandle->printGLAYDevice();
   }
@@ -195,7 +197,7 @@ GLAYxrtBufferHandlePerKernel::GLAYxrtBufferHandlePerKernel(
       xrt_buffer_object[i] =
           xrt::bo(glayHandle->deviceHandle, xrt_buffer_size[i],
                   glayHandle->mem_used.get_index());
-      printf(
+      DEBUG_PRINT(
           "IP::Buffer::Allocate::xrt::bo xrt_buffer_object[%d] BankGroup[%d]\n",
           i, glayHandle->mem_used.get_index());
     }
@@ -206,9 +208,9 @@ GLAYxrtBufferHandlePerKernel::GLAYxrtBufferHandlePerKernel(
       xrt_buffer_object[i] =
           xrt::bo(glayHandle->deviceHandle, xrt_buffer_size[i],
                   glayHandle->kernelHandle.group_id(i));
-      printf("KERNEL::Buffer allocate(xrt::bo) xrt_buffer_object[%d] "
-             "BankGroup[%d]\n",
-             i, glayHandle->kernelHandle.group_id(i));
+      DEBUG_PRINT("KERNEL::Buffer allocate(xrt::bo) xrt_buffer_object[%d] "
+                  "BankGroup[%d]\n",
+                  i, glayHandle->kernelHandle.group_id(i));
     }
 
   } break;
@@ -217,9 +219,9 @@ GLAYxrtBufferHandlePerKernel::GLAYxrtBufferHandlePerKernel(
       xrt_buffer_object[i] =
           xrt::bo(glayHandle->deviceHandle, xrt_buffer_size[i],
                   arguments->bankGroupIndex);
-      printf("DEFAULT::IP::Buffer allocate(xrt::bo) xrt_buffer_object[%d] "
-             "BankGroup[%d]\n",
-             i, glayHandle->mem_used.get_index());
+      DEBUG_PRINT("DEFAULT::IP::Buffer allocate(xrt::bo) xrt_buffer_object[%d] "
+                  "BankGroup[%d]\n",
+                  i, glayHandle->mem_used.get_index());
     }
 
   } break;
@@ -244,30 +246,31 @@ GLAYxrtBufferHandlePerKernel::GLAYxrtBufferHandlePerKernel(
       (uint64_t)(glayHandle->flush_enable << 2) |
       ((uint64_t)glayHandle->endian_write << 1) |
       (uint64_t)glayHandle->endian_read;
-  printf("-----------------------------------------------------\n");
+  DEBUG_PRINT("-----------------------------------------------------\n");
   for (int i = 0; i < xrt_buffers_num - 1; i++) {
     xrt_buffer_device[i] = xrt_buffer_object[i].address();
-    printf("SETUP::XRT-BUFFER-ID %-4u : DEVICE[0x%016lX] SIZE-BYTES[%-10lu], "
-           "SYNC[%-1d]\n",
-           i, xrt_buffer_device[i], xrt_buffer_size[i],
-           xrt_buffer_sync.test(i));
+    DEBUG_PRINT(
+        "SETUP::XRT-BUFFER-ID %-4u : DEVICE[0x%016lX] SIZE-BYTES[%-10lu], "
+        "SYNC[%-1d]\n",
+        i, xrt_buffer_device[i], xrt_buffer_size[i], xrt_buffer_sync.test(i));
   }
-  printf("SETUP::XRT-BUFFER-ID %-4u : DEVICE[0x%016lX] SIZE-BYTES[%-10lu], "
-         "SYNC[%-1d]\n",
-         xrt_buffers_num - 1, xrt_buffer_device[xrt_buffers_num - 1],
-         xrt_buffer_size[xrt_buffers_num - 1],
-         xrt_buffer_sync.test(xrt_buffers_num - 1));
-  printf("-----------------------------------------------------\n");
+  DEBUG_PRINT(
+      "SETUP::XRT-BUFFER-ID %-4u : DEVICE[0x%016lX] SIZE-BYTES[%-10lu], "
+      "SYNC[%-1d]\n",
+      xrt_buffers_num - 1, xrt_buffer_device[xrt_buffers_num - 1],
+      xrt_buffer_size[xrt_buffers_num - 1],
+      xrt_buffer_sync.test(xrt_buffers_num - 1));
+  DEBUG_PRINT("-----------------------------------------------------\n");
   // ********************************************************************************************
   // ***************                  Setup Host pointers **************
   // ********************************************************************************************
   initializeGLAYOverlayConfiguration(graph);
   assignGraphtoXRTBufferHost(graph, graphAuxiliary);
-  printf("SETUP::GLAYxrtBufferHandlePerKernel::"
-         "initializeGLAYOverlayConfiguration\n");
-  printf("SETUP::GLAYxrtBufferHandlePerKernel::"
-         "assignGraphtoXRTBufferHost\n");
-  printf("-----------------------------------------------------\n");
+  DEBUG_PRINT("SETUP::GLAYxrtBufferHandlePerKernel::"
+              "initializeGLAYOverlayConfiguration\n");
+  DEBUG_PRINT("SETUP::GLAYxrtBufferHandlePerKernel::"
+              "assignGraphtoXRTBufferHost\n");
+  DEBUG_PRINT("-----------------------------------------------------\n");
   // ********************************************************************************************
 }
 
@@ -286,8 +289,8 @@ void GLAYxrtBufferHandlePerKernel::SetSyncBuffersBasedOnString(
 void GLAYxrtBufferHandlePerKernel::assignGraphtoXRTBufferSize(
     struct GraphCSR *graph, struct GraphAuxiliary *graphAuxiliary) {
 
-  printf("IP::START::GLAYxrtBufferHandlePerKernel::"
-         "assignGraphtoXRTBufferSize\n");
+  DEBUG_PRINT("IP::START::GLAYxrtBufferHandlePerKernel::"
+              "assignGraphtoXRTBufferSize\n");
   if (xrt_buffers_num <= 10) // Adjust based on actual size
   {
     overlay_program_entries = glayHandle->overlay_program_entries;
@@ -306,8 +309,8 @@ void GLAYxrtBufferHandlePerKernel::assignGraphtoXRTBufferSize(
   } else {
     // Handle error or invalid `xrt_buffers_num` value
   }
-  printf("IP::DONE::GLAYxrtBufferHandlePerKernel::"
-         "assignGraphtoXRTBufferSize\n");
+  DEBUG_PRINT("IP::DONE::GLAYxrtBufferHandlePerKernel::"
+              "assignGraphtoXRTBufferSize\n");
 }
 
 void GLAYxrtBufferHandlePerKernel::prinGraphtoXRTBufferSize() const {
@@ -350,22 +353,22 @@ void GLAYxrtBufferHandlePerKernel::assignGraphtoXRTBufferHost(
 }
 
 int GLAYxrtBufferHandlePerKernel::writeGLAYHostToDeviceBuffersPerKernel() {
-  printf("IP::START::GLAYxrtBufferHandlePerKernel::"
-         "writeGLAYHostToDeviceBuffersPerKernel\n");
+  DEBUG_PRINT("IP::START::GLAYxrtBufferHandlePerKernel::"
+              "writeGLAYHostToDeviceBuffersPerKernel\n");
   for (int i = 0; i < xrt_buffers_num; i++) {
     xrt_buffer_object[i].write(xrt_buffer_host[i], xrt_buffer_size[i], 0);
-    printf("WRITE::XCL_BO_SYNC_BO_TO_DEVICE xrt_buffer_object[%d] "
-           "xrt_buffer_size[%ld]\n",
-           i, xrt_buffer_size[i]);
+    DEBUG_PRINT("WRITE::XCL_BO_SYNC_BO_TO_DEVICE xrt_buffer_object[%d] "
+                "xrt_buffer_size[%ld]\n",
+                i, xrt_buffer_size[i]);
   }
   for (int i = 0; i < xrt_buffers_num; i++) {
     xrt_buffer_object[i].sync(XCL_BO_SYNC_BO_TO_DEVICE, xrt_buffer_size[i], 0);
-    printf("SYNC::XCL_BO_SYNC_BO_TO_DEVICE xrt_buffer_object[%d] "
-           "xrt_buffer_size[%ld]\n",
-           i, xrt_buffer_size[i]);
+    DEBUG_PRINT("SYNC::XCL_BO_SYNC_BO_TO_DEVICE xrt_buffer_object[%d] "
+                "xrt_buffer_size[%ld]\n",
+                i, xrt_buffer_size[i]);
   }
-  printf("IP::DONE::GLAYxrtBufferHandlePerKernel::"
-         "writeGLAYHostToDeviceBuffersPerKernel\n");
+  DEBUG_PRINT("IP::DONE::GLAYxrtBufferHandlePerKernel::"
+              "writeGLAYHostToDeviceBuffersPerKernel\n");
   return 0;
 }
 
@@ -391,20 +394,20 @@ int GLAYxrtBufferHandlePerKernel::readGLAYDeviceToHostBuffersPerKernel() {
 int GLAYxrtBufferHandlePerKernel::
     writeRegistersAddressGLAYHostToDeviceBuffersPerKernel() {
   auto args = glayHandle->cuHandles[glayHandle->cu_id].get_args();
-  printf("IP::START::GLAYxrtBufferHandlePerKernel::"
-         "writeRegistersAddressGLAYHostToDeviceBuffersPerKernel");
+  DEBUG_PRINT("IP::START::GLAYxrtBufferHandlePerKernel::"
+              "writeRegistersAddressGLAYHostToDeviceBuffersPerKernel");
   for (int i = 0; i < xrt_buffers_num; i++) {
     glayHandle->ipHandle.write_register(args[i].get_offset(),
                                         xrt_buffer_device[i]);
     glayHandle->ipHandle.write_register((args[i].get_offset() + 4),
                                         xrt_buffer_device[i] >> 32);
-    printf("IP::WRITE::REGISTER::ARGS[%d] RHS-OFFSET[0x%08lX][0x%08lX] "
-           "LHS-OFFSET[0x%08lX][0x%08lX]",
-           i, (args[i].get_offset() + 4), (xrt_buffer_device[i] >> 32),
-           args[i].get_offset(), xrt_buffer_device[i]);
+    DEBUG_PRINT("IP::WRITE::REGISTER::ARGS[%d] RHS-OFFSET[0x%08lX][0x%08lX] "
+                "LHS-OFFSET[0x%08lX][0x%08lX]\n",
+                i, (args[i].get_offset() + 4), (xrt_buffer_device[i] >> 32),
+                args[i].get_offset(), xrt_buffer_device[i]);
   }
-  printf("IP::DONE::GLAYxrtBufferHandlePerKernel::"
-         "writeRegistersAddressGLAYHostToDeviceBuffersPerKernel\n");
+  DEBUG_PRINT("IP::DONE::GLAYxrtBufferHandlePerKernel::"
+              "writeRegistersAddressGLAYHostToDeviceBuffersPerKernel\n");
   return 0;
 }
 
@@ -469,16 +472,17 @@ void GLAYxrtBufferHandlePerKernel::initializeGLAYOverlayConfiguration(
 
 void GLAYxrtBufferHandlePerKernel::printGLAYxrtBufferHandlePerKernel() {
   for (uint32_t i = 0; i < 10; ++i) {
-    printf("XRT-BUFFER-ID %-4u : HOST[%16p] DEVICE[0x%016lX] SIZE-BYTES[%lu], "
-           "SYNC[%d]\n",
-           i, xrt_buffer_host[i], xrt_buffer_device[i], xrt_buffer_size[i],
-           xrt_buffer_sync.test(i));
+    DEBUG_PRINT(
+        "XRT-BUFFER-ID %-4u : HOST[%16p] DEVICE[0x%016lX] SIZE-BYTES[%lu], "
+        "SYNC[%d]\n",
+        i, xrt_buffer_host[i], xrt_buffer_device[i], xrt_buffer_size[i],
+        xrt_buffer_sync.test(i));
   }
 
-  printf("\nCURRENT OVERLAY CONFIGURATION ... \n");
+  DEBUG_PRINT("\nCURRENT OVERLAY CONFIGURATION ... \n");
 
   for (int j = 0; j < overlay_program_entries; j++) {
-    printf("[0x%08X] - current...entry[%u]\n", overlay_program[j], j);
+    DEBUG_PRINT("[0x%08X] - current...entry[%u]\n", overlay_program[j], j);
   }
 }
 
@@ -571,10 +575,10 @@ void GLAYxrtBufferHandlePerKernel::startGLAYUserManaged() {
 
   do {
     glay_control_read = glayHandle->ipHandle.read_register(CONTROL_OFFSET);
-    printf("MSG::UserManaged::START-[0x%08X] \n", glay_control_read);
+    DEBUG_PRINT("MSG::UserManaged::START-[0x%08X] \n", glay_control_read);
   } while (!(glay_control_read & CONTROL_READY));
 
-  printf("MSG::UserManaged::WAIT-[0x%08X] \n", glay_control_read);
+  DEBUG_PRINT("MSG::UserManaged::WAIT-[0x%08X] \n", glay_control_read);
 }
 
 void GLAYxrtBufferHandlePerKernel::waitGLAYUserManaged() {
@@ -582,10 +586,10 @@ void GLAYxrtBufferHandlePerKernel::waitGLAYUserManaged() {
 
   do {
     glay_control_read = glayHandle->ipHandle.read_register(CONTROL_OFFSET);
-    // printf("MSG: WAIT-[0x%08X] \n", glay_control_read);
+    // DEBUG_PRINT("MSG: WAIT-[0x%08X] \n", glay_control_read);
   } while (!(glay_control_read & CONTROL_IDLE));
 
-  printf("MSG::UserManaged::WAIT-[0x%08X] \n", glay_control_read);
+  DEBUG_PRINT("MSG::UserManaged::WAIT-[0x%08X] \n", glay_control_read);
 }
 
 void GLAYxrtBufferHandlePerKernel::releaseGLAYUserManaged() {
