@@ -57,17 +57,12 @@ GLay is a promising new approach to graph processing on FPGAs. It has the potent
 The design has been verified with the following software/hardware environment and tool chain versions:  
 * Hardware and Platform for your Alveo card (you need both the deployment and development platforms):
   * Alveo U250: xilinx_u250_gen3x16_xdma_4_1_202210_1
-    * XRT: 2.13.466 
-    * Vitis: 2022.1
-    * Operating Systems:
-      * Ubuntu 20.04 (See [Additional Requirements for Ubuntu](#cpu-dependencies))
-      * GCC 9
-  * Alveo U280: xilinx_u280_xdma_201920_3
-    * XRT: 2.15.634
+  * Alveo U280: xilinx_u280_gen3x16_xdma_1_202211_1
+    * XRT: 2.15.225
     * Vitis: 2023.1
     * Operating Systems:
       * Ubuntu 22.04 (See [Additional Requirements for Ubuntu](#cpu-dependencies))
-      * GCC 9
+      * GCC 11
 * Perl package installed for Verilog simulation (**required**)
 
 ## CPU Dependencies
