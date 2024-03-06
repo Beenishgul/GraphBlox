@@ -110,14 +110,14 @@ void GLAYxrtBufferHandlePerKernel::mapGLAYOverlayProgramBuffersTC(struct GraphCS
     overlay_program[139] = ( 0 );
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
-// Name ENGINE_MERGE_DATA             ID 16   mapping 4    cycles 2    None-None ( 0 )-( 0 )
+// Name ENGINE_MERGE_DATA             ID 16   mapping 4    cycles 3    None-None ( 0 )-( 0 )
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
 // Name ENGINE_READ_WRITE             ID 17   mapping 1    cycles 7    buffer_3-edges_idx ( 0 )-( graph->num_vertices )
 // --------------------------------------------------------------------------------------
    // --  0  - Index_Start
-    overlay_program[148] = ( 0 );
+    overlay_program[149] = ( 0 );
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
 // Name ENGINE_FORWARD_DATA           ID 18   mapping 6    cycles 0    None-None ( 0 )-( 0 )
@@ -126,4 +126,4 @@ void GLAYxrtBufferHandlePerKernel::mapGLAYOverlayProgramBuffersTC(struct GraphCS
 }
 // --------------------------------------------------------------------------------------
 // -->  CPP.Single.TC  <-- 
-// Number of entries 155
+// Number of entries 156

@@ -209,21 +209,22 @@
 0x00000000 // entry 145  cacheline 9    offset 1    -- // entry_28   cacheline[  1][12] <16b>: ops_mask[0:15]=0x0000
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
-// Name ENGINE_MERGE_DATA             ID 16   mapping 4    cycles 2    None-None ( 0 )-( 0 )
+// Name ENGINE_MERGE_DATA             ID 16   mapping 4    cycles 3    None-None ( 0 )-( 0 )
 // --------------------------------------------------------------------------------------
 0x00000000 // entry 146  cacheline 9    offset 2    -- // entry_0    cacheline[  0][ 0] < 4b>: merge_mask[0:3]=0x0
 0x00000000 // entry 147  cacheline 9    offset 3    -- // entry_1    cacheline[  0][ 1] < 4b>: merge_type[0:3]=0x0
+0x00008421 // entry 148  cacheline 9    offset 4    -- // entry_2    cacheline[  0][ 2] <16b>: ops_mask[0:15]=0x8421
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
 // Name ENGINE_READ_WRITE             ID 17   mapping 1    cycles 7    buffer_3-edges_idx ( 0 )-( graph->num_vertices )
 // --------------------------------------------------------------------------------------
-0x00000000 // entry 148  cacheline 9    offset 4    -- // entry_0    cacheline[  0][ 0] <32b>: index_start[0:31]=0x00000000
-0x00000000 // entry 149  cacheline 9    offset 5    -- // entry_1    cacheline[  0][ 1] <32b>: shift.amount[0:30]=0 || shift.direction[31:31]=0
-0x00000001 // entry 150  cacheline 9    offset 6    -- // entry_2    cacheline[  0][ 2] <30b>: cmd[0:5]=CMD_MEM_INVALID || id_module[6:13]=0x00 || id_engine[14:21]=0x00 || id_channel[22:29]=0x00
-0x00000000 // entry 151  cacheline 9    offset 7    -- // entry_3    cacheline[  0][ 3] <32b>: id_cu[0:7]=0x00 || id_bundle[8:15]=0x00 || id_lane[16:23]=0x00 || id_buffer[24:31]=0x00
-0x00000000 // entry 152  cacheline 9    offset 8    -- // entry_4    cacheline[  0][ 4] < 4b>: const_mask[0:3]=0x0
-0x00000000 // entry 153  cacheline 9    offset 9    -- // entry_5    cacheline[  0][ 5] <32b>: const_value[0:31]=0x00000000
-0x00000000 // entry 154  cacheline 9    offset 10   -- // entry_6    cacheline[  0][ 6] <16b>: ops_mask[0:15]=0x0000
+0x00000000 // entry 149  cacheline 9    offset 5    -- // entry_0    cacheline[  0][ 0] <32b>: index_start[0:31]=0x00000000
+0x00000000 // entry 150  cacheline 9    offset 6    -- // entry_1    cacheline[  0][ 1] <32b>: shift.amount[0:30]=0 || shift.direction[31:31]=0
+0x00000001 // entry 151  cacheline 9    offset 7    -- // entry_2    cacheline[  0][ 2] <30b>: cmd[0:5]=CMD_MEM_INVALID || id_module[6:13]=0x00 || id_engine[14:21]=0x00 || id_channel[22:29]=0x00
+0x00000000 // entry 152  cacheline 9    offset 8    -- // entry_3    cacheline[  0][ 3] <32b>: id_cu[0:7]=0x00 || id_bundle[8:15]=0x00 || id_lane[16:23]=0x00 || id_buffer[24:31]=0x00
+0x00000000 // entry 153  cacheline 9    offset 9    -- // entry_4    cacheline[  0][ 4] < 4b>: const_mask[0:3]=0x0
+0x00000000 // entry 154  cacheline 9    offset 10   -- // entry_5    cacheline[  0][ 5] <32b>: const_value[0:31]=0x00000000
+0x00000000 // entry 155  cacheline 9    offset 11   -- // entry_6    cacheline[  0][ 6] <16b>: ops_mask[0:15]=0x0000
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
 // Name ENGINE_FORWARD_DATA           ID 18   mapping 6    cycles 0    None-None ( 0 )-( 0 )
@@ -231,4 +232,4 @@
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
 // -->  Template.Single.TC  <-- 
-// Number of entries 155
+// Number of entries 156
