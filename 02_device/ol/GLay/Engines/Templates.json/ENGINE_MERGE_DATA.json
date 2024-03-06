@@ -12,6 +12,12 @@
                     "bits": "4",
                     "value": "0x0"
                 }
+            },
+            "entry_2": {
+                "ops_mask": {
+                    "bits": "16",
+                    "value": "0x8421"
+                }
             }
         }
     }
