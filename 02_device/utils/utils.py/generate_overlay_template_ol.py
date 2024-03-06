@@ -1131,7 +1131,7 @@ def process_entries_json_v2(
                 # Replace symbolic values with their corresponding numeric values
                 if isinstance(value, str) and not value.startswith("0x"):
                     original_flag = 1
-                    if param == "id_buffer":
+                    if param in ["id_buffer", "if_id_buffer", "else_id_buffer"] :
                         buffer_index = get_buffer_index(buffers, value)
                         if buffer_index is not None:
                             if buffer_index == 0:
