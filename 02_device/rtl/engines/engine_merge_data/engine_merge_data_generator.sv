@@ -382,22 +382,26 @@ end
 // Generation Logic - Merge data [0-4] -> Gen
 // --------------------------------------------------------------------------------------
 always_ff @(posedge ap_clk) begin
-    generator_engine_request_engine_reg.valid                 <= response_engine_in_int[0].valid;
-    generator_engine_request_engine_reg.payload.meta          <= response_engine_in_int[0].payload.meta;
-    generator_engine_request_engine_reg.payload.data.field[0] <= response_engine_in_int[0].payload.data.field[0];
+    generator_engine_request_engine_reg.valid        <= response_engine_in_int[0].valid;
+    generator_engine_request_engine_reg.payload.meta <= response_engine_in_int[0].payload.meta;
+end
 
-    for (int j=1; j<(1+ENGINE_MERGE_WIDTH); j++) begin
-        if(configure_engine_param_int.merge_mask[j]) begin
-            generator_engine_request_engine_reg.payload.data.field[j] <= response_engine_in_int[j].payload.data.field[0];
+always_ff @(posedge ap_clk) begin
+    for (int i=0; i<(1+ENGINE_MERGE_WIDTH); i++) begin
+        if(configure_engine_param_int.merge_mask[i]) begin
+            for (int j = 0; j<ENGINE_PACKET_DATA_NUM_FIELDS; j++) begin
+                if(configure_engine_param_int.ops_mask[i][j]) begin
+                    generator_engine_request_engine_reg.payload.data.field[j] <= response_engine_in_int[i].payload.data.field[0];
+                end
+            end
         end else begin
-            generator_engine_request_engine_reg.payload.data.field[j] <= response_engine_in_int[0].payload.data.field[j];
+            generator_engine_request_engine_reg.payload.data.field[i] <= response_engine_in_int[0].payload.data.field[i];
         end
     end
 
-    for (int j=(1+ENGINE_MERGE_WIDTH); j<ENGINE_PACKET_DATA_NUM_FIELDS; j++) begin
-        generator_engine_request_engine_reg.payload.data.field[j] <= response_engine_in_int[0].payload.data.field[j];
+    for (int i=(1+ENGINE_MERGE_WIDTH); i<ENGINE_PACKET_DATA_NUM_FIELDS; i++) begin
+        generator_engine_request_engine_reg.payload.data.field[i] <= response_engine_in_int[0].payload.data.field[i];
     end
-
 end
 
 // --------------------------------------------------------------------------------------

@@ -112,8 +112,9 @@ typedef enum logic[10:0] {
 } engine_merge_data_generator_state;
 
 typedef struct packed{
-    logic [ENGINE_PACKET_DATA_NUM_FIELDS-1:0] merge_mask;
-    logic [ENGINE_PACKET_DATA_NUM_FIELDS-1:0] merge_type;
+    logic [ENGINE_PACKET_DATA_NUM_FIELDS-1:0]                                    merge_mask;
+    logic [ENGINE_PACKET_DATA_NUM_FIELDS-1:0]                                    merge_type;
+    logic [ENGINE_PACKET_DATA_NUM_FIELDS-1:0][ENGINE_PACKET_DATA_NUM_FIELDS-1:0] ops_mask  ;
 } MergeDataConfigurationParameters;
 
 typedef struct packed{

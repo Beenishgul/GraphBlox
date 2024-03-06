@@ -633,7 +633,7 @@
             "ENGINE_READ_WRITE"         : [1, 7,  1419, 16, 32, 0,  0],
             "ENGINE_CSR_INDEX"          : [2, 8,  1852, 16, 32, 0, 16],
             "ENGINE_FILTER_COND"        : [3, 9,  1929, 16, 0,  16, 0],
-            "ENGINE_MERGE_DATA"         : [4, 2,  669,  16, 0,  0,  0],
+            "ENGINE_MERGE_DATA"         : [4, 3,  669,  16, 0,  0,  0],
             "ENGINE_ALU_OPS"            : [5, 6,  1802, 16, 0,  0,  0],
             "ENGINE_FORWARD_DATA"       : [6, 0,  409,  16, 0,  0,  0],
             "ENGINE_SET_OPS"            : [7, 2,  669,  16, 0,  0,  0],
@@ -646,7 +646,7 @@
         "ENGINE_READ_WRITE"         : [1, 7,  1419, 16, 32, 0,  0],
         "ENGINE_CSR_INDEX"          : [2, 8,  1852, 16, 32, 0, 16],
         "ENGINE_FILTER_COND"        : [3, 9,  2070, 16, 0,  16, 0],
-        "ENGINE_MERGE_DATA"         : [4, 2,  669,  16, 0,  0,  0],
+        "ENGINE_MERGE_DATA"         : [4, 3,  669,  16, 0,  0,  0],
         "ENGINE_ALU_OPS"            : [5, 6,  1802, 16, 0,  0,  0],
         "ENGINE_FORWARD_DATA"       : [6, 0,  409,  16, 0,  0,  0],
         "ENGINE_PARALLEL_READ_WRITE": [7, 29, 2374, 16, 32, 0,  0]
