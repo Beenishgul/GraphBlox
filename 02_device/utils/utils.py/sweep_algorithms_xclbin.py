@@ -172,7 +172,7 @@ ignore_patterns = read_gitignore_patterns(gitignore_path)
 algorithms = [
     # Format: (algorithm, architecture, capability, Number of Kernels, cache_properties[l2_size, l2_num_ways, l2_ram, l2_ctrl, l1_size, l1_num_ways, l1_buffer, l1_ram], synth_strategy, frequency)
     (
-        1,
+        8,
         "GLay",
         "Single",
         1,
@@ -182,7 +182,7 @@ algorithms = [
         300000000,
     ),
     (
-        1,
+        8,
         "GLay",
         "Single",
         1,
@@ -192,7 +192,7 @@ algorithms = [
         300000000,
     ),
     (
-        1,
+        8,
         "GLay",
         "Single",
         1,
@@ -202,7 +202,7 @@ algorithms = [
         300000000,
     ),
     (
-        1,
+        8,
         "GLay",
         "Single",
         1,
@@ -212,7 +212,7 @@ algorithms = [
         300000000,
     ),
     (
-        1,
+        8,
         "GLay",
         "Single",
         1,
@@ -222,7 +222,7 @@ algorithms = [
         300000000,
     ),
     (
-        1,
+        8,
         "GLay",
         "Single",
         1,
@@ -232,7 +232,7 @@ algorithms = [
         300000000,
     ),
     (
-        1,
+        8,
         "GLay",
         "Single",
         1,
@@ -242,7 +242,7 @@ algorithms = [
         300000000,
     ),
     (
-        1,
+        8,
         "GLay",
         "Single",
         1,
@@ -252,7 +252,7 @@ algorithms = [
         300000000,
     ),
     (
-        1,
+        8,
         "GLay",
         "Single",
         1,

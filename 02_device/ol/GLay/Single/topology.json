@@ -429,9 +429,6 @@
                 "ENGINE_ALU_OPS"
             ],
             [
-                "ENGINE_READ_WRITE(B:out_degree,0,num_vertices)"
-            ],
-            [
                 "ENGINE_CSR_INDEX(B:edges_array_dest,0,num_edges)",
                 "ENGINE_FILTER_COND"
             ],
@@ -441,10 +438,7 @@
         ],
         "3": [
             [
-                "ENGINE_READ_WRITE(B:auxiliary_2,0,num_vertices)"
-            ],
-            [
-                "ENGINE_PARALLEL_READ_WRITE(B:edges_idx,0,num_vertices)(B:out_degree,0,num_vertices)(B:edges_idx,0,num_vertices)(B:edges_idx,0,num_vertices)"
+                "ENGINE_PARALLEL_READ_WRITE(B:edges_idx,0,num_vertices)(B:out_degree,0,num_vertices)(B:edges_idx,0,num_vertices)(B:auxiliary_2,0,num_vertices)"
             ],
             [
                 "ENGINE_FORWARD_DATA"

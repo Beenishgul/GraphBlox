@@ -66,7 +66,7 @@
                 },
                 "id_module": {
                     "bits": "8",
-                    "value": "0x001
+                    "value": "0x001"
                 },
                 "id_engine": {
                     "bits": "8",
@@ -1342,89 +1342,7 @@
     "ENGINE_FORWARD_DATA_12": {
         "entries": {}
     },
-    "ENGINE_READ_WRITE_13": {
-        "type_memory_cmd": {
-            "CMD_MEM_INVALID": 1,
-            "CMD_MEM_READ": 2,
-            "CMD_MEM_WRITE": 4,
-            "CMD_STREAM_READ": 8,
-            "CMD_STREAM_WRITE": 16,
-            "CMD_CACHE_FLUSH": 32
-        },
-        "entries": {
-            "entry_0": {
-                "index_start": {
-                    "bits": "32",
-                    "value": "0x00000000"
-                }
-            },
-            "entry_1": {
-                "shift.amount": {
-                    "bits": "31",
-                    "value": "2"
-                },
-                "shift.direction": {
-                    "bits": "1",
-                    "value": "1"
-                }
-            },
-            "entry_2": {
-                "cmd": {
-                    "bits": "6",
-                    "value": "CMD_MEM_WRITE"
-                },
-                "id_module": {
-                    "bits": "8",
-                    "value": "0x00"
-                },
-                "id_engine": {
-                    "bits": "8",
-                    "value": "0x00"
-                },
-                "id_channel": {
-                    "bits": "8",
-                    "value": "buffer_8"
-                }
-            },
-            "entry_3": {
-                "id_cu": {
-                    "bits": "8",
-                    "value": "0x01"
-                },
-                "id_bundle": {
-                    "bits": "8",
-                    "value": "0x00"
-                },
-                "id_lane": {
-                    "bits": "8",
-                    "value": "0x00"
-                },
-                "id_buffer": {
-                    "bits": "8",
-                    "value": "buffer_8"
-                }
-            },
-            "entry_4": {
-                "const_mask": {
-                    "bits": "4",
-                    "value": "0x2"
-                }
-            },
-            "entry_5": {
-                "const_value": {
-                    "bits": "32",
-                    "value": "0x00000000"
-                }
-            },
-            "entry_6": {
-                "ops_mask": {
-                    "bits": "16",
-                    "value": "0x8421"
-                }
-            }
-        }
-    },
-    "ENGINE_PARALLEL_READ_WRITE_14": {
+    "ENGINE_PARALLEL_READ_WRITE_13": {
         "type_memory_cmd": {
             "CMD_MEM_INVALID": 1,
             "CMD_MEM_READ": 2,
@@ -1437,7 +1355,7 @@
             "entry_0": {
                 "lane_mask": {
                     "bits": "4",
-                    "value": "0x7"
+                    "value": "0xF"
                 },
                 "cast_mask": {
                     "bits": "4",
@@ -1691,17 +1609,17 @@
             "entry_23": {
                 "shift.amount": {
                     "bits": "31",
-                    "value": "0"
+                    "value": "2"
                 },
                 "shift.direction": {
                     "bits": "1",
-                    "value": "0"
+                    "value": "1"
                 }
             },
             "entry_24": {
                 "cmd": {
                     "bits": "6",
-                    "value": "CMD_MEM_INVALID"
+                    "value": "CMD_MEM_WRITE"
                 },
                 "id_module": {
                     "bits": "8",
@@ -1713,13 +1631,13 @@
                 },
                 "id_channel": {
                     "bits": "8",
-                    "value": "0x00"
+                    "value": "buffer_8"
                 }
             },
             "entry_25": {
                 "id_cu": {
                     "bits": "8",
-                    "value": "0x00"
+                    "value": "0x01"
                 },
                 "id_bundle": {
                     "bits": "8",
@@ -1731,13 +1649,13 @@
                 },
                 "id_buffer": {
                     "bits": "8",
-                    "value": "0x00"
+                    "value": "buffer_8"
                 }
             },
             "entry_26": {
                 "const_mask": {
                     "bits": "4",
-                    "value": "0x0"
+                    "value": "0x2"
                 },
                 "op_bundle": {
                     "bits": "8",
@@ -1757,12 +1675,12 @@
             "entry_28": {
                 "ops_mask": {
                     "bits": "16",
-                    "value": "0x00"
+                    "value": "0x8421"
                 }
             }
         }
     },
-    "ENGINE_FORWARD_DATA_15": {
+    "ENGINE_FORWARD_DATA_14": {
         "entries": {}
     }
 }
