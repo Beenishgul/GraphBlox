@@ -70,6 +70,8 @@ ARCHITECTURE = params["ARCHITECTURE"]
 CAPABILITY = params["CAPABILITY"]
 OVERRIDE_TOPOLOGY_JSON = params["OVERRIDE_TOPOLOGY_JSON"]
 DESIGN_FREQ_SCALE = "1"
+DEBUG_IP = "0"
+PROFILE_IP = "0"
 
 # Construct the full path for the file $(APP_DIR_ACTIVE)/$(UTILS_DIR_ACTIVE)/$(KERNEL_NAME)_$(TARGET).topology.json
 config_filename = f"{KERNEL_NAME}_{TARGET}.topology.json"
@@ -139,6 +141,8 @@ if not int(OVERRIDE_TOPOLOGY_JSON):
     XILINX_NUM_KERNELS = config_data["cu_properties"]["num_kernels"]
     DESIGN_FREQ_HZ = config_data["cu_properties"]["frequency"]
     DESIGN_FREQ_SCALE = config_data["cu_properties"]["frequency_scale"]
+    DEBUG_IP = config_data["cu_properties"]["debug"]
+    PROFILE_IP = config_data["cu_properties"]["profile"]
 
 XILINX_MAX_THREADS = int(XILINX_MAX_THREADS)
 XILINX_JOBS_STRATEGY = int(XILINX_JOBS_STRATEGY)
@@ -485,7 +489,7 @@ config += f"log_dir={KERNEL_NAME}.build/logs\n"
 config += "save-temps=1\n"
 config += "link=1\n"
 
-if TARGET == "hw_emu":
+if DEBUG_IP == "1" and TARGET == "hw_emu":
     config += "debug=1\n"
 #     config +=f"""
 # [advanced]
@@ -498,6 +502,28 @@ config += "\n"
 if DESIGN_FREQ_SCALE == "0":
     config += "[clock]\n"
     config += f"defaultFreqHz={DESIGN_FREQ_HZ}\n\n"
+
+if DEBUG_IP == "1" and TARGET == "hw":
+    config += "[debug]\n"
+    config += f"protocol=all:all\n"
+    config += f"chipscope={KERNEL_NAME}_1\n\n"
+
+if PROFILE_IP == "1" and TARGET == "hw":
+    config += "[profile]\n"
+    config += f"""data=all:all:all           # Monitor data on all kernels and CUs
+data=k1:all:all            # Monitor data on all instances of kernel k1
+data=k1:cu2:port3          # Specific CU master
+data=k1:cu2:port3:counters # Specific CU master (counters only, no trace)
+memory=all                 # Monitor transfers for all memories
+memory=<sptag>             # Monitor transfers for the specified memory
+stall=all:all              # Monitor stalls for all CUs of all kernels
+stall=k1:cu2               # Stalls only for cu2
+exec=all:all               # Monitor execution times for all CUs
+exec=k1:cu2                # Execution tims only for cu2
+aie=all                    # Monitor all AIE streams
+aie=DataIn1                # Monitor the specific input stream in the SDF graph
+aie=M02_AXIS               # Monitor specific stream interface
+"""
 
 config += generate_kernel_and_memory_config(
     KERNEL_NAME, config_data, PART, int(XILINX_NUM_KERNELS)
