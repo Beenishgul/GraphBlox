@@ -447,7 +447,7 @@ always_comb begin
 end
 // --------------------------------------------------------------------------------------
 always_comb begin
-    generator_engine_request_control_start_Stage.valid                                 = (filter_flow_int & ~break_running_flow_reg & ~break_done_flow_int) & configure_engine_int.payload.param.break_flag;
+    generator_engine_request_control_start_Stage.valid                                 = (break_start_flow_int & ~break_running_flow_reg & ~break_done_flow_int) & configure_engine_int.payload.param.break_flag;
     generator_engine_request_control_start_Stage.payload.meta.route.packet_destination = response_engine_reg_int.route.sequence_source;
     generator_engine_request_control_start_Stage.payload.meta.route.sequence_state     = SEQUENCE_BREAK;
     generator_engine_request_control_start_Stage.payload.meta.route.sequence_id        = response_engine_reg_int.route.sequence_id;

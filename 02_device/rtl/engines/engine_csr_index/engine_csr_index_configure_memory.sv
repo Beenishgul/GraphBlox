@@ -218,12 +218,15 @@ always_ff @(posedge ap_clk) begin
             (1 << 7) : begin
                 configure_memory_reg.payload.param.array_size <= fifo_response_memory_in_dout_reg.payload.data.field;
             end
-            // (1 << 8)  : begin
-            // end
-            // (1 << 9)  : begin
-            // end
-            // (1 << 10) : begin
-            // end
+            (1 << 8) : begin
+                configure_memory_reg.payload.param.const_mask <= fifo_response_memory_in_dout_reg.payload.data.field[ENGINE_PACKET_DATA_NUM_FIELDS-1:0];
+            end
+            (1 << 9) : begin
+                configure_memory_reg.payload.param.const_value <= fifo_response_memory_in_dout_reg.payload.data.field;
+            end
+            (1 << 10) : begin
+                configure_memory_reg.payload.param.ops_mask <= fifo_response_memory_in_dout_reg.payload.data.field[(ENGINE_PACKET_DATA_NUM_FIELDS*ENGINE_PACKET_DATA_NUM_FIELDS)-1:0];
+            end
             // (1 << 11) : begin
             // end
             // (1 << 12) : begin

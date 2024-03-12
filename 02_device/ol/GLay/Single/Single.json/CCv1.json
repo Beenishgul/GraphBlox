@@ -100,6 +100,24 @@
                     "bits": "32",
                     "value": "0x00000000"
                 }
+            },
+            "entry_8": {
+                "const_mask": {
+                    "bits": "4",
+                    "value": "0x0"
+                }
+            },
+            "entry_9": {
+                "const_value": {
+                    "bits": "32",
+                    "value": "0x00000000"
+                }
+            },
+            "entry_10": {
+                "ops_mask": {
+                    "bits": "16",
+                    "value": "0x0421"
+                }
             }
         }
     },
@@ -852,6 +870,24 @@
                 "array_size": {
                     "bits": "32",
                     "value": "0x00000000"
+                }
+            },
+            "entry_8": {
+                "const_mask": {
+                    "bits": "4",
+                    "value": "0x0"
+                }
+            },
+            "entry_9": {
+                "const_value": {
+                    "bits": "32",
+                    "value": "0x00000000"
+                }
+            },
+            "entry_10": {
+                "ops_mask": {
+                    "bits": "16",
+                    "value": "0x0421"
                 }
             }
         }
