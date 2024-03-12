@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-
+add_wave {{//pfm_top_wrapper/pfm_top_i/pfm_dynamic_inst/glay_kernel_1/inst/inst_kernel_afu/inst_kernel_cu}}
 # add_wave {{/pfm_top_wrapper/pfm_top_i/pfm_dynamic_inst/glay_kernel_1}} 
 log_wave -r *
 run all
