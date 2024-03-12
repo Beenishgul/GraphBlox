@@ -11,7 +11,7 @@
         "entries": {
             "entry_0": {
                 "increment": {
-                    "bits": "0",
+                    "bits": "1",
                     "value": "1"
                 },
                 "decrement": {
@@ -99,6 +99,24 @@
                 "array_size": {
                     "bits": "32",
                     "value": "0x00000000"
+                }
+            },
+            "entry_8": {
+                "const_mask": {
+                    "bits": "4",
+                    "value": "0x0"
+                }
+            },
+            "entry_9": {
+                "const_value": {
+                    "bits": "32",
+                    "value": "0x00000000"
+                }
+            },
+            "entry_10": {
+                "ops_mask": {
+                    "bits": "16",
+                    "value": "0x0421"
                 }
             }
         }
@@ -333,6 +351,24 @@
                     "bits": "32",
                     "value": "0x00000000"
                 }
+            },
+            "entry_8": {
+                "const_mask": {
+                    "bits": "4",
+                    "value": "0x0"
+                }
+            },
+            "entry_9": {
+                "const_value": {
+                    "bits": "32",
+                    "value": "0x00000000"
+                }
+            },
+            "entry_10": {
+                "ops_mask": {
+                    "bits": "16",
+                    "value": "0x0421"
+                }
             }
         }
     },
@@ -408,7 +444,7 @@
                 },
                 "id_lane": {
                     "bits": "8",
-                    "value": "0x04"
+                    "value": "0x02"
                 },
                 "id_buffer": {
                     "bits": "8",
@@ -426,7 +462,7 @@
                 },
                 "op_lane": {
                     "bits": "8",
-                    "value": "0x01"
+                    "value": "0x02"
                 }
             },
             "entry_6": {
@@ -486,7 +522,7 @@
                 },
                 "id_lane": {
                     "bits": "8",
-                    "value": "0x04"
+                    "value": "0x02"
                 },
                 "id_buffer": {
                     "bits": "8",
@@ -504,7 +540,7 @@
                 },
                 "op_lane": {
                     "bits": "8",
-                    "value": "0x01"
+                    "value": "0x02"
                 }
             },
             "entry_13": {
@@ -777,6 +813,24 @@
                 "array_size": {
                     "bits": "32",
                     "value": "0x00000000"
+                }
+            },
+            "entry_8": {
+                "const_mask": {
+                    "bits": "4",
+                    "value": "0x0"
+                }
+            },
+            "entry_9": {
+                "const_value": {
+                    "bits": "32",
+                    "value": "0x00000000"
+                }
+            },
+            "entry_10": {
+                "ops_mask": {
+                    "bits": "16",
+                    "value": "0x0421"
                 }
             }
         }
@@ -1195,7 +1249,7 @@
                 },
                 "id_lane": {
                     "bits": "8",
-                    "value": "0x06"
+                    "value": "0x01"
                 },
                 "id_buffer": {
                     "bits": "8",
@@ -1206,6 +1260,24 @@
                 "array_size": {
                     "bits": "32",
                     "value": "0x00000000"
+                }
+            },
+            "entry_8": {
+                "const_mask": {
+                    "bits": "4",
+                    "value": "0x0"
+                }
+            },
+            "entry_9": {
+                "const_value": {
+                    "bits": "32",
+                    "value": "0x00000000"
+                }
+            },
+            "entry_10": {
+                "ops_mask": {
+                    "bits": "16",
+                    "value": "0x0421"
                 }
             }
         }
@@ -1250,7 +1322,7 @@
             "entry_4": {
                 "ops_mask": {
                     "bits": "16",
-                    "value": "0x4281"
+                    "value": "0x8181"
                 }
             },
             "entry_5": {
@@ -1268,7 +1340,7 @@
                 },
                 "filter_pass": {
                     "bits": "1",
-                    "value": "0"
+                    "value": "1"
                 },
                 "continue_flag": {
                     "bits": "1",
@@ -1294,7 +1366,7 @@
                 },
                 "if_id_lane": {
                     "bits": "8",
-                    "value": "0x06"
+                    "value": "0x01"
                 },
                 "if_id_buffer": {
                     "bits": "8",
@@ -1429,7 +1501,7 @@
                 },
                 "op_lane": {
                     "bits": "8",
-                    "value": "0x04"
+                    "value": "0x02"
                 }
             },
             "entry_6": {
@@ -1507,7 +1579,7 @@
                 },
                 "op_lane": {
                     "bits": "8",
-                    "value": "0x04"
+                    "value": "0x02"
                 }
             },
             "entry_13": {
@@ -1585,7 +1657,7 @@
                 },
                 "op_lane": {
                     "bits": "8",
-                    "value": "0x04"
+                    "value": "0x02"
                 }
             },
             "entry_20": {
@@ -1659,11 +1731,11 @@
                 },
                 "op_bundle": {
                     "bits": "8",
-                    "value": "0x00"
+                    "value": "0x04"
                 },
                 "op_lane": {
                     "bits": "8",
-                    "value": "0x00"
+                    "value": "0x01"
                 }
             },
             "entry_27": {
