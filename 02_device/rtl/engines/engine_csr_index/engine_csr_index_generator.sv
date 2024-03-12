@@ -741,20 +741,6 @@ module engine_csr_index_generator #(parameter
         end
     end
 // --------------------------------------------------------------------------------------
-    // always_comb begin
-    //     fifo_request_comb.payload.data = 0;
-    //     if(configure_engine_int.payload.param.mode_sequence) begin
-    //         for (int j = 0; j<ENGINE_PACKET_DATA_NUM_FIELDS-1; j++) begin
-    //             fifo_request_comb.payload.data.field[j] = configure_engine_int.payload.data.field[j];
-    //         end
-    //         fifo_request_comb.payload.data.field[ENGINE_PACKET_DATA_NUM_FIELDS-1] = counter_count;
-    //     end else begin
-    //         for (int j = 0; j<ENGINE_PACKET_DATA_NUM_FIELDS; j++) begin
-    //             fifo_request_comb.payload.data.field[j] = counter_count;
-    //         end
-    //     end
-    // end
-
     always_comb begin
         fifo_request_comb.payload.data = 0;
         if(configure_engine_int.payload.param.mode_sequence) begin
