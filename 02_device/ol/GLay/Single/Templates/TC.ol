@@ -46,7 +46,7 @@
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
-// Name ENGINE_PARALLEL_READ_WRITE    ID 4    mapping 7    cycles 29   buffer_3-edges_idx ( 0 )-( graph->num_vertices )
+// Name ENGINE_PARALLEL_READ_WRITE    ID 4    mapping 7    cycles 36   buffer_3-edges_idx ( 0 )-( graph->num_vertices )
 // --------------------------------------------------------------------------------------
 0x00000000 // entry 31   cacheline 1    offset 15   -- // entry_0    cacheline[  0][ 0] <12b>: lane_mask[0:3]=0x0 || cast_mask[4:7]=0x0 || merge_mask[8:11]=0x0
 0x00000000 // entry 32   cacheline 2    offset 0    -- // entry_1    cacheline[  0][ 1] <32b>: index_start[0:31]=0x00000000
@@ -166,7 +166,7 @@
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
-// Name ENGINE_PARALLEL_READ_WRITE    ID 13   mapping 7    cycles 29   buffer_3-edges_idx ( 0 )-( graph->num_vertices )
+// Name ENGINE_PARALLEL_READ_WRITE    ID 13   mapping 7    cycles 36   buffer_3-edges_idx ( 0 )-( graph->num_vertices )
 // --------------------------------------------------------------------------------------
 0x00000000 // entry 115  cacheline 7    offset 3    -- // entry_0    cacheline[  0][ 0] <12b>: lane_mask[0:3]=0x0 || cast_mask[4:7]=0x0 || merge_mask[8:11]=0x0
 0x00000000 // entry 116  cacheline 7    offset 4    -- // entry_1    cacheline[  0][ 1] <32b>: index_start[0:31]=0x00000000

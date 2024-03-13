@@ -236,7 +236,7 @@ typedef struct packed{
   MemoryPacketType            subclass;
 } EnginePacketMetaFull;
 
-parameter ENGINE_PACKET_DATA_NUM_FIELDS = 4;
+parameter ENGINE_PACKET_DATA_NUM_FIELDS = 5;
 typedef struct packed{
   logic [ENGINE_PACKET_DATA_NUM_FIELDS-1:0][M00_AXI4_FE_DATA_W-1:0] field;
 } EnginePacketData;
