@@ -138,6 +138,9 @@ always_ff @(posedge ap_clk) begin
     configure_engine_reg.payload.param.id_channel              <= 0;
     configure_engine_reg.payload.param.id_buffer               <= 0;
     configure_engine_reg.payload.param.array_size              <= fifo_response_engine_in_dout_reg.payload.data.field[1];
+    configure_engine_reg.payload.param.const_mask              <= 0;
+    configure_engine_reg.payload.param.const_value             <= 0;
+    configure_engine_reg.payload.param.ops_mask                <= 0;
 end
 
 // --------------------------------------------------------------------------------------

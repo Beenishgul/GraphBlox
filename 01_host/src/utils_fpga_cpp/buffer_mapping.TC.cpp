@@ -30,7 +30,7 @@ void GLAYxrtBufferHandlePerKernel::mapGLAYOverlayProgramBuffersTC(struct GraphCS
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
-// Name ENGINE_PARALLEL_READ_WRITE    ID 4    mapping 7    cycles 29   buffer_3-edges_idx ( 0 )-( graph->num_vertices )
+// Name ENGINE_PARALLEL_READ_WRITE    ID 4    mapping 7    cycles 36   buffer_3-edges_idx ( 0 )-( graph->num_vertices )
 // --------------------------------------------------------------------------------------
    // --  1  - Index_Start
     overlay_program[32] = ( 0 );
@@ -86,7 +86,7 @@ void GLAYxrtBufferHandlePerKernel::mapGLAYOverlayProgramBuffersTC(struct GraphCS
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
-// Name ENGINE_PARALLEL_READ_WRITE    ID 13   mapping 7    cycles 29   buffer_3-edges_idx ( 0 )-( graph->num_vertices )
+// Name ENGINE_PARALLEL_READ_WRITE    ID 13   mapping 7    cycles 36   buffer_3-edges_idx ( 0 )-( graph->num_vertices )
 // --------------------------------------------------------------------------------------
    // --  1  - Index_Start
     overlay_program[116] = ( 0 );
