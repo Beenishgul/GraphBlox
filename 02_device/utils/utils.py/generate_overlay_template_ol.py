@@ -392,8 +392,8 @@ def extract_buffer_details(token):
 
         buffer_details_list.append((buffer_name, start_value_ops, end_value_ops))
 
-    # Ensure there are at least four tuples in the list
-    while len(buffer_details_list) < 4:
+    # Ensure there are at least five tuples in the list
+    while len(buffer_details_list) < 5:
         buffer_details_list.append(("None", ["0"], ["0"]))
 
     return buffer_details_list
