@@ -181,6 +181,7 @@ always_ff @(posedge ap_clk) begin
                 configure_memory_reg.payload.param.continue_flag    <= fifo_response_memory_in_dout_reg.payload.data.field[4];
                 configure_memory_reg.payload.param.ternary_flag     <= fifo_response_memory_in_dout_reg.payload.data.field[5];
                 configure_memory_reg.payload.param.conditional_flag <= fifo_response_memory_in_dout_reg.payload.data.field[6];
+                configure_memory_reg.payload.param.equal_flag       <= fifo_response_memory_in_dout_reg.payload.data.field[7];
             end
             (1 << 6) : begin
                 configure_memory_reg.payload.param.filter_route._if.id_cu     <= fifo_response_memory_in_dout_reg.payload.data.field[(NUM_CUS_WIDTH_BITS)-1:0];
