@@ -3,20 +3,37 @@
         "entries": {
             "entry_0": {
                 "merge_mask": {
-                    "bits": "4",
-                    "value": "0x0"
+                    "bits": "5",
+                    "value": "0x00"
                 }
             },
             "entry_1": {
                 "merge_type": {
-                    "bits": "4",
-                    "value": "0x0"
+                    "bits": "5",
+                    "value": "0x00"
                 }
             },
             "entry_2": {
-                "ops_mask": {
-                    "bits": "16",
-                    "value": "0x8421"
+                "ops_mask":{},
+                "field_1": {
+                    "bits": "5",
+                    "value": "0x01"
+                },
+                "field_2": {
+                    "bits": "5",
+                    "value": "0x02"
+                },
+                "field_3": {
+                    "bits": "5",
+                    "value": "0x04"
+                },
+                "field_4": {
+                    "bits": "5",
+                    "value": "0x08"
+                },
+                "field_5": {
+                    "bits": "5",
+                    "value": "0x16"
                 }
             }
         }

@@ -63,8 +63,8 @@
             },
             "entry_4": {
                 "const_mask": {
-                    "bits": "4",
-                    "value": "0x0"
+                    "bits": "5",
+                    "value": "0x00"
                 }
             },
             "entry_5": {
@@ -74,8 +74,25 @@
                 }
             },
             "entry_6": {
-                "ops_mask": {
-                    "bits": "16",
+                "ops_mask":{},
+                "field_1": {
+                    "bits": "5",
+                    "value": "0x00"
+                },
+                "field_2": {
+                    "bits": "5",
+                    "value": "0x00"
+                },
+                "field_3": {
+                    "bits": "5",
+                    "value": "0x00"
+                },
+                "field_4": {
+                    "bits": "5",
+                    "value": "0x00"
+                },
+                "field_5": {
+                    "bits": "5",
                     "value": "0x00"
                 }
             }

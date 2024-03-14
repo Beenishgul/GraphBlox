@@ -9,8 +9,8 @@
         "entries": {
             "entry_0": {
                 "set_mask": {
-                    "bits": "4",
-                    "value": "0x0"
+                    "bits": "5",
+                    "value": "0x00"
                 }
             },
             "entry_1": {

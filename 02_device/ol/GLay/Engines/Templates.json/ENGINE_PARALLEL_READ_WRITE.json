@@ -11,16 +11,16 @@
         "entries": {
             "entry_0": {
                 "lane_mask": {
-                    "bits": "4",
-                    "value": "0x0"
+                    "bits": "5",
+                    "value": "0x00"
                 },
                 "cast_mask": {
-                    "bits": "4",
-                    "value": "0x0"
+                    "bits": "5",
+                    "value": "0x00"
                 }, 
                 "merge_mask": {
-                    "bits": "4",
-                    "value": "0x0"
+                    "bits": "5",
+                    "value": "0x00"
                 }
             },
             "entry_1": {
@@ -77,8 +77,8 @@
             },
             "entry_5": {
                 "const_mask": {
-                    "bits": "4",
-                    "value": "0x0"
+                    "bits": "5",
+                    "value": "0x00"
                 },
                 "op_bundle": {
                     "bits": "8",
@@ -96,8 +96,25 @@
                 }
             },
             "entry_7": {
-                "ops_mask": {
-                    "bits": "16",
+                "ops_mask":{},
+                "field_1": {
+                    "bits": "5",
+                    "value": "0x00"
+                },
+                "field_2": {
+                    "bits": "5",
+                    "value": "0x00"
+                },
+                "field_3": {
+                    "bits": "5",
+                    "value": "0x00"
+                },
+                "field_4": {
+                    "bits": "5",
+                    "value": "0x00"
+                },
+                "field_5": {
+                    "bits": "5",
                     "value": "0x00"
                 }
             },
@@ -155,8 +172,8 @@
             },
             "entry_12": {
                 "const_mask": {
-                    "bits": "4",
-                    "value": "0x0"
+                    "bits": "5",
+                    "value": "0x00"
                 },
                 "op_bundle": {
                     "bits": "8",
@@ -174,8 +191,25 @@
                 }
             },
             "entry_14": {
-                "ops_mask": {
-                    "bits": "16",
+                "ops_mask":{},
+                "field_1": {
+                    "bits": "5",
+                    "value": "0x00"
+                },
+                "field_2": {
+                    "bits": "5",
+                    "value": "0x00"
+                },
+                "field_3": {
+                    "bits": "5",
+                    "value": "0x00"
+                },
+                "field_4": {
+                    "bits": "5",
+                    "value": "0x00"
+                },
+                "field_5": {
+                    "bits": "5",
                     "value": "0x00"
                 }
             },
@@ -233,8 +267,8 @@
             },
             "entry_19": {
                 "const_mask": {
-                    "bits": "4",
-                    "value": "0x0"
+                    "bits": "5",
+                    "value": "0x00"
                 },
                 "op_bundle": {
                     "bits": "8",
@@ -252,8 +286,25 @@
                 }
             },
             "entry_21": {
-                "ops_mask": {
-                    "bits": "16",
+                "ops_mask":{},
+                "field_1": {
+                    "bits": "5",
+                    "value": "0x00"
+                },
+                "field_2": {
+                    "bits": "5",
+                    "value": "0x00"
+                },
+                "field_3": {
+                    "bits": "5",
+                    "value": "0x00"
+                },
+                "field_4": {
+                    "bits": "5",
+                    "value": "0x00"
+                },
+                "field_5": {
+                    "bits": "5",
                     "value": "0x00"
                 }
             },
@@ -311,8 +362,8 @@
             },
             "entry_26": {
                 "const_mask": {
-                    "bits": "4",
-                    "value": "0x0"
+                    "bits": "5",
+                    "value": "0x00"
                 },
                 "op_bundle": {
                     "bits": "8",
@@ -330,8 +381,25 @@
                 }
             },
             "entry_28": {
-                "ops_mask": {
-                    "bits": "16",
+                "ops_mask":{},
+                "field_1": {
+                    "bits": "5",
+                    "value": "0x00"
+                },
+                "field_2": {
+                    "bits": "5",
+                    "value": "0x00"
+                },
+                "field_3": {
+                    "bits": "5",
+                    "value": "0x00"
+                },
+                "field_4": {
+                    "bits": "5",
+                    "value": "0x00"
+                },
+                "field_5": {
+                    "bits": "5",
                     "value": "0x00"
                 }
             },
@@ -390,7 +458,7 @@
             "entry_33": {
                 "const_mask": {
                     "bits": "5",
-                    "value": "0x0"
+                    "value": "0x00"
                 },
                 "op_bundle": {
                     "bits": "8",
@@ -411,23 +479,23 @@
                 "ops_mask":{},
                 "field_1": {
                     "bits": "5",
-                    "value": "0x0"
+                    "value": "0x00"
                 },
                 "field_2": {
                     "bits": "5",
-                    "value": "0x0"
+                    "value": "0x00"
                 },
                 "field_3": {
                     "bits": "5",
-                    "value": "0x0"
+                    "value": "0x00"
                 },
                 "field_4": {
                     "bits": "5",
-                    "value": "0x0"
+                    "value": "0x00"
                 },
                 "field_5": {
                     "bits": "5",
-                    "value": "0x0"
+                    "value": "0x00"
                 }
             }
         }
