@@ -274,6 +274,10 @@
                 "conditional_flag": {
                     "bits": "1",
                     "value": "0"
+                },
+                "equal_flag": {
+                    "bits": "1",
+                    "value": "0"
                 }
             },
             "entry_6": {
@@ -1292,6 +1296,10 @@
                 "conditional_flag": {
                     "bits": "1",
                     "value": "0"
+                },
+                "equal_flag": {
+                    "bits": "1",
+                    "value": "0"
                 }
             },
             "entry_6": {
@@ -1419,6 +1427,10 @@
                     "value": "1"
                 },
                 "conditional_flag": {
+                    "bits": "1",
+                    "value": "0"
+                },
+                "equal_flag": {
                     "bits": "1",
                     "value": "0"
                 }

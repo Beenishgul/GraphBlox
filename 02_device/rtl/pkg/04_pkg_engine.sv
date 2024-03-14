@@ -281,6 +281,7 @@ typedef struct packed{
     logic                                                                        continue_flag   ;
     logic                                                                        ternary_flag    ;
     logic                                                                        conditional_flag;
+    logic                                                                        equal_flag      ;
     FilterCondEnginePacketRoute                                                  filter_route    ;
 } FilterCondConfigurationParameters;
 
@@ -420,11 +421,11 @@ typedef struct packed{
 } ParallelReadWriteConfigurationParameterField;
 
 typedef struct packed{
-    logic                                        [ENGINE_PACKET_DATA_NUM_FIELDS-1:0] lane_mask  ;
-    logic                                        [ENGINE_PACKET_DATA_NUM_FIELDS-1:0] cast_mask  ;
-    logic                                        [ENGINE_PACKET_DATA_NUM_FIELDS-1:0] merge_mask ;
-    ParallelReadWriteConfigurationParameterField [ENGINE_PACKET_DATA_NUM_FIELDS-1:0] param_field;
-    ParallelReadWriteConfigurationMeta           [ENGINE_PACKET_DATA_NUM_FIELDS-1:0] meta       ;
+    logic                                        [ENGINE_PACKET_DATA_NUM_FIELDS-1:0]                                    lane_mask  ;
+    logic                                        [ENGINE_PACKET_DATA_NUM_FIELDS-1:0]                                    cast_mask  ;
+    logic                                        [                              1:0][ENGINE_PACKET_DATA_NUM_FIELDS-1:0] merge_mask ;
+    ParallelReadWriteConfigurationParameterField [ENGINE_PACKET_DATA_NUM_FIELDS-1:0]                                    param_field;
+    ParallelReadWriteConfigurationMeta           [ENGINE_PACKET_DATA_NUM_FIELDS-1:0]                                    meta       ;
 } ParallelReadWriteConfigurationParameters;
 
 typedef struct packed{
