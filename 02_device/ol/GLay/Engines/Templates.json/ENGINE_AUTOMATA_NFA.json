@@ -20,14 +20,14 @@
             },
             "entry_1": {
                 "filter_mask": {
-                    "bits": "4",
-                    "value": "0x0"
+                    "bits": "5",
+                    "value": "0x00"
                 }
             },
             "entry_2": {
                 "const_mask": {
-                    "bits": "4",
-                    "value": "0x0"
+                    "bits": "5",
+                    "value": "0x00"
                 }
             },
             "entry_3": {
@@ -37,9 +37,26 @@
                 }
             },
             "entry_4": {
-                "ops_mask": {
-                    "bits": "16",
-                    "value": "0x0000"
+                "ops_mask":{},
+                "field_1": {
+                    "bits": "5",
+                    "value": "0x00"
+                },
+                "field_2": {
+                    "bits": "5",
+                    "value": "0x00"
+                },
+                "field_3": {
+                    "bits": "5",
+                    "value": "0x00"
+                },
+                "field_4": {
+                    "bits": "5",
+                    "value": "0x00"
+                },
+                "field_5": {
+                    "bits": "5",
+                    "value": "0x00"
                 }
             },
             "entry_5": {
