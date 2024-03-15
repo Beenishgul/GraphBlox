@@ -48,7 +48,7 @@
 // --------------------------------------------------------------------------------------
 // Name ENGINE_PARALLEL_READ_WRITE    ID 4    mapping 7    cycles 36   buffer_3-edges_idx ( 0 )-( graph->num_vertices )
 // --------------------------------------------------------------------------------------
-0x00000000 // entry 31   cacheline 1    offset 15   -- // entry_0    cacheline[  0][ 0] <15b>: lane_mask[0:4]=0x0 || cast_mask[5:9]=0x0 || merge_mask[10:14]=0x0
+0x00000000 // entry 31   cacheline 1    offset 15   -- // entry_0    cacheline[  0][ 0] <20b>: lane_mask[0:4]=0x0 || cast_mask[5:9]=0x0 || merge_mask_1[10:14]=0x0 || merge_mask_2[15:19]=0x0
 0x00000000 // entry 32   cacheline 2    offset 0    -- // entry_1    cacheline[  0][ 1] <32b>: index_start[0:31]=0x00000000
 0x00000000 // entry 33   cacheline 2    offset 1    -- // entry_2    cacheline[  0][ 2] <32b>: shift.amount[0:30]=0 || shift.direction[31:31]=0
 0x00000001 // entry 34   cacheline 2    offset 2    -- // entry_3    cacheline[  0][ 3] <30b>: cmd[0:5]=CMD_MEM_INVALID || id_module[6:13]=0x00 || id_engine[14:21]=0x00 || id_channel[22:29]=0x00
@@ -152,7 +152,7 @@
 // --------------------------------------------------------------------------------------
 // Name ENGINE_PARALLEL_READ_WRITE    ID 11   mapping 7    cycles 36   buffer_3-edges_idx ( 0 )-( graph->num_vertices )
 // --------------------------------------------------------------------------------------
-0x00000000 // entry 107  cacheline 6    offset 11   -- // entry_0    cacheline[  0][ 0] <15b>: lane_mask[0:4]=0x0 || cast_mask[5:9]=0x0 || merge_mask[10:14]=0x0
+0x00000000 // entry 107  cacheline 6    offset 11   -- // entry_0    cacheline[  0][ 0] <20b>: lane_mask[0:4]=0x0 || cast_mask[5:9]=0x0 || merge_mask_1[10:14]=0x0 || merge_mask_2[15:19]=0x0
 0x00000000 // entry 108  cacheline 6    offset 12   -- // entry_1    cacheline[  0][ 1] <32b>: index_start[0:31]=0x00000000
 0x00000000 // entry 109  cacheline 6    offset 13   -- // entry_2    cacheline[  0][ 2] <32b>: shift.amount[0:30]=0 || shift.direction[31:31]=0
 0x00000001 // entry 110  cacheline 6    offset 14   -- // entry_3    cacheline[  0][ 3] <30b>: cmd[0:5]=CMD_MEM_INVALID || id_module[6:13]=0x00 || id_engine[14:21]=0x00 || id_channel[22:29]=0x00
