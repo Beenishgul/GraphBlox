@@ -86,13 +86,13 @@
 // --------------------------------------------------------------------------------------
 // Engine: ENGINE_CSR_INDEX_6, Number of entries: 11
 // --------------------------------------------------------------------------------------
-0x00000000 // entry_0    cacheline[  4][ 3] < 5b>: increment[0:0]=0 || decrement[1:1]=0 || mode_sequence[2:2]=0 || mode_buffer[3:3]=0 || mode_break[4:4]=0
+0x0000000D // entry_0    cacheline[  4][ 3] < 5b>: increment[0:0]=1 || decrement[1:1]=0 || mode_sequence[2:2]=1 || mode_buffer[3:3]=1 || mode_break[4:4]=0
 0x00000000 // entry_1    cacheline[  4][ 4] <32b>: index_start[0:31]=0x00000000
 0x00000000 // entry_2    cacheline[  4][ 5] <32b>: index_end[0:31]=0x00000000
-0x00000000 // entry_3    cacheline[  4][ 6] <32b>: stride[0:31]=0x00000000
-0x00000000 // entry_4    cacheline[  4][ 7] <32b>: shift.amount[0:30]=0 || shift.direction[31:31]=0
-0x00000001 // entry_5    cacheline[  4][ 8] <30b>: cmd[0:5]=CMD_MEM_INVALID || id_module[6:13]=0x00 || id_engine[14:21]=0x00 || id_channel[22:29]=0x00
-0x00000000 // entry_6    cacheline[  4][ 9] <32b>: id_cu[0:7]=0x00 || id_bundle[8:15]=0x00 || id_lane[16:23]=0x00 || id_buffer[24:31]=0x00
+0x00000001 // entry_3    cacheline[  4][ 6] <32b>: stride[0:31]=0x00000001
+0x80000002 // entry_4    cacheline[  4][ 7] <32b>: shift.amount[0:30]=2 || shift.direction[31:31]=1
+0x00800008 // entry_5    cacheline[  4][ 8] <30b>: cmd[0:5]=CMD_STREAM_READ || id_module[6:13]=0x00 || id_engine[14:21]=0x00 || id_channel[22:29]=buffer_5
+0x10010801 // entry_6    cacheline[  4][ 9] <32b>: id_cu[0:7]=0x01 || id_bundle[8:15]=0x08 || id_lane[16:23]=0x01 || id_buffer[24:31]=buffer_5
 0x00000000 // entry_7    cacheline[  4][10] <32b>: array_size[0:31]=0x00000000
 0x00000000 // entry_8    cacheline[  4][11] < 5b>: const_mask[0:4]=0x0
 0x00000000 // entry_9    cacheline[  4][12] <32b>: const_value[0:31]=0x00000000
@@ -104,21 +104,21 @@
 0x00000001 // entry_1    cacheline[  4][15] < 5b>: filter_mask[0:4]=0x1
 0x00000000 // entry_2    cacheline[  5][ 0] < 5b>: const_mask[0:4]=0x0
 0x00000000 // entry_3    cacheline[  5][ 1] <32b>: const_value[0:31]=0x00000000
-0x00020901 // entry_4    cacheline[  5][ 2] <25b>: field_1[0:4]=0x1 || field_2[5:9]=0x8 || field_3[10:14]=0x2 || field_4[15:19]=0x4 || field_5[20:24]=0x0
-0x00000001 // entry_5    cacheline[  5][ 3] < 8b>: break_flag[0:0]=1 || break_pass[1:1]=0 || filter_post[2:2]=0 || filter_pass[3:3]=0 || continue_flag[4:4]=0 || ternary_flag[5:5]=0 || conditional_flag[6:6]=0 || equal_flag[7:7]=0
-0x00000000 // entry_6    cacheline[  5][ 4] <32b>: if_id_cu[0:7]=0x00 || if_id_bundle[8:15]=0x00 || if_id_lane[16:23]=0x00 || if_id_buffer[24:31]=0x00
+0x00040501 // entry_4    cacheline[  5][ 2] <25b>: field_1[0:4]=0x1 || field_2[5:9]=0x8 || field_3[10:14]=0x1 || field_4[15:19]=0x8 || field_5[20:24]=0x0
+0x00000009 // entry_5    cacheline[  5][ 3] < 8b>: break_flag[0:0]=1 || break_pass[1:1]=0 || filter_post[2:2]=0 || filter_pass[3:3]=1 || continue_flag[4:4]=0 || ternary_flag[5:5]=0 || conditional_flag[6:6]=0 || equal_flag[7:7]=0
+0x10010801 // entry_6    cacheline[  5][ 4] <32b>: if_id_cu[0:7]=0x01 || if_id_bundle[8:15]=0x08 || if_id_lane[16:23]=0x01 || if_id_buffer[24:31]=buffer_5
 0x00000000 // entry_7    cacheline[  5][ 5] <32b>: else_id_cu[0:7]=0x00 || else_id_bundle[8:15]=0x00 || else_id_lane[16:23]=0x00 || else_id_buffer[24:31]=0x00
 0x00000000 // entry_8    cacheline[  5][ 6] <32b>: if_id_module[0:7]=0x00 || if_id_engine[8:15]=0x00 || else_id_module[16:23]=0x00 || else_id_engine[24:31]=0x00
 // --------------------------------------------------------------------------------------
 // Engine: ENGINE_CSR_INDEX_8, Number of entries: 11
 // --------------------------------------------------------------------------------------
-0x0000000D // entry_0    cacheline[  5][ 7] < 5b>: increment[0:0]=1 || decrement[1:1]=0 || mode_sequence[2:2]=1 || mode_buffer[3:3]=1 || mode_break[4:4]=0
+0x00000000 // entry_0    cacheline[  5][ 7] < 5b>: increment[0:0]=0 || decrement[1:1]=0 || mode_sequence[2:2]=0 || mode_buffer[3:3]=0 || mode_break[4:4]=0
 0x00000000 // entry_1    cacheline[  5][ 8] <32b>: index_start[0:31]=0x00000000
 0x00000000 // entry_2    cacheline[  5][ 9] <32b>: index_end[0:31]=0x00000000
-0x00000001 // entry_3    cacheline[  5][10] <32b>: stride[0:31]=0x00000001
-0x80000002 // entry_4    cacheline[  5][11] <32b>: shift.amount[0:30]=2 || shift.direction[31:31]=1
-0x00800008 // entry_5    cacheline[  5][12] <30b>: cmd[0:5]=CMD_STREAM_READ || id_module[6:13]=0x00 || id_engine[14:21]=0x00 || id_channel[22:29]=buffer_5
-0x10010801 // entry_6    cacheline[  5][13] <32b>: id_cu[0:7]=0x01 || id_bundle[8:15]=0x08 || id_lane[16:23]=0x01 || id_buffer[24:31]=buffer_5
+0x00000000 // entry_3    cacheline[  5][10] <32b>: stride[0:31]=0x00000000
+0x00000000 // entry_4    cacheline[  5][11] <32b>: shift.amount[0:30]=0 || shift.direction[31:31]=0
+0x00000001 // entry_5    cacheline[  5][12] <30b>: cmd[0:5]=CMD_MEM_INVALID || id_module[6:13]=0x00 || id_engine[14:21]=0x00 || id_channel[22:29]=0x00
+0x00000000 // entry_6    cacheline[  5][13] <32b>: id_cu[0:7]=0x00 || id_bundle[8:15]=0x00 || id_lane[16:23]=0x00 || id_buffer[24:31]=0x00
 0x00000000 // entry_7    cacheline[  5][14] <32b>: array_size[0:31]=0x00000000
 0x00000000 // entry_8    cacheline[  5][15] < 5b>: const_mask[0:4]=0x0
 0x00000000 // entry_9    cacheline[  6][ 0] <32b>: const_value[0:31]=0x00000000
@@ -130,9 +130,9 @@
 0x00000001 // entry_1    cacheline[  6][ 3] < 5b>: filter_mask[0:4]=0x1
 0x00000000 // entry_2    cacheline[  6][ 4] < 5b>: const_mask[0:4]=0x0
 0x00000000 // entry_3    cacheline[  6][ 5] <32b>: const_value[0:31]=0x00000000
-0x00040501 // entry_4    cacheline[  6][ 6] <25b>: field_1[0:4]=0x1 || field_2[5:9]=0x8 || field_3[10:14]=0x1 || field_4[15:19]=0x8 || field_5[20:24]=0x0
-0x00000009 // entry_5    cacheline[  6][ 7] < 8b>: break_flag[0:0]=1 || break_pass[1:1]=0 || filter_post[2:2]=0 || filter_pass[3:3]=1 || continue_flag[4:4]=0 || ternary_flag[5:5]=0 || conditional_flag[6:6]=0 || equal_flag[7:7]=0
-0x10010801 // entry_6    cacheline[  6][ 8] <32b>: if_id_cu[0:7]=0x01 || if_id_bundle[8:15]=0x08 || if_id_lane[16:23]=0x01 || if_id_buffer[24:31]=buffer_5
+0x00020901 // entry_4    cacheline[  6][ 6] <25b>: field_1[0:4]=0x1 || field_2[5:9]=0x8 || field_3[10:14]=0x2 || field_4[15:19]=0x4 || field_5[20:24]=0x0
+0x00000001 // entry_5    cacheline[  6][ 7] < 8b>: break_flag[0:0]=1 || break_pass[1:1]=0 || filter_post[2:2]=0 || filter_pass[3:3]=0 || continue_flag[4:4]=0 || ternary_flag[5:5]=0 || conditional_flag[6:6]=0 || equal_flag[7:7]=0
+0x00000000 // entry_6    cacheline[  6][ 8] <32b>: if_id_cu[0:7]=0x00 || if_id_bundle[8:15]=0x00 || if_id_lane[16:23]=0x00 || if_id_buffer[24:31]=0x00
 0x00000000 // entry_7    cacheline[  6][ 9] <32b>: else_id_cu[0:7]=0x00 || else_id_bundle[8:15]=0x00 || else_id_lane[16:23]=0x00 || else_id_buffer[24:31]=0x00
 0x00000000 // entry_8    cacheline[  6][10] <32b>: if_id_module[0:7]=0x00 || if_id_engine[8:15]=0x00 || else_id_module[16:23]=0x00 || else_id_engine[24:31]=0x00
 // --------------------------------------------------------------------------------------

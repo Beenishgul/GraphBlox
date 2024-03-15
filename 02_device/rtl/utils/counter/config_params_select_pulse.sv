@@ -63,7 +63,7 @@ module config_params_select_pulse #(parameter int MASK_WIDTH = 8 // Default para
             param_select_out_int <= 0;
         end else begin
             if (|config_params_cast_valid) begin
-                param_select_out_int <= config_params_in.payload.param.cast_mask;
+                param_select_out_int <= config_params_cast_valid;
             end else if (pulse_counter_reg > 0) begin
                 param_select_out_int <= param_select_out_int & (param_select_out_int - 1);
             end
