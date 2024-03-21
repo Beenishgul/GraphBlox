@@ -77,7 +77,7 @@
 0x80000002 // entry_30   cacheline[  3][13] <32b>: shift.amount[0:30]=2 || shift.direction[31:31]=1
 0x00400004 // entry_31   cacheline[  3][14] <30b>: cmd[0:5]=CMD_MEM_WRITE || id_module[6:13]=0x00 || id_engine[14:21]=0x00 || id_channel[22:29]=buffer_8
 0x80000001 // entry_32   cacheline[  3][15] <32b>: id_cu[0:7]=0x01 || id_bundle[8:15]=0x00 || id_lane[16:23]=0x00 || id_buffer[24:31]=buffer_8
-0x00004082 // entry_33   cacheline[  4][ 0] <21b>: const_mask[0:4]=0x2 || op_bundle[5:12]=0x04 || op_lane[13:20]=0x02
+0x00004102 // entry_33   cacheline[  4][ 0] <21b>: const_mask[0:4]=0x2 || op_bundle[5:12]=0x08 || op_lane[13:20]=0x02
 0x00000000 // entry_34   cacheline[  4][ 1] <32b>: const_value[0:31]=0x00000000
 0x00041041 // entry_35   cacheline[  4][ 2] <25b>: field_1[0:4]=0x1 || field_2[5:9]=0x2 || field_3[10:14]=0x4 || field_4[15:19]=0x8 || field_5[20:24]=0x0
 // --------------------------------------------------------------------------------------
@@ -104,14 +104,14 @@
 0x04020401 // entry_18   cacheline[  5][ 5] <32b>: id_cu[0:7]=0x01 || id_bundle[8:15]=0x04 || id_lane[16:23]=0x02 || id_buffer[24:31]=buffer_3
 0x00002020 // entry_19   cacheline[  5][ 6] <21b>: const_mask[0:4]=0x0 || op_bundle[5:12]=0x01 || op_lane[13:20]=0x01
 0x00000000 // entry_20   cacheline[  5][ 7] <32b>: const_value[0:31]=0x00000000
-0x00820400 // entry_21   cacheline[  5][ 8] <25b>: field_1[0:4]=0x0 || field_2[5:9]=0x0 || field_3[10:14]=0x1 || field_4[15:19]=0x4 || field_5[20:24]=0x8
+0x00820456 // entry_21   cacheline[  5][ 8] <25b>: field_1[0:4]=0x16 || field_2[5:9]=0x2 || field_3[10:14]=0x1 || field_4[15:19]=0x4 || field_5[20:24]=0x8
 0x00000000 // entry_22   cacheline[  5][ 9] <32b>: index_start[0:31]=0x00000000
 0x80000002 // entry_23   cacheline[  5][10] <32b>: shift.amount[0:30]=2 || shift.direction[31:31]=1
 0x00400042 // entry_24   cacheline[  5][11] <30b>: cmd[0:5]=CMD_MEM_READ || id_module[6:13]=0x01 || id_engine[14:21]=0x00 || id_channel[22:29]=buffer_2
 0x02020401 // entry_25   cacheline[  5][12] <32b>: id_cu[0:7]=0x01 || id_bundle[8:15]=0x04 || id_lane[16:23]=0x02 || id_buffer[24:31]=buffer_2
 0x00002020 // entry_26   cacheline[  5][13] <21b>: const_mask[0:4]=0x0 || op_bundle[5:12]=0x01 || op_lane[13:20]=0x01
 0x00000000 // entry_27   cacheline[  5][14] <32b>: const_value[0:31]=0x00000000
-0x00820400 // entry_28   cacheline[  5][15] <25b>: field_1[0:4]=0x0 || field_2[5:9]=0x0 || field_3[10:14]=0x1 || field_4[15:19]=0x4 || field_5[20:24]=0x8
+0x00820456 // entry_28   cacheline[  5][15] <25b>: field_1[0:4]=0x16 || field_2[5:9]=0x2 || field_3[10:14]=0x1 || field_4[15:19]=0x4 || field_5[20:24]=0x8
 0x00000000 // entry_29   cacheline[  6][ 0] <32b>: index_start[0:31]=0x00000000
 0x80000002 // entry_30   cacheline[  6][ 1] <32b>: shift.amount[0:30]=2 || shift.direction[31:31]=1
 0x00400004 // entry_31   cacheline[  6][ 2] <30b>: cmd[0:5]=CMD_MEM_WRITE || id_module[6:13]=0x00 || id_engine[14:21]=0x00 || id_channel[22:29]=buffer_8
@@ -161,7 +161,7 @@
 0x00000000 // entry_7    cacheline[  8][ 2] <32b>: array_size[0:31]=0x00000000
 0x00000000 // entry_8    cacheline[  8][ 3] < 5b>: const_mask[0:4]=0x0
 0x00000000 // entry_9    cacheline[  8][ 4] <32b>: const_value[0:31]=0x00000000
-0x0020D904 // entry_10   cacheline[  8][ 5] <25b>: field_1[0:4]=0x4 || field_2[5:9]=0x8 || field_3[10:14]=0x16 || field_4[15:19]=0x1 || field_5[20:24]=0x2
+0x00005904 // entry_10   cacheline[  8][ 5] <25b>: field_1[0:4]=0x4 || field_2[5:9]=0x8 || field_3[10:14]=0x16 || field_4[15:19]=0x0 || field_5[20:24]=0x0
 // --------------------------------------------------------------------------------------
 // Engine: ENGINE_FILTER_COND_10, Number of entries: 9
 // --------------------------------------------------------------------------------------
@@ -169,9 +169,9 @@
 0x00000001 // entry_1    cacheline[  8][ 7] < 5b>: filter_mask[0:4]=0x1
 0x00000000 // entry_2    cacheline[  8][ 8] < 5b>: const_mask[0:4]=0x0
 0x00000000 // entry_3    cacheline[  8][ 9] <32b>: const_value[0:31]=0x00000000
-0x00040501 // entry_4    cacheline[  8][10] <25b>: field_1[0:4]=0x1 || field_2[5:9]=0x8 || field_3[10:14]=0x1 || field_4[15:19]=0x8 || field_5[20:24]=0x0
-0x00000009 // entry_5    cacheline[  8][11] < 8b>: break_flag[0:0]=1 || break_pass[1:1]=0 || filter_post[2:2]=0 || filter_pass[3:3]=1 || continue_flag[4:4]=0 || ternary_flag[5:5]=0 || conditional_flag[6:6]=0 || equal_flag[7:7]=0
-0x10010801 // entry_6    cacheline[  8][12] <32b>: if_id_cu[0:7]=0x01 || if_id_bundle[8:15]=0x08 || if_id_lane[16:23]=0x01 || if_id_buffer[24:31]=buffer_5
+0x01641041 // entry_4    cacheline[  8][10] <25b>: field_1[0:4]=0x1 || field_2[5:9]=0x2 || field_3[10:14]=0x4 || field_4[15:19]=0x8 || field_5[20:24]=0x16
+0x00000089 // entry_5    cacheline[  8][11] < 8b>: break_flag[0:0]=1 || break_pass[1:1]=0 || filter_post[2:2]=0 || filter_pass[3:3]=1 || continue_flag[4:4]=0 || ternary_flag[5:5]=0 || conditional_flag[6:6]=0 || equal_flag[7:7]=1
+0x10020801 // entry_6    cacheline[  8][12] <32b>: if_id_cu[0:7]=0x01 || if_id_bundle[8:15]=0x08 || if_id_lane[16:23]=0x02 || if_id_buffer[24:31]=buffer_5
 0x00000000 // entry_7    cacheline[  8][13] <32b>: else_id_cu[0:7]=0x00 || else_id_bundle[8:15]=0x00 || else_id_lane[16:23]=0x00 || else_id_buffer[24:31]=0x00
 0x00000000 // entry_8    cacheline[  8][14] <32b>: if_id_module[0:7]=0x00 || if_id_engine[8:15]=0x00 || else_id_module[16:23]=0x00 || else_id_engine[24:31]=0x00
 // --------------------------------------------------------------------------------------
@@ -219,24 +219,24 @@
 // --------------------------------------------------------------------------------------
 // Engine: ENGINE_FILTER_COND_13, Number of entries: 9
 // --------------------------------------------------------------------------------------
-0x00000001 // entry_0    cacheline[ 11][ 3] < 9b>: filter_operation[0:8]=FILTER_NOP
-0x00000000 // entry_1    cacheline[ 11][ 4] < 5b>: filter_mask[0:4]=0x0
+0x00000008 // entry_0    cacheline[ 11][ 3] < 9b>: filter_operation[0:8]=FILTER_EQ
+0x00000001 // entry_1    cacheline[ 11][ 4] < 5b>: filter_mask[0:4]=0x1
 0x00000000 // entry_2    cacheline[ 11][ 5] < 5b>: const_mask[0:4]=0x0
 0x00000000 // entry_3    cacheline[ 11][ 6] <32b>: const_value[0:31]=0x00000000
-0x00000000 // entry_4    cacheline[ 11][ 7] <25b>: field_1[0:4]=0x0 || field_2[5:9]=0x0 || field_3[10:14]=0x0 || field_4[15:19]=0x0 || field_5[20:24]=0x0
+0x01640881 // entry_4    cacheline[ 11][ 7] <25b>: field_1[0:4]=0x1 || field_2[5:9]=0x4 || field_3[10:14]=0x2 || field_4[15:19]=0x8 || field_5[20:24]=0x16
 0x00000000 // entry_5    cacheline[ 11][ 8] < 8b>: break_flag[0:0]=0 || break_pass[1:1]=0 || filter_post[2:2]=0 || filter_pass[3:3]=0 || continue_flag[4:4]=0 || ternary_flag[5:5]=0 || conditional_flag[6:6]=0 || equal_flag[7:7]=0
-0x00000000 // entry_6    cacheline[ 11][ 9] <32b>: if_id_cu[0:7]=0x00 || if_id_bundle[8:15]=0x00 || if_id_lane[16:23]=0x00 || if_id_buffer[24:31]=0x00
+0x80010201 // entry_6    cacheline[ 11][ 9] <32b>: if_id_cu[0:7]=0x01 || if_id_bundle[8:15]=0x02 || if_id_lane[16:23]=0x01 || if_id_buffer[24:31]=buffer_8
 0x00000000 // entry_7    cacheline[ 11][10] <32b>: else_id_cu[0:7]=0x00 || else_id_bundle[8:15]=0x00 || else_id_lane[16:23]=0x00 || else_id_buffer[24:31]=0x00
 0x00000000 // entry_8    cacheline[ 11][11] <32b>: if_id_module[0:7]=0x00 || if_id_engine[8:15]=0x00 || else_id_module[16:23]=0x00 || else_id_engine[24:31]=0x00
 // --------------------------------------------------------------------------------------
 // Engine: ENGINE_ALU_OPS_14, Number of entries: 6
 // --------------------------------------------------------------------------------------
-0x00000001 // entry_0    cacheline[ 11][12] < 6b>: alu_operation[0:5]=ALU_NOP
-0x00000000 // entry_1    cacheline[ 11][13] <21b>: alu_mask[0:4]=0x0 || id_engine[5:12]=0x00 || id_module[13:20]=0x00
-0x00000000 // entry_2    cacheline[ 11][14] < 5b>: const_mask[0:4]=0x0
-0x00000000 // entry_3    cacheline[ 11][15] <32b>: const_value[0:31]=0x00000000
-0x00000000 // entry_4    cacheline[ 12][ 0] <25b>: field_1[0:4]=0x0 || field_2[5:9]=0x0 || field_3[10:14]=0x0 || field_4[15:19]=0x0 || field_5[20:24]=0x0
-0x00000000 // entry_5    cacheline[ 12][ 1] <24b>: id_cu[0:7]=0x00 || id_bundle[8:15]=0x00 || id_lane[16:23]=0x00
+0x00000010 // entry_0    cacheline[ 11][12] < 6b>: alu_operation[0:5]=ALU_ACC
+0x00000001 // entry_1    cacheline[ 11][13] <21b>: alu_mask[0:4]=0x1 || id_engine[5:12]=0x00 || id_module[13:20]=0x00
+0x00000001 // entry_2    cacheline[ 11][14] < 5b>: const_mask[0:4]=0x1
+0x00000001 // entry_3    cacheline[ 11][15] <32b>: const_value[0:31]=0x00000001
+0x01641041 // entry_4    cacheline[ 12][ 0] <25b>: field_1[0:4]=0x1 || field_2[5:9]=0x2 || field_3[10:14]=0x4 || field_4[15:19]=0x8 || field_5[20:24]=0x16
+0x00010201 // entry_5    cacheline[ 12][ 1] <24b>: id_cu[0:7]=0x01 || id_bundle[8:15]=0x02 || id_lane[16:23]=0x01
 // --------------------------------------------------------------------------------------
 // Engine: ENGINE_FORWARD_DATA_15, Number of entries: 0
 // --------------------------------------------------------------------------------------

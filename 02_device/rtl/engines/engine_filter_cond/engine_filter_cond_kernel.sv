@@ -63,6 +63,7 @@ end
 always_ff @(posedge ap_clk) begin
   config_params_reg.filter_mask      <= config_params_in.filter_mask;
   config_params_reg.filter_operation <= config_params_in.filter_operation;
+  config_params_reg.equal_flag       <= config_params_in.equal_flag;
   case (config_params_reg.filter_operation)
 // --------------------------------------------------------------------------------------
     FILTER_NOP : begin
