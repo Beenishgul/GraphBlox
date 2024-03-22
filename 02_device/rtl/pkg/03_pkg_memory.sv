@@ -31,6 +31,7 @@ import PKG_CACHE::*;
 typedef logic [GLOBAL_BUFFER_SIZE_WIDTH_BITS-1:0]    type_memory_request_offset;
 typedef logic [GLOBAL_OVERLAY_SIZE_WIDTH_BITS-1:0]   type_memory_response_offset;
 typedef type_m00_axi4_fe_len                         type_memory_burst_length;
+typedef type_m00_axi4_fe_cache                       type_memory_cache_mode;
 
 parameter TYPE_MEMORY_CMD_BITS = 6;
 typedef enum logic[TYPE_MEMORY_CMD_BITS-1:0] {
@@ -152,6 +153,7 @@ typedef struct packed{
   type_memory_burst_length               burst_length;
   type_memory_request_offset             offset      ; // SIZE = clog2(4GB) bits
   PacketDataAddressShift                 shift       ; // SIZE = clog2(offset) bits + 1
+  // type_memory_cache_mode                 cache_mode;
 } PacketRequestDataAddress;
 
 // --------------------------------------------------------------------------------------
