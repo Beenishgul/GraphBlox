@@ -67,6 +67,7 @@ typedef struct packed{
     logic [ENGINE_PACKET_DATA_NUM_FIELDS-1:0]                                    const_mask   ;
     logic [           M00_AXI4_FE_DATA_W-1:0]                                    const_value  ;
     logic [ENGINE_PACKET_DATA_NUM_FIELDS-1:0][ENGINE_PACKET_DATA_NUM_FIELDS-1:0] ops_mask     ;
+    // type_memory_cache_mode                 mode_cache;
 } CSRIndexConfigurationParameters;
 
 typedef struct packed{
@@ -331,6 +332,7 @@ typedef struct packed{
     logic [ENGINE_PACKET_DATA_NUM_FIELDS-1:0]                                    const_mask ;
     logic [           M00_AXI4_FE_DATA_W-1:0]                                    const_value;
     logic [ENGINE_PACKET_DATA_NUM_FIELDS-1:0][ENGINE_PACKET_DATA_NUM_FIELDS-1:0] ops_mask   ;
+    // type_memory_cache_mode                 mode_cache;
 } ReadWriteConfigurationParameters;
 
 typedef struct packed{
@@ -418,6 +420,7 @@ typedef struct packed{
     logic [ENGINE_PACKET_DATA_NUM_FIELDS-1:0]                                    const_mask ;
     logic [           M00_AXI4_FE_DATA_W-1:0]                                    const_value;
     logic [ENGINE_PACKET_DATA_NUM_FIELDS-1:0][ENGINE_PACKET_DATA_NUM_FIELDS-1:0] ops_mask   ;
+    // type_memory_cache_mode                 mode_cache;
 } ParallelReadWriteConfigurationParameterField;
 
 typedef struct packed{
