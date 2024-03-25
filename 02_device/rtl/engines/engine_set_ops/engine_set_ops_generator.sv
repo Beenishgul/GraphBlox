@@ -386,14 +386,17 @@ always_ff @(posedge ap_clk) begin
 
     for (int j=1; j<(1+ENGINE_MERGE_WIDTH); j++) begin
         if(configure_engine_param_int.set_mask[j]) begin
-            generator_engine_request_engine_reg.payload.data.field[j] <= response_engine_in_int[j].payload.data.field[0];
+            generator_engine_request_engine_reg.payload.data.field[j]       <= response_engine_in_int[j].payload.data.field[0];
+            generator_engine_request_engine_reg.payload.data.field_state[j] <= response_engine_in_int[j].payload.data.field_state[0];
         end else begin
-            generator_engine_request_engine_reg.payload.data.field[j] <= response_engine_in_int[0].payload.data.field[j];
+            generator_engine_request_engine_reg.payload.data.field[j]       <= response_engine_in_int[0].payload.data.field[j];
+            generator_engine_request_engine_reg.payload.data.field_state[j] <= response_engine_in_int[0].payload.data.field_state[j];
         end
     end
 
     for (int j=(1+ENGINE_MERGE_WIDTH); j<ENGINE_PACKET_DATA_NUM_FIELDS; j++) begin
-        generator_engine_request_engine_reg.payload.data.field[j] <= response_engine_in_int[0].payload.data.field[j];
+        generator_engine_request_engine_reg.payload.data.field[j]       <= response_engine_in_int[0].payload.data.field[j];
+        generator_engine_request_engine_reg.payload.data.field_state[j] <= response_engine_in_int[0].payload.data.field_state[j];
     end
 end
 

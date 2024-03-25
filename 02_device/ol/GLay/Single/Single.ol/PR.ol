@@ -27,7 +27,7 @@
 // --------------------------------------------------------------------------------------
 // Engine: ENGINE_PARALLEL_READ_WRITE_3, Number of entries: 36
 // --------------------------------------------------------------------------------------
-0x00000C63 // entry_0    cacheline[  1][ 1] <15b>: lane_mask[0:4]=0x3 || cast_mask[5:9]=0x3 || merge_mask[10:14]=0x3
+0x00018C63 // entry_0    cacheline[  1][ 1] <20b>: lane_mask[0:4]=0x3 || cast_mask[5:9]=0x3 || merge_mask_1[10:14]=0x3 || merge_mask_2[15:19]=0x3
 0x00000000 // entry_1    cacheline[  1][ 2] <32b>: index_start[0:31]=0x00000000
 0x80000002 // entry_2    cacheline[  1][ 3] <32b>: shift.amount[0:30]=0x0000002 || shift.direction[31:31]=0x1
 0x00400042 // entry_3    cacheline[  1][ 4] <30b>: cmd[0:5]=CMD_MEM_READ || id_module[6:13]=0x01 || id_engine[14:21]=0x00 || id_channel[22:29]=buffer_3

@@ -240,7 +240,8 @@ typedef struct packed{
 
 parameter ENGINE_PACKET_DATA_NUM_FIELDS = 5;
 typedef struct packed{
-  logic [ENGINE_PACKET_DATA_NUM_FIELDS-1:0][M00_AXI4_FE_DATA_W-1:0] field;
+  logic               [ENGINE_PACKET_DATA_NUM_FIELDS-1:0][M00_AXI4_FE_DATA_W-1:0] field      ;
+  type_sequence_state [ENGINE_PACKET_DATA_NUM_FIELDS-1:0]                         field_state;
 } EnginePacketData;
 
 typedef struct packed{
@@ -497,9 +498,11 @@ function EnginePacketData map_MemoryResponsePacketData_to_EnginePacketData (inpu
 
   EnginePacketData output_packet;
 
-  output_packet.field[0] = input_packet.field;
+  output_packet.field[0]       = input_packet.field;
+  output_packet.field_state[0] = SEQUENCE_RUNNING;
   for (int i = 1; i<ENGINE_PACKET_DATA_NUM_FIELDS; i++) begin
-    output_packet.field[i] = pending_packet.field[i-1];
+    output_packet.field[i]       = pending_packet.field[i-1];
+    output_packet.field_state[i] = pending_packet.field_state[i-1];
   end
 
   return output_packet;

@@ -391,16 +391,19 @@ always_ff @(posedge ap_clk) begin
         if(configure_engine_param_int.merge_mask[i]) begin
             for (int j = 0; j<ENGINE_PACKET_DATA_NUM_FIELDS; j++) begin
                 if(configure_engine_param_int.ops_mask[i][j]) begin
-                    generator_engine_request_engine_reg.payload.data.field[j] <= response_engine_in_int[i].payload.data.field[0];
+                    generator_engine_request_engine_reg.payload.data.field[j]       <= response_engine_in_int[i].payload.data.field[0];
+                    generator_engine_request_engine_reg.payload.data.field_state[j] <= response_engine_in_int[i].payload.data.field_state[0];
                 end
             end
         end else begin
-            generator_engine_request_engine_reg.payload.data.field[i] <= response_engine_in_int[0].payload.data.field[i];
+            generator_engine_request_engine_reg.payload.data.field[i]       <= response_engine_in_int[0].payload.data.field[i];
+            generator_engine_request_engine_reg.payload.data.field_state[i] <= response_engine_in_int[0].payload.data.field_state[i];
         end
     end
 
     for (int i=(1+ENGINE_MERGE_WIDTH); i<ENGINE_PACKET_DATA_NUM_FIELDS; i++) begin
-        generator_engine_request_engine_reg.payload.data.field[i] <= response_engine_in_int[0].payload.data.field[i];
+        generator_engine_request_engine_reg.payload.data.field[i]       <= response_engine_in_int[0].payload.data.field[i];
+        generator_engine_request_engine_reg.payload.data.field_state[i] <= response_engine_in_int[0].payload.data.field_state[i];
     end
 end
 

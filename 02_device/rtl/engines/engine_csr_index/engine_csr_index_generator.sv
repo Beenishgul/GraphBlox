@@ -358,7 +358,7 @@ module engine_csr_index_generator #(parameter
     localparam BURST_SCALE     = 2                          ;
     localparam PAGE_SIZE_WORDS = 4096/(M00_AXI4_FE_DATA_W/8); // 4K page size in words
     localparam PAGE_SIZE_LOG2  = $clog2(PAGE_SIZE_WORDS)    ;
-    // --------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------
     assign cmd_stream_read_int = configure_engine_int.payload.param.mode_buffer ? (fifo_request_memory_out_signals_in_reg.rd_en & backtrack_fifo_request_memory_out_signals_out.rd_en) : (fifo_request_engine_out_signals_in_reg.rd_en & backtrack_fifo_response_engine_in_signals_out.rd_en);
     assign enter_gen_pause_int = configure_engine_int.payload.param.mode_buffer ? fifo_request_send_signals_out_int.prog_full : fifo_request_send_signals_out_int.prog_full;
     assign exit_gen_pause_int  = configure_engine_int.payload.param.mode_buffer ? (fifo_request_commit_signals_out_int.empty & fifo_request_pending_signals_out_int.empty & fifo_request_send_signals_out_int.empty & ~cmd_in_flight_assert) : fifo_request_send_signals_out_int.empty & ~cmd_in_flight_assert;
@@ -751,11 +751,13 @@ module engine_csr_index_generator #(parameter
                     if(|configure_memory_reg.payload.param.ops_mask[i])begin
                         for (int j = 0; j<ENGINE_PACKET_DATA_NUM_FIELDS; j++) begin
                             if(configure_memory_reg.payload.param.ops_mask[i][j]) begin
-                                fifo_request_comb.payload.data.field[i] = configure_engine_int.payload.data.field[j];
+                                fifo_request_comb.payload.data.field[i]       = configure_engine_int.payload.data.field[j];
+                                fifo_request_comb.payload.data.field_state[i] = configure_engine_int.payload.data.field_state[j];
                             end
                         end
                     end else begin
-                        fifo_request_comb.payload.data.field[i] = counter_count;
+                        fifo_request_comb.payload.data.field[i]       = counter_count;
+                        fifo_request_comb.payload.data.field_state[i] = SEQUENCE_RUNNING;
                     end
                 end
             end
@@ -766,6 +768,7 @@ module engine_csr_index_generator #(parameter
                 end else  begin
                     fifo_request_comb.payload.data.field[i] = counter_count;
                 end
+                fifo_request_comb.payload.data.field_state[i] = SEQUENCE_RUNNING;
             end
         end
     end

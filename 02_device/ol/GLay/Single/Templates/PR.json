@@ -241,7 +241,11 @@
                     "bits": "5",
                     "value": "0x00"
                 },
-                "merge_mask": {
+                "merge_mask_1": {
+                    "bits": "5",
+                    "value": "0x00"
+                },
+                "merge_mask_2": {
                     "bits": "5",
                     "value": "0x00"
                 }
