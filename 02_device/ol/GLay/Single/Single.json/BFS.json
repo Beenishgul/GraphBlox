@@ -17,8 +17,12 @@
                 "cast_mask": {
                     "bits": "5",
                     "value": "0x03"
-                }, 
-                "merge_mask": {
+                },
+                "merge_mask_1": {
+                    "bits": "5",
+                    "value": "0x00"
+                },
+                "merge_mask_2": {
                     "bits": "5",
                     "value": "0x00"
                 }
@@ -660,8 +664,12 @@
                 "cast_mask": {
                     "bits": "5",
                     "value": "0x07"
-                }, 
-                "merge_mask": {
+                },
+                "merge_mask_1": {
+                    "bits": "5",
+                    "value": "0x07"
+                },
+                "merge_mask_2": {
                     "bits": "5",
                     "value": "0x07"
                 }
