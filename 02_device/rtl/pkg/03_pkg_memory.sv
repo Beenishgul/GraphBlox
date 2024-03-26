@@ -499,7 +499,7 @@ function EnginePacketData map_MemoryResponsePacketData_to_EnginePacketData (inpu
   EnginePacketData output_packet;
 
   output_packet.field[0]       = input_packet.field;
-  output_packet.field_state[0] = SEQUENCE_RUNNING;
+  output_packet.field_state[0] = pending_packet.field_state[0];
   for (int i = 1; i<ENGINE_PACKET_DATA_NUM_FIELDS; i++) begin
     output_packet.field[i]       = pending_packet.field[i-1];
     output_packet.field_state[i] = pending_packet.field_state[i-1];

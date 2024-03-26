@@ -409,7 +409,7 @@ always_comb sequence_state_control_int = break_start_flow_int ? SEQUENCE_BREAK :
 // --------------------------------------------------------------------------------------
 localparam RESPONSE_ENGINE_IN_INT_STAGES  = 3;
 localparam RESPONSE_ENGINE_GEN_INT_STAGES = 1;
-// --------------------------------------------------------------------------------------
+
 hyper_pipeline_noreset #(
     .STAGES(RESPONSE_ENGINE_IN_INT_STAGES),
     .WIDTH ($bits(EnginePacketMeta)      )
@@ -437,8 +437,15 @@ engine_filter_cond_kernel inst_engine_filter_cond_kernel (
 );
 // --------------------------------------------------------------------------------------
 always_comb begin
-    generator_engine_request_engine_start_Stage.valid                                 = filter_flow_int & ~break_running_flow_reg;
-    generator_engine_request_engine_start_Stage.payload.data                          = result_int;
+    generator_engine_request_engine_start_Stage.valid        = filter_flow_int & ~break_running_flow_reg;
+    generator_engine_request_engine_start_Stage.payload.data = result_int;
+
+    for (int i = 0; i<ENGINE_PACKET_DATA_NUM_FIELDS-1; i++) begin
+        if (configure_engine_int.payload.param.filter_mask[i]) begin
+            generator_engine_request_engine_start_Stage.payload.data.field_state[i] = sequence_state_engine_int;
+        end
+    end
+
     generator_engine_request_engine_start_Stage.payload.meta.route.packet_destination = packet_destination_int;
     generator_engine_request_engine_start_Stage.payload.meta.route.sequence_source    = response_engine_reg_int.route.sequence_source;
     generator_engine_request_engine_start_Stage.payload.meta.route.sequence_state     = sequence_state_engine_int;

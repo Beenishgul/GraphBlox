@@ -79,7 +79,7 @@ always_ff @(posedge ap_clk) begin
   config_params_reg.alu_mask      <= config_params_in.alu_mask;
   config_params_reg.alu_operation <= config_params_in.alu_operation;
   if (clear) begin
-    result_reg <= 0;
+    result_reg.field <= 0;
   end else begin
     case (config_params_reg.alu_operation)
 // --------------------------------------------------------------------------------------
@@ -90,7 +90,7 @@ always_ff @(posedge ap_clk) begin
       ALU_ADD : begin
         for (int i = 0; i<ENGINE_PACKET_DATA_NUM_FIELDS-1; i++) begin
           if (config_params_reg.alu_mask[i]) begin
-            result_reg <= ops_value_reg.field[i] + ops_value_reg.field[i+1];
+            result_reg.field <= ops_value_reg.field[i] + ops_value_reg.field[i+1];
           end
         end
       end
@@ -99,9 +99,9 @@ always_ff @(posedge ap_clk) begin
         for (int i = 0; i<ENGINE_PACKET_DATA_NUM_FIELDS-1; i++) begin
           if (config_params_reg.alu_mask[i]) begin
             if(ops_value_reg.field[i] > ops_value_reg.field[i+1])
-              result_reg <= ops_value_reg.field[i] - ops_value_reg.field[i+1];
+              result_reg.field <= ops_value_reg.field[i] - ops_value_reg.field[i+1];
             else
-              result_reg <= ops_value_reg.field[i+1] - ops_value_reg.field[i];
+              result_reg.field <= ops_value_reg.field[i+1] - ops_value_reg.field[i];
           end
         end
       end
@@ -109,7 +109,7 @@ always_ff @(posedge ap_clk) begin
       ALU_MUL : begin
         for (int i = 0; i<ENGINE_PACKET_DATA_NUM_FIELDS-1; i++) begin
           if (config_params_reg.alu_mask[i]) begin
-            result_reg <= ops_value_reg.field[i] * ops_value_reg.field[i+1];
+            result_reg.field <= ops_value_reg.field[i] * ops_value_reg.field[i+1];
           end
         end
       end
@@ -118,7 +118,7 @@ always_ff @(posedge ap_clk) begin
         if(data_valid_reg) begin
           for (int i = 0; i<ENGINE_PACKET_DATA_NUM_FIELDS; i++) begin
             if (config_params_reg.alu_mask[i]) begin
-              result_reg <= result_reg + ops_value_reg.field[i];
+              result_reg.field <= result_reg.field + ops_value_reg.field[i];
             end
           end
         end
