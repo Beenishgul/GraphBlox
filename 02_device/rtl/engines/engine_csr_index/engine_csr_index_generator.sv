@@ -881,8 +881,10 @@ module engine_csr_index_generator #(parameter
 
         if(response_memory_counter_is_zero & fifo_request_signals_out_reg_empty) begin
             fifo_request_dout_reg_S2.payload.meta.route.sequence_state <= SEQUENCE_DONE;
+            fifo_request_dout_reg_S2.payload.data.field_state[0]       <= SEQUENCE_DONE;
         end else begin
             fifo_request_dout_reg_S2.payload.meta.route.sequence_state <= SEQUENCE_RUNNING;
+            fifo_request_dout_reg_S2.payload.data.field_state[0]       <= SEQUENCE_RUNNING;
         end
     end
 // --------------------------------------------------------------------------------------

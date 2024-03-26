@@ -18,7 +18,11 @@
                     "bits": "5",
                     "value": "0x00"
                 },
-                "merge_mask": {
+                "merge_mask_1": {
+                    "bits": "5",
+                    "value": "0x00"
+                },
+                "merge_mask_2": {
                     "bits": "5",
                     "value": "0x00"
                 }
@@ -661,7 +665,11 @@
                     "bits": "5",
                     "value": "0x00"
                 },
-                "merge_mask": {
+                "merge_mask_1": {
+                    "bits": "5",
+                    "value": "0x00"
+                },
+                "merge_mask_2": {
                     "bits": "5",
                     "value": "0x00"
                 }
@@ -1231,6 +1239,10 @@
                 "conditional_flag": {
                     "bits": "1",
                     "value": "0"
+                },
+                "equal_flag": {
+                    "bits": "1",
+                    "value": "0"
                 }
             },
             "entry_6": {
@@ -1619,6 +1631,10 @@
                     "value": "0"
                 },
                 "conditional_flag": {
+                    "bits": "1",
+                    "value": "0"
+                },
+                "equal_flag": {
                     "bits": "1",
                     "value": "0"
                 }

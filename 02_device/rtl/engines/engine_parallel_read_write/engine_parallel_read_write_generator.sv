@@ -661,9 +661,9 @@ module engine_parallel_read_write_generator #(parameter
 // --------------------------------------------------------------------------------------
 // Generation Logic - Merge commit data [0-4] -> Gen
 // --------------------------------------------------------------------------------------
-    logic [1:0][ENGINE_PACKET_DATA_NUM_FIELDS-1:0] generator_engine_response_pending_in_merge_valid_int ;
-    logic [1:0][ENGINE_PACKET_DATA_NUM_FIELDS-1:0] generator_engine_response_pending_in_merge_valid_reg ;
-    logic [1:0] generator_engine_response_pending_in_merge_active_mask;
+    logic [1:0][ENGINE_PACKET_DATA_NUM_FIELDS-1:0] generator_engine_response_pending_in_merge_valid_int  ;
+    logic [1:0][ENGINE_PACKET_DATA_NUM_FIELDS-1:0] generator_engine_response_pending_in_merge_valid_reg  ;
+    logic [1:0]                                    generator_engine_response_pending_in_merge_active_mask;
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
         if (areset_generator) begin
@@ -689,19 +689,19 @@ module engine_parallel_read_write_generator #(parameter
         end
     end
 // --------------------------------------------------------------------------------------
-always_ff @(posedge ap_clk) begin
-    if (areset_generator) begin
-        generator_engine_response_pending_in_merge_active_mask <= 0;
-    end else begin
-        if(|generator_engine_response_pending_in_merge_valid_int[0]) begin
-            generator_engine_response_pending_in_merge_active_mask[0] <= 1'b1;
-            generator_engine_response_pending_in_merge_active_mask[1] <= 1'b0;
-        end else if(|generator_engine_response_pending_in_merge_valid_int[1]) begin
-            generator_engine_response_pending_in_merge_active_mask[0] <= 1'b0;
-            generator_engine_response_pending_in_merge_active_mask[1] <= 1'b1;
+    always_ff @(posedge ap_clk) begin
+        if (areset_generator) begin
+            generator_engine_response_pending_in_merge_active_mask <= 0;
+        end else begin
+            if(|generator_engine_response_pending_in_merge_valid_int[0]) begin
+                generator_engine_response_pending_in_merge_active_mask[0] <= 1'b1;
+                generator_engine_response_pending_in_merge_active_mask[1] <= 1'b0;
+            end else if(|generator_engine_response_pending_in_merge_valid_int[1]) begin
+                generator_engine_response_pending_in_merge_active_mask[0] <= 1'b0;
+                generator_engine_response_pending_in_merge_active_mask[1] <= 1'b1;
+            end
         end
     end
-end
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
         if (areset_generator) begin
@@ -734,22 +734,25 @@ end
 
         for (int j=0; j<(ENGINE_PACKET_DATA_NUM_FIELDS); j++) begin
             if(generator_engine_response_pending_in_merge_valid_int[0][j] | generator_engine_response_pending_in_merge_valid_int[1][j]) begin
-                request_pending_out_reg.payload.data.field[j] <= request_pending_out_int.payload.data.field[0];
+                request_pending_out_reg.payload.data.field[j]       <= request_pending_out_int.payload.data.field[0];
+                request_pending_out_reg.payload.data.field_state[j] <= request_pending_out_int.payload.data.field_state[0];
             end
         end
 
         for (int j=0; j<(ENGINE_PACKET_DATA_NUM_FIELDS); j++) begin
             if(request_pending_out_int.valid & ~configure_engine_int.payload.param.merge_mask[0][j] & generator_engine_response_pending_in_merge_active_mask[0]) begin
-                request_pending_out_reg.payload.data.field[j] <= request_pending_out_int.payload.data.field[j];
+                request_pending_out_reg.payload.data.field[j]       <= request_pending_out_int.payload.data.field[j];
+                request_pending_out_reg.payload.data.field_state[j] <= request_pending_out_int.payload.data.field_state[j];
             end else if(request_pending_out_int.valid & ~configure_engine_int.payload.param.merge_mask[1][j] & generator_engine_response_pending_in_merge_active_mask[1]) begin
-                request_pending_out_reg.payload.data.field[j] <= request_pending_out_int.payload.data.field[j];
+                request_pending_out_reg.payload.data.field[j]       <= request_pending_out_int.payload.data.field[j];
+                request_pending_out_reg.payload.data.field_state[j] <= request_pending_out_int.payload.data.field_state[j];
             end
         end
     end
 // --------------------------------------------------------------------------------------
-always_comb begin
-    
-end
+    always_comb begin
+
+    end
 // --------------------------------------------------------------------------------------
     always_comb begin
         for (int i = 0; i < ENGINE_PACKET_DATA_NUM_FIELDS; i++) begin
