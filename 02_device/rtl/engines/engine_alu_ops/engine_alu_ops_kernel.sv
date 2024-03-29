@@ -78,6 +78,8 @@ end
 always_ff @(posedge ap_clk) begin
   config_params_reg.alu_mask      <= config_params_in.alu_mask;
   config_params_reg.alu_operation <= config_params_in.alu_operation;
+  result_reg.field_state          <= org_value_reg.field_state; // Undefined operations reset result_out
+
   if (clear) begin
     result_reg.field <= 0;
   end else begin
@@ -125,11 +127,11 @@ always_ff @(posedge ap_clk) begin
       end
 // --------------------------------------------------------------------------------------
       ALU_DIV : begin
-        result_reg <= ops_value_reg; // Undefined operations reset result_out
+        result_reg.field <= ops_value_reg.field; // Undefined operations reset result_out
       end
 // --------------------------------------------------------------------------------------
       default : begin
-        result_reg <= ops_value_reg; // Undefined operations reset result_out
+        result_reg.field <= ops_value_reg.field; // Undefined operations reset result_out
       end
 // --------------------------------------------------------------------------------------
     endcase
