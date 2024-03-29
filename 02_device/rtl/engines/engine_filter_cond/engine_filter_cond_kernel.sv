@@ -69,6 +69,7 @@ always_ff @(posedge ap_clk) begin
   config_params_reg.filter_mask      <= config_params_in.filter_mask;
   config_params_reg.filter_operation <= config_params_in.filter_operation;
   config_params_reg.equal_flag       <= config_params_in.equal_flag;
+  result_reg.field_state             <= org_value_reg.field_state; // Undefined operations reset result_out
   case (config_params_reg.filter_operation)
 // --------------------------------------------------------------------------------------
     FILTER_NOP : begin
@@ -185,8 +186,8 @@ always_ff @(posedge ap_clk) begin
     end
 // --------------------------------------------------------------------------------------
     default : begin
-      result_reg      <= org_value_reg; // Undefined operations reset result_out
-      result_bool_reg <= ~0;
+      result_reg.field <= org_value_reg.field; // Undefined operations reset result_out
+      result_bool_reg  <= ~0;
     end
 // --------------------------------------------------------------------------------------
   endcase
