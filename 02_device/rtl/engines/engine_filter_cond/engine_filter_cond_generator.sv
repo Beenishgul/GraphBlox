@@ -446,6 +446,12 @@ always_comb begin
         end
     end
 
+    for (int i = 0; i<ENGINE_PACKET_DATA_NUM_FIELDS-1; i++) begin
+        if (configure_engine_int.payload.param.set_mask[i] & (filter_flow_int & ~break_running_flow_reg)) begin
+            generator_engine_request_engine_start_Stage.payload.data.field_state[i] = configure_engine_int.payload.param.set_value;
+        end
+    end
+
     generator_engine_request_engine_start_Stage.payload.meta.route.packet_destination = packet_destination_int;
     generator_engine_request_engine_start_Stage.payload.meta.route.sequence_source    = response_engine_reg_int.route.sequence_source;
     generator_engine_request_engine_start_Stage.payload.meta.route.sequence_state     = sequence_state_engine_int;

@@ -273,7 +273,9 @@ typedef struct packed{
     type_filter_operation                                                        filter_operation;
     logic [ENGINE_PACKET_DATA_NUM_FIELDS-1:0]                                    filter_mask     ;
     logic [ENGINE_PACKET_DATA_NUM_FIELDS-1:0]                                    const_mask      ;
+    logic [ENGINE_PACKET_DATA_NUM_FIELDS-1:0]                                    set_mask        ;
     logic [           M00_AXI4_FE_DATA_W-1:0]                                    const_value     ;
+    logic [           M00_AXI4_FE_DATA_W-1:0]                                    set_value       ;
     logic [ENGINE_PACKET_DATA_NUM_FIELDS-1:0][ENGINE_PACKET_DATA_NUM_FIELDS-1:0] ops_mask        ;
     logic                                                                        break_flag      ;
     logic                                                                        break_pass      ;
