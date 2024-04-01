@@ -28,6 +28,10 @@
                 "const_mask": {
                     "bits": "5",
                     "value": "0x00"
+                },                
+                "set_mask": {
+                    "bits": "5",
+                    "value": "0x00"
                 }
             },
             "entry_3": {
@@ -37,6 +41,12 @@
                 }
             },
             "entry_4": {
+                "set_value": {
+                    "bits": "32",
+                    "value": "0x00000000"
+                }
+            },
+            "entry_5": {
                 "ops_mask":{},
                 "field_1": {
                     "bits": "5",
@@ -59,7 +69,7 @@
                     "value": "0x00"
                 }
             },
-            "entry_5": {
+            "entry_6": {
                 "break_flag": {
                     "bits": "1",
                     "value": "0"
@@ -93,7 +103,7 @@
                     "value": "0"
                 }
             },
-            "entry_6": {
+            "entry_7": {
                 "if_id_cu": {
                     "bits": "8",
                     "value": "0x00"
@@ -111,7 +121,7 @@
                     "value": "0x00"
                 }
             },
-            "entry_7": {
+            "entry_8": {
                 "else_id_cu": {
                     "bits": "8",
                     "value": "0x00"
@@ -129,7 +139,7 @@
                     "value": "0x00"
                 }
             },
-            "entry_8": {
+            "entry_9": {
                 "if_id_module": {
                     "bits": "8",
                     "value": "0x00"
