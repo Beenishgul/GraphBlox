@@ -9389,7 +9389,7 @@ m{0:02d}_axi_cu_cache_mid{1}x{2}_fe{3}x{4} inst_m{0:02d}_axi_cu_cache_mid{1}x{2}
   .M0_AXI_RRESP      (m_axi_read_in.rresp                                      ), // Input Read channel response
   .M0_AXI_ARVALID    (m_axi_read_out.arvalid                                   ), // Output Read Address read channel valid
    //.M0_AXI_ARADDR     ({{m_axi_read_out_araddr_{2}, m_axi_read_out.araddr[{2}-2:0]}}  ), // Output Read Address read channel address
-  .M0_AXI_ARADDR     (m_axi_read.out.araddr                                    ), // Output Read Address read channel address
+  .M0_AXI_ARADDR     (m_axi_read_out.araddr                                    ), // Output Read Address read channel address
   .M0_AXI_ARLEN      (m_axi_read_out.arlen                                     ), // Output Read Address channel burst length
   .M0_AXI_RREADY     (m_axi_read_out.rready                                    ), // Output Read Read channel ready
   .M0_AXI_ARID       (m_axi_read_out.arid                                      ), // Output Read Address read channel ID
@@ -9407,7 +9407,7 @@ m{0:02d}_axi_cu_cache_mid{1}x{2}_fe{3}x{4} inst_m{0:02d}_axi_cu_cache_mid{1}x{2}
   .M0_AXI_AWVALID    (m_axi_write_out.awvalid                                  ), // Output Write Address write channel valid
   .M0_AXI_AWID       (m_axi_write_out.awid                                     ), // Output Write Address write channel ID
    //.M0_AXI_AWADDR     ({{m_axi_write_out_awaddr_{2}, m_axi_write_out.awaddr[{2}-2:0]}}), // Output Write Address write channel address
-  .M0_AXI_AWADDR     (m_axi_write.out.awaddr                                   ), // Output Write Address write channel address
+  .M0_AXI_AWADDR     (m_axi_write_out.awaddr                                   ), // Output Write Address write channel address
   .M0_AXI_AWLEN      (m_axi_write_out.awlen                                    ), // Output Write Address write channel burst length
   .M0_AXI_AWSIZE     (m_axi_write_out.awsize                                   ), // Output Write Address write channel burst size. This signal indicates the size of each transfer in the burst
   .M0_AXI_AWBURST    (m_axi_write_out.awburst                                  ), // Output Write Address write channel burst type
