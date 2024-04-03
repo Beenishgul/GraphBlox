@@ -186,6 +186,10 @@
                 "const_mask": {
                     "bits": "5",
                     "value": "0x00"
+                },
+                "mode_cache": {
+                    "bits": "4",
+                    "value": "0x0"
                 }
             },
             "entry_9": {
@@ -307,6 +311,10 @@
                     "bits": "5",
                     "value": "0x00"
                 },
+                "mode_cache": {
+                    "bits": "4",
+                    "value": "0x0"
+                },
                 "op_bundle": {
                     "bits": "8",
                     "value": "0x00"
@@ -401,6 +409,10 @@
                 "const_mask": {
                     "bits": "5",
                     "value": "0x00"
+                },
+                "mode_cache": {
+                    "bits": "4",
+                    "value": "0x0"
                 },
                 "op_bundle": {
                     "bits": "8",
@@ -497,6 +509,10 @@
                     "bits": "5",
                     "value": "0x00"
                 },
+                "mode_cache": {
+                    "bits": "4",
+                    "value": "0x0"
+                },
                 "op_bundle": {
                     "bits": "8",
                     "value": "0x00"
@@ -592,6 +608,10 @@
                     "bits": "5",
                     "value": "0x00"
                 },
+                "mode_cache": {
+                    "bits": "4",
+                    "value": "0x0"
+                },
                 "op_bundle": {
                     "bits": "8",
                     "value": "0x00"
@@ -686,6 +706,10 @@
                 "const_mask": {
                     "bits": "5",
                     "value": "0x00"
+                },
+                "mode_cache": {
+                    "bits": "4",
+                    "value": "0x0"
                 },
                 "op_bundle": {
                     "bits": "8",
@@ -793,6 +817,10 @@
                 "const_mask": {
                     "bits": "5",
                     "value": "0x00"
+                },
+                "mode_cache": {
+                    "bits": "4",
+                    "value": "0x0"
                 }
             },
             "entry_5": {
@@ -935,6 +963,10 @@
                 "const_mask": {
                     "bits": "5",
                     "value": "0x00"
+                },
+                "mode_cache": {
+                    "bits": "4",
+                    "value": "0x0"
                 }
             },
             "entry_9": {
@@ -1037,6 +1069,10 @@
                 "const_mask": {
                     "bits": "5",
                     "value": "0x00"
+                },
+                "mode_cache": {
+                    "bits": "4",
+                    "value": "0x0"
                 }
             },
             "entry_5": {

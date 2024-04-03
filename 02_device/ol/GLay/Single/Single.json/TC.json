@@ -105,6 +105,10 @@
                 "const_mask": {
                     "bits": "5",
                     "value": "0x0"
+                },
+                "mode_cache": {
+                    "bits": "4",
+                    "value": "0x0"
                 }
             },
             "entry_9": {
@@ -404,6 +408,10 @@
                 "const_mask": {
                     "bits": "5",
                     "value": "0x0"
+                },
+                "mode_cache": {
+                    "bits": "4",
+                    "value": "0x0"
                 }
             },
             "entry_9": {
@@ -525,6 +533,10 @@
                     "bits": "5",
                     "value": "0x0"
                 },
+                "mode_cache": {
+                    "bits": "4",
+                    "value": "0x0"
+                },
                 "op_bundle": {
                     "bits": "8",
                     "value": "0x01"
@@ -618,6 +630,10 @@
             "entry_12": {
                 "const_mask": {
                     "bits": "5",
+                    "value": "0x0"
+                },
+                "mode_cache": {
+                    "bits": "4",
                     "value": "0x0"
                 },
                 "op_bundle": {
@@ -715,6 +731,10 @@
                     "bits": "5",
                     "value": "0x0"
                 },
+                "mode_cache": {
+                    "bits": "4",
+                    "value": "0x0"
+                },
                 "op_bundle": {
                     "bits": "8",
                     "value": "0x01"
@@ -808,6 +828,10 @@
             "entry_26": {
                 "const_mask": {
                     "bits": "5",
+                    "value": "0x0"
+                },
+                "mode_cache": {
+                    "bits": "4",
                     "value": "0x0"
                 },
                 "op_bundle": {
@@ -904,6 +928,10 @@
                 "const_mask": {
                     "bits": "5",
                     "value": "0x2"
+                },
+                "mode_cache": {
+                    "bits": "4",
+                    "value": "0x0"
                 },
                 "op_bundle": {
                     "bits": "8",
@@ -1030,6 +1058,10 @@
                     "bits": "5",
                     "value": "0x0"
                 },
+                "mode_cache": {
+                    "bits": "4",
+                    "value": "0x0"
+                },
                 "op_bundle": {
                     "bits": "8",
                     "value": "0x01"
@@ -1123,6 +1155,10 @@
             "entry_12": {
                 "const_mask": {
                     "bits": "5",
+                    "value": "0x0"
+                },
+                "mode_cache": {
+                    "bits": "4",
                     "value": "0x0"
                 },
                 "op_bundle": {
@@ -1220,6 +1256,10 @@
                     "bits": "5",
                     "value": "0x0"
                 },
+                "mode_cache": {
+                    "bits": "4",
+                    "value": "0x0"
+                },
                 "op_bundle": {
                     "bits": "8",
                     "value": "0x01"
@@ -1313,6 +1353,10 @@
             "entry_26": {
                 "const_mask": {
                     "bits": "5",
+                    "value": "0x0"
+                },
+                "mode_cache": {
+                    "bits": "4",
                     "value": "0x0"
                 },
                 "op_bundle": {
@@ -1409,6 +1453,10 @@
                 "const_mask": {
                     "bits": "5",
                     "value": "0x2"
+                },
+                "mode_cache": {
+                    "bits": "4",
+                    "value": "0x0"
                 },
                 "op_bundle": {
                     "bits": "8",
@@ -1558,6 +1606,10 @@
             "entry_8": {
                 "const_mask": {
                     "bits": "5",
+                    "value": "0x0"
+                },
+                "mode_cache": {
+                    "bits": "4",
                     "value": "0x0"
                 }
             },
@@ -1858,6 +1910,10 @@
                 "const_mask": {
                     "bits": "5",
                     "value": "0x0"
+                },
+                "mode_cache": {
+                    "bits": "4",
+                    "value": "0x0"
                 }
             },
             "entry_9": {
@@ -2139,6 +2195,10 @@
                     "bits": "5",
                     "value": "0x0"
                 },
+                "mode_cache": {
+                    "bits": "4",
+                    "value": "0x0"
+                },
                 "op_bundle": {
                     "bits": "8",
                     "value": "0x04"
@@ -2232,6 +2292,10 @@
             "entry_12": {
                 "const_mask": {
                     "bits": "5",
+                    "value": "0x0"
+                },
+                "mode_cache": {
+                    "bits": "4",
                     "value": "0x0"
                 },
                 "op_bundle": {
@@ -2329,6 +2393,10 @@
                     "bits": "5",
                     "value": "0x0"
                 },
+                "mode_cache": {
+                    "bits": "4",
+                    "value": "0x0"
+                },
                 "op_bundle": {
                     "bits": "8",
                     "value": "0x04"
@@ -2424,6 +2492,10 @@
                     "bits": "5",
                     "value": "0x00"
                 },
+                "mode_cache": {
+                    "bits": "4",
+                    "value": "0x0"
+                },
                 "op_bundle": {
                     "bits": "8",
                     "value": "0x00"
@@ -2517,6 +2589,10 @@
             "entry_33": {
                 "const_mask": {
                     "bits": "5",
+                    "value": "0x0"
+                },
+                "mode_cache": {
+                    "bits": "4",
                     "value": "0x0"
                 },
                 "op_bundle": {

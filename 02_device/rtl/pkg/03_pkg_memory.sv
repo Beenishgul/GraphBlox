@@ -153,7 +153,7 @@ typedef struct packed{
   type_memory_burst_length               burst_length;
   type_memory_request_offset             offset      ; // SIZE = clog2(4GB) bits
   PacketDataAddressShift                 shift       ; // SIZE = clog2(offset) bits + 1
-  type_memory_cache_mode                 cache_mode  ;
+  type_memory_cache_mode                 mode_cache  ;
 } PacketRequestDataAddress;
 
 // --------------------------------------------------------------------------------------

@@ -9,7 +9,7 @@
 0x00000001 // entry_5    cacheline[  0][ 5] <30b>: cmd[0:5]=CMD_MEM_INVALID || id_module[6:13]=0x00 || id_engine[14:21]=0x00 || id_channel[22:29]=0x00
 0x00000000 // entry_6    cacheline[  0][ 6] <32b>: id_cu[0:7]=0x00 || id_bundle[8:15]=0x00 || id_lane[16:23]=0x00 || id_buffer[24:31]=0x00
 0x00000000 // entry_7    cacheline[  0][ 7] <32b>: array_size[0:31]=0x00000000
-0x00000000 // entry_8    cacheline[  0][ 8] < 5b>: const_mask[0:4]=0x0
+0x00000000 // entry_8    cacheline[  0][ 8] < 9b>: const_mask[0:4]=0x0 || mode_cache[5:8]=0x0
 0x00000000 // entry_9    cacheline[  0][ 9] <32b>: const_value[0:31]=0x00000000
 0x00000000 // entry_10   cacheline[  0][10] <25b>: field_1[0:4]=0x0 || field_2[5:9]=0x0 || field_3[10:14]=0x0 || field_4[15:19]=0x0 || field_5[20:24]=0x0
 // --------------------------------------------------------------------------------------
