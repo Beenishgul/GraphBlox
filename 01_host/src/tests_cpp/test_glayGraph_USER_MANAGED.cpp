@@ -639,13 +639,13 @@ void multiple_iteration_TC(struct GraphCSR *graph,
     printf(" -----------------------------------------------------\n");
     printf("| %-9f | \n", Seconds(timer));
     printf(" -----------------------------------------------------\n");
-    for (uint32_t i = 0; i < graph->num_vertices; i++)
-    {
-        DEBUG_PRINT("%u \n",
-                    static_cast<uint32_t *>(
-                        graphAuxiliary->auxiliary_2)[i + graph->num_vertices]);
-    }
-    DEBUG_PRINT(" -----------------------------------------------------\n");
+    // for (uint32_t i = 0; i < graph->num_vertices; i++)
+    // {
+    //     DEBUG_PRINT("%u \n",
+    //                 static_cast<uint32_t *>(
+    //                     graphAuxiliary->auxiliary_2)[i + graph->num_vertices]);
+    // }
+    // DEBUG_PRINT(" -----------------------------------------------------\n");
 
     count = static_cast<uint32_t *>(graphAuxiliary->auxiliary_2)[1];
     printf("| count %-9u | \n", count);
