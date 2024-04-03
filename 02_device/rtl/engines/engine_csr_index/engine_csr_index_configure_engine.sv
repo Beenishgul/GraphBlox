@@ -130,6 +130,7 @@ always_ff @(posedge ap_clk) begin
     configure_engine_reg.payload.param.mode_sequence           <= 1'b0;
     configure_engine_reg.payload.param.mode_buffer             <= 1'b0;
     configure_engine_reg.payload.param.mode_break              <= 1'b0;
+    configure_engine_reg.payload.param.mode_cache              <= M00_AXI4_FE_CACHE_WRITE_THROUGH_ALLOCATE_ON_READS;
     configure_engine_reg.payload.param.index_start             <= fifo_response_engine_in_dout_reg.payload.data.field[0];
     configure_engine_reg.payload.param.index_end               <= fifo_response_engine_in_dout_reg.payload.data.field[0] + fifo_response_engine_in_dout_reg.payload.data.field[1];
     configure_engine_reg.payload.param.stride                  <= 0;

@@ -588,14 +588,15 @@ module engine_parallel_read_write_generator #(parameter
 
     // Pop
     assign fifo_request_send_signals_in_int.rd_en = ~fifo_request_send_signals_out_int.empty & ~fifo_request_pending_signals_out_int.prog_full & ~fifo_request_commit_signals_out_int.prog_full & fifo_request_memory_out_signals_in_reg.rd_en & backtrack_fifo_request_memory_out_signals_out.rd_en;
-    assign request_send_out_int.valid             = fifo_request_send_signals_out_int.valid;
+    assign request_send_out_int.valid             = fifo_request_send_signals_out_int.valid & fifo_request_send_signals_in_int.rd_en ;
     assign request_send_out_int.payload           = fifo_request_send_dout;
 
     xpm_fifo_sync_wrapper #(
         .FIFO_WRITE_DEPTH(BURST_LENGTH * 2                     ),
         .WRITE_DATA_WIDTH($bits(EnginePacketFullPayload)       ),
         .READ_DATA_WIDTH ($bits(EnginePacketFullPayload)       ),
-        .PROG_THRESH     ((ENGINE_PACKET_DATA_NUM_FIELDS * 2)+1)
+        .PROG_THRESH     ((ENGINE_PACKET_DATA_NUM_FIELDS * 2)+1),
+        .READ_MODE       ("fwft"                               )
     ) inst_fifo_EnginePacketRequestSend (
         .clk        (ap_clk                                       ),
         .srst       (areset_fifo                                  ),
@@ -838,8 +839,8 @@ module engine_parallel_read_write_generator #(parameter
 // --------------------------------------------------------------------------------------
 // Backtrack FIFO module - Engine i <- Channel i-1
 // --------------------------------------------------------------------------------------
-    assign backtrack_configure_address_valid                      = configure_engine_int.valid;
-    assign backtrack_configure_address_in                         = configure_engine_int.payload.param.meta[0].address;
+    assign backtrack_configure_address_valid                      = fifo_request_send_signals_out_int.valid;
+    assign backtrack_configure_address_in                         = fifo_request_send_dout.meta.route.packet_destination;
     assign backtrack_fifo_request_memory_out_backtrack_signals_in = fifo_request_memory_out_backtrack_signals_in;
 
     backtrack_fifo_request_memory_out_signals #(

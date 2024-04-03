@@ -213,8 +213,9 @@ always_ff @(posedge ap_clk) begin
             end
             (1 << (5+(7*0))) : begin
                 configure_memory_reg.payload.param.param_field[0].const_mask <= fifo_response_memory_in_dout_reg.payload.data.field[ENGINE_PACKET_DATA_NUM_FIELDS-1:0];
-                configure_memory_reg.payload.param.meta[0].ops_bundle <= fifo_response_memory_in_dout_reg.payload.data.field[NUM_BUNDLES_WIDTH_BITS+ENGINE_PACKET_DATA_NUM_FIELDS-1:ENGINE_PACKET_DATA_NUM_FIELDS];
-                configure_memory_reg.payload.param.meta[0].ops_lane   <= fifo_response_memory_in_dout_reg.payload.data.field[NUM_LANES_WIDTH_BITS+CU_BUNDLE_COUNT_MAX_WIDTH_BITS+ENGINE_PACKET_DATA_NUM_FIELDS-1:CU_BUNDLE_COUNT_MAX_WIDTH_BITS+ENGINE_PACKET_DATA_NUM_FIELDS];
+                configure_memory_reg.payload.param.param_field[0].mode_cache <= fifo_response_memory_in_dout_reg.payload.data.field[M00_AXI4_FE_CACHE_W + ENGINE_PACKET_DATA_NUM_FIELDS-1:ENGINE_PACKET_DATA_NUM_FIELDS];
+                configure_memory_reg.payload.param.meta[0].ops_bundle <= fifo_response_memory_in_dout_reg.payload.data.field[NUM_BUNDLES_WIDTH_BITS+M00_AXI4_FE_CACHE_W +ENGINE_PACKET_DATA_NUM_FIELDS-1:M00_AXI4_FE_CACHE_W +ENGINE_PACKET_DATA_NUM_FIELDS];
+                configure_memory_reg.payload.param.meta[0].ops_lane   <= fifo_response_memory_in_dout_reg.payload.data.field[NUM_LANES_WIDTH_BITS+CU_BUNDLE_COUNT_MAX_WIDTH_BITS+M00_AXI4_FE_CACHE_W +ENGINE_PACKET_DATA_NUM_FIELDS-1:CU_BUNDLE_COUNT_MAX_WIDTH_BITS+M00_AXI4_FE_CACHE_W +ENGINE_PACKET_DATA_NUM_FIELDS];
             end
             (1 << (6+(7*0))) : begin
                 configure_memory_reg.payload.param.param_field[0].const_value <= fifo_response_memory_in_dout_reg.payload.data.field;
@@ -249,8 +250,9 @@ always_ff @(posedge ap_clk) begin
             end
             (1 << (5+(7*1))) : begin
                 configure_memory_reg.payload.param.param_field[1].const_mask <= fifo_response_memory_in_dout_reg.payload.data.field[ENGINE_PACKET_DATA_NUM_FIELDS-1:0];
-                configure_memory_reg.payload.param.meta[1].ops_bundle <= fifo_response_memory_in_dout_reg.payload.data.field[NUM_BUNDLES_WIDTH_BITS+ENGINE_PACKET_DATA_NUM_FIELDS-1:ENGINE_PACKET_DATA_NUM_FIELDS];
-                configure_memory_reg.payload.param.meta[1].ops_lane   <= fifo_response_memory_in_dout_reg.payload.data.field[NUM_LANES_WIDTH_BITS+CU_BUNDLE_COUNT_MAX_WIDTH_BITS+ENGINE_PACKET_DATA_NUM_FIELDS-1:CU_BUNDLE_COUNT_MAX_WIDTH_BITS+ENGINE_PACKET_DATA_NUM_FIELDS];
+                configure_memory_reg.payload.param.param_field[1].mode_cache <= fifo_response_memory_in_dout_reg.payload.data.field[M00_AXI4_FE_CACHE_W + ENGINE_PACKET_DATA_NUM_FIELDS-1:ENGINE_PACKET_DATA_NUM_FIELDS];
+                configure_memory_reg.payload.param.meta[1].ops_bundle <= fifo_response_memory_in_dout_reg.payload.data.field[NUM_BUNDLES_WIDTH_BITS+M00_AXI4_FE_CACHE_W +ENGINE_PACKET_DATA_NUM_FIELDS-1:M00_AXI4_FE_CACHE_W +ENGINE_PACKET_DATA_NUM_FIELDS];
+                configure_memory_reg.payload.param.meta[1].ops_lane   <= fifo_response_memory_in_dout_reg.payload.data.field[NUM_LANES_WIDTH_BITS+CU_BUNDLE_COUNT_MAX_WIDTH_BITS+M00_AXI4_FE_CACHE_W +ENGINE_PACKET_DATA_NUM_FIELDS-1:CU_BUNDLE_COUNT_MAX_WIDTH_BITS+M00_AXI4_FE_CACHE_W +ENGINE_PACKET_DATA_NUM_FIELDS];
             end
             (1 << (6+(7*1))) : begin
                 configure_memory_reg.payload.param.param_field[1].const_value <= fifo_response_memory_in_dout_reg.payload.data.field;
@@ -285,8 +287,9 @@ always_ff @(posedge ap_clk) begin
             end
             (1 << (5+(7*2))) : begin
                 configure_memory_reg.payload.param.param_field[2].const_mask <= fifo_response_memory_in_dout_reg.payload.data.field[ENGINE_PACKET_DATA_NUM_FIELDS-1:0];
-                configure_memory_reg.payload.param.meta[2].ops_bundle <= fifo_response_memory_in_dout_reg.payload.data.field[NUM_BUNDLES_WIDTH_BITS+ENGINE_PACKET_DATA_NUM_FIELDS-1:ENGINE_PACKET_DATA_NUM_FIELDS];
-                configure_memory_reg.payload.param.meta[2].ops_lane   <= fifo_response_memory_in_dout_reg.payload.data.field[NUM_LANES_WIDTH_BITS+CU_BUNDLE_COUNT_MAX_WIDTH_BITS+ENGINE_PACKET_DATA_NUM_FIELDS-1:CU_BUNDLE_COUNT_MAX_WIDTH_BITS+ENGINE_PACKET_DATA_NUM_FIELDS];
+                configure_memory_reg.payload.param.param_field[2].mode_cache <= fifo_response_memory_in_dout_reg.payload.data.field[M00_AXI4_FE_CACHE_W + ENGINE_PACKET_DATA_NUM_FIELDS-1:ENGINE_PACKET_DATA_NUM_FIELDS];
+                configure_memory_reg.payload.param.meta[2].ops_bundle <= fifo_response_memory_in_dout_reg.payload.data.field[NUM_BUNDLES_WIDTH_BITS+M00_AXI4_FE_CACHE_W +ENGINE_PACKET_DATA_NUM_FIELDS-1:M00_AXI4_FE_CACHE_W +ENGINE_PACKET_DATA_NUM_FIELDS];
+                configure_memory_reg.payload.param.meta[2].ops_lane   <= fifo_response_memory_in_dout_reg.payload.data.field[NUM_LANES_WIDTH_BITS+CU_BUNDLE_COUNT_MAX_WIDTH_BITS+M00_AXI4_FE_CACHE_W +ENGINE_PACKET_DATA_NUM_FIELDS-1:CU_BUNDLE_COUNT_MAX_WIDTH_BITS+M00_AXI4_FE_CACHE_W +ENGINE_PACKET_DATA_NUM_FIELDS];
             end
             (1 << (6+(7*2))) : begin
                 configure_memory_reg.payload.param.param_field[2].const_value <= fifo_response_memory_in_dout_reg.payload.data.field;
@@ -321,9 +324,10 @@ always_ff @(posedge ap_clk) begin
             end
             (1 << (5+(7*3))) : begin
                 configure_memory_reg.payload.param.param_field[3].const_mask <= fifo_response_memory_in_dout_reg.payload.data.field[ENGINE_PACKET_DATA_NUM_FIELDS-1:0];
-                configure_memory_reg.payload.param.meta[3].ops_bundle <= fifo_response_memory_in_dout_reg.payload.data.field[NUM_BUNDLES_WIDTH_BITS+ENGINE_PACKET_DATA_NUM_FIELDS-1:ENGINE_PACKET_DATA_NUM_FIELDS];
-                configure_memory_reg.payload.param.meta[3].ops_lane   <= fifo_response_memory_in_dout_reg.payload.data.field[NUM_LANES_WIDTH_BITS+CU_BUNDLE_COUNT_MAX_WIDTH_BITS+ENGINE_PACKET_DATA_NUM_FIELDS-1:CU_BUNDLE_COUNT_MAX_WIDTH_BITS+ENGINE_PACKET_DATA_NUM_FIELDS];
-            end
+                configure_memory_reg.payload.param.param_field[3].mode_cache <= fifo_response_memory_in_dout_reg.payload.data.field[M00_AXI4_FE_CACHE_W + ENGINE_PACKET_DATA_NUM_FIELDS-1:ENGINE_PACKET_DATA_NUM_FIELDS];
+                configure_memory_reg.payload.param.meta[3].ops_bundle <= fifo_response_memory_in_dout_reg.payload.data.field[NUM_BUNDLES_WIDTH_BITS+M00_AXI4_FE_CACHE_W +ENGINE_PACKET_DATA_NUM_FIELDS-1:M00_AXI4_FE_CACHE_W +ENGINE_PACKET_DATA_NUM_FIELDS];
+                configure_memory_reg.payload.param.meta[3].ops_lane   <= fifo_response_memory_in_dout_reg.payload.data.field[NUM_LANES_WIDTH_BITS+CU_BUNDLE_COUNT_MAX_WIDTH_BITS+M00_AXI4_FE_CACHE_W +ENGINE_PACKET_DATA_NUM_FIELDS-1:CU_BUNDLE_COUNT_MAX_WIDTH_BITS+M00_AXI4_FE_CACHE_W +ENGINE_PACKET_DATA_NUM_FIELDS];
+           end
             (1 << (6+(7*3))) : begin
                 configure_memory_reg.payload.param.param_field[3].const_value <= fifo_response_memory_in_dout_reg.payload.data.field;
             end
@@ -357,9 +361,10 @@ always_ff @(posedge ap_clk) begin
             end
             (1 << (5+(7*4))) : begin
                 configure_memory_reg.payload.param.param_field[4].const_mask <= fifo_response_memory_in_dout_reg.payload.data.field[ENGINE_PACKET_DATA_NUM_FIELDS-1:0];
-                configure_memory_reg.payload.param.meta[4].ops_bundle <= fifo_response_memory_in_dout_reg.payload.data.field[NUM_BUNDLES_WIDTH_BITS+ENGINE_PACKET_DATA_NUM_FIELDS-1:ENGINE_PACKET_DATA_NUM_FIELDS];
-                configure_memory_reg.payload.param.meta[4].ops_lane   <= fifo_response_memory_in_dout_reg.payload.data.field[NUM_LANES_WIDTH_BITS+CU_BUNDLE_COUNT_MAX_WIDTH_BITS+ENGINE_PACKET_DATA_NUM_FIELDS-1:CU_BUNDLE_COUNT_MAX_WIDTH_BITS+ENGINE_PACKET_DATA_NUM_FIELDS];
-            end
+                configure_memory_reg.payload.param.param_field[4].mode_cache <= fifo_response_memory_in_dout_reg.payload.data.field[M00_AXI4_FE_CACHE_W + ENGINE_PACKET_DATA_NUM_FIELDS-1:ENGINE_PACKET_DATA_NUM_FIELDS];
+                configure_memory_reg.payload.param.meta[4].ops_bundle <= fifo_response_memory_in_dout_reg.payload.data.field[NUM_BUNDLES_WIDTH_BITS+M00_AXI4_FE_CACHE_W +ENGINE_PACKET_DATA_NUM_FIELDS-1:M00_AXI4_FE_CACHE_W +ENGINE_PACKET_DATA_NUM_FIELDS];
+                configure_memory_reg.payload.param.meta[4].ops_lane   <= fifo_response_memory_in_dout_reg.payload.data.field[NUM_LANES_WIDTH_BITS+CU_BUNDLE_COUNT_MAX_WIDTH_BITS+M00_AXI4_FE_CACHE_W +ENGINE_PACKET_DATA_NUM_FIELDS-1:CU_BUNDLE_COUNT_MAX_WIDTH_BITS+M00_AXI4_FE_CACHE_W +ENGINE_PACKET_DATA_NUM_FIELDS];
+           end
             (1 << (6+(7*4))) : begin
                 configure_memory_reg.payload.param.param_field[4].const_value <= fifo_response_memory_in_dout_reg.payload.data.field;
             end

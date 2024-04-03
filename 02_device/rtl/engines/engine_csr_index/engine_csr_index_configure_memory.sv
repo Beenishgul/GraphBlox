@@ -220,6 +220,7 @@ always_ff @(posedge ap_clk) begin
             end
             (1 << 8) : begin
                 configure_memory_reg.payload.param.const_mask <= fifo_response_memory_in_dout_reg.payload.data.field[ENGINE_PACKET_DATA_NUM_FIELDS-1:0];
+                configure_memory_reg.payload.param.mode_cache <= fifo_response_memory_in_dout_reg.payload.data.field[M00_AXI4_FE_CACHE_W + ENGINE_PACKET_DATA_NUM_FIELDS-1:ENGINE_PACKET_DATA_NUM_FIELDS];
             end
             (1 << 9) : begin
                 configure_memory_reg.payload.param.const_value <= fifo_response_memory_in_dout_reg.payload.data.field;
