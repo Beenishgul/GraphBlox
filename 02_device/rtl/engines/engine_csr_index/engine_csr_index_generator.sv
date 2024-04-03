@@ -730,7 +730,7 @@ module engine_csr_index_generator #(parameter
     assign fifo_request_comb.payload.meta.address.id_channel       = configure_engine_int.payload.meta.address.id_channel;
     assign fifo_request_comb.payload.meta.address.id_buffer        = configure_engine_int.payload.meta.address.id_buffer;
     assign fifo_request_comb.payload.meta.address.shift            = configure_engine_int.payload.meta.address.shift;
-    assign fifo_request_comb.payload.meta.address.cache_mode       = configure_engine_int.payload.meta.address.cache_mode;
+    assign fifo_request_comb.payload.meta.address.mode_cache       = configure_memory_reg.payload.meta.address.mode_cache;
     assign fifo_request_comb.payload.meta.address.burst_length     = 1;
     assign fifo_request_comb.payload.meta.subclass                 = configure_engine_int.payload.meta.subclass;
 // --------------------------------------------------------------------------------------
@@ -859,6 +859,7 @@ module engine_csr_index_generator #(parameter
         fifo_request_dout_reg_S2.payload.meta.route.sequence_source    <= fifo_request_dout_reg.payload.meta.route.sequence_source;
         fifo_request_dout_reg_S2.payload.meta.route.sequence_id        <= fifo_request_dout_reg.payload.meta.route.sequence_id;
         fifo_request_dout_reg_S2.payload.meta.address.id_channel       <= fifo_request_dout_reg.payload.meta.address.id_channel;
+        fifo_request_dout_reg_S2.payload.meta.address.mode_cache       <= fifo_request_dout_reg.payload.meta.address.mode_cache;
         fifo_request_dout_reg_S2.payload.meta.address.id_buffer        <= fifo_request_dout_reg.payload.meta.address.id_buffer;
 
         fifo_request_dout_reg_S2.payload.meta.address.offset <= fifo_request_dout_reg.payload.meta.address.offset;
