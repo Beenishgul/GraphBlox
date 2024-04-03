@@ -75,6 +75,7 @@ always_ff @(posedge ap_clk) begin
   // Process the ALU operation if both config_params_in and data are valid field 1 used for offset and field 0 for data write, mask data accordingly
   address_int.shift.amount    <= config_params_reg.granularity;
   address_int.shift.direction <= config_params_reg.direction;
+  address_int.mode_cache      <= config_params_reg.mode_cache;
   address_int.id_channel      <= config_params_reg.id_channel;
   address_int.id_buffer       <= config_params_reg.id_buffer;
   address_int.burst_length    <= 1;

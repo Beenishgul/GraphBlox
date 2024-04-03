@@ -105,6 +105,10 @@
                 "const_mask": {
                     "bits": "5",
                     "value": "0x00"
+                },
+                "mode_cache": {
+                    "bits": "4",
+                    "value": "0x0"
                 }
             },
             "entry_9": {
