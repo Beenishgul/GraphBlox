@@ -8932,6 +8932,7 @@ iob_cache_axi #(
   .iob_addr_i  (cache_request_mem.iob.addr [CACHE_CTRL_CNT+M{0:02d}_AXI4_FE_ADDR_W-1:$clog2(M{0:02d}_AXI4_FE_DATA_W/8)]),
   .iob_wdata_i (cache_request_mem.iob.wdata                                                           ),
   .iob_wstrb_i (cache_request_mem.iob.wstrb                                                           ),
+  .iob_acache_i(cache_request_mem.meta.address.mode_cache                                             ),
   .iob_rdata_o (cache_response_mem.iob.rdata                                                          ),
   .iob_rvalid_o(cache_response_mem.iob.valid                                                          ),
   .iob_ready_o (cache_response_mem.iob.ready                                                          ),
@@ -9304,8 +9305,8 @@ axi_from_mem #(
   .mem_rsp_valid_o(sram_response_mem.iob.valid                        ),
   .mem_rsp_rdata_o(sram_response_mem.iob.rdata                        ),
   .mem_rsp_error_o(mem_rsp_error_o                                    ),
-  .slv_aw_cache_i (M{0:02d}_AXI4_MID_CACHE_WRITE_BACK_ALLOCATE_READS_WRITES),
-  .slv_ar_cache_i (M{0:02d}_AXI4_MID_CACHE_WRITE_BACK_ALLOCATE_READS_WRITES),
+  .slv_aw_cache_i (sram_request_mem.meta.address.mode_cache           ),
+  .slv_ar_cache_i (sram_request_mem.meta.address.mode_cache           ),
   .axi_req_o      (axi_req_o                                          ),
   .axi_rsp_i      (axi_rsp_i                                          )
 );
@@ -10340,8 +10341,8 @@ axi_from_mem #(
   .mem_rsp_valid_o(sram_response_mem.iob.valid              ),
   .mem_rsp_rdata_o(sram_response_mem.iob.rdata              ),
   .mem_rsp_error_o(mem_rsp_error_o                          ),
-  .slv_aw_cache_i (M{0:02d}_AXI4_MID_CACHE_WRITE_BACK_ALLOCATE_READS_WRITES),
-  .slv_ar_cache_i (M{0:02d}_AXI4_MID_CACHE_WRITE_BACK_ALLOCATE_READS_WRITES),
+  .slv_aw_cache_i (sram_request_mem.meta.address.mode_cache ),
+  .slv_ar_cache_i (sram_request_mem.meta.address.mode_cache ),
   .axi_req_o      (axi_req_o                                ),
   .axi_rsp_i      (axi_rsp_i                                )
 );

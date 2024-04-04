@@ -257,7 +257,7 @@ always_comb begin
             next_state = CU_SETUP_FLUSH_DONE;
         end
         default : begin
-          next_state = CU_SETUP_RESET;
+            next_state = CU_SETUP_RESET;
         end
     endcase
 end// always_comb
@@ -380,6 +380,7 @@ assign configuration_comb_program.meta.route.packet_source.id_module = 1;
 assign configuration_comb_program.meta.address.id_channel            = 1;
 assign configuration_comb_program.meta.address.id_buffer             = 0;
 assign configuration_comb_program.meta.address.offset                = 0;
+assign configuration_comb_program.meta.address.mode_cache            = M00_AXI4_FE_CACHE_WRITE_THROUGH_ALLOCATE_ON_READS;
 assign configuration_comb_program.meta.address.burst_length          = 1;
 assign configuration_comb_program.meta.address.shift.amount          = $clog2(M00_AXI4_FE_DATA_W/8);
 assign configuration_comb_program.meta.address.shift.direction       = 1'b1;
@@ -403,6 +404,7 @@ assign configuration_comb_flush.meta.route                   = 0;
 assign configuration_comb_flush.meta.address.id_channel      = 1;
 assign configuration_comb_flush.meta.address.id_buffer       = 0;
 assign configuration_comb_flush.meta.address.offset          = 0;
+assign configuration_comb_flush.meta.address.mode_cache      = M00_AXI4_FE_CACHE_WRITE_THROUGH_ALLOCATE_ON_READS;
 assign configuration_comb_flush.meta.address.burst_length    = 1;
 assign configuration_comb_flush.meta.address.shift.amount    = $clog2(M00_AXI4_FE_DATA_W/8);
 assign configuration_comb_flush.meta.address.shift.direction = 1'b1;

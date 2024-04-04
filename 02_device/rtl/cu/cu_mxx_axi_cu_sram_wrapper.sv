@@ -250,8 +250,8 @@ axi_from_mem #(
   .mem_rsp_valid_o(sram_response_mem.iob.valid              ),
   .mem_rsp_rdata_o(sram_response_mem.iob.rdata              ),
   .mem_rsp_error_o(mem_rsp_error_o                          ),
-  .slv_aw_cache_i (M00_AXI4_MID_CACHE_WRITE_BACK_ALLOCATE_READS_WRITES),
-  .slv_ar_cache_i (M00_AXI4_MID_CACHE_WRITE_BACK_ALLOCATE_READS_WRITES),
+  .slv_aw_cache_i (sram_request_mem.meta.address.mode_cache ),
+  .slv_ar_cache_i (sram_request_mem.meta.address.mode_cache ),
   .axi_req_o      (axi_req_o                                ),
   .axi_rsp_i      (axi_rsp_i                                )
 );
@@ -595,8 +595,8 @@ axi_from_mem #(
   .mem_rsp_valid_o(sram_response_mem.iob.valid              ),
   .mem_rsp_rdata_o(sram_response_mem.iob.rdata              ),
   .mem_rsp_error_o(mem_rsp_error_o                          ),
-  .slv_aw_cache_i (M01_AXI4_MID_CACHE_WRITE_BACK_ALLOCATE_READS_WRITES),
-  .slv_ar_cache_i (M01_AXI4_MID_CACHE_WRITE_BACK_ALLOCATE_READS_WRITES),
+  .slv_aw_cache_i (sram_request_mem.meta.address.mode_cache ),
+  .slv_ar_cache_i (sram_request_mem.meta.address.mode_cache ),
   .axi_req_o      (axi_req_o                                ),
   .axi_rsp_i      (axi_rsp_i                                )
 );

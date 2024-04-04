@@ -332,6 +332,7 @@ module engine_cu_setup #(parameter COUNTER_WIDTH      = 32) (
     assign fifo_request_comb.meta.address.id_buffer    = configuration_reg.payload.meta.address.id_buffer;
     assign fifo_request_comb.meta.address.shift        = configuration_reg.payload.meta.address.shift;
     assign fifo_request_comb.meta.address.burst_length = configuration_reg.payload.meta.address.burst_length;
+    assign fifo_request_comb.meta.address.mode_cache   = configuration_reg.payload.meta.address.mode_cache;
     assign fifo_request_comb.meta.subclass             = configuration_reg.payload.meta.subclass;
 
     always_comb begin
