@@ -129,7 +129,7 @@ module iob_cache_front_end #(
       .data_o(data_wstrb_reg_o)
    );
    iob_reg_re #(
-      .DATA_W (DATA_W / 8),
+      .DATA_W (4),
       .RST_VAL(0)
    ) iob_reg_acache (
       .clk_i (clk_i),
