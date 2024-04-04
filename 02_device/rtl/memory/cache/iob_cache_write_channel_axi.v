@@ -29,6 +29,7 @@ module iob_cache_write_channel_axi #(
    input      [           ADDR_W-1 : FE_NBYTES_W + WRITE_POL*WORD_OFFSET_W] addr_i,
    input      [DATA_W + WRITE_POL*(DATA_W*(2**WORD_OFFSET_W)-DATA_W)-1 : 0] wdata_i,
    input      [                                              FE_NBYTES-1:0] wstrb_i,
+   input      [                                              FE_NBYTES-1:0] acache_i,
    output reg                                                               ready_o,
    output     [                                               AXI_ID_W-1:0] axi_awid_o,
    output     [                                             AXI_ADDR_W-1:0] axi_awaddr_o,
@@ -57,10 +58,12 @@ module iob_cache_write_channel_axi #(
    reg axi_awvalid_int;
    reg axi_wvalid_int;
    reg axi_bready_int;
+   reg [4-1:0] axi_awcache_int;
 
    assign axi_awvalid_o = axi_awvalid_int;
    assign axi_wvalid_o  = axi_wvalid_int;
    assign axi_bready_o  = axi_bready_int;
+   assign axi_awcache_o  = axi_awcache_int;
 
    genvar i;
    generate
@@ -72,7 +75,7 @@ module iob_cache_write_channel_axi #(
          assign axi_awsize_o = BE_NBYTES_W;  // verify - Writes data of the size of BE_DATA_W
          assign axi_awburst_o = 2'd0;
          assign axi_awlock_o = 1'b0;  // 00 - Normal Access
-         assign axi_awcache_o = CACHE_AXI_CACHE_MODE;
+         // assign axi_awcache_o = CACHE_AXI_CACHE_MODE;
          assign axi_awprot_o = 3'd0;
          assign axi_awqos_o = 4'd0;
          assign axi_wlast_o = axi_wvalid_o;
@@ -97,8 +100,14 @@ module iob_cache_write_channel_axi #(
          reg [1:0] state;
 
          always @(posedge clk_i, posedge reset_i) begin
-            if (reset_i) state <= idle;
+            if (reset_i) begin 
+               state <= idle;
+               axi_awcache_int <= CACHE_AXI_CACHE_MODE;
+            end
             else
+               
+               if (valid_i) axi_awcache_int <= acache_i;
+
                case (state)
                   idle: begin
                      if (valid_i) state <= address;
@@ -145,7 +154,7 @@ module iob_cache_write_channel_axi #(
             // Constant AXI signals
             assign axi_awid_o = AXI_ID;
             assign axi_awlock_o = 1'b0;
-            assign axi_awcache_o = CACHE_AXI_CACHE_MODE;
+            // assign axi_awcache_o = CACHE_AXI_CACHE_MODE;
             assign axi_awprot_o = 3'd0;
             assign axi_awqos_o = 4'd0;
 
@@ -171,8 +180,11 @@ module iob_cache_write_channel_axi #(
                if (reset_i) begin
                   state        <= idle;
                   word_counter <= 0;
+                  axi_awcache_int <= CACHE_AXI_CACHE_MODE;
                end else begin
                   word_counter <= 0;
+
+                  if (valid_i) axi_awcache_int <= acache_i;
 
                   case (state)
                      idle:
@@ -207,6 +219,7 @@ module iob_cache_write_channel_axi #(
                axi_awvalid_int = 1'b0;
                axi_wvalid_int  = 1'b0;
                axi_bready_int  = 1'b0;
+               axi_awcache_int = CACHE_AXI_CACHE_MODE;
 
                case (state)
                   idle:    ready_o = ~valid_i;

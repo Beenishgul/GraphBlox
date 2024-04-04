@@ -22,6 +22,7 @@ module iob_cache_read_channel_axi #(
 ) (
    input                                       replace_valid_i,
    input      [ADDR_W-1:BE_NBYTES_W+LINE2BE_W] replace_addr_i,
+   input                          [4-1:0]      replace_acache_i,
    output reg                                  replace_o,
    output                                      read_valid_o,
    output reg [                 LINE2BE_W-1:0] read_addr_o,
@@ -49,17 +50,18 @@ module iob_cache_read_channel_axi #(
 
    reg axi_arvalid_int;
    reg axi_rready_int;
+   reg [4-1:0] axi_arcache_int;
 
    assign axi_arvalid_o = axi_arvalid_int;
    assign axi_rready_o  = axi_rready_int;
-
+   assign axi_arcache_o = axi_arcache_int;
 
    generate
       if (LINE2BE_W > 0) begin : g_line2be_w
          // Constant AXI signals
          assign axi_arid_o = AXI_ID;
          assign axi_arlock_o = 1'b0;
-         assign axi_arcache_o = CACHE_AXI_CACHE_MODE;
+         // assign axi_arcache_o = CACHE_AXI_CACHE_MODE;
          assign axi_arprot_o = 3'd0;
          assign axi_arqos_o = 4'd0;
 
@@ -83,8 +85,11 @@ module iob_cache_read_channel_axi #(
                state       <= idle;
                read_addr_o <= 0;
                slave_error <= 0;
+               axi_arcache_int <= CACHE_AXI_CACHE_MODE;
             end else begin
                slave_error <= slave_error;
+
+               if (replace_valid_i) axi_arcache_int <= replace_acache_i;
 
                case (state)
                   idle: begin
@@ -131,7 +136,7 @@ module iob_cache_read_channel_axi #(
             axi_arvalid_int = 1'b0;
             axi_rready_int  = 1'b0;
             replace_o       = 1'b1;
-
+         
             case (state)
                idle:         replace_o = 1'b0;
                init_process: axi_arvalid_int = 1'b1;
@@ -145,7 +150,7 @@ module iob_cache_read_channel_axi #(
          // assign read_addr_o  = 0;
          assign axi_arid_o = AXI_ID;
          assign axi_arlock_o = 1'b0;
-         assign axi_arcache_o = CACHE_AXI_CACHE_MODE;
+         // assign axi_arcache_o = CACHE_AXI_CACHE_MODE;
          assign axi_arprot_o = 3'd0;
          assign axi_arqos_o = 4'd0;
 
@@ -164,8 +169,15 @@ module iob_cache_read_channel_axi #(
          reg [1:0] state;
 
          always @(posedge clk_i, posedge reset_i) begin
-            if (reset_i) state <= idle;
+            if (reset_i) 
+            begin 
+               state <= idle; 
+               axi_arcache_int <= CACHE_AXI_CACHE_MODE; 
+            end
             else
+
+               if (replace_valid_i) axi_arcache_int <= replace_acache_i;
+
                case (state)
                   idle: begin
                      if (replace_valid_i) state <= init_process;
