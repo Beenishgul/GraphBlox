@@ -544,7 +544,7 @@
         "comments":"address_width_be, data_width_be, axi_port_full_be, l2_type, address_width_mid, data_width_mid, l1_type, address_width_fe, data_width_fe"
     },
     "ch_properties": {
-        "channel_0": ["33", "512", "0", "1", "33", "32",  "4", "33", "32"],
+        "channel_0": ["33", "512", "0", "1", "33", "32",  "2", "33", "32"],
         "channel_1": ["33", "512", "0", "2", "33", "32",  "3", "33", "32"],
         "channel_2": ["64", "512", "0", "0", "64", "512", "0", "64", "32"],
         "channel_3": ["64", "512", "0", "0", "64", "512", "0", "64", "32"],
@@ -627,7 +627,7 @@
             "ENGINE_PIPELINE"           : [0, 0,  1081, 16, 0,  0,  0],
             "ENGINE_READ_WRITE"         : [1, 7,  1419, 16, 32, 0,  0],
             "ENGINE_CSR_INDEX"          : [2, 11,  1852, 16, 32, 0, 16],
-            "ENGINE_FILTER_COND"        : [3, 9,  1929, 16, 0,  16, 0],
+            "ENGINE_FILTER_COND"        : [3, 10,  1929, 16, 0,  16, 0],
             "ENGINE_MERGE_DATA"         : [4, 3,  669,  16, 0,  0,  0],
             "ENGINE_ALU_OPS"            : [5, 6,  1802, 16, 0,  0,  0],
             "ENGINE_FORWARD_DATA"       : [6, 0,  409,  16, 0,  0,  0],
@@ -640,7 +640,7 @@
         "ENGINE_PIPELINE"           : [0, 0,  1081, 16, 0,  0,  0],
         "ENGINE_READ_WRITE"         : [1, 7,  1419, 16, 32, 0,  0],
         "ENGINE_CSR_INDEX"          : [2, 11,  1852, 16, 32, 0, 16],
-        "ENGINE_FILTER_COND"        : [3, 9,  2070, 16, 0,  16, 0],
+        "ENGINE_FILTER_COND"        : [3, 10,  2070, 16, 0,  16, 0],
         "ENGINE_MERGE_DATA"         : [4, 3,  669,  16, 0,  0,  0],
         "ENGINE_ALU_OPS"            : [5, 6,  1802, 16, 0,  0,  0],
         "ENGINE_FORWARD_DATA"       : [6, 0,  409,  16, 0,  0,  0],
