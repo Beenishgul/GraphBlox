@@ -135,6 +135,7 @@ assign configure_memory_meta_int.route.packet_destination.id_module = 1;
 assign configure_memory_meta_int.address.id_channel      = 0;
 assign configure_memory_meta_int.address.id_buffer       = 0;
 assign configure_memory_meta_int.address.offset          = 0;
+assign configure_memory_meta_int.address.mode_cache      = M00_AXI4_FE_CACHE_BUFFERABLE_NO_ALLOCATE;
 assign configure_memory_meta_int.address.burst_length    = 1;
 assign configure_memory_meta_int.address.shift.amount    = 0;
 assign configure_memory_meta_int.address.shift.direction = 1'b1;
