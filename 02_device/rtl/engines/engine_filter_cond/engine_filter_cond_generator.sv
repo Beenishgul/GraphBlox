@@ -388,6 +388,7 @@ EnginePacketData result_int ;
 logic            result_bool;
 // --------------------------------------------------------------------------------------
 logic filter_flow_int       ;
+logic filter_flow_post      ;
 logic break_start_flow_int  ;
 logic break_done_flow_int   ;
 logic break_running_flow_reg;
@@ -398,6 +399,7 @@ PacketRouteAddress  packet_destination_int    ;
 type_sequence_state sequence_state_engine_int ;
 type_sequence_state sequence_state_control_int;
 // --------------------------------------------------------------------------------------
+always_comb filter_flow_post     = response_engine_reg_int_valid & ((result_bool^ configure_engine_int.payload.param.filter_pass)| configure_engine_int.payload.param.filter_post);
 always_comb filter_flow_int      = response_engine_reg_int_valid & (result_bool^ configure_engine_int.payload.param.filter_pass);
 always_comb conditional_flow_int = response_engine_reg_int_valid & (result_bool^ configure_engine_int.payload.param.filter_pass);
 always_comb break_start_flow_int = response_engine_reg_int_valid & (result_bool^ configure_engine_int.payload.param.break_pass) & configure_engine_int.payload.param.break_flag & ~break_running_flow_reg;
@@ -437,7 +439,7 @@ engine_filter_cond_kernel inst_engine_filter_cond_kernel (
 );
 // --------------------------------------------------------------------------------------
 always_comb begin
-    generator_engine_request_engine_start_Stage.valid        = filter_flow_int & ~break_running_flow_reg;
+    generator_engine_request_engine_start_Stage.valid        = filter_flow_post & ~break_running_flow_reg;
     generator_engine_request_engine_start_Stage.payload.data = result_int;
 
     for (int i = 0; i<ENGINE_PACKET_DATA_NUM_FIELDS-1; i++) begin
