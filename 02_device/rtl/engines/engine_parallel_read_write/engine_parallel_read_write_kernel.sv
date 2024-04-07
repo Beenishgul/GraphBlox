@@ -53,7 +53,7 @@ always_ff @(posedge ap_clk) begin
   for (int i = 0; i<ENGINE_PACKET_DATA_NUM_FIELDS; i++) begin
     if(config_params_in.const_mask[i]) begin
       org_value_reg.field[i]       <= config_params_in.const_value;
-      ops_value_reg.field_state[i] <= SEQUENCE_RUNNING;
+      org_value_reg.field_state[i] <= SEQUENCE_RUNNING;
     end else  begin
       if(|config_params_in.ops_mask[i])begin
         for (int j = 0; j<ENGINE_PACKET_DATA_NUM_FIELDS; j++) begin

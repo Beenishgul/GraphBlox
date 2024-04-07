@@ -86,7 +86,7 @@
                 },
                 "mode_cache": {
                     "bits": "4",
-                    "value": "0x0"
+                    "value": "0xF"
                 },
                 "op_bundle": {
                     "bits": "8",
@@ -185,7 +185,7 @@
                 },
                 "mode_cache": {
                     "bits": "4",
-                    "value": "0x0"
+                    "value": "0xF"
                 },
                 "op_bundle": {
                     "bits": "8",
@@ -757,7 +757,7 @@
                 },
                 "mode_cache": {
                     "bits": "4",
-                    "value": "0x0"
+                    "value": "0x3"
                 },
                 "op_bundle": {
                     "bits": "8",
@@ -856,7 +856,7 @@
                 },
                 "mode_cache": {
                     "bits": "4",
-                    "value": "0x0"
+                    "value": "0x3"
                 },
                 "op_bundle": {
                     "bits": "8",
@@ -955,7 +955,7 @@
                 },
                 "mode_cache": {
                     "bits": "4",
-                    "value": "0x0"
+                    "value": "0x3"
                 },
                 "op_bundle": {
                     "bits": "8",
@@ -1467,7 +1467,7 @@
                 },
                 "mode_cache": {
                     "bits": "4",
-                    "value": "0x0"
+                    "value": "0x3"
                 }
             },
             "entry_9": {
@@ -1573,7 +1573,7 @@
                 },
                 "mode_cache": {
                     "bits": "4",
-                    "value": "0x0"
+                    "value": "0xF"
                 }
             },
             "entry_5": {
