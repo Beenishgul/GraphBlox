@@ -23,7 +23,7 @@ void GLAYxrtBufferHandlePerKernel::mapGLAYOverlayProgramBuffersBFS(struct GraphC
    // --  2  - Index_End
     overlay_program[38] = ( graph->num_vertices );
    // --  7  - Array_size
-    overlay_program[43] = (( graph->num_vertices )-( 0 ))/2;
+    overlay_program[43] = (( graph->num_vertices )-( 0 ))/4;
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
 // Name ENGINE_FORWARD_DATA           ID 2    mapping 6    cycles 0    None-None ( 0 )-( 0 )

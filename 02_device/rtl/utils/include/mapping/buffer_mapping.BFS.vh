@@ -20,7 +20,7 @@
    // --  2  - Index_End
     graph.overlay_program[38]  = ( graph.num_vertices );
    // --  7  - Array_size
-    graph.overlay_program[43]  = (( graph.num_vertices )-( 0 ))/2;
+    graph.overlay_program[43]  = (( graph.num_vertices )-( 0 ))/4;
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
 // Name ENGINE_FORWARD_DATA           ID 2    mapping 6    cycles 0    None-None ( 0 )-( 0 )
