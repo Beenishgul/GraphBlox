@@ -15,6 +15,7 @@
 `include "global_package.vh"
 
 module cu_setup #(
+    parameter TRUE_ID_CU       = 0               ,
     parameter ID_CU            = 0               ,
     parameter ID_BUNDLE        = 0               ,
     parameter ID_LANE          = 0               ,
@@ -225,7 +226,7 @@ always_comb begin
                 next_state = CU_SETUP_REQ_PAUSE;
         end
         CU_SETUP_REQ_DONE : begin
-            if (~configuration_comb_program.param.flush_enable)
+            if (~configuration_comb_program.param.flush_enable | (TRUE_ID_CU != 0))
                 next_state = CU_SETUP_FLUSH_DONE;
             else if (cu_flush_reg & configuration_comb_program.param.flush_enable)
                 next_state = CU_SETUP_FLUSH_START;

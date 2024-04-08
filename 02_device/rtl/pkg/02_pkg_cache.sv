@@ -77,7 +77,7 @@ parameter CACHE_CTRL_CNT   = 0; //Counters for Cache Hits and Misses - Disabling
 // CACHE FLUSH GENERAL
 // --------------------------------------------------------------------------------------
 parameter SYSTEM_CACHE_NUM_WAYS       = CACHE_CONFIG_MAX_NUM_WAYS                                                          ;
-parameter SYSTEM_CACHE_DATA_WIDTH     = CACHE_BACKEND_NBYTES                                                               ;
+parameter SYSTEM_CACHE_DATA_WIDTH     = M00_AXI4_BE_DATA_W/8                                                               ;
 parameter SYSTEM_CACHE_LINE_SIZE_LOG  = $clog2(SYSTEM_CACHE_DATA_WIDTH)                                                    ;
 parameter SYSTEM_CACHE_SIZE           = CACHE_CONFIG_MAX_SIZE                                                              ;
 parameter SYSTEM_CACHE_NUM_SETS       = (SYSTEM_CACHE_SIZE >> (SYSTEM_CACHE_LINE_SIZE_LOG + $clog2(SYSTEM_CACHE_NUM_WAYS))); // Adjusted for shift operations
