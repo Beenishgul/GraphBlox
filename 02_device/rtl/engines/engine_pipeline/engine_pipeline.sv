@@ -22,6 +22,7 @@ module engine_pipeline #(parameter
     ID_RELATIVE         = 0                             ,
     NUM_BACKTRACK_LANES = 4                             ,
     NUM_CHANNELS        = 2                             ,
+    NUM_CUS             = 1                             ,
     ENGINE_CAST_WIDTH   = 0                             ,
     NUM_BUNDLES         = 4                             ,
     ENGINES_CONFIG      = 0                             ,

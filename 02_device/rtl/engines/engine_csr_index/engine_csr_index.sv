@@ -23,6 +23,7 @@ module engine_csr_index #(parameter
     ENGINE_CAST_WIDTH   = 1                             ,
     ENGINE_MERGE_WIDTH  = 1                             ,
     NUM_CHANNELS        = 2                             ,
+    NUM_CUS             = 1                             ,
     ENGINES_CONFIG      = 0                             ,
     FIFO_WRITE_DEPTH    = 32                            ,
     PROG_THRESH         = 16                            ,
@@ -398,6 +399,7 @@ engine_csr_index_generator #(
     .PIPELINE_STAGES    (PIPELINE_STAGES    ),
     .NUM_BACKTRACK_LANES(NUM_BACKTRACK_LANES),
     .NUM_CHANNELS       (NUM_CHANNELS       ),
+    .NUM_CUS            (NUM_CUS            ),
     .ENGINE_CAST_WIDTH  (ENGINE_CAST_WIDTH  ),
     .NUM_BUNDLES        (NUM_BUNDLES        )
 ) inst_engine_csr_index_generator (

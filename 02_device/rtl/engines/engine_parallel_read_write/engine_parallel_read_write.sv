@@ -23,6 +23,7 @@ module engine_parallel_read_write #(parameter
     ENGINE_CAST_WIDTH   = 1                             ,
     ENGINE_MERGE_WIDTH  = 1                             ,
     NUM_CHANNELS        = 2                             ,
+    NUM_CUS             = 1                             ,
     ENGINES_CONFIG      = 0                             ,
     FIFO_WRITE_DEPTH    = 32                            ,
     PROG_THRESH         = 16                            ,

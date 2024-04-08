@@ -56,7 +56,7 @@ typedef struct packed{
     logic                                                                        mode_sequence;
     logic                                                                        mode_buffer  ;
     logic                                                                        mode_break   ;
-    // logic                                                                        mode_parallel;
+    logic                                                                        mode_parallel;
     logic [      NUM_CHANNELS_WIDTH_BITS-1:0]                                    id_channel   ;
     logic [   CU_BUFFER_COUNT_WIDTH_BITS-1:0]                                    id_buffer    ;
     logic [           M00_AXI4_FE_DATA_W-1:0]                                    array_size   ;

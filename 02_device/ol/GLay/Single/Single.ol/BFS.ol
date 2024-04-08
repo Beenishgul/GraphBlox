@@ -40,7 +40,7 @@
 // --------------------------------------------------------------------------------------
 // Engine: ENGINE_CSR_INDEX_1, Number of entries: 11
 // --------------------------------------------------------------------------------------
-0x00000001 // entry_0    cacheline[  2][ 4] < 5b>: increment[0:0]=1 || decrement[1:1]=0 || mode_sequence[2:2]=0 || mode_buffer[3:3]=0 || mode_break[4:4]=0
+0x00000021 // entry_0    cacheline[  2][ 4] < 6b>: increment[0:0]=1 || decrement[1:1]=0 || mode_sequence[2:2]=0 || mode_buffer[3:3]=0 || mode_break[4:4]=0 || mode_parallel[5:5]=1
 0x00000000 // entry_1    cacheline[  2][ 5] <32b>: index_start[0:31]=0x00000000
 0x00000000 // entry_2    cacheline[  2][ 6] <32b>: index_end[0:31]=0x00000000
 0x00000001 // entry_3    cacheline[  2][ 7] <32b>: stride[0:31]=0x00000001
@@ -112,7 +112,7 @@
 // --------------------------------------------------------------------------------------
 // Engine: ENGINE_CSR_INDEX_6, Number of entries: 11
 // --------------------------------------------------------------------------------------
-0x0000000D // entry_0    cacheline[  5][13] < 5b>: increment[0:0]=1 || decrement[1:1]=0 || mode_sequence[2:2]=1 || mode_buffer[3:3]=1 || mode_break[4:4]=0
+0x0000000D // entry_0    cacheline[  5][13] < 6b>: increment[0:0]=1 || decrement[1:1]=0 || mode_sequence[2:2]=1 || mode_buffer[3:3]=1 || mode_break[4:4]=0 || mode_parallel[5:5]=0
 0x00000000 // entry_1    cacheline[  5][14] <32b>: index_start[0:31]=0x00000000
 0x00000000 // entry_2    cacheline[  5][15] <32b>: index_end[0:31]=0x00000000
 0x00000001 // entry_3    cacheline[  6][ 0] <32b>: stride[0:31]=0x00000001
