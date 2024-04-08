@@ -41,6 +41,7 @@ module engine_csr_index_generator #(parameter
     COUNTER_WIDTH       = CACHE_FRONTEND_DATA_W,
     NUM_BACKTRACK_LANES = 4                    ,
     NUM_CHANNELS        = 2                    ,
+    NUM_CUS             = 1                    ,
     ENGINE_CAST_WIDTH   = 1                    ,
     NUM_BUNDLES         = 4
 ) (
@@ -134,7 +135,8 @@ module engine_csr_index_generator #(parameter
     logic                configure_engine_setup_reg;
     logic                configure_memory_setup_reg;
 
-    CSRIndexConfiguration configure_engine_int;
+    CSRIndexConfiguration configure_engine_int ;
+    CSRIndexConfiguration configure_engine_comb;
 
     EnginePacket     request_engine_out_reg;
     EnginePacketFull request_memory_out_reg;
@@ -481,7 +483,7 @@ module engine_csr_index_generator #(parameter
     always_ff @(posedge ap_clk) begin
         case (current_state)
             ENGINE_CSR_INDEX_GEN_RESET : begin
-                configure_engine_int.payload.param <= 0;
+                configure_engine_int.payload       <= 0;
                 cmd_stream_mode_pop                <= 1'b0;
                 configure_engine_int.valid         <= 1'b0;
                 configure_engine_setup_reg         <= 1'b0;
@@ -544,15 +546,12 @@ module engine_csr_index_generator #(parameter
             end
             ENGINE_CSR_INDEX_GEN_SETUP_MEMORY_TRANS : begin
                 configure_memory_setup_reg <= 1'b1;
+                configure_engine_int       <= 0;
             end
             ENGINE_CSR_INDEX_GEN_SETUP_MEMORY : begin
-                configure_memory_setup_reg   <= 1'b0;
-                configure_engine_int.payload <= configure_memory_reg.payload;
-                if(configure_memory_reg.valid & configure_memory_reg.payload.param.mode_sequence) begin
-                    configure_engine_int.valid <= 1'b0;
-                end else if(configure_memory_reg.valid & ~configure_memory_reg.payload.param.mode_sequence) begin
-                    configure_engine_int.valid <= 1'b1;
-                end
+                configure_memory_setup_reg <= 1'b0;
+                if(configure_memory_reg.valid)
+                    configure_engine_int <= configure_engine_comb;
             end
             ENGINE_CSR_INDEX_GEN_SETUP_ENGINE_IDLE : begin
                 configure_engine_int.valid         <= 1'b0;
@@ -580,10 +579,10 @@ module engine_csr_index_generator #(parameter
             ENGINE_CSR_INDEX_GEN_SETUP_ENGINE : begin
                 configure_engine_setup_reg <= 1'b0;
                 if(configure_engine_reg.valid) begin
-                    configure_engine_int.valid                     <= 1'b1;
                     configure_engine_int.payload.param.index_start <= configure_engine_reg.payload.param.index_start;
                     configure_engine_int.payload.param.index_end   <= configure_engine_reg.payload.param.index_end;
                     configure_engine_int.payload.param.array_size  <= configure_engine_reg.payload.param.array_size;
+                    configure_engine_int.valid                     <= 1'b1;
                     configure_engine_int.payload.data              <= configure_engine_reg.payload.data;
                 end
             end
@@ -739,6 +738,21 @@ module engine_csr_index_generator #(parameter
             fifo_request_comb.payload.meta.address.offset = counter_count << configure_engine_int.payload.meta.address.shift.amount;
         end else begin
             fifo_request_comb.payload.meta.address.offset = counter_count >> configure_engine_int.payload.meta.address.shift.amount;
+        end
+    end
+// --------------------------------------------------------------------------------------
+    always_comb begin
+        configure_engine_comb.valid   = 1'b0;
+        configure_engine_comb.payload = configure_memory_reg.payload;
+        if(configure_memory_reg.payload.param.mode_parallel) begin
+            configure_engine_comb.payload.param.index_start = configure_memory_reg.payload.param.index_start + (ID_CU*configure_memory_reg.payload.param.array_size);
+            configure_engine_comb.payload.param.index_end   = (ID_CU == (NUM_CUS-1)) ? configure_memory_reg.payload.param.index_end : configure_memory_reg.payload.param.index_start + ((ID_CU+1)*configure_memory_reg.payload.param.array_size);
+            configure_engine_comb.payload.param.array_size  = (ID_CU == (NUM_CUS-1)) ? (configure_memory_reg.payload.param.index_end - (configure_memory_reg.payload.param.index_start + (ID_CU*configure_memory_reg.payload.param.array_size))): configure_memory_reg.payload.param.array_size;
+        end
+        if(configure_memory_reg.valid & configure_memory_reg.payload.param.mode_sequence) begin
+            configure_engine_comb.valid = 1'b0;
+        end else if(configure_memory_reg.valid & ~configure_memory_reg.payload.param.mode_sequence) begin
+            configure_engine_comb.valid = 1'b1;
         end
     end
 // --------------------------------------------------------------------------------------

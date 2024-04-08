@@ -114,7 +114,8 @@ with open(config_file_path, "r") as file:
 buffers = config_data["buffers"]
 channels = config_data["channels"]
 engine_properties = config_data["engine_properties"]
-
+cu_properties = config_data["cu_properties"]
+NUM_KERNEL_CUS  = int(cu_properties["num_kernel_cu"])
 
 def recreate_data_structures_from_columns(engine_properties, categories_order):
     """
@@ -188,7 +189,7 @@ CU_BUNDLES_CONFIG_ARRAY = get_config(config_data, topology)
 # CU_BUNDLES_CONFIG_ARRAY = [config_data['bundle'][key] for key in sorted(config_data['bundle'].keys(), key=int)]
 
 # Compute values based on CU_BUNDLES_CONFIG_ARRAY
-NUM_CUS_MAX = 1  # As there's only one CU
+NUM_CUS_MAX = NUM_KERNEL_CUS  # As there's only one CU
 NUM_BUNDLES_MAX = len(CU_BUNDLES_CONFIG_ARRAY)
 NUM_LANES_MAX = max(len(bundle) for bundle in CU_BUNDLES_CONFIG_ARRAY)
 NUM_ENGINES_MAX = max(
@@ -248,7 +249,7 @@ def get_engine_id(engine_name):
     global buffers
     base_name = engine_name.split("(")[0]
     detail_pattern = extract_buffer_details(engine_name)
-    buffer_name, buffer_start, buffer_end = detail_pattern[0]
+    buffer_name, buffer_start, buffer_end, parallel_level = detail_pattern[0]
     buffer_key = get_key_from_value(buffers, buffer_name)
     base_mapping = mapping.get(base_name, 0)
     base_cycles = cycles.get(base_name, 0)
@@ -370,34 +371,73 @@ def extract_buffer(token):
     return ""  # Returns an empty string if "(B:" is not found
 
 
-def extract_buffer_details(token):
-    """Extracts details of multiple buffers from a token, handling formats including mathematical operations.
-    Ensures at least four tuples are returned."""
-    buffer_pattern = r"\(B:([^\)]+)\)"
-    detail_pattern = r"([a-zA-Z_][a-zA-Z0-9_]*|\d+|\+|\-|\*|\/|\%|\(|\))"
-    matches = re.findall(buffer_pattern, token)
+# def extract_buffer_details(token):
+#     """Extracts details of multiple buffers from a token, handling formats including mathematical operations.
+#     Ensures at least four tuples are returned."""
+#     buffer_pattern = r"\(B:([^\)]+)\)"
+#     detail_pattern = r"([a-zA-Z_][a-zA-Z0-9_]*|\d+|\+|\-|\*|\/|\%|\(|\))"
+#     matches = re.findall(buffer_pattern, token)
 
+#     buffer_details_list = []
+
+#     for match in matches:
+#         details = match.split(",")
+#         buffer_name = details[0]
+#         start_value_ops = ["0"]
+#         end_value_ops = ["0"]
+
+#         if len(details) > 1:
+#             start_value_ops = re.findall(detail_pattern, details[1])
+#         if len(details) > 2:
+#             end_value_ops = re.findall(detail_pattern, details[2])
+
+#         buffer_details_list.append((buffer_name, start_value_ops, end_value_ops))
+
+#     # Ensure there are at least five tuples in the list
+#     while len(buffer_details_list) < 5:
+#         buffer_details_list.append(("None", ["0"], ["0"]))
+
+#     return buffer_details_list
+
+def extract_buffer_details(token):
+    """Extracts details of multiple buffers from a token, handling formats including mathematical operations and parallelism indications.
+    Ensures at least four tuples are returned, each tuple now includes a parallelism level as the fourth element."""
+    
+    # Regex patterns to extract buffer details and parallelism level
+    buffer_pattern = r"\(B:([^\)]+)\)"
+    parallel_pattern = r"\(P:(\d+)\)"
+    detail_pattern = r"([a-zA-Z_][a-zA-Z0-9_]*|\d+|\+|\-|\*|\/|\%)"
+    
+    # Find all matches for buffer and parallel patterns
+    buffer_matches = re.findall(buffer_pattern, token)
+    parallel_matches = re.findall(parallel_pattern, token)
+    
+    # Determine the parallelism level, default to "1" if not specified
+    parallel_level = parallel_matches[0] if parallel_matches else "1"
+    
     buffer_details_list = []
 
-    for match in matches:
+    # Process each buffer match
+    for match in buffer_matches:
         details = match.split(",")
-        buffer_name = details[0]
+        buffer_name = details[0].strip()
         start_value_ops = ["0"]
         end_value_ops = ["0"]
 
+        # Extract start and end values operations using detailed pattern
         if len(details) > 1:
-            start_value_ops = re.findall(detail_pattern, details[1])
+            start_value_ops = re.findall(detail_pattern, details[1].strip())
         if len(details) > 2:
-            end_value_ops = re.findall(detail_pattern, details[2])
+            end_value_ops = re.findall(detail_pattern, details[2].strip())
 
-        buffer_details_list.append((buffer_name, start_value_ops, end_value_ops))
+        # Append buffer details including parallelism level
+        buffer_details_list.append((buffer_name, start_value_ops, end_value_ops, parallel_level))
 
-    # Ensure there are at least five tuples in the list
+    # Ensure there are at least four tuples in the list
     while len(buffer_details_list) < 5:
-        buffer_details_list.append(("None", ["0"], ["0"]))
+        buffer_details_list.append(("None", ["0"], ["0"], "1"))
 
     return buffer_details_list
-
 
 # Modified pad_data to accept a default pad value
 def pad_data(data, max_length, default_val=0):
@@ -570,7 +610,7 @@ def process_file_vh_v2(
 
     engine_type = engine_name.split("(")[0]
     detail_pattern = extract_buffer_details(engine_name)
-    buffer_name, buffer_start, buffer_end = detail_pattern[0]
+    buffer_name, buffer_start, buffer_end, parallel_level = detail_pattern[0]
     buffer_start_ops = print_operations_vh(buffer_start)
     buffer_end_ops = print_operations_vh(buffer_end)
     buffer_key = get_key_from_value(buffers, buffer_name)
@@ -624,7 +664,7 @@ def process_file_vh_v2(
                         )
                         append_to_file(
                             output_file_path_vh,
-                            f"    graph.overlay_program[{entry_index_vh}]  = {buffer_end_ops}-{buffer_start_ops};",
+                            f"    graph.overlay_program[{entry_index_vh}]  = ({buffer_end_ops}-{buffer_start_ops})/{parallel_level};",
                         )
                 elif engine_type in ["ENGINE_READ_WRITE"]:
                     if local_count == 0:
@@ -637,7 +677,7 @@ def process_file_vh_v2(
                         )
                 elif engine_type in ["ENGINE_PARALLEL_READ_WRITE"]:
                     if local_count == 1:
-                        local_buffer_name, local_buffer_start, local_buffer_end = (
+                        local_buffer_name, local_buffer_start, local_buffer_end, parallel_level = (
                             detail_pattern[0]
                         )
                         local_buffer_start_ops = print_operations_vh(local_buffer_start)
@@ -649,7 +689,7 @@ def process_file_vh_v2(
                             f"    graph.overlay_program[{entry_index_vh}] = {local_buffer_start_ops};",
                         )
                     elif local_count == 8:
-                        local_buffer_name, local_buffer_start, local_buffer_end = (
+                        local_buffer_name, local_buffer_start, local_buffer_end, parallel_level  = (
                             detail_pattern[1]
                         )
                         local_buffer_start_ops = print_operations_vh(local_buffer_start)
@@ -661,7 +701,7 @@ def process_file_vh_v2(
                             f"    graph.overlay_program[{entry_index_vh}] = {local_buffer_start_ops};",
                         )
                     elif local_count == 15:
-                        local_buffer_name, local_buffer_start, local_buffer_end = (
+                        local_buffer_name, local_buffer_start, local_buffer_end, parallel_level  = (
                             detail_pattern[2]
                         )
                         local_buffer_start_ops = print_operations_vh(local_buffer_start)
@@ -673,7 +713,7 @@ def process_file_vh_v2(
                             f"    graph.overlay_program[{entry_index_vh}] = {local_buffer_start_ops};",
                         )
                     elif local_count == 22:
-                        local_buffer_name, local_buffer_start, local_buffer_end = (
+                        local_buffer_name, local_buffer_start, local_buffer_end, parallel_level  = (
                             detail_pattern[3]
                         )
                         local_buffer_start_ops = print_operations_vh(local_buffer_start)
@@ -685,7 +725,7 @@ def process_file_vh_v2(
                             f"    graph.overlay_program[{entry_index_vh}] = {local_buffer_start_ops};",
                         )
                     elif local_count == 29:
-                        local_buffer_name, local_buffer_start, local_buffer_end = (
+                        local_buffer_name, local_buffer_start, local_buffer_end, parallel_level  = (
                             detail_pattern[4]
                         )
                         local_buffer_start_ops = print_operations_vh(local_buffer_start)
@@ -725,7 +765,7 @@ def process_file_cpp_v2(
 
     engine_type = engine_name.split("(")[0]
     detail_pattern = extract_buffer_details(engine_name)
-    buffer_name, buffer_start, buffer_end = detail_pattern[0]
+    buffer_name, buffer_start, buffer_end, parallel_level  = detail_pattern[0]
     buffer_start_ops = print_operations_cpp(buffer_start)
     buffer_end_ops = print_operations_cpp(buffer_end)
     buffer_key = get_key_from_value(buffers, buffer_name)
@@ -781,7 +821,7 @@ def process_file_cpp_v2(
                         )
                         append_to_file(
                             output_file_path_cpp,
-                            f"    overlay_program[{entry_index_cpp}] = {buffer_end_ops}-{buffer_start_ops};",
+                            f"    overlay_program[{entry_index_cpp}] = ({buffer_end_ops}-{buffer_start_ops})/{parallel_level};",
                         )
                 elif engine_type in ["ENGINE_READ_WRITE"]:
                     if local_count == 0:
@@ -794,7 +834,7 @@ def process_file_cpp_v2(
                         )
                 elif engine_type in ["ENGINE_PARALLEL_READ_WRITE"]:
                     if local_count == 1:
-                        local_buffer_name, local_buffer_start, local_buffer_end = (
+                        local_buffer_name, local_buffer_start, local_buffer_end, parallel_level  = (
                             detail_pattern[0]
                         )
                         local_buffer_start_ops = print_operations_cpp(
@@ -808,7 +848,7 @@ def process_file_cpp_v2(
                             f"    overlay_program[{entry_index_cpp}] = {local_buffer_start_ops};",
                         )
                     elif local_count == 8:
-                        local_buffer_name, local_buffer_start, local_buffer_end = (
+                        local_buffer_name, local_buffer_start, local_buffer_end, parallel_level  = (
                             detail_pattern[1]
                         )
                         local_buffer_start_ops = print_operations_cpp(
@@ -822,7 +862,7 @@ def process_file_cpp_v2(
                             f"    overlay_program[{entry_index_cpp}] = {local_buffer_start_ops};",
                         )
                     elif local_count == 15:
-                        local_buffer_name, local_buffer_start, local_buffer_end = (
+                        local_buffer_name, local_buffer_start, local_buffer_end, parallel_level  = (
                             detail_pattern[2]
                         )
                         local_buffer_start_ops = print_operations_cpp(
@@ -836,7 +876,7 @@ def process_file_cpp_v2(
                             f"    overlay_program[{entry_index_cpp}] = {local_buffer_start_ops};",
                         )
                     elif local_count == 22:
-                        local_buffer_name, local_buffer_start, local_buffer_end = (
+                        local_buffer_name, local_buffer_start, local_buffer_end, parallel_level  = (
                             detail_pattern[3]
                         )
                         local_buffer_start_ops = print_operations_cpp(
@@ -850,7 +890,7 @@ def process_file_cpp_v2(
                             f"    overlay_program[{entry_index_cpp}] = {local_buffer_start_ops};",
                         )
                     elif local_count == 29:
-                        local_buffer_name, local_buffer_start, local_buffer_end = (
+                        local_buffer_name, local_buffer_start, local_buffer_end, parallel_level  = (
                             detail_pattern[4]
                         )
                         local_buffer_start_ops = print_operations_cpp(

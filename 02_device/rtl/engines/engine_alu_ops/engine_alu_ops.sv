@@ -23,6 +23,7 @@ module engine_alu_ops #(parameter
     ENGINE_CAST_WIDTH   = 0                             ,
     ENGINE_MERGE_WIDTH  = 0                             ,
     NUM_CHANNELS        = 2                             ,
+    NUM_CUS             = 1                             ,
     ENGINES_CONFIG      = 0                             ,
     MERGE_WIDTH         = 1                             ,
     FIFO_WRITE_DEPTH    = 32                            ,
