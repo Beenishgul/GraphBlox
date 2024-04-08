@@ -16,7 +16,7 @@
             <top_module name="PKG_MXX_AXI4_FE" />
             <top_module name="PKG_MXX_AXI4_MID" />
             <top_module name="PKG_SETUP" />
-            <top_module name="\$unit_control_glay_kernel_vip_pkg_sv_2330054533 " />
+            <top_module name="\$unit_control_glay_kernel_vip_pkg_sv_3865785574 " />
             <top_module name="axi_pkg" />
             <top_module name="axi_vip_pkg" />
             <top_module name="control_glay_kernel_vip_pkg" />
@@ -31,225 +31,185 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="16,974.800000 us"></ZoomStartTime>
-      <ZoomEndTime time="17,150.000001 us"></ZoomEndTime>
-      <Cursor1Time time="17,050.000000 us"></Cursor1Time>
+      <ZoomStartTime time="0.000000000 ms"></ZoomStartTime>
+      <ZoomEndTime time="164.887000000 ms"></ZoomEndTime>
+      <Cursor1Time time="41.074000000 ms"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="552"></NameColumnWidth>
-      <ValueColumnWidth column_width="236"></ValueColumnWidth>
+      <ValueColumnWidth column_width="232"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="4" />
-   <wvobject type="logic" fp_name="/glay_kernel_testbench/inst_dut/inst_kernel_afu/inst_kernel_cu_0/inst_cu_bundles/\generate_bundle_lanes[0].inst_bundle_lanes /\generate_lane_template[1].inst_lane_template /\generate_engine_template[0].inst_engine_template /\genblk5.inst_engine_csr_index /inst_engine_csr_index_generator/ap_clk">
+   <WVObjectSize size="10" />
+   <wvobject type="logic" fp_name="/glay_kernel_testbench/inst_dut/inst_kernel_afu/inst_kernel_cu_0/\genblk1.inst_cu_sram_l1_m00_axi_cu_sram_mid32x33_fe32x33_ch0 /ap_clk">
       <obj_property name="ElementShortName">ap_clk</obj_property>
       <obj_property name="ObjectShortName">ap_clk</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/glay_kernel_testbench/inst_dut/inst_kernel_afu/inst_kernel_cu_0/inst_cu_bundles/\generate_bundle_lanes[0].inst_bundle_lanes /\generate_lane_template[1].inst_lane_template /\generate_engine_template[0].inst_engine_template /\genblk5.inst_engine_csr_index /inst_engine_csr_index_generator/areset">
-      <obj_property name="ElementShortName">areset</obj_property>
-      <obj_property name="ObjectShortName">areset</obj_property>
+   <wvobject type="array" fp_name="/glay_kernel_testbench/inst_dut/inst_kernel_afu/inst_kernel_cu_0/\genblk1.inst_cu_sram_l1_m00_axi_cu_sram_mid32x33_fe32x33_ch0 /descriptor_in">
+      <obj_property name="ElementShortName">descriptor_in</obj_property>
+      <obj_property name="ObjectShortName">descriptor_in</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/glay_kernel_testbench/inst_dut/inst_kernel_afu/inst_kernel_cu_0/inst_cu_bundles/\generate_bundle_lanes[0].inst_bundle_lanes /\generate_lane_template[1].inst_lane_template /\generate_engine_template[0].inst_engine_template /\genblk5.inst_engine_csr_index /inst_engine_csr_index_generator/configure_engine_int">
-      <obj_property name="ElementShortName">configure_engine_int</obj_property>
-      <obj_property name="ObjectShortName">configure_engine_int</obj_property>
+   <wvobject type="array" fp_name="/glay_kernel_testbench/inst_dut/inst_kernel_afu/inst_kernel_cu_0/\genblk1.inst_cu_sram_l1_m00_axi_cu_sram_mid32x33_fe32x33_ch0 /request_in">
+      <obj_property name="ElementShortName">request_in</obj_property>
+      <obj_property name="ObjectShortName">request_in</obj_property>
       <obj_property name="isExpanded"></obj_property>
-      <wvobject type="logic" fp_name="/glay_kernel_testbench/inst_dut/inst_kernel_afu/inst_kernel_cu_0/inst_cu_bundles/\generate_bundle_lanes[0].inst_bundle_lanes /\generate_lane_template[1].inst_lane_template /\generate_engine_template[0].inst_engine_template /\genblk5.inst_engine_csr_index /inst_engine_csr_index_generator/configure_engine_int.valid">
+      <wvobject type="logic" fp_name="/glay_kernel_testbench/inst_dut/inst_kernel_afu/inst_kernel_cu_0/\genblk1.inst_cu_sram_l1_m00_axi_cu_sram_mid32x33_fe32x33_ch0 /request_in.valid">
          <obj_property name="ElementShortName">.valid</obj_property>
          <obj_property name="ObjectShortName">.valid</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/glay_kernel_testbench/inst_dut/inst_kernel_afu/inst_kernel_cu_0/inst_cu_bundles/\generate_bundle_lanes[0].inst_bundle_lanes /\generate_lane_template[1].inst_lane_template /\generate_engine_template[0].inst_engine_template /\genblk5.inst_engine_csr_index /inst_engine_csr_index_generator/configure_engine_int.payload">
+      <wvobject type="array" fp_name="/glay_kernel_testbench/inst_dut/inst_kernel_afu/inst_kernel_cu_0/\genblk1.inst_cu_sram_l1_m00_axi_cu_sram_mid32x33_fe32x33_ch0 /request_in.payload">
          <obj_property name="ElementShortName">.payload</obj_property>
          <obj_property name="ObjectShortName">.payload</obj_property>
          <obj_property name="isExpanded"></obj_property>
-         <wvobject type="array" fp_name="/glay_kernel_testbench/inst_dut/inst_kernel_afu/inst_kernel_cu_0/inst_cu_bundles/\generate_bundle_lanes[0].inst_bundle_lanes /\generate_lane_template[1].inst_lane_template /\generate_engine_template[0].inst_engine_template /\genblk5.inst_engine_csr_index /inst_engine_csr_index_generator/configure_engine_int.payload.param">
-            <obj_property name="ElementShortName">.param</obj_property>
-            <obj_property name="ObjectShortName">.param</obj_property>
-            <obj_property name="isExpanded"></obj_property>
-            <wvobject type="logic" fp_name="/glay_kernel_testbench/inst_dut/inst_kernel_afu/inst_kernel_cu_0/inst_cu_bundles/\generate_bundle_lanes[0].inst_bundle_lanes /\generate_lane_template[1].inst_lane_template /\generate_engine_template[0].inst_engine_template /\genblk5.inst_engine_csr_index /inst_engine_csr_index_generator/configure_engine_int.payload.param.increment">
-               <obj_property name="ElementShortName">.increment</obj_property>
-               <obj_property name="ObjectShortName">.increment</obj_property>
-            </wvobject>
-            <wvobject type="logic" fp_name="/glay_kernel_testbench/inst_dut/inst_kernel_afu/inst_kernel_cu_0/inst_cu_bundles/\generate_bundle_lanes[0].inst_bundle_lanes /\generate_lane_template[1].inst_lane_template /\generate_engine_template[0].inst_engine_template /\genblk5.inst_engine_csr_index /inst_engine_csr_index_generator/configure_engine_int.payload.param.decrement">
-               <obj_property name="ElementShortName">.decrement</obj_property>
-               <obj_property name="ObjectShortName">.decrement</obj_property>
-            </wvobject>
-            <wvobject type="logic" fp_name="/glay_kernel_testbench/inst_dut/inst_kernel_afu/inst_kernel_cu_0/inst_cu_bundles/\generate_bundle_lanes[0].inst_bundle_lanes /\generate_lane_template[1].inst_lane_template /\generate_engine_template[0].inst_engine_template /\genblk5.inst_engine_csr_index /inst_engine_csr_index_generator/configure_engine_int.payload.param.mode_sequence">
-               <obj_property name="ElementShortName">.mode_sequence</obj_property>
-               <obj_property name="ObjectShortName">.mode_sequence</obj_property>
-            </wvobject>
-            <wvobject type="logic" fp_name="/glay_kernel_testbench/inst_dut/inst_kernel_afu/inst_kernel_cu_0/inst_cu_bundles/\generate_bundle_lanes[0].inst_bundle_lanes /\generate_lane_template[1].inst_lane_template /\generate_engine_template[0].inst_engine_template /\genblk5.inst_engine_csr_index /inst_engine_csr_index_generator/configure_engine_int.payload.param.mode_buffer">
-               <obj_property name="ElementShortName">.mode_buffer</obj_property>
-               <obj_property name="ObjectShortName">.mode_buffer</obj_property>
-            </wvobject>
-            <wvobject type="logic" fp_name="/glay_kernel_testbench/inst_dut/inst_kernel_afu/inst_kernel_cu_0/inst_cu_bundles/\generate_bundle_lanes[0].inst_bundle_lanes /\generate_lane_template[1].inst_lane_template /\generate_engine_template[0].inst_engine_template /\genblk5.inst_engine_csr_index /inst_engine_csr_index_generator/configure_engine_int.payload.param.mode_break">
-               <obj_property name="ElementShortName">.mode_break</obj_property>
-               <obj_property name="ObjectShortName">.mode_break</obj_property>
-            </wvobject>
-            <wvobject type="logic" fp_name="/glay_kernel_testbench/inst_dut/inst_kernel_afu/inst_kernel_cu_0/inst_cu_bundles/\generate_bundle_lanes[0].inst_bundle_lanes /\generate_lane_template[1].inst_lane_template /\generate_engine_template[0].inst_engine_template /\genblk5.inst_engine_csr_index /inst_engine_csr_index_generator/configure_engine_int.payload.param.mode_parallel">
-               <obj_property name="ElementShortName">.mode_parallel</obj_property>
-               <obj_property name="ObjectShortName">.mode_parallel</obj_property>
-            </wvobject>
-            <wvobject type="array" fp_name="/glay_kernel_testbench/inst_dut/inst_kernel_afu/inst_kernel_cu_0/inst_cu_bundles/\generate_bundle_lanes[0].inst_bundle_lanes /\generate_lane_template[1].inst_lane_template /\generate_engine_template[0].inst_engine_template /\genblk5.inst_engine_csr_index /inst_engine_csr_index_generator/configure_engine_int.payload.param.id_channel">
-               <obj_property name="ElementShortName">.id_channel[1:0]</obj_property>
-               <obj_property name="ObjectShortName">.id_channel[1:0]</obj_property>
-            </wvobject>
-            <wvobject type="array" fp_name="/glay_kernel_testbench/inst_dut/inst_kernel_afu/inst_kernel_cu_0/inst_cu_bundles/\generate_bundle_lanes[0].inst_bundle_lanes /\generate_lane_template[1].inst_lane_template /\generate_engine_template[0].inst_engine_template /\genblk5.inst_engine_csr_index /inst_engine_csr_index_generator/configure_engine_int.payload.param.id_buffer">
-               <obj_property name="ElementShortName">.id_buffer[7:0]</obj_property>
-               <obj_property name="ObjectShortName">.id_buffer[7:0]</obj_property>
-            </wvobject>
-            <wvobject type="array" fp_name="/glay_kernel_testbench/inst_dut/inst_kernel_afu/inst_kernel_cu_0/inst_cu_bundles/\generate_bundle_lanes[0].inst_bundle_lanes /\generate_lane_template[1].inst_lane_template /\generate_engine_template[0].inst_engine_template /\genblk5.inst_engine_csr_index /inst_engine_csr_index_generator/configure_engine_int.payload.param.array_size">
-               <obj_property name="ElementShortName">.array_size[31:0]</obj_property>
-               <obj_property name="ObjectShortName">.array_size[31:0]</obj_property>
-               <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
-            </wvobject>
-            <wvobject type="array" fp_name="/glay_kernel_testbench/inst_dut/inst_kernel_afu/inst_kernel_cu_0/inst_cu_bundles/\generate_bundle_lanes[0].inst_bundle_lanes /\generate_lane_template[1].inst_lane_template /\generate_engine_template[0].inst_engine_template /\genblk5.inst_engine_csr_index /inst_engine_csr_index_generator/configure_engine_int.payload.param.index_start">
-               <obj_property name="ElementShortName">.index_start[31:0]</obj_property>
-               <obj_property name="ObjectShortName">.index_start[31:0]</obj_property>
-               <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
-            </wvobject>
-            <wvobject type="array" fp_name="/glay_kernel_testbench/inst_dut/inst_kernel_afu/inst_kernel_cu_0/inst_cu_bundles/\generate_bundle_lanes[0].inst_bundle_lanes /\generate_lane_template[1].inst_lane_template /\generate_engine_template[0].inst_engine_template /\genblk5.inst_engine_csr_index /inst_engine_csr_index_generator/configure_engine_int.payload.param.index_end">
-               <obj_property name="ElementShortName">.index_end[31:0]</obj_property>
-               <obj_property name="ObjectShortName">.index_end[31:0]</obj_property>
-               <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
-            </wvobject>
-            <wvobject type="array" fp_name="/glay_kernel_testbench/inst_dut/inst_kernel_afu/inst_kernel_cu_0/inst_cu_bundles/\generate_bundle_lanes[0].inst_bundle_lanes /\generate_lane_template[1].inst_lane_template /\generate_engine_template[0].inst_engine_template /\genblk5.inst_engine_csr_index /inst_engine_csr_index_generator/configure_engine_int.payload.param.stride">
-               <obj_property name="ElementShortName">.stride[31:0]</obj_property>
-               <obj_property name="ObjectShortName">.stride[31:0]</obj_property>
-            </wvobject>
-            <wvobject type="array" fp_name="/glay_kernel_testbench/inst_dut/inst_kernel_afu/inst_kernel_cu_0/inst_cu_bundles/\generate_bundle_lanes[0].inst_bundle_lanes /\generate_lane_template[1].inst_lane_template /\generate_engine_template[0].inst_engine_template /\genblk5.inst_engine_csr_index /inst_engine_csr_index_generator/configure_engine_int.payload.param.granularity">
-               <obj_property name="ElementShortName">.granularity[5:0]</obj_property>
-               <obj_property name="ObjectShortName">.granularity[5:0]</obj_property>
-            </wvobject>
-            <wvobject type="logic" fp_name="/glay_kernel_testbench/inst_dut/inst_kernel_afu/inst_kernel_cu_0/inst_cu_bundles/\generate_bundle_lanes[0].inst_bundle_lanes /\generate_lane_template[1].inst_lane_template /\generate_engine_template[0].inst_engine_template /\genblk5.inst_engine_csr_index /inst_engine_csr_index_generator/configure_engine_int.payload.param.direction">
-               <obj_property name="ElementShortName">.direction</obj_property>
-               <obj_property name="ObjectShortName">.direction</obj_property>
-            </wvobject>
-            <wvobject type="array" fp_name="/glay_kernel_testbench/inst_dut/inst_kernel_afu/inst_kernel_cu_0/inst_cu_bundles/\generate_bundle_lanes[0].inst_bundle_lanes /\generate_lane_template[1].inst_lane_template /\generate_engine_template[0].inst_engine_template /\genblk5.inst_engine_csr_index /inst_engine_csr_index_generator/configure_engine_int.payload.param.const_mask">
-               <obj_property name="ElementShortName">.const_mask[4:0]</obj_property>
-               <obj_property name="ObjectShortName">.const_mask[4:0]</obj_property>
-            </wvobject>
-            <wvobject type="array" fp_name="/glay_kernel_testbench/inst_dut/inst_kernel_afu/inst_kernel_cu_0/inst_cu_bundles/\generate_bundle_lanes[0].inst_bundle_lanes /\generate_lane_template[1].inst_lane_template /\generate_engine_template[0].inst_engine_template /\genblk5.inst_engine_csr_index /inst_engine_csr_index_generator/configure_engine_int.payload.param.const_value">
-               <obj_property name="ElementShortName">.const_value[31:0]</obj_property>
-               <obj_property name="ObjectShortName">.const_value[31:0]</obj_property>
-            </wvobject>
-            <wvobject type="array" fp_name="/glay_kernel_testbench/inst_dut/inst_kernel_afu/inst_kernel_cu_0/inst_cu_bundles/\generate_bundle_lanes[0].inst_bundle_lanes /\generate_lane_template[1].inst_lane_template /\generate_engine_template[0].inst_engine_template /\genblk5.inst_engine_csr_index /inst_engine_csr_index_generator/configure_engine_int.payload.param.ops_mask">
-               <obj_property name="ElementShortName">.ops_mask[4:0][4:0]</obj_property>
-               <obj_property name="ObjectShortName">.ops_mask[4:0][4:0]</obj_property>
-            </wvobject>
-            <wvobject type="array" fp_name="/glay_kernel_testbench/inst_dut/inst_kernel_afu/inst_kernel_cu_0/inst_cu_bundles/\generate_bundle_lanes[0].inst_bundle_lanes /\generate_lane_template[1].inst_lane_template /\generate_engine_template[0].inst_engine_template /\genblk5.inst_engine_csr_index /inst_engine_csr_index_generator/configure_engine_int.payload.param.mode_cache">
-               <obj_property name="ElementShortName">.mode_cache[3:0]</obj_property>
-               <obj_property name="ObjectShortName">.mode_cache[3:0]</obj_property>
-            </wvobject>
-         </wvobject>
-         <wvobject type="array" fp_name="/glay_kernel_testbench/inst_dut/inst_kernel_afu/inst_kernel_cu_0/inst_cu_bundles/\generate_bundle_lanes[0].inst_bundle_lanes /\generate_lane_template[1].inst_lane_template /\generate_engine_template[0].inst_engine_template /\genblk5.inst_engine_csr_index /inst_engine_csr_index_generator/configure_engine_int.payload.meta">
+         <wvobject type="array" fp_name="/glay_kernel_testbench/inst_dut/inst_kernel_afu/inst_kernel_cu_0/\genblk1.inst_cu_sram_l1_m00_axi_cu_sram_mid32x33_fe32x33_ch0 /request_in.payload.meta">
             <obj_property name="ElementShortName">.meta</obj_property>
             <obj_property name="ObjectShortName">.meta</obj_property>
+            <obj_property name="isExpanded"></obj_property>
+            <wvobject type="array" fp_name="/glay_kernel_testbench/inst_dut/inst_kernel_afu/inst_kernel_cu_0/\genblk1.inst_cu_sram_l1_m00_axi_cu_sram_mid32x33_fe32x33_ch0 /request_in.payload.meta.route">
+               <obj_property name="ElementShortName">.route</obj_property>
+               <obj_property name="ObjectShortName">.route</obj_property>
+            </wvobject>
+            <wvobject type="array" fp_name="/glay_kernel_testbench/inst_dut/inst_kernel_afu/inst_kernel_cu_0/\genblk1.inst_cu_sram_l1_m00_axi_cu_sram_mid32x33_fe32x33_ch0 /request_in.payload.meta.address">
+               <obj_property name="ElementShortName">.address</obj_property>
+               <obj_property name="ObjectShortName">.address</obj_property>
+            </wvobject>
+            <wvobject type="array" fp_name="/glay_kernel_testbench/inst_dut/inst_kernel_afu/inst_kernel_cu_0/\genblk1.inst_cu_sram_l1_m00_axi_cu_sram_mid32x33_fe32x33_ch0 /request_in.payload.meta.subclass">
+               <obj_property name="ElementShortName">.subclass</obj_property>
+               <obj_property name="ObjectShortName">.subclass</obj_property>
+               <obj_property name="CustomSignalColor">#FFD700</obj_property>
+               <obj_property name="UseCustomSignalColor">true</obj_property>
+            </wvobject>
          </wvobject>
-         <wvobject type="array" fp_name="/glay_kernel_testbench/inst_dut/inst_kernel_afu/inst_kernel_cu_0/inst_cu_bundles/\generate_bundle_lanes[0].inst_bundle_lanes /\generate_lane_template[1].inst_lane_template /\generate_engine_template[0].inst_engine_template /\genblk5.inst_engine_csr_index /inst_engine_csr_index_generator/configure_engine_int.payload.data">
+         <wvobject type="array" fp_name="/glay_kernel_testbench/inst_dut/inst_kernel_afu/inst_kernel_cu_0/\genblk1.inst_cu_sram_l1_m00_axi_cu_sram_mid32x33_fe32x33_ch0 /request_in.payload.data">
             <obj_property name="ElementShortName">.data</obj_property>
             <obj_property name="ObjectShortName">.data</obj_property>
          </wvobject>
       </wvobject>
    </wvobject>
-   <wvobject type="array" fp_name="/glay_kernel_testbench/inst_dut/inst_kernel_afu/inst_kernel_cu_1/inst_cu_bundles/\generate_bundle_lanes[0].inst_bundle_lanes /\generate_lane_template[1].inst_lane_template /\generate_engine_template[0].inst_engine_template /\genblk5.inst_engine_csr_index /inst_engine_csr_index_generator/configure_engine_int">
-      <obj_property name="ElementShortName">configure_engine_int</obj_property>
-      <obj_property name="ObjectShortName">configure_engine_int</obj_property>
+   <wvobject type="array" fp_name="/glay_kernel_testbench/inst_dut/inst_kernel_afu/inst_kernel_cu_0/\genblk1.inst_cu_sram_l1_m00_axi_cu_sram_mid32x33_fe32x33_ch0 /response_out">
+      <obj_property name="ElementShortName">response_out</obj_property>
+      <obj_property name="ObjectShortName">response_out</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/glay_kernel_testbench/inst_dut/inst_kernel_afu/inst_kernel_cu_1/\genblk1.inst_cu_sram_l1_m00_axi_cu_sram_mid32x33_fe32x33_ch0 /request_in">
+      <obj_property name="ElementShortName">request_in</obj_property>
+      <obj_property name="ObjectShortName">request_in</obj_property>
       <obj_property name="isExpanded"></obj_property>
-      <wvobject type="logic" fp_name="/glay_kernel_testbench/inst_dut/inst_kernel_afu/inst_kernel_cu_1/inst_cu_bundles/\generate_bundle_lanes[0].inst_bundle_lanes /\generate_lane_template[1].inst_lane_template /\generate_engine_template[0].inst_engine_template /\genblk5.inst_engine_csr_index /inst_engine_csr_index_generator/configure_engine_int.valid">
+      <wvobject type="logic" fp_name="/glay_kernel_testbench/inst_dut/inst_kernel_afu/inst_kernel_cu_1/\genblk1.inst_cu_sram_l1_m00_axi_cu_sram_mid32x33_fe32x33_ch0 /request_in.valid">
          <obj_property name="ElementShortName">.valid</obj_property>
          <obj_property name="ObjectShortName">.valid</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/glay_kernel_testbench/inst_dut/inst_kernel_afu/inst_kernel_cu_1/inst_cu_bundles/\generate_bundle_lanes[0].inst_bundle_lanes /\generate_lane_template[1].inst_lane_template /\generate_engine_template[0].inst_engine_template /\genblk5.inst_engine_csr_index /inst_engine_csr_index_generator/configure_engine_int.payload">
+      <wvobject type="array" fp_name="/glay_kernel_testbench/inst_dut/inst_kernel_afu/inst_kernel_cu_1/\genblk1.inst_cu_sram_l1_m00_axi_cu_sram_mid32x33_fe32x33_ch0 /request_in.payload">
          <obj_property name="ElementShortName">.payload</obj_property>
          <obj_property name="ObjectShortName">.payload</obj_property>
          <obj_property name="isExpanded"></obj_property>
-         <wvobject type="array" fp_name="/glay_kernel_testbench/inst_dut/inst_kernel_afu/inst_kernel_cu_1/inst_cu_bundles/\generate_bundle_lanes[0].inst_bundle_lanes /\generate_lane_template[1].inst_lane_template /\generate_engine_template[0].inst_engine_template /\genblk5.inst_engine_csr_index /inst_engine_csr_index_generator/configure_engine_int.payload.param">
-            <obj_property name="ElementShortName">.param</obj_property>
-            <obj_property name="ObjectShortName">.param</obj_property>
-            <obj_property name="isExpanded"></obj_property>
-            <wvobject type="logic" fp_name="/glay_kernel_testbench/inst_dut/inst_kernel_afu/inst_kernel_cu_1/inst_cu_bundles/\generate_bundle_lanes[0].inst_bundle_lanes /\generate_lane_template[1].inst_lane_template /\generate_engine_template[0].inst_engine_template /\genblk5.inst_engine_csr_index /inst_engine_csr_index_generator/configure_engine_int.payload.param.increment">
-               <obj_property name="ElementShortName">.increment</obj_property>
-               <obj_property name="ObjectShortName">.increment</obj_property>
-            </wvobject>
-            <wvobject type="logic" fp_name="/glay_kernel_testbench/inst_dut/inst_kernel_afu/inst_kernel_cu_1/inst_cu_bundles/\generate_bundle_lanes[0].inst_bundle_lanes /\generate_lane_template[1].inst_lane_template /\generate_engine_template[0].inst_engine_template /\genblk5.inst_engine_csr_index /inst_engine_csr_index_generator/configure_engine_int.payload.param.decrement">
-               <obj_property name="ElementShortName">.decrement</obj_property>
-               <obj_property name="ObjectShortName">.decrement</obj_property>
-            </wvobject>
-            <wvobject type="logic" fp_name="/glay_kernel_testbench/inst_dut/inst_kernel_afu/inst_kernel_cu_1/inst_cu_bundles/\generate_bundle_lanes[0].inst_bundle_lanes /\generate_lane_template[1].inst_lane_template /\generate_engine_template[0].inst_engine_template /\genblk5.inst_engine_csr_index /inst_engine_csr_index_generator/configure_engine_int.payload.param.mode_sequence">
-               <obj_property name="ElementShortName">.mode_sequence</obj_property>
-               <obj_property name="ObjectShortName">.mode_sequence</obj_property>
-            </wvobject>
-            <wvobject type="logic" fp_name="/glay_kernel_testbench/inst_dut/inst_kernel_afu/inst_kernel_cu_1/inst_cu_bundles/\generate_bundle_lanes[0].inst_bundle_lanes /\generate_lane_template[1].inst_lane_template /\generate_engine_template[0].inst_engine_template /\genblk5.inst_engine_csr_index /inst_engine_csr_index_generator/configure_engine_int.payload.param.mode_buffer">
-               <obj_property name="ElementShortName">.mode_buffer</obj_property>
-               <obj_property name="ObjectShortName">.mode_buffer</obj_property>
-            </wvobject>
-            <wvobject type="logic" fp_name="/glay_kernel_testbench/inst_dut/inst_kernel_afu/inst_kernel_cu_1/inst_cu_bundles/\generate_bundle_lanes[0].inst_bundle_lanes /\generate_lane_template[1].inst_lane_template /\generate_engine_template[0].inst_engine_template /\genblk5.inst_engine_csr_index /inst_engine_csr_index_generator/configure_engine_int.payload.param.mode_break">
-               <obj_property name="ElementShortName">.mode_break</obj_property>
-               <obj_property name="ObjectShortName">.mode_break</obj_property>
-            </wvobject>
-            <wvobject type="logic" fp_name="/glay_kernel_testbench/inst_dut/inst_kernel_afu/inst_kernel_cu_1/inst_cu_bundles/\generate_bundle_lanes[0].inst_bundle_lanes /\generate_lane_template[1].inst_lane_template /\generate_engine_template[0].inst_engine_template /\genblk5.inst_engine_csr_index /inst_engine_csr_index_generator/configure_engine_int.payload.param.mode_parallel">
-               <obj_property name="ElementShortName">.mode_parallel</obj_property>
-               <obj_property name="ObjectShortName">.mode_parallel</obj_property>
-            </wvobject>
-            <wvobject type="array" fp_name="/glay_kernel_testbench/inst_dut/inst_kernel_afu/inst_kernel_cu_1/inst_cu_bundles/\generate_bundle_lanes[0].inst_bundle_lanes /\generate_lane_template[1].inst_lane_template /\generate_engine_template[0].inst_engine_template /\genblk5.inst_engine_csr_index /inst_engine_csr_index_generator/configure_engine_int.payload.param.id_channel">
-               <obj_property name="ElementShortName">.id_channel[1:0]</obj_property>
-               <obj_property name="ObjectShortName">.id_channel[1:0]</obj_property>
-            </wvobject>
-            <wvobject type="array" fp_name="/glay_kernel_testbench/inst_dut/inst_kernel_afu/inst_kernel_cu_1/inst_cu_bundles/\generate_bundle_lanes[0].inst_bundle_lanes /\generate_lane_template[1].inst_lane_template /\generate_engine_template[0].inst_engine_template /\genblk5.inst_engine_csr_index /inst_engine_csr_index_generator/configure_engine_int.payload.param.id_buffer">
-               <obj_property name="ElementShortName">.id_buffer[7:0]</obj_property>
-               <obj_property name="ObjectShortName">.id_buffer[7:0]</obj_property>
-            </wvobject>
-            <wvobject type="array" fp_name="/glay_kernel_testbench/inst_dut/inst_kernel_afu/inst_kernel_cu_1/inst_cu_bundles/\generate_bundle_lanes[0].inst_bundle_lanes /\generate_lane_template[1].inst_lane_template /\generate_engine_template[0].inst_engine_template /\genblk5.inst_engine_csr_index /inst_engine_csr_index_generator/configure_engine_int.payload.param.array_size">
-               <obj_property name="ElementShortName">.array_size[31:0]</obj_property>
-               <obj_property name="ObjectShortName">.array_size[31:0]</obj_property>
-               <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
-            </wvobject>
-            <wvobject type="array" fp_name="/glay_kernel_testbench/inst_dut/inst_kernel_afu/inst_kernel_cu_1/inst_cu_bundles/\generate_bundle_lanes[0].inst_bundle_lanes /\generate_lane_template[1].inst_lane_template /\generate_engine_template[0].inst_engine_template /\genblk5.inst_engine_csr_index /inst_engine_csr_index_generator/configure_engine_int.payload.param.index_start">
-               <obj_property name="ElementShortName">.index_start[31:0]</obj_property>
-               <obj_property name="ObjectShortName">.index_start[31:0]</obj_property>
-               <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
-            </wvobject>
-            <wvobject type="array" fp_name="/glay_kernel_testbench/inst_dut/inst_kernel_afu/inst_kernel_cu_1/inst_cu_bundles/\generate_bundle_lanes[0].inst_bundle_lanes /\generate_lane_template[1].inst_lane_template /\generate_engine_template[0].inst_engine_template /\genblk5.inst_engine_csr_index /inst_engine_csr_index_generator/configure_engine_int.payload.param.index_end">
-               <obj_property name="ElementShortName">.index_end[31:0]</obj_property>
-               <obj_property name="ObjectShortName">.index_end[31:0]</obj_property>
-               <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
-            </wvobject>
-            <wvobject type="array" fp_name="/glay_kernel_testbench/inst_dut/inst_kernel_afu/inst_kernel_cu_1/inst_cu_bundles/\generate_bundle_lanes[0].inst_bundle_lanes /\generate_lane_template[1].inst_lane_template /\generate_engine_template[0].inst_engine_template /\genblk5.inst_engine_csr_index /inst_engine_csr_index_generator/configure_engine_int.payload.param.stride">
-               <obj_property name="ElementShortName">.stride[31:0]</obj_property>
-               <obj_property name="ObjectShortName">.stride[31:0]</obj_property>
-            </wvobject>
-            <wvobject type="array" fp_name="/glay_kernel_testbench/inst_dut/inst_kernel_afu/inst_kernel_cu_1/inst_cu_bundles/\generate_bundle_lanes[0].inst_bundle_lanes /\generate_lane_template[1].inst_lane_template /\generate_engine_template[0].inst_engine_template /\genblk5.inst_engine_csr_index /inst_engine_csr_index_generator/configure_engine_int.payload.param.granularity">
-               <obj_property name="ElementShortName">.granularity[5:0]</obj_property>
-               <obj_property name="ObjectShortName">.granularity[5:0]</obj_property>
-            </wvobject>
-            <wvobject type="logic" fp_name="/glay_kernel_testbench/inst_dut/inst_kernel_afu/inst_kernel_cu_1/inst_cu_bundles/\generate_bundle_lanes[0].inst_bundle_lanes /\generate_lane_template[1].inst_lane_template /\generate_engine_template[0].inst_engine_template /\genblk5.inst_engine_csr_index /inst_engine_csr_index_generator/configure_engine_int.payload.param.direction">
-               <obj_property name="ElementShortName">.direction</obj_property>
-               <obj_property name="ObjectShortName">.direction</obj_property>
-            </wvobject>
-            <wvobject type="array" fp_name="/glay_kernel_testbench/inst_dut/inst_kernel_afu/inst_kernel_cu_1/inst_cu_bundles/\generate_bundle_lanes[0].inst_bundle_lanes /\generate_lane_template[1].inst_lane_template /\generate_engine_template[0].inst_engine_template /\genblk5.inst_engine_csr_index /inst_engine_csr_index_generator/configure_engine_int.payload.param.const_mask">
-               <obj_property name="ElementShortName">.const_mask[4:0]</obj_property>
-               <obj_property name="ObjectShortName">.const_mask[4:0]</obj_property>
-            </wvobject>
-            <wvobject type="array" fp_name="/glay_kernel_testbench/inst_dut/inst_kernel_afu/inst_kernel_cu_1/inst_cu_bundles/\generate_bundle_lanes[0].inst_bundle_lanes /\generate_lane_template[1].inst_lane_template /\generate_engine_template[0].inst_engine_template /\genblk5.inst_engine_csr_index /inst_engine_csr_index_generator/configure_engine_int.payload.param.const_value">
-               <obj_property name="ElementShortName">.const_value[31:0]</obj_property>
-               <obj_property name="ObjectShortName">.const_value[31:0]</obj_property>
-            </wvobject>
-            <wvobject type="array" fp_name="/glay_kernel_testbench/inst_dut/inst_kernel_afu/inst_kernel_cu_1/inst_cu_bundles/\generate_bundle_lanes[0].inst_bundle_lanes /\generate_lane_template[1].inst_lane_template /\generate_engine_template[0].inst_engine_template /\genblk5.inst_engine_csr_index /inst_engine_csr_index_generator/configure_engine_int.payload.param.ops_mask">
-               <obj_property name="ElementShortName">.ops_mask[4:0][4:0]</obj_property>
-               <obj_property name="ObjectShortName">.ops_mask[4:0][4:0]</obj_property>
-            </wvobject>
-            <wvobject type="array" fp_name="/glay_kernel_testbench/inst_dut/inst_kernel_afu/inst_kernel_cu_1/inst_cu_bundles/\generate_bundle_lanes[0].inst_bundle_lanes /\generate_lane_template[1].inst_lane_template /\generate_engine_template[0].inst_engine_template /\genblk5.inst_engine_csr_index /inst_engine_csr_index_generator/configure_engine_int.payload.param.mode_cache">
-               <obj_property name="ElementShortName">.mode_cache[3:0]</obj_property>
-               <obj_property name="ObjectShortName">.mode_cache[3:0]</obj_property>
-            </wvobject>
-         </wvobject>
-         <wvobject type="array" fp_name="/glay_kernel_testbench/inst_dut/inst_kernel_afu/inst_kernel_cu_1/inst_cu_bundles/\generate_bundle_lanes[0].inst_bundle_lanes /\generate_lane_template[1].inst_lane_template /\generate_engine_template[0].inst_engine_template /\genblk5.inst_engine_csr_index /inst_engine_csr_index_generator/configure_engine_int.payload.meta">
+         <wvobject type="array" fp_name="/glay_kernel_testbench/inst_dut/inst_kernel_afu/inst_kernel_cu_1/\genblk1.inst_cu_sram_l1_m00_axi_cu_sram_mid32x33_fe32x33_ch0 /request_in.payload.meta">
             <obj_property name="ElementShortName">.meta</obj_property>
             <obj_property name="ObjectShortName">.meta</obj_property>
+            <obj_property name="isExpanded"></obj_property>
+            <wvobject type="array" fp_name="/glay_kernel_testbench/inst_dut/inst_kernel_afu/inst_kernel_cu_1/\genblk1.inst_cu_sram_l1_m00_axi_cu_sram_mid32x33_fe32x33_ch0 /request_in.payload.meta.route">
+               <obj_property name="ElementShortName">.route</obj_property>
+               <obj_property name="ObjectShortName">.route</obj_property>
+            </wvobject>
+            <wvobject type="array" fp_name="/glay_kernel_testbench/inst_dut/inst_kernel_afu/inst_kernel_cu_1/\genblk1.inst_cu_sram_l1_m00_axi_cu_sram_mid32x33_fe32x33_ch0 /request_in.payload.meta.address">
+               <obj_property name="ElementShortName">.address</obj_property>
+               <obj_property name="ObjectShortName">.address</obj_property>
+            </wvobject>
+            <wvobject type="array" fp_name="/glay_kernel_testbench/inst_dut/inst_kernel_afu/inst_kernel_cu_1/\genblk1.inst_cu_sram_l1_m00_axi_cu_sram_mid32x33_fe32x33_ch0 /request_in.payload.meta.subclass">
+               <obj_property name="ElementShortName">.subclass</obj_property>
+               <obj_property name="ObjectShortName">.subclass</obj_property>
+               <obj_property name="CustomSignalColor">#FFD700</obj_property>
+               <obj_property name="UseCustomSignalColor">true</obj_property>
+            </wvobject>
          </wvobject>
-         <wvobject type="array" fp_name="/glay_kernel_testbench/inst_dut/inst_kernel_afu/inst_kernel_cu_1/inst_cu_bundles/\generate_bundle_lanes[0].inst_bundle_lanes /\generate_lane_template[1].inst_lane_template /\generate_engine_template[0].inst_engine_template /\genblk5.inst_engine_csr_index /inst_engine_csr_index_generator/configure_engine_int.payload.data">
+         <wvobject type="array" fp_name="/glay_kernel_testbench/inst_dut/inst_kernel_afu/inst_kernel_cu_1/\genblk1.inst_cu_sram_l1_m00_axi_cu_sram_mid32x33_fe32x33_ch0 /request_in.payload.data">
             <obj_property name="ElementShortName">.data</obj_property>
             <obj_property name="ObjectShortName">.data</obj_property>
          </wvobject>
       </wvobject>
+   </wvobject>
+   <wvobject type="array" fp_name="/glay_kernel_testbench/inst_dut/inst_kernel_afu/inst_kernel_cu_1/\genblk1.inst_cu_sram_l1_m00_axi_cu_sram_mid32x33_fe32x33_ch0 /response_out">
+      <obj_property name="ElementShortName">response_out</obj_property>
+      <obj_property name="ObjectShortName">response_out</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/glay_kernel_testbench/inst_dut/inst_kernel_afu/inst_kernel_cu_2/\genblk1.inst_cu_sram_l1_m00_axi_cu_sram_mid32x33_fe32x33_ch0 /request_in">
+      <obj_property name="ElementShortName">request_in</obj_property>
+      <obj_property name="ObjectShortName">request_in</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject type="logic" fp_name="/glay_kernel_testbench/inst_dut/inst_kernel_afu/inst_kernel_cu_2/\genblk1.inst_cu_sram_l1_m00_axi_cu_sram_mid32x33_fe32x33_ch0 /request_in.valid">
+         <obj_property name="ElementShortName">.valid</obj_property>
+         <obj_property name="ObjectShortName">.valid</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/glay_kernel_testbench/inst_dut/inst_kernel_afu/inst_kernel_cu_2/\genblk1.inst_cu_sram_l1_m00_axi_cu_sram_mid32x33_fe32x33_ch0 /request_in.payload">
+         <obj_property name="ElementShortName">.payload</obj_property>
+         <obj_property name="ObjectShortName">.payload</obj_property>
+         <obj_property name="isExpanded"></obj_property>
+         <wvobject type="array" fp_name="/glay_kernel_testbench/inst_dut/inst_kernel_afu/inst_kernel_cu_2/\genblk1.inst_cu_sram_l1_m00_axi_cu_sram_mid32x33_fe32x33_ch0 /request_in.payload.meta">
+            <obj_property name="ElementShortName">.meta</obj_property>
+            <obj_property name="ObjectShortName">.meta</obj_property>
+            <obj_property name="isExpanded"></obj_property>
+            <wvobject type="array" fp_name="/glay_kernel_testbench/inst_dut/inst_kernel_afu/inst_kernel_cu_2/\genblk1.inst_cu_sram_l1_m00_axi_cu_sram_mid32x33_fe32x33_ch0 /request_in.payload.meta.route">
+               <obj_property name="ElementShortName">.route</obj_property>
+               <obj_property name="ObjectShortName">.route</obj_property>
+            </wvobject>
+            <wvobject type="array" fp_name="/glay_kernel_testbench/inst_dut/inst_kernel_afu/inst_kernel_cu_2/\genblk1.inst_cu_sram_l1_m00_axi_cu_sram_mid32x33_fe32x33_ch0 /request_in.payload.meta.address">
+               <obj_property name="ElementShortName">.address</obj_property>
+               <obj_property name="ObjectShortName">.address</obj_property>
+            </wvobject>
+            <wvobject type="array" fp_name="/glay_kernel_testbench/inst_dut/inst_kernel_afu/inst_kernel_cu_2/\genblk1.inst_cu_sram_l1_m00_axi_cu_sram_mid32x33_fe32x33_ch0 /request_in.payload.meta.subclass">
+               <obj_property name="ElementShortName">.subclass</obj_property>
+               <obj_property name="ObjectShortName">.subclass</obj_property>
+               <obj_property name="CustomSignalColor">#FFD700</obj_property>
+               <obj_property name="UseCustomSignalColor">true</obj_property>
+            </wvobject>
+         </wvobject>
+         <wvobject type="array" fp_name="/glay_kernel_testbench/inst_dut/inst_kernel_afu/inst_kernel_cu_2/\genblk1.inst_cu_sram_l1_m00_axi_cu_sram_mid32x33_fe32x33_ch0 /request_in.payload.data">
+            <obj_property name="ElementShortName">.data</obj_property>
+            <obj_property name="ObjectShortName">.data</obj_property>
+         </wvobject>
+      </wvobject>
+   </wvobject>
+   <wvobject type="array" fp_name="/glay_kernel_testbench/inst_dut/inst_kernel_afu/inst_kernel_cu_2/\genblk1.inst_cu_sram_l1_m00_axi_cu_sram_mid32x33_fe32x33_ch0 /response_out">
+      <obj_property name="ElementShortName">response_out</obj_property>
+      <obj_property name="ObjectShortName">response_out</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/glay_kernel_testbench/inst_dut/inst_kernel_afu/inst_kernel_cu_3/\genblk1.inst_cu_sram_l1_m00_axi_cu_sram_mid32x33_fe32x33_ch0 /request_in">
+      <obj_property name="ElementShortName">request_in</obj_property>
+      <obj_property name="ObjectShortName">request_in</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject type="logic" fp_name="/glay_kernel_testbench/inst_dut/inst_kernel_afu/inst_kernel_cu_3/\genblk1.inst_cu_sram_l1_m00_axi_cu_sram_mid32x33_fe32x33_ch0 /request_in.valid">
+         <obj_property name="ElementShortName">.valid</obj_property>
+         <obj_property name="ObjectShortName">.valid</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/glay_kernel_testbench/inst_dut/inst_kernel_afu/inst_kernel_cu_3/\genblk1.inst_cu_sram_l1_m00_axi_cu_sram_mid32x33_fe32x33_ch0 /request_in.payload">
+         <obj_property name="ElementShortName">.payload</obj_property>
+         <obj_property name="ObjectShortName">.payload</obj_property>
+         <obj_property name="isExpanded"></obj_property>
+         <wvobject type="array" fp_name="/glay_kernel_testbench/inst_dut/inst_kernel_afu/inst_kernel_cu_3/\genblk1.inst_cu_sram_l1_m00_axi_cu_sram_mid32x33_fe32x33_ch0 /request_in.payload.meta">
+            <obj_property name="ElementShortName">.meta</obj_property>
+            <obj_property name="ObjectShortName">.meta</obj_property>
+            <obj_property name="isExpanded"></obj_property>
+            <wvobject type="array" fp_name="/glay_kernel_testbench/inst_dut/inst_kernel_afu/inst_kernel_cu_3/\genblk1.inst_cu_sram_l1_m00_axi_cu_sram_mid32x33_fe32x33_ch0 /request_in.payload.meta.route">
+               <obj_property name="ElementShortName">.route</obj_property>
+               <obj_property name="ObjectShortName">.route</obj_property>
+            </wvobject>
+            <wvobject type="array" fp_name="/glay_kernel_testbench/inst_dut/inst_kernel_afu/inst_kernel_cu_3/\genblk1.inst_cu_sram_l1_m00_axi_cu_sram_mid32x33_fe32x33_ch0 /request_in.payload.meta.address">
+               <obj_property name="ElementShortName">.address</obj_property>
+               <obj_property name="ObjectShortName">.address</obj_property>
+            </wvobject>
+            <wvobject type="array" fp_name="/glay_kernel_testbench/inst_dut/inst_kernel_afu/inst_kernel_cu_3/\genblk1.inst_cu_sram_l1_m00_axi_cu_sram_mid32x33_fe32x33_ch0 /request_in.payload.meta.subclass">
+               <obj_property name="ElementShortName">.subclass</obj_property>
+               <obj_property name="ObjectShortName">.subclass</obj_property>
+               <obj_property name="CustomSignalColor">#FFD700</obj_property>
+               <obj_property name="UseCustomSignalColor">true</obj_property>
+            </wvobject>
+         </wvobject>
+         <wvobject type="array" fp_name="/glay_kernel_testbench/inst_dut/inst_kernel_afu/inst_kernel_cu_3/\genblk1.inst_cu_sram_l1_m00_axi_cu_sram_mid32x33_fe32x33_ch0 /request_in.payload.data">
+            <obj_property name="ElementShortName">.data</obj_property>
+            <obj_property name="ObjectShortName">.data</obj_property>
+         </wvobject>
+      </wvobject>
+   </wvobject>
+   <wvobject type="array" fp_name="/glay_kernel_testbench/inst_dut/inst_kernel_afu/inst_kernel_cu_3/\genblk1.inst_cu_sram_l1_m00_axi_cu_sram_mid32x33_fe32x33_ch0 /response_out">
+      <obj_property name="ElementShortName">response_out</obj_property>
+      <obj_property name="ObjectShortName">response_out</obj_property>
    </wvobject>
 </wave_config>

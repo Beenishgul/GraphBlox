@@ -64,6 +64,8 @@ KernelDescriptor        kernel_control_descriptor_out;
 logic [NUM_CUS-1:0] kernel_cu_done_out         ;
 logic [NUM_CUS-1:0] kernel_cu_fifo_setup_signal;
 
+logic [NUM_CUS-1:0] cus_flush_int;
+logic [NUM_CUS-1:0] cu_flush_out;
 // --------------------------------------------------------------------------------------
 // CU -> [CU_CACHE|BUNDLES|LANES|ENGINES]
 // --------------------------------------------------------------------------------------

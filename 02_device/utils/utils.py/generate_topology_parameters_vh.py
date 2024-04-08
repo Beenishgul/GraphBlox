@@ -3620,6 +3620,7 @@ endgenerate
 // Kernel_setup
 
 assign kernel_cu_descriptor_in[{0}] = kernel_control_descriptor_out;
+assign cus_flush_int[{0}] = cu_flush_out[{0}];
 
 kernel_cu #(
   .ID_CU       ({0}           ),
@@ -3628,10 +3629,12 @@ kernel_cu #(
     .ap_clk           (ap_clk                     ),
     .areset           (areset_cu[{0}]                  ),
     .descriptor_in    (kernel_cu_descriptor_in[{0}]    ),
+    .cus_flush_in     (cus_flush_int                 ),
     """
 
     output_file_kernel_cu_module_post = """
     .fifo_setup_signal(kernel_cu_fifo_setup_signal[{0}]),
+    .cu_flush_out     (cu_flush_out[{0}]               ),
     .done_out         (kernel_cu_done_out[{0}]         )
 );
     """
@@ -4379,10 +4382,17 @@ if {{[checkXciFileExistsIP ${{files_sources_xci}}]}} {{
               -module_name ${{module_name}}   >> $log_file
 
     set_property -dict [list                                                 \\
-                        CONFIG.ADDR_WIDTH ${{BE_ADDR_WIDTH_M{0:02d}}}        \\
-                        CONFIG.DATA_WIDTH ${{BE_CACHE_DATA_WIDTH_M{0:02d}}}  \\
-                        CONFIG.NUM_MI {{{9}}}  \\
-                        CONFIG.STRATEGY {{2}} \\
+                        CONFIG.ADDR_WIDTH ${{MID_ADDR_WIDTH_M{0:02d}}} \\
+                        CONFIG.DATA_WIDTH ${{MID_CACHE_DATA_WIDTH_M{0:02d}}} \\
+                        CONFIG.M00_A00_ADDR_WIDTH  ${{BE_ADDR_WIDTH_M{0:02d}}} \\
+                        CONFIG.M00_READ_ISSUING {{32}} \\
+                        CONFIG.M00_WRITE_ISSUING {{32}} \\
+                        CONFIG.NUM_MI {{1}} \\
+                        CONFIG.NUM_SI {{{9}}} \\"""
+
+    fill_m_axi_vip_tcl_template_crossbar_ports = """                    CONFIG.S{0:02d}_READ_ACCEPTANCE {{32}} \\"""
+
+    fill_m_axi_vip_tcl_template_crossbar_post = """                    CONFIG.STRATEGY {{2}} \\
                         ] [get_ips ${{module_name}}] >> $log_file
 
 
@@ -4744,41 +4754,89 @@ if {{[checkXciFileExistsIP ${{files_sources_xci}}]}} {{
             )
         )
 
-        # if CHANNEL_CONFIG_L2_TYPE[index] == 1:
-        #     output_lines.append(
-        #         fill_m_axi_vip_tcl_template_crossbar_pre.format(
-        #             channel,
-        #             CHANNEL_CONFIG_DATA_WIDTH_BE[index],
-        #             CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],
-        #             CHANNEL_CONFIG_DATA_WIDTH_MID[index],
-        #             CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],
-        #             adjust_to_nearest_legal_cache_size(CACHE_CONFIG_L2_SIZE[index]),
-        #             adjust_to_nearest_legal_cache_num_ways(
-        #                 CACHE_CONFIG_L2_NUM_WAYS[index]
-        #             ),
-        #             CACHE_CONFIG_L2_RAM[index],
-        #             CACHE_CONFIG_L2_CTRL[index],
-        #             (CHANNEL_CONFIG_L2_MERGE[CACHE_MERGE_COUNT]*NUM_CUS),
-        #         )
-        #     )
-        #     # CACHE_MERGE_COUNT = CACHE_MERGE_COUNT + 1
-        # else:
-        #     output_lines.append(
-        #         fill_m_axi_vip_tcl_template_crossbar_pre.format(
-        #             channel,
-        #             CHANNEL_CONFIG_DATA_WIDTH_BE[index],
-        #             CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],
-        #             CHANNEL_CONFIG_DATA_WIDTH_MID[index],
-        #             CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],
-        #             adjust_to_nearest_legal_cache_size(CACHE_CONFIG_L2_SIZE[index]),
-        #             adjust_to_nearest_legal_cache_num_ways(
-        #                 CACHE_CONFIG_L2_NUM_WAYS[index]
-        #             ),
-        #             CACHE_CONFIG_L2_RAM[index],
-        #             CACHE_CONFIG_L2_CTRL[index],
-        #             1,
-        #         )
-        #     )
+        if CHANNEL_CONFIG_L2_TYPE[index] == 1:
+            output_lines.append(
+                fill_m_axi_vip_tcl_template_crossbar_pre.format(
+                    channel,
+                    CHANNEL_CONFIG_DATA_WIDTH_BE[index],
+                    CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],
+                    CHANNEL_CONFIG_DATA_WIDTH_MID[index],
+                    CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],
+                    adjust_to_nearest_legal_cache_size(CACHE_CONFIG_L2_SIZE[index]),
+                    adjust_to_nearest_legal_cache_num_ways(
+                        CACHE_CONFIG_L2_NUM_WAYS[index]
+                    ),
+                    CACHE_CONFIG_L2_RAM[index],
+                    CACHE_CONFIG_L2_CTRL[index],
+                    (CHANNEL_CONFIG_L2_MERGE[CACHE_MERGE_COUNT]*NUM_CUS),
+                )
+            )
+            # CACHE_MERGE_COUNT = CACHE_MERGE_COUNT + 1
+        else:
+            output_lines.append(
+                fill_m_axi_vip_tcl_template_crossbar_pre.format(
+                    channel,
+                    CHANNEL_CONFIG_DATA_WIDTH_BE[index],
+                    CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],
+                    CHANNEL_CONFIG_DATA_WIDTH_MID[index],
+                    CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],
+                    adjust_to_nearest_legal_cache_size(CACHE_CONFIG_L2_SIZE[index]),
+                    adjust_to_nearest_legal_cache_num_ways(
+                        CACHE_CONFIG_L2_NUM_WAYS[index]
+                    ),
+                    CACHE_CONFIG_L2_RAM[index],
+                    CACHE_CONFIG_L2_CTRL[index],
+                    NUM_CUS,
+                )
+            )
+
+        if int(CACHE_CONFIG_L2_CTRL[index]):
+            output_lines.append(
+                fill_m_axi_vip_tcl_template_crossbar_mid.format(
+                    channel,
+                    CHANNEL_CONFIG_DATA_WIDTH_BE[index],
+                    CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],
+                    CHANNEL_CONFIG_DATA_WIDTH_MID[index],
+                    CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],
+                    adjust_to_nearest_legal_cache_size(CACHE_CONFIG_L2_SIZE[index]),
+                    adjust_to_nearest_legal_cache_num_ways(
+                        CACHE_CONFIG_L2_NUM_WAYS[index]
+                    ),
+                    CACHE_CONFIG_L2_RAM[index],
+                    CACHE_CONFIG_L2_CTRL[index],
+                )
+            )
+
+        for ID_CU in range(NUM_CUS):
+            CHANNEL_PORT_INDEX = 0
+            if CHANNEL_CONFIG_L2_TYPE[index] == 1:
+                CACHE_PORT_COUNT = CHANNEL_CONFIG_L2_MERGE[CACHE_MERGE_COUNT - 1]
+                CU_OFFSET = CACHE_PORT_COUNT * ID_CU
+                for CACHE_PORT_INDEX in range(CACHE_PORT_COUNT):
+                    output_lines.append(
+                        fill_m_axi_vip_tcl_template_crossbar_ports.format(
+                            (CACHE_PORT_INDEX+CU_OFFSET), CHANNEL_PORT_INDEX
+                        )
+                    )
+                    CHANNEL_PORT_INDEX = CHANNEL_PORT_INDEX + 1
+            else:
+                output_lines.append(
+                    fill_m_axi_vip_tcl_template_crossbar_ports.format(0, channel)
+                )
+
+        output_lines.append(
+            fill_m_axi_vip_tcl_template_crossbar_post.format(
+                channel,
+                CHANNEL_CONFIG_DATA_WIDTH_BE[index],
+                CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],
+                CHANNEL_CONFIG_DATA_WIDTH_MID[index],
+                CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],
+                adjust_to_nearest_legal_cache_size(CACHE_CONFIG_L2_SIZE[index]),
+                adjust_to_nearest_legal_cache_num_ways(CACHE_CONFIG_L2_NUM_WAYS[index]),
+                CACHE_CONFIG_L2_RAM[index],
+                CACHE_CONFIG_L2_CTRL[index],
+            )
+        )
 
         if CHANNEL_CONFIG_L2_TYPE[index] == 1:
             output_lines.append(
@@ -6257,7 +6315,6 @@ if XPM_FIFO_ENABLE == "0":
 fill_fifo_filelist_xsim_ip_v = "".join(fill_fifo_filelist_xsim_ip_v)
 fill_fifo_filelist_xsim_ip_vhdl = "".join(fill_fifo_filelist_xsim_ip_vhdl)
 
-
 # ----------------------------------------------------------------------------
 # generate axi vip project files
 # ----------------------------------------------------------------------------
@@ -6359,16 +6416,19 @@ with open(output_file_filelist_xsim_ip_v_f, "w") as file:
 
     fill_file_filelist_xsim_ip_v_template_once = """
 {5}/m{0:02d}_axi_register_slice_be_{1}x{2}/hdl/axi_register_slice_v2_1_vl_rfs.v
+{5}/m{0:02d}_axi_system_crossbar_be{1}x{2}_mid{3}x{4}/hdl/axi_crossbar_v2_1_vl_rfs.v
    """
 
     fill_file_filelist_xsim_ip_v_template = """
 {5}/m{0:02d}_axi_register_slice_be_{1}x{2}/sim/m{0:02d}_axi_register_slice_be_{1}x{2}.v
 {5}/m{0:02d}_axi_register_slice_mid_{3}x{4}/sim/m{0:02d}_axi_register_slice_mid_{3}x{4}.v
+{5}/m{0:02d}_axi_system_crossbar_be{1}x{2}_mid{3}x{4}/sim/m{0:02d}_axi_system_crossbar_be{1}x{2}_mid{3}x{4}.v
    """
 
     fill_file_filelist_xsim_ip_v_template_axi_lite = """
 {5}/m{0:02d}_axi_lite_register_slice_mid_64x17/sim/m{0:02d}_axi_lite_register_slice_mid_64x17.v
    """
+
     for index, channel in enumerate(DISTINCT_CHANNELS):
         if index == 0:
             output_lines.append(

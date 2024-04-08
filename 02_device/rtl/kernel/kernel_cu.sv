@@ -16,13 +16,15 @@
 
 module kernel_cu #(
   `include "kernel_parameters.vh"
-) (
-  input  logic                                   ap_clk                              ,
-  input  logic                                   areset                              ,
-  input  KernelDescriptor                        descriptor_in                       ,
+  ) (
+  input  logic               ap_clk           ,
+  input  logic               areset           ,
+  input  KernelDescriptor    descriptor_in    ,
+  input  logic [NUM_CUS-1:0] cus_flush_in     ,
   `include "m_axi_ports_kernel_cu.vh"
-  output logic                                   fifo_setup_signal                   ,
-  output logic                                   done_out
+  output logic               fifo_setup_signal,
+  output logic               cu_flush_out     ,
+  output logic               done_out
 );
 
 genvar i;
@@ -37,6 +39,8 @@ logic areset_bundles  ;
 
 logic fifo_empty_int;
 logic fifo_empty_reg;
+
+logic [NUM_CUS-1:0] cus_flush_reg;
 
 KernelDescriptor descriptor_in_reg;
 
@@ -162,12 +166,16 @@ always_ff @(posedge ap_clk) begin
     done_out          <= 1'b0;
     fifo_empty_reg    <= 1'b1;
     cu_setup_cu_flush <= 1'b0;
+    cu_flush_out      <= 1'b0;
+    cus_flush_reg     <= 0;
   end
   else begin
     fifo_setup_signal <= ch_arbiter_1_to_N_chs_cache_fifo_setup_signal | ch_arbiter_N_to_1_cache_fifo_setup_signal | (|cu_channel_fifo_setup_signal) | cache_generator_fifo_request_setup_signal | cache_generator_fifo_response_setup_signal | cu_setup_fifo_setup_signal | cu_bundles_fifo_setup_signal;
     done_out          <= cu_setup_done_assert;
-    cu_setup_cu_flush <= cu_bundles_done_assert;
+    cu_setup_cu_flush <= &cus_flush_reg;
+    cu_flush_out      <= cu_bundles_done_assert;
     fifo_empty_reg    <= fifo_empty_int;
+    cus_flush_reg     <= cus_flush_in;
   end
 end
 
@@ -179,15 +187,15 @@ assign fifo_empty_int = ch_arbiter_N_to_1_cache_fifo_response_signals_out.empty 
 // --------------------------------------------------------------------------------------
 always_ff @(posedge ap_clk) begin
   if (areset_control) begin
-    descriptor_in_reg.valid     <= 1'b0;
-    cu_setup_descriptor.valid   <= 1'b0;
+    descriptor_in_reg.valid   <= 1'b0;
+    cu_setup_descriptor.valid <= 1'b0;
     for (int i = 0; i < NUM_CHANNELS; i++) begin
       cu_channel_descriptor[i].valid  <= 1'b0;
     end
   end
   else begin
-    descriptor_in_reg.valid     <= descriptor_in.valid;
-    cu_setup_descriptor.valid   <= descriptor_in_reg.valid;
+    descriptor_in_reg.valid   <= descriptor_in.valid;
+    cu_setup_descriptor.valid <= descriptor_in_reg.valid;
     for (int i = 0; i < NUM_CHANNELS; i++) begin
       cu_channel_descriptor[i].valid  <= descriptor_in_reg.valid;
     end
@@ -195,8 +203,8 @@ always_ff @(posedge ap_clk) begin
 end
 
 always_ff @(posedge ap_clk) begin
-  descriptor_in_reg.payload     <= descriptor_in.payload;
-  cu_setup_descriptor.payload   <= descriptor_in_reg.payload;
+  descriptor_in_reg.payload   <= descriptor_in.payload;
+  cu_setup_descriptor.payload <= descriptor_in_reg.payload;
   for (int i = 0; i < NUM_CHANNELS; i++) begin
     cu_channel_descriptor[i].payload  <= descriptor_in_reg.payload;
   end
@@ -276,7 +284,7 @@ always_ff @(posedge ap_clk) begin
     ch_arbiter_1_to_N_chs_cache_fifo_request_signals_in[i].rd_en = ~cu_channel_fifo_request_signals_out[i].prog_full ;
     cu_channel_fifo_request_signals_in[i].rd_en <= 1'b1;
 
-    cu_channel_fifo_request_backtrack_signals_in[i]  = cu_channel_fifo_request_signals_out[i];
+    cu_channel_fifo_request_backtrack_signals_in[i] = cu_channel_fifo_request_signals_out[i];
   end
 end
 
@@ -348,9 +356,10 @@ end
 // Initial setup and configuration reading
 // --------------------------------------------------------------------------------------
 cu_setup #(
-  .ID_CU    ({NUM_CUS_WIDTH_BITS{1'b1}}    ),
-  .ID_BUNDLE({NUM_BUNDLES_WIDTH_BITS{1'b1}}),
-  .ID_LANE  ({NUM_LANES_WIDTH_BITS{1'b1}}  )
+  .TRUE_ID_CU(ID_CU                         ),
+  .ID_CU     ({NUM_CUS_WIDTH_BITS{1'b1}}    ),
+  .ID_BUNDLE ({NUM_BUNDLES_WIDTH_BITS{1'b1}}),
+  .ID_LANE   ({NUM_LANES_WIDTH_BITS{1'b1}}  )
 ) inst_cu_setup (
   .ap_clk                   (ap_clk                            ),
   .areset                   (areset_setup                      ),
@@ -369,9 +378,7 @@ cu_setup #(
 // --------------------------------------------------------------------------------------
 // Bundles CU
 // --------------------------------------------------------------------------------------
-cu_bundles #(
-  `include"set_cu_parameters.vh"
-  ) inst_cu_bundles (
+cu_bundles #(`include"set_cu_parameters.vh") inst_cu_bundles (
   .ap_clk                                      (ap_clk                                      ),
   .areset                                      (areset_bundles                              ),
   .response_memory_in                          (cu_bundles_response_in                      ),
