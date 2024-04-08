@@ -4812,7 +4812,7 @@ if {{[checkXciFileExistsIP ${{files_sources_xci}}]}} {{
                     ),
                     CACHE_CONFIG_L2_RAM[index],
                     CACHE_CONFIG_L2_CTRL[index],
-                    1,
+                    NUM_CUS,
                 )
             )
 
@@ -8572,7 +8572,7 @@ with open(output_file_kernel_mxx_axi_system_cache_wrapper, "w") as file:
                     )
             else:
                 fill_kernel_mxx_axi_system_cache_wrapper_module.append(
-                    fill_kernel_mxx_axi_system_cache_wrapper_portmaps.format(0, 0, ID_CU)
+                    fill_kernel_mxx_axi_system_cache_wrapper_portmaps.format(ID_CU, 0, ID_CU)
                 )
 
         fill_kernel_mxx_axi_system_cache_wrapper_module.append(

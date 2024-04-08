@@ -83,7 +83,7 @@
                 "ENGINE_PARALLEL_READ_WRITE(B:auxiliary_2,num_vertices,num_vertices*2)(B:auxiliary_1,0,num_vertices)"
             ],
             [
-                "ENGINE_CSR_INDEX(P:2)(B:NONE,0,num_vertices)"
+                "ENGINE_CSR_INDEX(P:4)(B:NONE,0,num_vertices)"
             ],
             [
                 "ENGINE_FORWARD_DATA"
@@ -464,7 +464,7 @@
         "frequency_scale": "1",
         "ctrl_mode"      : "USER_MANAGED",
         "num_kernels"    : "1",
-        "num_kernel_cu"  : "2",
+        "num_kernel_cu"  : "4",
         "xpm_fifo"       : "3",
         "slr_percent"    : [33, 33, 33, 0],
         "slr_mapping"    : [0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 1, 2, 1, 2],
