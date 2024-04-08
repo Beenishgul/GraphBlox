@@ -186,6 +186,7 @@ always_ff @(posedge ap_clk) begin
                 configure_memory_reg.payload.param.mode_sequence <= fifo_response_memory_in_dout_reg.payload.data.field[2];
                 configure_memory_reg.payload.param.mode_buffer   <= fifo_response_memory_in_dout_reg.payload.data.field[3];
                 configure_memory_reg.payload.param.mode_break    <= fifo_response_memory_in_dout_reg.payload.data.field[4];
+                configure_memory_reg.payload.param.mode_parallel <= fifo_response_memory_in_dout_reg.payload.data.field[5];
             end
             (1 << 1) : begin
                 configure_memory_reg.payload.param.index_start <= fifo_response_memory_in_dout_reg.payload.data.field;

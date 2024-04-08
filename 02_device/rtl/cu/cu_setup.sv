@@ -408,7 +408,7 @@ assign configuration_comb_flush.meta.address.mode_cache      = M00_AXI4_FE_CACHE
 assign configuration_comb_flush.meta.address.burst_length    = 1;
 assign configuration_comb_flush.meta.address.shift.amount    = $clog2(M00_AXI4_FE_DATA_W/8);
 assign configuration_comb_flush.meta.address.shift.direction = 1'b1;
-assign configuration_comb_flush.meta.subclass.cmd            = CMD_MEM_READ;
+assign configuration_comb_flush.meta.subclass.cmd            = CMD_CACHE_FLUSH;
 
 // --------------------------------------------------------------------------------------
 // Create Configuration Packet
