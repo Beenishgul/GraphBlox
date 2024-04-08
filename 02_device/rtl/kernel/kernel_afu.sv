@@ -44,9 +44,9 @@ genvar i;
 // --------------------------------------------------------------------------------------
 // Wires and Variables
 // --------------------------------------------------------------------------------------
-logic areset_m_axi  ;
-logic areset_cu     ;
-logic areset_control;
+logic areset_m_axi               ;
+logic areset_cu     [NUM_CUS-1:0];
+logic areset_control             ;
 
 
 logic endian_read_reg ;
@@ -61,13 +61,13 @@ ControlChainInterfaceOutput kernel_control_out;
 KernelDescriptorPayload kernel_control_descriptor_in ;
 KernelDescriptor        kernel_control_descriptor_out;
 
-logic kernel_cu_done_out         ;
-logic kernel_cu_fifo_setup_signal;
+logic [NUM_CUS-1:0] kernel_cu_done_out         ;
+logic [NUM_CUS-1:0] kernel_cu_fifo_setup_signal;
 
 // --------------------------------------------------------------------------------------
 // CU -> [CU_CACHE|BUNDLES|LANES|ENGINES]
 // --------------------------------------------------------------------------------------
-KernelDescriptor kernel_cu_descriptor_in;
+KernelDescriptor kernel_cu_descriptor_in[NUM_CUS-1:0];
 
 // --------------------------------------------------------------------------------------
 // System Cache -> AXI Mutli channels support
@@ -80,16 +80,19 @@ logic [NUM_CHANNELS-1:0] kernel_cache_setup_signal                  ;
 //   Register and invert reset signal.
 // --------------------------------------------------------------------------------------
 localparam PULSE_HOLD    = 100;
-logic     areset_system      ;
+logic      areset_system      ;
 // --------------------------------------------------------------------------------------
 always_ff @(posedge ap_clk) begin
   areset_m_axi   <= areset_system;
-  areset_cu      <= areset_system;
   areset_control <= areset_system;
 
   for (int i = 0; i < NUM_CHANNELS; i++) begin
     areset_cache[i]     <= areset_system;
     areset_axi_slice[i] <= areset_system;
+  end
+
+  for (int i = 0; i < NUM_CUS; i++) begin
+    areset_cu[i] <= areset_system;
   end
 end
 
@@ -121,8 +124,8 @@ always_ff @(posedge ap_clk) begin
   else begin
     kernel_control_in.ap_start    <= ap_start;
     kernel_control_in.ap_continue <= ap_continue;
-    kernel_control_in.setup       <= ~(kernel_cu_fifo_setup_signal | (|kernel_cache_setup_signal));
-    kernel_control_in.done        <= kernel_cu_done_out;
+    kernel_control_in.setup       <= ~(|kernel_cu_fifo_setup_signal | (|kernel_cache_setup_signal));
+    kernel_control_in.done        <= &kernel_cu_done_out;
   end
 end
 
@@ -163,24 +166,6 @@ end
 // System Cache CH 0-> AXI
 // --------------------------------------------------------------------------------------
 `include "afu_topology.vh"
-
-// --------------------------------------------------------------------------------------
-// CU -> [CU_CACHE|BUNDLES|LANES|ENGINES]
-// --------------------------------------------------------------------------------------
-// Kernel_setup
-assign kernel_cu_descriptor_in = kernel_control_descriptor_out;
-
-kernel_cu #(
-  .ID_CU       (0           ),
-  .NUM_CHANNELS(NUM_CHANNELS)
-) inst_kernel_cu (
-  .ap_clk           (ap_clk                     ),
-  .areset           (areset_cu                  ),
-  .descriptor_in    (kernel_cu_descriptor_in    ),
-  `include "m_axi_portmap_kernel_cu.vh"
-  .fifo_setup_signal(kernel_cu_fifo_setup_signal),
-  .done_out         (kernel_cu_done_out         )
-);
 
 // --------------------------------------------------------------------------------------
 // Kernel -> State Control

@@ -17,30 +17,32 @@
 
 
 
-module kernel_m00_axi_system_cache_be512x33_mid32x33_wrapper (
+module kernel_m00_axi_system_cache_be512x33_mid32x33_wrapper  #(
+  parameter NUM_CUS             = 1
+) (
   // System Signals
   input  logic                                  ap_clk            ,
   input  logic                                  areset            ,
   
 
-  output M00_AXI4_MID_SlaveReadInterfaceOutput  s0_axi_read_out    ,
-  input  M00_AXI4_MID_SlaveReadInterfaceInput   s0_axi_read_in     ,
-  output M00_AXI4_MID_SlaveWriteInterfaceOutput s0_axi_write_out   ,
-  input  M00_AXI4_MID_SlaveWriteInterfaceInput  s0_axi_write_in    ,
+  output M00_AXI4_MID_SlaveReadInterfaceOutput  s0_axi_read_out [NUM_CUS-1:0]    ,
+  input  M00_AXI4_MID_SlaveReadInterfaceInput   s0_axi_read_in  [NUM_CUS-1:0]    ,
+  output M00_AXI4_MID_SlaveWriteInterfaceOutput s0_axi_write_out[NUM_CUS-1:0]    ,
+  input  M00_AXI4_MID_SlaveWriteInterfaceInput  s0_axi_write_in [NUM_CUS-1:0]    ,
   
 
-  output M01_AXI4_MID_SlaveReadInterfaceOutput  s1_axi_read_out    ,
-  input  M01_AXI4_MID_SlaveReadInterfaceInput   s1_axi_read_in     ,
-  output M01_AXI4_MID_SlaveWriteInterfaceOutput s1_axi_write_out   ,
-  input  M01_AXI4_MID_SlaveWriteInterfaceInput  s1_axi_write_in    ,
+  output M01_AXI4_MID_SlaveReadInterfaceOutput  s1_axi_read_out [NUM_CUS-1:0]    ,
+  input  M01_AXI4_MID_SlaveReadInterfaceInput   s1_axi_read_in  [NUM_CUS-1:0]    ,
+  output M01_AXI4_MID_SlaveWriteInterfaceOutput s1_axi_write_out[NUM_CUS-1:0]    ,
+  input  M01_AXI4_MID_SlaveWriteInterfaceInput  s1_axi_write_in [NUM_CUS-1:0]    ,
   
 
   input  M00_AXI4_BE_MasterReadInterfaceInput   m_axi_read_in     ,
   output M00_AXI4_BE_MasterReadInterfaceOutput  m_axi_read_out    ,
   input  M00_AXI4_BE_MasterWriteInterfaceInput  m_axi_write_in    ,
   output M00_AXI4_BE_MasterWriteInterfaceOutput m_axi_write_out   ,
-  input  S00_AXI4_LITE_MID_REQ_T                s_axi_lite_in     ,
-  output S00_AXI4_LITE_MID_RESP_T               s_axi_lite_out    ,
+  input  S00_AXI4_LITE_MID_REQ_T                s_axi_lite_in  [NUM_CUS-1:0]    ,
+  output S00_AXI4_LITE_MID_RESP_T               s_axi_lite_out [NUM_CUS-1:0]    ,
   output logic                                  cache_setup_signal
 );
 
@@ -88,84 +90,166 @@ m00_axi_system_cache_be512x33_mid32x33 inst_m00_axi_system_cache_be512x33_mid32x
 
   .S0_AXI_GEN_ARUSER (0                           ),
   .S0_AXI_GEN_AWUSER (0                           ),
-  .S0_AXI_GEN_RVALID (s0_axi_read_out.rvalid       ), // Output Read channel valid
-  .S0_AXI_GEN_ARREADY(s0_axi_read_out.arready      ), // Output Read Address read channel ready
-  .S0_AXI_GEN_RLAST  (s0_axi_read_out.rlast        ), // Output Read channel last word
-  .S0_AXI_GEN_RDATA  (s0_axi_read_out.rdata        ), // Output Read channel data
-  .S0_AXI_GEN_RID    (s0_axi_read_out.rid          ), // Output Read channel ID
-  .S0_AXI_GEN_RRESP  (s0_axi_read_out.rresp        ), // Output Read channel response
-  .S0_AXI_GEN_ARVALID(s0_axi_read_in.arvalid       ), // Input Read Address read channel valid
-  .S0_AXI_GEN_ARADDR (s0_axi_read_in.araddr        ), // Input Read Address read channel address
-  .S0_AXI_GEN_ARLEN  (s0_axi_read_in.arlen         ), // Input Read Address channel burst length
-  .S0_AXI_GEN_RREADY (s0_axi_read_in.rready        ), // Input Read Read channel ready
-  .S0_AXI_GEN_ARID   (s0_axi_read_in.arid          ), // Input Read Address read channel ID
-  .S0_AXI_GEN_ARSIZE (s0_axi_read_in.arsize        ), // Input Read Address read channel burst size. This signal indicates the size of each transfer out the burst
-  .S0_AXI_GEN_ARBURST(s0_axi_read_in.arburst       ), // Input Read Address read channel burst type
-  .S0_AXI_GEN_ARLOCK (s0_axi_read_in.arlock        ), // Input Read Address read channel lock type
-  .S0_AXI_GEN_ARCACHE(s0_axi_read_in.arcache       ), // Input Read Address read channel memory type. Transactions set with Normal Non-cacheable Modifiable and Bufferable (0011).
-  .S0_AXI_GEN_ARPROT (s0_axi_read_in.arprot        ), // Input Read Address channel protection type. Transactions set with Normal, Secure, and Data attributes (000).
-  .S0_AXI_GEN_ARQOS  (s0_axi_read_in.arqos         ), // Input Read Address channel quality of service
-  .S0_AXI_GEN_AWREADY(s0_axi_write_out.awready     ), // Output Write Address write channel ready
-  .S0_AXI_GEN_WREADY (s0_axi_write_out.wready      ), // Output Write channel ready
-  .S0_AXI_GEN_BID    (s0_axi_write_out.bid         ), // Output Write response channel ID
-  .S0_AXI_GEN_BRESP  (s0_axi_write_out.bresp       ), // Output Write channel response
-  .S0_AXI_GEN_BVALID (s0_axi_write_out.bvalid      ), // Output Write response channel valid
-  .S0_AXI_GEN_AWVALID(s0_axi_write_in.awvalid      ), // Input Write Address write channel valid
-  .S0_AXI_GEN_AWID   (s0_axi_write_in.awid         ), // Input Write Address write channel ID
-  .S0_AXI_GEN_AWADDR (s0_axi_write_in.awaddr       ), // Input Write Address write channel address
-  .S0_AXI_GEN_AWLEN  (s0_axi_write_in.awlen        ), // Input Write Address write channel burst length
-  .S0_AXI_GEN_AWSIZE (s0_axi_write_in.awsize       ), // Input Write Address write channel burst size. This signal indicates the size of each transfer out the burst
-  .S0_AXI_GEN_AWBURST(s0_axi_write_in.awburst      ), // Input Write Address write channel burst type
-  .S0_AXI_GEN_AWLOCK (s0_axi_write_in.awlock       ), // Input Write Address write channel lock type
-  .S0_AXI_GEN_AWCACHE(s0_axi_write_in.awcache      ), // Input Write Address write channel memory type. Transactions set with Normal Non-cacheable Modifiable and Bufferable (0011).
-  .S0_AXI_GEN_AWPROT (s0_axi_write_in.awprot       ), // Input Write Address write channel protection type. Transactions set with Normal, Secure, and Data attributes (000).
-  .S0_AXI_GEN_AWQOS  (s0_axi_write_in.awqos        ), // Input Write Address write channel quality of service
-  .S0_AXI_GEN_WDATA  (s0_axi_write_in.wdata        ), // Input Write channel data
-  .S0_AXI_GEN_WSTRB  (s0_axi_write_in.wstrb        ), // Input Write channel write strobe
-  .S0_AXI_GEN_WLAST  (s0_axi_write_in.wlast        ), // Input Write channel last word flag
-  .S0_AXI_GEN_WVALID (s0_axi_write_in.wvalid       ), // Input Write channel valid
-  .S0_AXI_GEN_BREADY (s0_axi_write_in.bready       ), // Input Write response channel ready
+  .S0_AXI_GEN_RVALID (s0_axi_read_out[0].rvalid       ), // Output Read channel valid
+  .S0_AXI_GEN_ARREADY(s0_axi_read_out[0].arready      ), // Output Read Address read channel ready
+  .S0_AXI_GEN_RLAST  (s0_axi_read_out[0].rlast        ), // Output Read channel last word
+  .S0_AXI_GEN_RDATA  (s0_axi_read_out[0].rdata        ), // Output Read channel data
+  .S0_AXI_GEN_RID    (s0_axi_read_out[0].rid          ), // Output Read channel ID
+  .S0_AXI_GEN_RRESP  (s0_axi_read_out[0].rresp        ), // Output Read channel response
+  .S0_AXI_GEN_ARVALID(s0_axi_read_in[0].arvalid       ), // Input Read Address read channel valid
+  .S0_AXI_GEN_ARADDR (s0_axi_read_in[0].araddr        ), // Input Read Address read channel address
+  .S0_AXI_GEN_ARLEN  (s0_axi_read_in[0].arlen         ), // Input Read Address channel burst length
+  .S0_AXI_GEN_RREADY (s0_axi_read_in[0].rready        ), // Input Read Read channel ready
+  .S0_AXI_GEN_ARID   (s0_axi_read_in[0].arid          ), // Input Read Address read channel ID
+  .S0_AXI_GEN_ARSIZE (s0_axi_read_in[0].arsize        ), // Input Read Address read channel burst size. This signal indicates the size of each transfer out the burst
+  .S0_AXI_GEN_ARBURST(s0_axi_read_in[0].arburst       ), // Input Read Address read channel burst type
+  .S0_AXI_GEN_ARLOCK (s0_axi_read_in[0].arlock        ), // Input Read Address read channel lock type
+  .S0_AXI_GEN_ARCACHE(s0_axi_read_in[0].arcache       ), // Input Read Address read channel memory type. Transactions set with Normal Non-cacheable Modifiable and Bufferable (0011).
+  .S0_AXI_GEN_ARPROT (s0_axi_read_in[0].arprot        ), // Input Read Address channel protection type. Transactions set with Normal, Secure, and Data attributes (000).
+  .S0_AXI_GEN_ARQOS  (s0_axi_read_in[0].arqos         ), // Input Read Address channel quality of service
+  .S0_AXI_GEN_AWREADY(s0_axi_write_out[0].awready     ), // Output Write Address write channel ready
+  .S0_AXI_GEN_WREADY (s0_axi_write_out[0].wready      ), // Output Write channel ready
+  .S0_AXI_GEN_BID    (s0_axi_write_out[0].bid         ), // Output Write response channel ID
+  .S0_AXI_GEN_BRESP  (s0_axi_write_out[0].bresp       ), // Output Write channel response
+  .S0_AXI_GEN_BVALID (s0_axi_write_out[0].bvalid      ), // Output Write response channel valid
+  .S0_AXI_GEN_AWVALID(s0_axi_write_in[0].awvalid      ), // Input Write Address write channel valid
+  .S0_AXI_GEN_AWID   (s0_axi_write_in[0].awid         ), // Input Write Address write channel ID
+  .S0_AXI_GEN_AWADDR (s0_axi_write_in[0].awaddr       ), // Input Write Address write channel address
+  .S0_AXI_GEN_AWLEN  (s0_axi_write_in[0].awlen        ), // Input Write Address write channel burst length
+  .S0_AXI_GEN_AWSIZE (s0_axi_write_in[0].awsize       ), // Input Write Address write channel burst size. This signal indicates the size of each transfer out the burst
+  .S0_AXI_GEN_AWBURST(s0_axi_write_in[0].awburst      ), // Input Write Address write channel burst type
+  .S0_AXI_GEN_AWLOCK (s0_axi_write_in[0].awlock       ), // Input Write Address write channel lock type
+  .S0_AXI_GEN_AWCACHE(s0_axi_write_in[0].awcache      ), // Input Write Address write channel memory type. Transactions set with Normal Non-cacheable Modifiable and Bufferable (0011).
+  .S0_AXI_GEN_AWPROT (s0_axi_write_in[0].awprot       ), // Input Write Address write channel protection type. Transactions set with Normal, Secure, and Data attributes (000).
+  .S0_AXI_GEN_AWQOS  (s0_axi_write_in[0].awqos        ), // Input Write Address write channel quality of service
+  .S0_AXI_GEN_WDATA  (s0_axi_write_in[0].wdata        ), // Input Write channel data
+  .S0_AXI_GEN_WSTRB  (s0_axi_write_in[0].wstrb        ), // Input Write channel write strobe
+  .S0_AXI_GEN_WLAST  (s0_axi_write_in[0].wlast        ), // Input Write channel last word flag
+  .S0_AXI_GEN_WVALID (s0_axi_write_in[0].wvalid       ), // Input Write channel valid
+  .S0_AXI_GEN_BREADY (s0_axi_write_in[0].bready       ), // Input Write response channel ready
   
 
   .S1_AXI_GEN_ARUSER (0                           ),
   .S1_AXI_GEN_AWUSER (0                           ),
-  .S1_AXI_GEN_RVALID (s1_axi_read_out.rvalid       ), // Output Read channel valid
-  .S1_AXI_GEN_ARREADY(s1_axi_read_out.arready      ), // Output Read Address read channel ready
-  .S1_AXI_GEN_RLAST  (s1_axi_read_out.rlast        ), // Output Read channel last word
-  .S1_AXI_GEN_RDATA  (s1_axi_read_out.rdata        ), // Output Read channel data
-  .S1_AXI_GEN_RID    (s1_axi_read_out.rid          ), // Output Read channel ID
-  .S1_AXI_GEN_RRESP  (s1_axi_read_out.rresp        ), // Output Read channel response
-  .S1_AXI_GEN_ARVALID(s1_axi_read_in.arvalid       ), // Input Read Address read channel valid
-  .S1_AXI_GEN_ARADDR (s1_axi_read_in.araddr        ), // Input Read Address read channel address
-  .S1_AXI_GEN_ARLEN  (s1_axi_read_in.arlen         ), // Input Read Address channel burst length
-  .S1_AXI_GEN_RREADY (s1_axi_read_in.rready        ), // Input Read Read channel ready
-  .S1_AXI_GEN_ARID   (s1_axi_read_in.arid          ), // Input Read Address read channel ID
-  .S1_AXI_GEN_ARSIZE (s1_axi_read_in.arsize        ), // Input Read Address read channel burst size. This signal indicates the size of each transfer out the burst
-  .S1_AXI_GEN_ARBURST(s1_axi_read_in.arburst       ), // Input Read Address read channel burst type
-  .S1_AXI_GEN_ARLOCK (s1_axi_read_in.arlock        ), // Input Read Address read channel lock type
-  .S1_AXI_GEN_ARCACHE(s1_axi_read_in.arcache       ), // Input Read Address read channel memory type. Transactions set with Normal Non-cacheable Modifiable and Bufferable (0011).
-  .S1_AXI_GEN_ARPROT (s1_axi_read_in.arprot        ), // Input Read Address channel protection type. Transactions set with Normal, Secure, and Data attributes (000).
-  .S1_AXI_GEN_ARQOS  (s1_axi_read_in.arqos         ), // Input Read Address channel quality of service
-  .S1_AXI_GEN_AWREADY(s1_axi_write_out.awready     ), // Output Write Address write channel ready
-  .S1_AXI_GEN_WREADY (s1_axi_write_out.wready      ), // Output Write channel ready
-  .S1_AXI_GEN_BID    (s1_axi_write_out.bid         ), // Output Write response channel ID
-  .S1_AXI_GEN_BRESP  (s1_axi_write_out.bresp       ), // Output Write channel response
-  .S1_AXI_GEN_BVALID (s1_axi_write_out.bvalid      ), // Output Write response channel valid
-  .S1_AXI_GEN_AWVALID(s1_axi_write_in.awvalid      ), // Input Write Address write channel valid
-  .S1_AXI_GEN_AWID   (s1_axi_write_in.awid         ), // Input Write Address write channel ID
-  .S1_AXI_GEN_AWADDR (s1_axi_write_in.awaddr       ), // Input Write Address write channel address
-  .S1_AXI_GEN_AWLEN  (s1_axi_write_in.awlen        ), // Input Write Address write channel burst length
-  .S1_AXI_GEN_AWSIZE (s1_axi_write_in.awsize       ), // Input Write Address write channel burst size. This signal indicates the size of each transfer out the burst
-  .S1_AXI_GEN_AWBURST(s1_axi_write_in.awburst      ), // Input Write Address write channel burst type
-  .S1_AXI_GEN_AWLOCK (s1_axi_write_in.awlock       ), // Input Write Address write channel lock type
-  .S1_AXI_GEN_AWCACHE(s1_axi_write_in.awcache      ), // Input Write Address write channel memory type. Transactions set with Normal Non-cacheable Modifiable and Bufferable (0011).
-  .S1_AXI_GEN_AWPROT (s1_axi_write_in.awprot       ), // Input Write Address write channel protection type. Transactions set with Normal, Secure, and Data attributes (000).
-  .S1_AXI_GEN_AWQOS  (s1_axi_write_in.awqos        ), // Input Write Address write channel quality of service
-  .S1_AXI_GEN_WDATA  (s1_axi_write_in.wdata        ), // Input Write channel data
-  .S1_AXI_GEN_WSTRB  (s1_axi_write_in.wstrb        ), // Input Write channel write strobe
-  .S1_AXI_GEN_WLAST  (s1_axi_write_in.wlast        ), // Input Write channel last word flag
-  .S1_AXI_GEN_WVALID (s1_axi_write_in.wvalid       ), // Input Write channel valid
-  .S1_AXI_GEN_BREADY (s1_axi_write_in.bready       ), // Input Write response channel ready
+  .S1_AXI_GEN_RVALID (s1_axi_read_out[0].rvalid       ), // Output Read channel valid
+  .S1_AXI_GEN_ARREADY(s1_axi_read_out[0].arready      ), // Output Read Address read channel ready
+  .S1_AXI_GEN_RLAST  (s1_axi_read_out[0].rlast        ), // Output Read channel last word
+  .S1_AXI_GEN_RDATA  (s1_axi_read_out[0].rdata        ), // Output Read channel data
+  .S1_AXI_GEN_RID    (s1_axi_read_out[0].rid          ), // Output Read channel ID
+  .S1_AXI_GEN_RRESP  (s1_axi_read_out[0].rresp        ), // Output Read channel response
+  .S1_AXI_GEN_ARVALID(s1_axi_read_in[0].arvalid       ), // Input Read Address read channel valid
+  .S1_AXI_GEN_ARADDR (s1_axi_read_in[0].araddr        ), // Input Read Address read channel address
+  .S1_AXI_GEN_ARLEN  (s1_axi_read_in[0].arlen         ), // Input Read Address channel burst length
+  .S1_AXI_GEN_RREADY (s1_axi_read_in[0].rready        ), // Input Read Read channel ready
+  .S1_AXI_GEN_ARID   (s1_axi_read_in[0].arid          ), // Input Read Address read channel ID
+  .S1_AXI_GEN_ARSIZE (s1_axi_read_in[0].arsize        ), // Input Read Address read channel burst size. This signal indicates the size of each transfer out the burst
+  .S1_AXI_GEN_ARBURST(s1_axi_read_in[0].arburst       ), // Input Read Address read channel burst type
+  .S1_AXI_GEN_ARLOCK (s1_axi_read_in[0].arlock        ), // Input Read Address read channel lock type
+  .S1_AXI_GEN_ARCACHE(s1_axi_read_in[0].arcache       ), // Input Read Address read channel memory type. Transactions set with Normal Non-cacheable Modifiable and Bufferable (0011).
+  .S1_AXI_GEN_ARPROT (s1_axi_read_in[0].arprot        ), // Input Read Address channel protection type. Transactions set with Normal, Secure, and Data attributes (000).
+  .S1_AXI_GEN_ARQOS  (s1_axi_read_in[0].arqos         ), // Input Read Address channel quality of service
+  .S1_AXI_GEN_AWREADY(s1_axi_write_out[0].awready     ), // Output Write Address write channel ready
+  .S1_AXI_GEN_WREADY (s1_axi_write_out[0].wready      ), // Output Write channel ready
+  .S1_AXI_GEN_BID    (s1_axi_write_out[0].bid         ), // Output Write response channel ID
+  .S1_AXI_GEN_BRESP  (s1_axi_write_out[0].bresp       ), // Output Write channel response
+  .S1_AXI_GEN_BVALID (s1_axi_write_out[0].bvalid      ), // Output Write response channel valid
+  .S1_AXI_GEN_AWVALID(s1_axi_write_in[0].awvalid      ), // Input Write Address write channel valid
+  .S1_AXI_GEN_AWID   (s1_axi_write_in[0].awid         ), // Input Write Address write channel ID
+  .S1_AXI_GEN_AWADDR (s1_axi_write_in[0].awaddr       ), // Input Write Address write channel address
+  .S1_AXI_GEN_AWLEN  (s1_axi_write_in[0].awlen        ), // Input Write Address write channel burst length
+  .S1_AXI_GEN_AWSIZE (s1_axi_write_in[0].awsize       ), // Input Write Address write channel burst size. This signal indicates the size of each transfer out the burst
+  .S1_AXI_GEN_AWBURST(s1_axi_write_in[0].awburst      ), // Input Write Address write channel burst type
+  .S1_AXI_GEN_AWLOCK (s1_axi_write_in[0].awlock       ), // Input Write Address write channel lock type
+  .S1_AXI_GEN_AWCACHE(s1_axi_write_in[0].awcache      ), // Input Write Address write channel memory type. Transactions set with Normal Non-cacheable Modifiable and Bufferable (0011).
+  .S1_AXI_GEN_AWPROT (s1_axi_write_in[0].awprot       ), // Input Write Address write channel protection type. Transactions set with Normal, Secure, and Data attributes (000).
+  .S1_AXI_GEN_AWQOS  (s1_axi_write_in[0].awqos        ), // Input Write Address write channel quality of service
+  .S1_AXI_GEN_WDATA  (s1_axi_write_in[0].wdata        ), // Input Write channel data
+  .S1_AXI_GEN_WSTRB  (s1_axi_write_in[0].wstrb        ), // Input Write channel write strobe
+  .S1_AXI_GEN_WLAST  (s1_axi_write_in[0].wlast        ), // Input Write channel last word flag
+  .S1_AXI_GEN_WVALID (s1_axi_write_in[0].wvalid       ), // Input Write channel valid
+  .S1_AXI_GEN_BREADY (s1_axi_write_in[0].bready       ), // Input Write response channel ready
+  
+
+  .S2_AXI_GEN_ARUSER (0                           ),
+  .S2_AXI_GEN_AWUSER (0                           ),
+  .S2_AXI_GEN_RVALID (s0_axi_read_out[1].rvalid       ), // Output Read channel valid
+  .S2_AXI_GEN_ARREADY(s0_axi_read_out[1].arready      ), // Output Read Address read channel ready
+  .S2_AXI_GEN_RLAST  (s0_axi_read_out[1].rlast        ), // Output Read channel last word
+  .S2_AXI_GEN_RDATA  (s0_axi_read_out[1].rdata        ), // Output Read channel data
+  .S2_AXI_GEN_RID    (s0_axi_read_out[1].rid          ), // Output Read channel ID
+  .S2_AXI_GEN_RRESP  (s0_axi_read_out[1].rresp        ), // Output Read channel response
+  .S2_AXI_GEN_ARVALID(s0_axi_read_in[1].arvalid       ), // Input Read Address read channel valid
+  .S2_AXI_GEN_ARADDR (s0_axi_read_in[1].araddr        ), // Input Read Address read channel address
+  .S2_AXI_GEN_ARLEN  (s0_axi_read_in[1].arlen         ), // Input Read Address channel burst length
+  .S2_AXI_GEN_RREADY (s0_axi_read_in[1].rready        ), // Input Read Read channel ready
+  .S2_AXI_GEN_ARID   (s0_axi_read_in[1].arid          ), // Input Read Address read channel ID
+  .S2_AXI_GEN_ARSIZE (s0_axi_read_in[1].arsize        ), // Input Read Address read channel burst size. This signal indicates the size of each transfer out the burst
+  .S2_AXI_GEN_ARBURST(s0_axi_read_in[1].arburst       ), // Input Read Address read channel burst type
+  .S2_AXI_GEN_ARLOCK (s0_axi_read_in[1].arlock        ), // Input Read Address read channel lock type
+  .S2_AXI_GEN_ARCACHE(s0_axi_read_in[1].arcache       ), // Input Read Address read channel memory type. Transactions set with Normal Non-cacheable Modifiable and Bufferable (0011).
+  .S2_AXI_GEN_ARPROT (s0_axi_read_in[1].arprot        ), // Input Read Address channel protection type. Transactions set with Normal, Secure, and Data attributes (000).
+  .S2_AXI_GEN_ARQOS  (s0_axi_read_in[1].arqos         ), // Input Read Address channel quality of service
+  .S2_AXI_GEN_AWREADY(s0_axi_write_out[1].awready     ), // Output Write Address write channel ready
+  .S2_AXI_GEN_WREADY (s0_axi_write_out[1].wready      ), // Output Write channel ready
+  .S2_AXI_GEN_BID    (s0_axi_write_out[1].bid         ), // Output Write response channel ID
+  .S2_AXI_GEN_BRESP  (s0_axi_write_out[1].bresp       ), // Output Write channel response
+  .S2_AXI_GEN_BVALID (s0_axi_write_out[1].bvalid      ), // Output Write response channel valid
+  .S2_AXI_GEN_AWVALID(s0_axi_write_in[1].awvalid      ), // Input Write Address write channel valid
+  .S2_AXI_GEN_AWID   (s0_axi_write_in[1].awid         ), // Input Write Address write channel ID
+  .S2_AXI_GEN_AWADDR (s0_axi_write_in[1].awaddr       ), // Input Write Address write channel address
+  .S2_AXI_GEN_AWLEN  (s0_axi_write_in[1].awlen        ), // Input Write Address write channel burst length
+  .S2_AXI_GEN_AWSIZE (s0_axi_write_in[1].awsize       ), // Input Write Address write channel burst size. This signal indicates the size of each transfer out the burst
+  .S2_AXI_GEN_AWBURST(s0_axi_write_in[1].awburst      ), // Input Write Address write channel burst type
+  .S2_AXI_GEN_AWLOCK (s0_axi_write_in[1].awlock       ), // Input Write Address write channel lock type
+  .S2_AXI_GEN_AWCACHE(s0_axi_write_in[1].awcache      ), // Input Write Address write channel memory type. Transactions set with Normal Non-cacheable Modifiable and Bufferable (0011).
+  .S2_AXI_GEN_AWPROT (s0_axi_write_in[1].awprot       ), // Input Write Address write channel protection type. Transactions set with Normal, Secure, and Data attributes (000).
+  .S2_AXI_GEN_AWQOS  (s0_axi_write_in[1].awqos        ), // Input Write Address write channel quality of service
+  .S2_AXI_GEN_WDATA  (s0_axi_write_in[1].wdata        ), // Input Write channel data
+  .S2_AXI_GEN_WSTRB  (s0_axi_write_in[1].wstrb        ), // Input Write channel write strobe
+  .S2_AXI_GEN_WLAST  (s0_axi_write_in[1].wlast        ), // Input Write channel last word flag
+  .S2_AXI_GEN_WVALID (s0_axi_write_in[1].wvalid       ), // Input Write channel valid
+  .S2_AXI_GEN_BREADY (s0_axi_write_in[1].bready       ), // Input Write response channel ready
+  
+
+  .S3_AXI_GEN_ARUSER (0                           ),
+  .S3_AXI_GEN_AWUSER (0                           ),
+  .S3_AXI_GEN_RVALID (s1_axi_read_out[1].rvalid       ), // Output Read channel valid
+  .S3_AXI_GEN_ARREADY(s1_axi_read_out[1].arready      ), // Output Read Address read channel ready
+  .S3_AXI_GEN_RLAST  (s1_axi_read_out[1].rlast        ), // Output Read channel last word
+  .S3_AXI_GEN_RDATA  (s1_axi_read_out[1].rdata        ), // Output Read channel data
+  .S3_AXI_GEN_RID    (s1_axi_read_out[1].rid          ), // Output Read channel ID
+  .S3_AXI_GEN_RRESP  (s1_axi_read_out[1].rresp        ), // Output Read channel response
+  .S3_AXI_GEN_ARVALID(s1_axi_read_in[1].arvalid       ), // Input Read Address read channel valid
+  .S3_AXI_GEN_ARADDR (s1_axi_read_in[1].araddr        ), // Input Read Address read channel address
+  .S3_AXI_GEN_ARLEN  (s1_axi_read_in[1].arlen         ), // Input Read Address channel burst length
+  .S3_AXI_GEN_RREADY (s1_axi_read_in[1].rready        ), // Input Read Read channel ready
+  .S3_AXI_GEN_ARID   (s1_axi_read_in[1].arid          ), // Input Read Address read channel ID
+  .S3_AXI_GEN_ARSIZE (s1_axi_read_in[1].arsize        ), // Input Read Address read channel burst size. This signal indicates the size of each transfer out the burst
+  .S3_AXI_GEN_ARBURST(s1_axi_read_in[1].arburst       ), // Input Read Address read channel burst type
+  .S3_AXI_GEN_ARLOCK (s1_axi_read_in[1].arlock        ), // Input Read Address read channel lock type
+  .S3_AXI_GEN_ARCACHE(s1_axi_read_in[1].arcache       ), // Input Read Address read channel memory type. Transactions set with Normal Non-cacheable Modifiable and Bufferable (0011).
+  .S3_AXI_GEN_ARPROT (s1_axi_read_in[1].arprot        ), // Input Read Address channel protection type. Transactions set with Normal, Secure, and Data attributes (000).
+  .S3_AXI_GEN_ARQOS  (s1_axi_read_in[1].arqos         ), // Input Read Address channel quality of service
+  .S3_AXI_GEN_AWREADY(s1_axi_write_out[1].awready     ), // Output Write Address write channel ready
+  .S3_AXI_GEN_WREADY (s1_axi_write_out[1].wready      ), // Output Write channel ready
+  .S3_AXI_GEN_BID    (s1_axi_write_out[1].bid         ), // Output Write response channel ID
+  .S3_AXI_GEN_BRESP  (s1_axi_write_out[1].bresp       ), // Output Write channel response
+  .S3_AXI_GEN_BVALID (s1_axi_write_out[1].bvalid      ), // Output Write response channel valid
+  .S3_AXI_GEN_AWVALID(s1_axi_write_in[1].awvalid      ), // Input Write Address write channel valid
+  .S3_AXI_GEN_AWID   (s1_axi_write_in[1].awid         ), // Input Write Address write channel ID
+  .S3_AXI_GEN_AWADDR (s1_axi_write_in[1].awaddr       ), // Input Write Address write channel address
+  .S3_AXI_GEN_AWLEN  (s1_axi_write_in[1].awlen        ), // Input Write Address write channel burst length
+  .S3_AXI_GEN_AWSIZE (s1_axi_write_in[1].awsize       ), // Input Write Address write channel burst size. This signal indicates the size of each transfer out the burst
+  .S3_AXI_GEN_AWBURST(s1_axi_write_in[1].awburst      ), // Input Write Address write channel burst type
+  .S3_AXI_GEN_AWLOCK (s1_axi_write_in[1].awlock       ), // Input Write Address write channel lock type
+  .S3_AXI_GEN_AWCACHE(s1_axi_write_in[1].awcache      ), // Input Write Address write channel memory type. Transactions set with Normal Non-cacheable Modifiable and Bufferable (0011).
+  .S3_AXI_GEN_AWPROT (s1_axi_write_in[1].awprot       ), // Input Write Address write channel protection type. Transactions set with Normal, Secure, and Data attributes (000).
+  .S3_AXI_GEN_AWQOS  (s1_axi_write_in[1].awqos        ), // Input Write Address write channel quality of service
+  .S3_AXI_GEN_WDATA  (s1_axi_write_in[1].wdata        ), // Input Write channel data
+  .S3_AXI_GEN_WSTRB  (s1_axi_write_in[1].wstrb        ), // Input Write channel write strobe
+  .S3_AXI_GEN_WLAST  (s1_axi_write_in[1].wlast        ), // Input Write channel last word flag
+  .S3_AXI_GEN_WVALID (s1_axi_write_in[1].wvalid       ), // Input Write channel valid
+  .S3_AXI_GEN_BREADY (s1_axi_write_in[1].bready       ), // Input Write response channel ready
   
 
   .M0_AXI_RVALID     (m_axi_read_in.rvalid        ), // Input Read channel valid
@@ -214,31 +298,37 @@ m00_axi_system_cache_be512x33_mid32x33 inst_m00_axi_system_cache_be512x33_mid32x
   .Initializing      (cache_setup_signal_int      )    
 );
 
-assign s_axi_lite_out = 0;
+generate
+    for (genvar i=0; i<NUM_CUS; i++) begin : generate_s_axi_lite_out
+        assign s_axi_lite_out[i] = 0;
+    end
+endgenerate
 
 endmodule : kernel_m00_axi_system_cache_be512x33_mid32x33_wrapper
 
 
 
 
-module kernel_m01_axi_system_cache_be512x33_mid32x33_wrapper (
+module kernel_m01_axi_system_cache_be512x33_mid32x33_wrapper  #(
+  parameter NUM_CUS             = 1
+) (
   // System Signals
   input  logic                                  ap_clk            ,
   input  logic                                  areset            ,
   
 
-  output M01_AXI4_MID_SlaveReadInterfaceOutput  s0_axi_read_out    ,
-  input  M01_AXI4_MID_SlaveReadInterfaceInput   s0_axi_read_in     ,
-  output M01_AXI4_MID_SlaveWriteInterfaceOutput s0_axi_write_out   ,
-  input  M01_AXI4_MID_SlaveWriteInterfaceInput  s0_axi_write_in    ,
+  output M01_AXI4_MID_SlaveReadInterfaceOutput  s0_axi_read_out [NUM_CUS-1:0]    ,
+  input  M01_AXI4_MID_SlaveReadInterfaceInput   s0_axi_read_in  [NUM_CUS-1:0]    ,
+  output M01_AXI4_MID_SlaveWriteInterfaceOutput s0_axi_write_out[NUM_CUS-1:0]    ,
+  input  M01_AXI4_MID_SlaveWriteInterfaceInput  s0_axi_write_in [NUM_CUS-1:0]    ,
   
 
   input  M01_AXI4_BE_MasterReadInterfaceInput   m_axi_read_in     ,
   output M01_AXI4_BE_MasterReadInterfaceOutput  m_axi_read_out    ,
   input  M01_AXI4_BE_MasterWriteInterfaceInput  m_axi_write_in    ,
   output M01_AXI4_BE_MasterWriteInterfaceOutput m_axi_write_out   ,
-  input  S01_AXI4_LITE_MID_REQ_T                s_axi_lite_in     ,
-  output S01_AXI4_LITE_MID_RESP_T               s_axi_lite_out    ,
+  input  S01_AXI4_LITE_MID_REQ_T                s_axi_lite_in  [NUM_CUS-1:0]    ,
+  output S01_AXI4_LITE_MID_RESP_T               s_axi_lite_out [NUM_CUS-1:0]    ,
   output logic                                  cache_setup_signal
 );
 
@@ -286,43 +376,84 @@ m01_axi_system_cache_be512x33_mid32x33 inst_m01_axi_system_cache_be512x33_mid32x
 
   .S0_AXI_GEN_ARUSER (0                           ),
   .S0_AXI_GEN_AWUSER (0                           ),
-  .S0_AXI_GEN_RVALID (s0_axi_read_out.rvalid       ), // Output Read channel valid
-  .S0_AXI_GEN_ARREADY(s0_axi_read_out.arready      ), // Output Read Address read channel ready
-  .S0_AXI_GEN_RLAST  (s0_axi_read_out.rlast        ), // Output Read channel last word
-  .S0_AXI_GEN_RDATA  (s0_axi_read_out.rdata        ), // Output Read channel data
-  .S0_AXI_GEN_RID    (s0_axi_read_out.rid          ), // Output Read channel ID
-  .S0_AXI_GEN_RRESP  (s0_axi_read_out.rresp        ), // Output Read channel response
-  .S0_AXI_GEN_ARVALID(s0_axi_read_in.arvalid       ), // Input Read Address read channel valid
-  .S0_AXI_GEN_ARADDR (s0_axi_read_in.araddr        ), // Input Read Address read channel address
-  .S0_AXI_GEN_ARLEN  (s0_axi_read_in.arlen         ), // Input Read Address channel burst length
-  .S0_AXI_GEN_RREADY (s0_axi_read_in.rready        ), // Input Read Read channel ready
-  .S0_AXI_GEN_ARID   (s0_axi_read_in.arid          ), // Input Read Address read channel ID
-  .S0_AXI_GEN_ARSIZE (s0_axi_read_in.arsize        ), // Input Read Address read channel burst size. This signal indicates the size of each transfer out the burst
-  .S0_AXI_GEN_ARBURST(s0_axi_read_in.arburst       ), // Input Read Address read channel burst type
-  .S0_AXI_GEN_ARLOCK (s0_axi_read_in.arlock        ), // Input Read Address read channel lock type
-  .S0_AXI_GEN_ARCACHE(s0_axi_read_in.arcache       ), // Input Read Address read channel memory type. Transactions set with Normal Non-cacheable Modifiable and Bufferable (0011).
-  .S0_AXI_GEN_ARPROT (s0_axi_read_in.arprot        ), // Input Read Address channel protection type. Transactions set with Normal, Secure, and Data attributes (000).
-  .S0_AXI_GEN_ARQOS  (s0_axi_read_in.arqos         ), // Input Read Address channel quality of service
-  .S0_AXI_GEN_AWREADY(s0_axi_write_out.awready     ), // Output Write Address write channel ready
-  .S0_AXI_GEN_WREADY (s0_axi_write_out.wready      ), // Output Write channel ready
-  .S0_AXI_GEN_BID    (s0_axi_write_out.bid         ), // Output Write response channel ID
-  .S0_AXI_GEN_BRESP  (s0_axi_write_out.bresp       ), // Output Write channel response
-  .S0_AXI_GEN_BVALID (s0_axi_write_out.bvalid      ), // Output Write response channel valid
-  .S0_AXI_GEN_AWVALID(s0_axi_write_in.awvalid      ), // Input Write Address write channel valid
-  .S0_AXI_GEN_AWID   (s0_axi_write_in.awid         ), // Input Write Address write channel ID
-  .S0_AXI_GEN_AWADDR (s0_axi_write_in.awaddr       ), // Input Write Address write channel address
-  .S0_AXI_GEN_AWLEN  (s0_axi_write_in.awlen        ), // Input Write Address write channel burst length
-  .S0_AXI_GEN_AWSIZE (s0_axi_write_in.awsize       ), // Input Write Address write channel burst size. This signal indicates the size of each transfer out the burst
-  .S0_AXI_GEN_AWBURST(s0_axi_write_in.awburst      ), // Input Write Address write channel burst type
-  .S0_AXI_GEN_AWLOCK (s0_axi_write_in.awlock       ), // Input Write Address write channel lock type
-  .S0_AXI_GEN_AWCACHE(s0_axi_write_in.awcache      ), // Input Write Address write channel memory type. Transactions set with Normal Non-cacheable Modifiable and Bufferable (0011).
-  .S0_AXI_GEN_AWPROT (s0_axi_write_in.awprot       ), // Input Write Address write channel protection type. Transactions set with Normal, Secure, and Data attributes (000).
-  .S0_AXI_GEN_AWQOS  (s0_axi_write_in.awqos        ), // Input Write Address write channel quality of service
-  .S0_AXI_GEN_WDATA  (s0_axi_write_in.wdata        ), // Input Write channel data
-  .S0_AXI_GEN_WSTRB  (s0_axi_write_in.wstrb        ), // Input Write channel write strobe
-  .S0_AXI_GEN_WLAST  (s0_axi_write_in.wlast        ), // Input Write channel last word flag
-  .S0_AXI_GEN_WVALID (s0_axi_write_in.wvalid       ), // Input Write channel valid
-  .S0_AXI_GEN_BREADY (s0_axi_write_in.bready       ), // Input Write response channel ready
+  .S0_AXI_GEN_RVALID (s0_axi_read_out[0].rvalid       ), // Output Read channel valid
+  .S0_AXI_GEN_ARREADY(s0_axi_read_out[0].arready      ), // Output Read Address read channel ready
+  .S0_AXI_GEN_RLAST  (s0_axi_read_out[0].rlast        ), // Output Read channel last word
+  .S0_AXI_GEN_RDATA  (s0_axi_read_out[0].rdata        ), // Output Read channel data
+  .S0_AXI_GEN_RID    (s0_axi_read_out[0].rid          ), // Output Read channel ID
+  .S0_AXI_GEN_RRESP  (s0_axi_read_out[0].rresp        ), // Output Read channel response
+  .S0_AXI_GEN_ARVALID(s0_axi_read_in[0].arvalid       ), // Input Read Address read channel valid
+  .S0_AXI_GEN_ARADDR (s0_axi_read_in[0].araddr        ), // Input Read Address read channel address
+  .S0_AXI_GEN_ARLEN  (s0_axi_read_in[0].arlen         ), // Input Read Address channel burst length
+  .S0_AXI_GEN_RREADY (s0_axi_read_in[0].rready        ), // Input Read Read channel ready
+  .S0_AXI_GEN_ARID   (s0_axi_read_in[0].arid          ), // Input Read Address read channel ID
+  .S0_AXI_GEN_ARSIZE (s0_axi_read_in[0].arsize        ), // Input Read Address read channel burst size. This signal indicates the size of each transfer out the burst
+  .S0_AXI_GEN_ARBURST(s0_axi_read_in[0].arburst       ), // Input Read Address read channel burst type
+  .S0_AXI_GEN_ARLOCK (s0_axi_read_in[0].arlock        ), // Input Read Address read channel lock type
+  .S0_AXI_GEN_ARCACHE(s0_axi_read_in[0].arcache       ), // Input Read Address read channel memory type. Transactions set with Normal Non-cacheable Modifiable and Bufferable (0011).
+  .S0_AXI_GEN_ARPROT (s0_axi_read_in[0].arprot        ), // Input Read Address channel protection type. Transactions set with Normal, Secure, and Data attributes (000).
+  .S0_AXI_GEN_ARQOS  (s0_axi_read_in[0].arqos         ), // Input Read Address channel quality of service
+  .S0_AXI_GEN_AWREADY(s0_axi_write_out[0].awready     ), // Output Write Address write channel ready
+  .S0_AXI_GEN_WREADY (s0_axi_write_out[0].wready      ), // Output Write channel ready
+  .S0_AXI_GEN_BID    (s0_axi_write_out[0].bid         ), // Output Write response channel ID
+  .S0_AXI_GEN_BRESP  (s0_axi_write_out[0].bresp       ), // Output Write channel response
+  .S0_AXI_GEN_BVALID (s0_axi_write_out[0].bvalid      ), // Output Write response channel valid
+  .S0_AXI_GEN_AWVALID(s0_axi_write_in[0].awvalid      ), // Input Write Address write channel valid
+  .S0_AXI_GEN_AWID   (s0_axi_write_in[0].awid         ), // Input Write Address write channel ID
+  .S0_AXI_GEN_AWADDR (s0_axi_write_in[0].awaddr       ), // Input Write Address write channel address
+  .S0_AXI_GEN_AWLEN  (s0_axi_write_in[0].awlen        ), // Input Write Address write channel burst length
+  .S0_AXI_GEN_AWSIZE (s0_axi_write_in[0].awsize       ), // Input Write Address write channel burst size. This signal indicates the size of each transfer out the burst
+  .S0_AXI_GEN_AWBURST(s0_axi_write_in[0].awburst      ), // Input Write Address write channel burst type
+  .S0_AXI_GEN_AWLOCK (s0_axi_write_in[0].awlock       ), // Input Write Address write channel lock type
+  .S0_AXI_GEN_AWCACHE(s0_axi_write_in[0].awcache      ), // Input Write Address write channel memory type. Transactions set with Normal Non-cacheable Modifiable and Bufferable (0011).
+  .S0_AXI_GEN_AWPROT (s0_axi_write_in[0].awprot       ), // Input Write Address write channel protection type. Transactions set with Normal, Secure, and Data attributes (000).
+  .S0_AXI_GEN_AWQOS  (s0_axi_write_in[0].awqos        ), // Input Write Address write channel quality of service
+  .S0_AXI_GEN_WDATA  (s0_axi_write_in[0].wdata        ), // Input Write channel data
+  .S0_AXI_GEN_WSTRB  (s0_axi_write_in[0].wstrb        ), // Input Write channel write strobe
+  .S0_AXI_GEN_WLAST  (s0_axi_write_in[0].wlast        ), // Input Write channel last word flag
+  .S0_AXI_GEN_WVALID (s0_axi_write_in[0].wvalid       ), // Input Write channel valid
+  .S0_AXI_GEN_BREADY (s0_axi_write_in[0].bready       ), // Input Write response channel ready
+  
+
+  .S0_AXI_GEN_ARUSER (0                           ),
+  .S0_AXI_GEN_AWUSER (0                           ),
+  .S0_AXI_GEN_RVALID (s0_axi_read_out[1].rvalid       ), // Output Read channel valid
+  .S0_AXI_GEN_ARREADY(s0_axi_read_out[1].arready      ), // Output Read Address read channel ready
+  .S0_AXI_GEN_RLAST  (s0_axi_read_out[1].rlast        ), // Output Read channel last word
+  .S0_AXI_GEN_RDATA  (s0_axi_read_out[1].rdata        ), // Output Read channel data
+  .S0_AXI_GEN_RID    (s0_axi_read_out[1].rid          ), // Output Read channel ID
+  .S0_AXI_GEN_RRESP  (s0_axi_read_out[1].rresp        ), // Output Read channel response
+  .S0_AXI_GEN_ARVALID(s0_axi_read_in[1].arvalid       ), // Input Read Address read channel valid
+  .S0_AXI_GEN_ARADDR (s0_axi_read_in[1].araddr        ), // Input Read Address read channel address
+  .S0_AXI_GEN_ARLEN  (s0_axi_read_in[1].arlen         ), // Input Read Address channel burst length
+  .S0_AXI_GEN_RREADY (s0_axi_read_in[1].rready        ), // Input Read Read channel ready
+  .S0_AXI_GEN_ARID   (s0_axi_read_in[1].arid          ), // Input Read Address read channel ID
+  .S0_AXI_GEN_ARSIZE (s0_axi_read_in[1].arsize        ), // Input Read Address read channel burst size. This signal indicates the size of each transfer out the burst
+  .S0_AXI_GEN_ARBURST(s0_axi_read_in[1].arburst       ), // Input Read Address read channel burst type
+  .S0_AXI_GEN_ARLOCK (s0_axi_read_in[1].arlock        ), // Input Read Address read channel lock type
+  .S0_AXI_GEN_ARCACHE(s0_axi_read_in[1].arcache       ), // Input Read Address read channel memory type. Transactions set with Normal Non-cacheable Modifiable and Bufferable (0011).
+  .S0_AXI_GEN_ARPROT (s0_axi_read_in[1].arprot        ), // Input Read Address channel protection type. Transactions set with Normal, Secure, and Data attributes (000).
+  .S0_AXI_GEN_ARQOS  (s0_axi_read_in[1].arqos         ), // Input Read Address channel quality of service
+  .S0_AXI_GEN_AWREADY(s0_axi_write_out[1].awready     ), // Output Write Address write channel ready
+  .S0_AXI_GEN_WREADY (s0_axi_write_out[1].wready      ), // Output Write channel ready
+  .S0_AXI_GEN_BID    (s0_axi_write_out[1].bid         ), // Output Write response channel ID
+  .S0_AXI_GEN_BRESP  (s0_axi_write_out[1].bresp       ), // Output Write channel response
+  .S0_AXI_GEN_BVALID (s0_axi_write_out[1].bvalid      ), // Output Write response channel valid
+  .S0_AXI_GEN_AWVALID(s0_axi_write_in[1].awvalid      ), // Input Write Address write channel valid
+  .S0_AXI_GEN_AWID   (s0_axi_write_in[1].awid         ), // Input Write Address write channel ID
+  .S0_AXI_GEN_AWADDR (s0_axi_write_in[1].awaddr       ), // Input Write Address write channel address
+  .S0_AXI_GEN_AWLEN  (s0_axi_write_in[1].awlen        ), // Input Write Address write channel burst length
+  .S0_AXI_GEN_AWSIZE (s0_axi_write_in[1].awsize       ), // Input Write Address write channel burst size. This signal indicates the size of each transfer out the burst
+  .S0_AXI_GEN_AWBURST(s0_axi_write_in[1].awburst      ), // Input Write Address write channel burst type
+  .S0_AXI_GEN_AWLOCK (s0_axi_write_in[1].awlock       ), // Input Write Address write channel lock type
+  .S0_AXI_GEN_AWCACHE(s0_axi_write_in[1].awcache      ), // Input Write Address write channel memory type. Transactions set with Normal Non-cacheable Modifiable and Bufferable (0011).
+  .S0_AXI_GEN_AWPROT (s0_axi_write_in[1].awprot       ), // Input Write Address write channel protection type. Transactions set with Normal, Secure, and Data attributes (000).
+  .S0_AXI_GEN_AWQOS  (s0_axi_write_in[1].awqos        ), // Input Write Address write channel quality of service
+  .S0_AXI_GEN_WDATA  (s0_axi_write_in[1].wdata        ), // Input Write channel data
+  .S0_AXI_GEN_WSTRB  (s0_axi_write_in[1].wstrb        ), // Input Write channel write strobe
+  .S0_AXI_GEN_WLAST  (s0_axi_write_in[1].wlast        ), // Input Write channel last word flag
+  .S0_AXI_GEN_WVALID (s0_axi_write_in[1].wvalid       ), // Input Write channel valid
+  .S0_AXI_GEN_BREADY (s0_axi_write_in[1].bready       ), // Input Write response channel ready
   
 
   .M0_AXI_RVALID     (m_axi_read_in.rvalid        ), // Input Read channel valid
@@ -371,7 +502,11 @@ m01_axi_system_cache_be512x33_mid32x33 inst_m01_axi_system_cache_be512x33_mid32x
   .Initializing      (cache_setup_signal_int      )    
 );
 
-assign s_axi_lite_out = 0;
+generate
+    for (genvar i=0; i<NUM_CUS; i++) begin : generate_s_axi_lite_out
+        assign s_axi_lite_out[i] = 0;
+    end
+endgenerate
 
 endmodule : kernel_m01_axi_system_cache_be512x33_mid32x33_wrapper
 

@@ -346,6 +346,7 @@ engine_properties = config_data["engine_properties"]
 
 XPM_FIFO_ENABLE = cu_properties["xpm_fifo"]
 
+NUM_KERNEL_CUS  = int(cu_properties["num_kernel_cu"])
 
 def recreate_data_structures_from_columns(engine_properties, categories_order):
     """
@@ -422,7 +423,7 @@ CU_BUNDLES_CONFIG_ARRAY = get_config(config_data, topology)
 # CU_BUNDLES_CONFIG_ARRAY = [config_data['bundle'][key] for key in sorted(config_data['bundle'].keys(), key=int)]
 
 # Compute values based on CU_BUNDLES_CONFIG_ARRAY
-NUM_CUS_MAX = 1  # As there's only one CU
+NUM_CUS_MAX = NUM_KERNEL_CUS 
 NUM_BUNDLES_MAX = len(CU_BUNDLES_CONFIG_ARRAY)
 NUM_LANES_MAX = max(len(bundle) for bundle in CU_BUNDLES_CONFIG_ARRAY)
 NUM_ENGINES_MAX = max(
@@ -3258,140 +3259,141 @@ with open(output_file_bundle_arbitration, "w") as file:
 
 with open(output_file_cu_arbitration, "w") as file:
 
-    BUNDLE_ARBITER_MEMORY_PIPELINE_STAGES = 0
-    if CU_BUNDLES_CONFIG_CU_ARBITER_NUM_MEMORY:
+    for ID_CU in range(NUM_CUS):
+        BUNDLE_ARBITER_MEMORY_PIPELINE_STAGES = 0
+        if CU_BUNDLES_CONFIG_CU_ARBITER_NUM_MEMORY:
 
-        file.write("\n")
-        file.write(f"generate\n")
-        file.write(f"     if(ID_CU == 0)\n")
-        file.write(f"          begin\n")
+            file.write("\n")
+            file.write(f"generate\n")
+            file.write(f"     if(ID_CU == {ID_CU})\n")
+            file.write(f"          begin\n")
 
-        REAL_ID_BUNDLE = 0
-        for ID_BUNDLE in range(NUM_BUNDLES):
-            MAP_BUNDLE = CU_BUNDLES_CONFIG_BUNDLE_ARBITER_NUM_MEMORY_TEMP[ID_BUNDLE]
+            REAL_ID_BUNDLE = 0
+            for ID_BUNDLE in range(NUM_BUNDLES):
+                MAP_BUNDLE = CU_BUNDLES_CONFIG_BUNDLE_ARBITER_NUM_MEMORY_TEMP[ID_BUNDLE]
 
-            if MAP_BUNDLE:
+                if MAP_BUNDLE:
+                    file.write(
+                        f"""               hyper_pipeline_noreset #(
+                       .STAGES({BUNDLE_ARBITER_MEMORY_PIPELINE_STAGES}                            ),
+                       .WIDTH ($bits(bundle_arbiter_memory_N_to_1_request_in[{REAL_ID_BUNDLE}]) )
+                   ) inst_hyper_pipeline_bundle_arbiter_memory_N_to_1_request_in_{REAL_ID_BUNDLE} (
+                       .ap_clk(ap_clk                       ),
+                       .din   (bundle_request_memory_out[{ID_BUNDLE}] ),
+                       .dout  (bundle_arbiter_memory_N_to_1_request_in[{REAL_ID_BUNDLE}])
+                   );
+
+                   hyper_pipeline_noreset #(
+                       .STAGES({BUNDLE_ARBITER_MEMORY_PIPELINE_STAGES}                            ),
+                       .WIDTH ($bits(bundle_fifo_request_memory_out_signals_in[{ID_BUNDLE}].rd_en) )
+                   ) inst_hyper_pipeline_bundle_fifo_request_memory_out_signals_in_rd_en_{ID_BUNDLE} (
+                       .ap_clk(ap_clk                       ),
+                       .din   (~bundle_arbiter_memory_N_to_1_fifo_request_signals_out.prog_full & bundle_arbiter_memory_N_to_1_arbiter_grant_out[{REAL_ID_BUNDLE}]),
+                       .dout  (bundle_fifo_request_memory_out_signals_in[{ID_BUNDLE}].rd_en)
+                   );
+
+    """
+                    )
+
+                    REAL_ID_BUNDLE += 1
+                else:
+                    file.write(
+                        f"               assign bundle_fifo_request_memory_out_signals_in[{ID_BUNDLE}].rd_en  = 1'b0;\n"
+                    )
+
+            for ID_BUNDLE in range(REAL_ID_BUNDLE, NUM_BUNDLES):
                 file.write(
-                    f"""               hyper_pipeline_noreset #(
-                   .STAGES({BUNDLE_ARBITER_MEMORY_PIPELINE_STAGES}                            ),
-                   .WIDTH ($bits(bundle_arbiter_memory_N_to_1_request_in[{REAL_ID_BUNDLE}]) )
-               ) inst_hyper_pipeline_bundle_arbiter_memory_N_to_1_request_in_{REAL_ID_BUNDLE} (
-                   .ap_clk(ap_clk                       ),
-                   .din   (bundle_request_memory_out[{ID_BUNDLE}] ),
-                   .dout  (bundle_arbiter_memory_N_to_1_request_in[{REAL_ID_BUNDLE}])
-               );
-
-               hyper_pipeline_noreset #(
-                   .STAGES({BUNDLE_ARBITER_MEMORY_PIPELINE_STAGES}                            ),
-                   .WIDTH ($bits(bundle_fifo_request_memory_out_signals_in[{ID_BUNDLE}].rd_en) )
-               ) inst_hyper_pipeline_bundle_fifo_request_memory_out_signals_in_rd_en_{ID_BUNDLE} (
-                   .ap_clk(ap_clk                       ),
-                   .din   (~bundle_arbiter_memory_N_to_1_fifo_request_signals_out.prog_full & bundle_arbiter_memory_N_to_1_arbiter_grant_out[{REAL_ID_BUNDLE}]),
-                   .dout  (bundle_fifo_request_memory_out_signals_in[{ID_BUNDLE}].rd_en)
-               );
-
-"""
+                    f"               assign bundle_arbiter_memory_N_to_1_request_in[{ID_BUNDLE}] = 0;\n"
+                )
+                file.write(
+                    f"               assign bundle_arbiter_memory_N_to_1_arbiter_grant_out[{ID_BUNDLE}] = 1'b0;\n"
                 )
 
-                REAL_ID_BUNDLE += 1
-            else:
+            file.write(
+                f"""               
+                    hyper_pipeline_noreset #(
+                        .STAGES({BUNDLE_ARBITER_MEMORY_PIPELINE_STAGES}                                                                ),
+                        .WIDTH ($bits(bundle_arbiter_memory_N_to_1_fifo_request_signals_in.rd_en))
+                    ) inst_hyper_pipeline_bundle_arbiter_memory_N_to_1_fifo_request_signals_in_rd_en (
+                        .ap_clk(ap_clk                                                    ),
+                        .din   (fifo_request_memory_out_signals_in_reg.rd_en              ),
+                        .dout  (bundle_arbiter_memory_N_to_1_fifo_request_signals_in.rd_en)
+                    );
+    """
+            )
+
+            file.write(f"          end\n")
+            file.write(f"endgenerate\n")
+            file.write(f"\n\n")
+
+        BUNDLE_ARBITER_CONTROL_PIPELINE_STAGES = 0
+        if CU_BUNDLES_CONFIG_CU_ARBITER_NUM_CONTROL_REQUEST:
+
+            file.write("\n")
+            file.write(f"generate\n")
+            file.write(f"     if(ID_CU == {ID_CU})\n")
+            file.write(f"          begin\n")
+
+            REAL_ID_BUNDLE = 0
+            for ID_BUNDLE in range(NUM_BUNDLES):
+                MAP_BUNDLE = CU_BUNDLES_CONFIG_BUNDLE_ARBITER_NUM_CONTROL_REQUEST_TEMP[
+                    ID_BUNDLE
+                ]
+
+                if MAP_BUNDLE:
+
+                    file.write(
+                        f"""               hyper_pipeline_noreset #(
+                       .STAGES({BUNDLE_ARBITER_CONTROL_PIPELINE_STAGES}                            ),
+                       .WIDTH ($bits(bundle_arbiter_control_N_to_1_request_in[{REAL_ID_BUNDLE}]) )
+                   ) inst_hyper_pipeline_bundle_arbiter_control_N_to_1_request_in_{REAL_ID_BUNDLE} (
+                       .ap_clk(ap_clk                       ),
+                       .din   (bundle_request_control_out[{ID_BUNDLE}] ),
+                       .dout  (bundle_arbiter_control_N_to_1_request_in[{REAL_ID_BUNDLE}])
+                   );
+
+                   hyper_pipeline_noreset #(
+                       .STAGES({BUNDLE_ARBITER_CONTROL_PIPELINE_STAGES}                            ),
+                       .WIDTH ($bits(bundle_fifo_request_control_out_signals_in[{ID_BUNDLE}].rd_en) )
+                   ) inst_hyper_pipeline_bundle_fifo_request_control_out_signals_in_rd_en_{ID_BUNDLE} (
+                       .ap_clk(ap_clk                       ),
+                       .din   (~bundle_arbiter_control_N_to_1_fifo_request_signals_out.prog_full & bundle_arbiter_control_N_to_1_arbiter_grant_out[{REAL_ID_BUNDLE}]),
+                       .dout  (bundle_fifo_request_control_out_signals_in[{ID_BUNDLE}].rd_en)
+                   );
+
+    """
+                    )
+
+                    REAL_ID_BUNDLE += 1
+                else:
+                    file.write(
+                        f"               assign bundle_fifo_request_control_out_signals_in[{ID_BUNDLE}].rd_en  = 1'b0;\n"
+                    )
+
+            for ID_BUNDLE in range(REAL_ID_BUNDLE, NUM_BUNDLES):
                 file.write(
-                    f"               assign bundle_fifo_request_memory_out_signals_in[{ID_BUNDLE}].rd_en  = 1'b0;\n"
+                    f"               assign bundle_arbiter_control_N_to_1_request_in[{ID_BUNDLE}]  = 0;\n"
+                )
+                file.write(
+                    f"               assign bundle_arbiter_control_N_to_1_arbiter_grant_out[{ID_BUNDLE}]  = 1'b0;\n"
                 )
 
-        for ID_BUNDLE in range(REAL_ID_BUNDLE, NUM_BUNDLES):
             file.write(
-                f"               assign bundle_arbiter_memory_N_to_1_request_in[{ID_BUNDLE}] = 0;\n"
-            )
-            file.write(
-                f"               assign bundle_arbiter_memory_N_to_1_arbiter_grant_out[{ID_BUNDLE}] = 1'b0;\n"
-            )
-
-        file.write(
-            f"""               
-                hyper_pipeline_noreset #(
-                    .STAGES({BUNDLE_ARBITER_MEMORY_PIPELINE_STAGES}                                                                ),
-                    .WIDTH ($bits(bundle_arbiter_memory_N_to_1_fifo_request_signals_in.rd_en))
-                ) inst_hyper_pipeline_bundle_arbiter_memory_N_to_1_fifo_request_signals_in_rd_en (
-                    .ap_clk(ap_clk                                                    ),
-                    .din   (fifo_request_memory_out_signals_in_reg.rd_en              ),
-                    .dout  (bundle_arbiter_memory_N_to_1_fifo_request_signals_in.rd_en)
-                );
-"""
-        )
-
-        file.write(f"          end\n")
-        file.write(f"endgenerate\n")
-        file.write(f"\n\n")
-
-    BUNDLE_ARBITER_CONTROL_PIPELINE_STAGES = 0
-    if CU_BUNDLES_CONFIG_CU_ARBITER_NUM_CONTROL_REQUEST:
-
-        file.write("\n")
-        file.write(f"generate\n")
-        file.write(f"     if(ID_CU == 0)\n")
-        file.write(f"          begin\n")
-
-        REAL_ID_BUNDLE = 0
-        for ID_BUNDLE in range(NUM_BUNDLES):
-            MAP_BUNDLE = CU_BUNDLES_CONFIG_BUNDLE_ARBITER_NUM_CONTROL_REQUEST_TEMP[
-                ID_BUNDLE
-            ]
-
-            if MAP_BUNDLE:
-
-                file.write(
-                    f"""               hyper_pipeline_noreset #(
-                   .STAGES({BUNDLE_ARBITER_CONTROL_PIPELINE_STAGES}                            ),
-                   .WIDTH ($bits(bundle_arbiter_control_N_to_1_request_in[{REAL_ID_BUNDLE}]) )
-               ) inst_hyper_pipeline_bundle_arbiter_control_N_to_1_request_in_{REAL_ID_BUNDLE} (
-                   .ap_clk(ap_clk                       ),
-                   .din   (bundle_request_control_out[{ID_BUNDLE}] ),
-                   .dout  (bundle_arbiter_control_N_to_1_request_in[{REAL_ID_BUNDLE}])
-               );
-
-               hyper_pipeline_noreset #(
-                   .STAGES({BUNDLE_ARBITER_CONTROL_PIPELINE_STAGES}                            ),
-                   .WIDTH ($bits(bundle_fifo_request_control_out_signals_in[{ID_BUNDLE}].rd_en) )
-               ) inst_hyper_pipeline_bundle_fifo_request_control_out_signals_in_rd_en_{ID_BUNDLE} (
-                   .ap_clk(ap_clk                       ),
-                   .din   (~bundle_arbiter_control_N_to_1_fifo_request_signals_out.prog_full & bundle_arbiter_control_N_to_1_arbiter_grant_out[{REAL_ID_BUNDLE}]),
-                   .dout  (bundle_fifo_request_control_out_signals_in[{ID_BUNDLE}].rd_en)
-               );
-
-"""
-                )
-
-                REAL_ID_BUNDLE += 1
-            else:
-                file.write(
-                    f"               assign bundle_fifo_request_control_out_signals_in[{ID_BUNDLE}].rd_en  = 1'b0;\n"
-                )
-
-        for ID_BUNDLE in range(REAL_ID_BUNDLE, NUM_BUNDLES):
-            file.write(
-                f"               assign bundle_arbiter_control_N_to_1_request_in[{ID_BUNDLE}]  = 0;\n"
-            )
-            file.write(
-                f"               assign bundle_arbiter_control_N_to_1_arbiter_grant_out[{ID_BUNDLE}]  = 1'b0;\n"
+                f"""               
+                    hyper_pipeline_noreset #(
+                        .STAGES({BUNDLE_ARBITER_CONTROL_PIPELINE_STAGES}                                                                ),
+                        .WIDTH ($bits(bundle_arbiter_control_N_to_1_fifo_request_signals_in.rd_en))
+                    ) inst_hyper_pipeline_bundle_arbiter_control_N_to_1_fifo_request_signals_in_rd_en (
+                        .ap_clk(ap_clk                                                    ),
+                        .din   (fifo_request_control_out_signals_in_reg.rd_en              ),
+                        .dout  (bundle_arbiter_control_N_to_1_fifo_request_signals_in.rd_en)
+                    );
+    """
             )
 
-        file.write(
-            f"""               
-                hyper_pipeline_noreset #(
-                    .STAGES({BUNDLE_ARBITER_CONTROL_PIPELINE_STAGES}                                                                ),
-                    .WIDTH ($bits(bundle_arbiter_control_N_to_1_fifo_request_signals_in.rd_en))
-                ) inst_hyper_pipeline_bundle_arbiter_control_N_to_1_fifo_request_signals_in_rd_en (
-                    .ap_clk(ap_clk                                                    ),
-                    .din   (fifo_request_control_out_signals_in_reg.rd_en              ),
-                    .dout  (bundle_arbiter_control_N_to_1_fifo_request_signals_in.rd_en)
-                );
-"""
-        )
-
-        file.write(f"          end\n")
-        file.write(f"endgenerate\n")
-        file.write(f"\n\n")
+            file.write(f"          end\n")
+            file.write(f"endgenerate\n")
+            file.write(f"\n\n")
 
     # if CU_BUNDLES_CONFIG_CU_ARBITER_NUM_CONTROL_RESPONSE:
 
@@ -3436,13 +3438,13 @@ M{0:02d}_AXI4_BE_MasterWriteInterfaceOutput kernel_m{0:02d}_axi4_write_out;
 """
 
     parameters_template_must = """
-M{0:02d}_AXI4_MID_SlaveReadInterfaceOutput  kernel_s{0:02d}_axi_read_out ;
-M{0:02d}_AXI4_MID_SlaveReadInterfaceInput   kernel_s{0:02d}_axi_read_in  ;
-M{0:02d}_AXI4_MID_SlaveWriteInterfaceOutput kernel_s{0:02d}_axi_write_out;
-M{0:02d}_AXI4_MID_SlaveWriteInterfaceInput  kernel_s{0:02d}_axi_write_in ;
+M{0:02d}_AXI4_MID_SlaveReadInterfaceOutput  kernel_s{0:02d}_axi_read_out [NUM_CUS-1:0] ;
+M{0:02d}_AXI4_MID_SlaveReadInterfaceInput   kernel_s{0:02d}_axi_read_in  [NUM_CUS-1:0]  ;
+M{0:02d}_AXI4_MID_SlaveWriteInterfaceOutput kernel_s{0:02d}_axi_write_out[NUM_CUS-1:0];
+M{0:02d}_AXI4_MID_SlaveWriteInterfaceInput  kernel_s{0:02d}_axi_write_in [NUM_CUS-1:0] ;
 
-M{0:02d}_AXI4_LITE_MID_RESP_T               kernel_m{0:02d}_axi_lite_in ;
-M{0:02d}_AXI4_LITE_MID_REQ_T                kernel_m{0:02d}_axi_lite_out;
+M{0:02d}_AXI4_LITE_MID_RESP_T               kernel_m{0:02d}_axi_lite_in [NUM_CUS-1:0] ;
+M{0:02d}_AXI4_LITE_MID_REQ_T                kernel_m{0:02d}_axi_lite_out[NUM_CUS-1:0];
 """
 
     assign_template_must = """
@@ -3539,7 +3541,7 @@ generate
 // --------------------------------------------------------------------------------------
     if(CHANNEL_CONFIG_L2_CACHE[{5}] == 1) begin
 // --------------------------------------------------------------------------------------
-      kernel_m{0:02d}_axi_system_cache_be{1}x{2}_mid{3}x{4}_wrapper inst_kernel_m{0:02d}_axi_system_cache_be{1}x{2}_mid{3}x{4}_wrapper_cache_l2 (
+      kernel_m{0:02d}_axi_system_cache_be{1}x{2}_mid{3}x{4}_wrapper #(.NUM_CUS(NUM_CUS))  inst_kernel_m{0:02d}_axi_system_cache_be{1}x{2}_mid{3}x{4}_wrapper_cache_l2 (
         .ap_clk            (ap_clk                          ),
         .areset            (areset_cache[{5}]               ),
             """
@@ -3575,31 +3577,74 @@ generate
 
     end else if(CHANNEL_CONFIG_L2_CACHE[{5}] == 2) begin 
 
-    // Merge the This channel with the adjacent axi_system_cache_be
+// Merge the This channel with the adjacent axi_system_cache_be
         assign kernel_cache_setup_signal[{5}] = 0;
-        assign kernel_m{0:02d}_axi_lite_in      = 0;
-    
-   end else begin
+
+        for (i=0; i<NUM_CUS; i++) begin : generate_axi_lite_in
+            assign kernel_m{0:02d}_axi_lite_in[i]      = 0;
+        end
+
+    end else begin
         assign kernel_cache_setup_signal[{5}] = 0;
         assign kernel_m{0:02d}_axi4_read_in   = 0;
         assign kernel_m{0:02d}_axi4_read_out  = 0;
         assign kernel_m{0:02d}_axi4_write_in  = 0;
         assign kernel_m{0:02d}_axi4_write_out = 0;
-        assign kernel_s{0:02d}_axi_read_out     = m{0:02d}_axi4_read.in       ;
-        assign m{0:02d}_axi4_read.out           = kernel_s{0:02d}_axi_read_in ;
-        assign kernel_s{0:02d}_axi_write_out    = m{0:02d}_axi4_write.in      ;
-        assign m{0:02d}_axi4_write.out          = kernel_s{0:02d}_axi_write_in;
-        assign kernel_m{0:02d}_axi_lite_in      = 0;
+        assign kernel_s{0:02d}_axi_read_out[0]     = m{0:02d}_axi4_read.in       ;
+        assign m{0:02d}_axi4_read.out           = kernel_s{0:02d}_axi_read_in[0] ;
+        assign kernel_s{0:02d}_axi_write_out[0]    = m{0:02d}_axi4_write.in      ;
+        assign m{0:02d}_axi4_write.out          = kernel_s{0:02d}_axi_write_in[0];
+        assign kernel_m{0:02d}_axi_lite_in[0]      = 0;
     end
 // --------------------------------------------------------------------------------------
 endgenerate
     """
 
     module_template_remove = """
-    // Merge the This channel with the adjacent axi_system_cache_be
+// Merge the This channel with the adjacent axi_system_cache_be
 assign kernel_cache_setup_signal[{5}] = 0;
-assign kernel_m{0:02d}_axi_lite_in      = 0;
+
+generate
+    for (i=0; i<NUM_CUS; i++) begin : generate_axi_lite_in
+        assign kernel_m{0:02d}_axi_lite_in[i]    = 0;
+    end
+endgenerate
+
+// --------------------------------------------------------------------------------------
    """
+
+    output_file_kernel_cu_module_pre = """
+// --------------------------------------------------------------------------------------
+// CU {0}-> [CU_CACHE|BUNDLES|LANES|ENGINES]
+// --------------------------------------------------------------------------------------
+// Kernel_setup
+
+assign kernel_cu_descriptor_in[{0}] = kernel_control_descriptor_out;
+
+kernel_cu #(
+  .ID_CU       ({0}           ),
+  .NUM_CHANNELS(NUM_CHANNELS)
+) inst_kernel_cu_{0} (
+    .ap_clk           (ap_clk                     ),
+    .areset           (areset_cu[{0}]                  ),
+    .descriptor_in    (kernel_cu_descriptor_in[{0}]    ),
+    """
+
+    output_file_kernel_cu_module_post = """
+    .fifo_setup_signal(kernel_cu_fifo_setup_signal[{0}]),
+    .done_out         (kernel_cu_done_out[{0}]         )
+);
+    """
+
+    output_file_kernel_cu_portmap_template = """
+    .m{1:02d}_axi_read_in  (kernel_s{1:02d}_axi_read_out[{0}] ),
+    .m{1:02d}_axi_read_out (kernel_s{1:02d}_axi_read_in[{0}]  ),
+    .m{1:02d}_axi_write_in (kernel_s{1:02d}_axi_write_out[{0}]),
+    .m{1:02d}_axi_write_out(kernel_s{1:02d}_axi_write_in[{0}] ),
+
+    .m{1:02d}_axi_lite_in (kernel_m{1:02d}_axi_lite_in[{0}]),
+    .m{1:02d}_axi_lite_out(kernel_m{1:02d}_axi_lite_out[{0}]),
+    """
 
     for index, channel in enumerate(DISTINCT_CHANNELS):
         output_lines.append(
@@ -3678,6 +3723,37 @@ assign kernel_m{0:02d}_axi_lite_in      = 0;
                     index,
                 )
             )
+
+    for ID_CU in range(NUM_CUS):
+        output_lines.append(
+            output_file_kernel_cu_module_pre.format(
+                ID_CU,
+                channel,
+                index,
+                CHANNEL_CONFIG_DATA_WIDTH_MID[index],
+                CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],
+            )
+        )
+        for index, channel in enumerate(DISTINCT_CHANNELS):
+            output_lines.append(
+                output_file_kernel_cu_portmap_template.format(
+                    ID_CU,
+                    channel,
+                    index,
+                    CHANNEL_CONFIG_DATA_WIDTH_MID[index],
+                    CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],
+                )
+            )
+
+        output_lines.append(
+            output_file_kernel_cu_module_post.format(
+                ID_CU,
+                channel,
+                index,
+                CHANNEL_CONFIG_DATA_WIDTH_MID[index],
+                CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],
+            )
+        )
 
     # Writing to the VHDL file
 
@@ -4284,6 +4360,43 @@ if {{[checkXciFileExistsIP ${{files_sources_xci}}]}} {{
 }}
     """
 
+    fill_m_axi_vip_tcl_template_crossbar_pre = """
+# ----------------------------------------------------------------------------
+# generate SYSTEM CROSSBAR AXI_M{0:02d}
+
+puts "[color 2 "                        Generate CROSSBAR AXI_M{0:02d}"]" 
+puts "[color 2 "                                     Back-End: Data width: ${{BE_CACHE_DATA_WIDTH_M{0:02d}}}bits | Address width: ${{BE_ADDR_WIDTH_M{0:02d}}}bits"]" 
+puts "[color 2 "                                      Mid-End: Data width: ${{MID_CACHE_DATA_WIDTH_M{0:02d}}}bits | Address width: ${{MID_ADDR_WIDTH_M{0:02d}}}bits"]" 
+
+set module_name m{0:02d}_axi_system_crossbar_be{1}x{2}_mid{3}x{4}
+set files_sources_xci ${{package_full_dir}}/${{KERNEL_NAME}}/${{KERNEL_NAME}}.srcs/sources_1/ip/${{module_name}}/${{module_name}}.xci
+
+if {{[checkXciFileExistsIP ${{files_sources_xci}}]}} {{
+    create_ip -name axi_crossbar            \\
+              -vendor xilinx.com            \\
+              -library ip                   \\
+              -version 2.*                  \\
+              -module_name ${{module_name}}   >> $log_file
+
+    set_property -dict [list                                                 \\
+                        CONFIG.ADDR_WIDTH ${{BE_ADDR_WIDTH_M{0:02d}}}        \\
+                        CONFIG.DATA_WIDTH ${{BE_CACHE_DATA_WIDTH_M{0:02d}}}  \\
+                        CONFIG.NUM_MI {{{9}}}  \\
+                        CONFIG.STRATEGY {{2}} \\
+                        ] [get_ips ${{module_name}}] >> $log_file
+
+
+    set files_ip_user_files_dir     ${{package_full_dir}}/${{KERNEL_NAME}}/${{KERNEL_NAME}}.ip_user_files
+    set files_crossbar_dir     ${{package_full_dir}}/${{KERNEL_NAME}}/${{KERNEL_NAME}}.crossbar
+    set_property generate_synth_checkpoint false [get_files ${{files_sources_xci}}]
+    generate_target {{instantiation_template}}     [get_files ${{files_sources_xci}}] >> $log_file
+    # catch {{ config_ip_crossbar -export [get_ips -all ${{module_name}}] }}
+    generate_target all                          [get_files ${{files_sources_xci}}] >> $log_file
+    export_ip_user_files -of_objects             [get_files ${{files_sources_xci}}] -no_script -force >> $log_file
+    export_simulation -of_objects [get_files ${{files_sources_xci}}] -directory ${{files_ip_user_files_dir}}/sim_scripts -ip_user_files_dir ${{files_ip_user_files_dir}} -ipstatic_source_dir ${{files_ip_user_files_dir}}/ipstatic -lib_map_path [list {{modelsim=${{files_crossbar_dir}}/compile_simlib/modelsim}} {{questa=${{files_crossbar_dir}}/compile_simlib/questa}} {{xcelium=${{files_crossbar_dir}}/compile_simlib/xcelium}} {{vcs=${{files_crossbar_dir}}/compile_simlib/vcs}} {{riviera=${{files_crossbar_dir}}/compile_simlib/riviera}}] -use_ip_compiled_libs -force >> $log_file
+}}
+    """
+
     fill_m_axi_vip_tcl_template_cache_pre = """
 # ----------------------------------------------------------------------------
 # generate SYSTEM CACHE AXI_M{0:02d}
@@ -4631,6 +4744,42 @@ if {{[checkXciFileExistsIP ${{files_sources_xci}}]}} {{
             )
         )
 
+        # if CHANNEL_CONFIG_L2_TYPE[index] == 1:
+        #     output_lines.append(
+        #         fill_m_axi_vip_tcl_template_crossbar_pre.format(
+        #             channel,
+        #             CHANNEL_CONFIG_DATA_WIDTH_BE[index],
+        #             CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],
+        #             CHANNEL_CONFIG_DATA_WIDTH_MID[index],
+        #             CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],
+        #             adjust_to_nearest_legal_cache_size(CACHE_CONFIG_L2_SIZE[index]),
+        #             adjust_to_nearest_legal_cache_num_ways(
+        #                 CACHE_CONFIG_L2_NUM_WAYS[index]
+        #             ),
+        #             CACHE_CONFIG_L2_RAM[index],
+        #             CACHE_CONFIG_L2_CTRL[index],
+        #             (CHANNEL_CONFIG_L2_MERGE[CACHE_MERGE_COUNT]*NUM_CUS),
+        #         )
+        #     )
+        #     # CACHE_MERGE_COUNT = CACHE_MERGE_COUNT + 1
+        # else:
+        #     output_lines.append(
+        #         fill_m_axi_vip_tcl_template_crossbar_pre.format(
+        #             channel,
+        #             CHANNEL_CONFIG_DATA_WIDTH_BE[index],
+        #             CHANNEL_CONFIG_ADDRESS_WIDTH_BE[index],
+        #             CHANNEL_CONFIG_DATA_WIDTH_MID[index],
+        #             CHANNEL_CONFIG_ADDRESS_WIDTH_MID[index],
+        #             adjust_to_nearest_legal_cache_size(CACHE_CONFIG_L2_SIZE[index]),
+        #             adjust_to_nearest_legal_cache_num_ways(
+        #                 CACHE_CONFIG_L2_NUM_WAYS[index]
+        #             ),
+        #             CACHE_CONFIG_L2_RAM[index],
+        #             CACHE_CONFIG_L2_CTRL[index],
+        #             1,
+        #         )
+        #     )
+
         if CHANNEL_CONFIG_L2_TYPE[index] == 1:
             output_lines.append(
                 fill_m_axi_vip_tcl_template_cache_pre.format(
@@ -4645,7 +4794,7 @@ if {{[checkXciFileExistsIP ${{files_sources_xci}}]}} {{
                     ),
                     CACHE_CONFIG_L2_RAM[index],
                     CACHE_CONFIG_L2_CTRL[index],
-                    CHANNEL_CONFIG_L2_MERGE[CACHE_MERGE_COUNT],
+                    (CHANNEL_CONFIG_L2_MERGE[CACHE_MERGE_COUNT]*NUM_CUS),
                 )
             )
             CACHE_MERGE_COUNT = CACHE_MERGE_COUNT + 1
@@ -4684,19 +4833,22 @@ if {{[checkXciFileExistsIP ${{files_sources_xci}}]}} {{
                 )
             )
 
-        if CHANNEL_CONFIG_L2_TYPE[index] == 1:
-            CACHE_PORT_COUNT = CHANNEL_CONFIG_L2_MERGE[CACHE_MERGE_COUNT - 1]
-            for CACHE_PORT_INDEX in range(CACHE_PORT_COUNT):
-                output_lines.append(
-                    fill_m_axi_vip_tcl_template_cache_ports.format(
-                        CACHE_PORT_INDEX, CHANNEL_PORT_INDEX
+        for ID_CU in range(NUM_CUS):
+            CHANNEL_PORT_INDEX = 0
+            if CHANNEL_CONFIG_L2_TYPE[index] == 1:
+                CACHE_PORT_COUNT = CHANNEL_CONFIG_L2_MERGE[CACHE_MERGE_COUNT - 1]
+                CU_OFFSET = CACHE_PORT_COUNT * ID_CU
+                for CACHE_PORT_INDEX in range(CACHE_PORT_COUNT):
+                    output_lines.append(
+                        fill_m_axi_vip_tcl_template_cache_ports.format(
+                            (CACHE_PORT_INDEX+CU_OFFSET), CHANNEL_PORT_INDEX
+                        )
                     )
+                    CHANNEL_PORT_INDEX = CHANNEL_PORT_INDEX + 1
+            else:
+                output_lines.append(
+                    fill_m_axi_vip_tcl_template_cache_ports.format(0, channel)
                 )
-                CHANNEL_PORT_INDEX = CHANNEL_PORT_INDEX + 1
-        else:
-            output_lines.append(
-                fill_m_axi_vip_tcl_template_cache_ports.format(0, channel)
-            )
 
         output_lines.append(
             fill_m_axi_vip_tcl_template_cache_post.format(
@@ -8153,16 +8305,18 @@ fill_kernel_mxx_axi_system_cache_wrapper_header = """
 
 fill_kernel_mxx_axi_system_cache_wrapper_pre = """
 
-module kernel_m{0:02d}_axi_system_cache_be{1}x{2}_mid{3}x{4}_wrapper (
+module kernel_m{0:02d}_axi_system_cache_be{1}x{2}_mid{3}x{4}_wrapper  #(
+  parameter NUM_CUS             = 1
+) (
   // System Signals
   input  logic                                  ap_clk            ,
   input  logic                                  areset            ,
   """
 fill_kernel_mxx_axi_system_cache_wrapper_ports = """
-  output M{1:02d}_AXI4_MID_SlaveReadInterfaceOutput  s{0}_axi_read_out    ,
-  input  M{1:02d}_AXI4_MID_SlaveReadInterfaceInput   s{0}_axi_read_in     ,
-  output M{1:02d}_AXI4_MID_SlaveWriteInterfaceOutput s{0}_axi_write_out   ,
-  input  M{1:02d}_AXI4_MID_SlaveWriteInterfaceInput  s{0}_axi_write_in    ,
+  output M{1:02d}_AXI4_MID_SlaveReadInterfaceOutput  s{0}_axi_read_out [NUM_CUS-1:0]    ,
+  input  M{1:02d}_AXI4_MID_SlaveReadInterfaceInput   s{0}_axi_read_in  [NUM_CUS-1:0]    ,
+  output M{1:02d}_AXI4_MID_SlaveWriteInterfaceOutput s{0}_axi_write_out[NUM_CUS-1:0]    ,
+  input  M{1:02d}_AXI4_MID_SlaveWriteInterfaceInput  s{0}_axi_write_in [NUM_CUS-1:0]    ,
   """
 
 fill_kernel_mxx_axi_system_cache_wrapper_mid = """
@@ -8170,8 +8324,8 @@ fill_kernel_mxx_axi_system_cache_wrapper_mid = """
   output M{0:02d}_AXI4_BE_MasterReadInterfaceOutput  m_axi_read_out    ,
   input  M{0:02d}_AXI4_BE_MasterWriteInterfaceInput  m_axi_write_in    ,
   output M{0:02d}_AXI4_BE_MasterWriteInterfaceOutput m_axi_write_out   ,
-  input  S{0:02d}_AXI4_LITE_MID_REQ_T                s_axi_lite_in     ,
-  output S{0:02d}_AXI4_LITE_MID_RESP_T               s_axi_lite_out    ,
+  input  S{0:02d}_AXI4_LITE_MID_REQ_T                s_axi_lite_in  [NUM_CUS-1:0]    ,
+  output S{0:02d}_AXI4_LITE_MID_RESP_T               s_axi_lite_out [NUM_CUS-1:0]    ,
   output logic                                  cache_setup_signal
 );
 
@@ -8219,43 +8373,43 @@ m{0:02d}_axi_system_cache_be{1}x{2}_mid{3}x{4} inst_m{0:02d}_axi_system_cache_be
 fill_kernel_mxx_axi_system_cache_wrapper_portmaps = """
   .S{0}_AXI_GEN_ARUSER (0                           ),
   .S{0}_AXI_GEN_AWUSER (0                           ),
-  .S{0}_AXI_GEN_RVALID (s{0}_axi_read_out.rvalid       ), // Output Read channel valid
-  .S{0}_AXI_GEN_ARREADY(s{0}_axi_read_out.arready      ), // Output Read Address read channel ready
-  .S{0}_AXI_GEN_RLAST  (s{0}_axi_read_out.rlast        ), // Output Read channel last word
-  .S{0}_AXI_GEN_RDATA  (s{0}_axi_read_out.rdata        ), // Output Read channel data
-  .S{0}_AXI_GEN_RID    (s{0}_axi_read_out.rid          ), // Output Read channel ID
-  .S{0}_AXI_GEN_RRESP  (s{0}_axi_read_out.rresp        ), // Output Read channel response
-  .S{0}_AXI_GEN_ARVALID(s{0}_axi_read_in.arvalid       ), // Input Read Address read channel valid
-  .S{0}_AXI_GEN_ARADDR (s{0}_axi_read_in.araddr        ), // Input Read Address read channel address
-  .S{0}_AXI_GEN_ARLEN  (s{0}_axi_read_in.arlen         ), // Input Read Address channel burst length
-  .S{0}_AXI_GEN_RREADY (s{0}_axi_read_in.rready        ), // Input Read Read channel ready
-  .S{0}_AXI_GEN_ARID   (s{0}_axi_read_in.arid          ), // Input Read Address read channel ID
-  .S{0}_AXI_GEN_ARSIZE (s{0}_axi_read_in.arsize        ), // Input Read Address read channel burst size. This signal indicates the size of each transfer out the burst
-  .S{0}_AXI_GEN_ARBURST(s{0}_axi_read_in.arburst       ), // Input Read Address read channel burst type
-  .S{0}_AXI_GEN_ARLOCK (s{0}_axi_read_in.arlock        ), // Input Read Address read channel lock type
-  .S{0}_AXI_GEN_ARCACHE(s{0}_axi_read_in.arcache       ), // Input Read Address read channel memory type. Transactions set with Normal Non-cacheable Modifiable and Bufferable (0011).
-  .S{0}_AXI_GEN_ARPROT (s{0}_axi_read_in.arprot        ), // Input Read Address channel protection type. Transactions set with Normal, Secure, and Data attributes (000).
-  .S{0}_AXI_GEN_ARQOS  (s{0}_axi_read_in.arqos         ), // Input Read Address channel quality of service
-  .S{0}_AXI_GEN_AWREADY(s{0}_axi_write_out.awready     ), // Output Write Address write channel ready
-  .S{0}_AXI_GEN_WREADY (s{0}_axi_write_out.wready      ), // Output Write channel ready
-  .S{0}_AXI_GEN_BID    (s{0}_axi_write_out.bid         ), // Output Write response channel ID
-  .S{0}_AXI_GEN_BRESP  (s{0}_axi_write_out.bresp       ), // Output Write channel response
-  .S{0}_AXI_GEN_BVALID (s{0}_axi_write_out.bvalid      ), // Output Write response channel valid
-  .S{0}_AXI_GEN_AWVALID(s{0}_axi_write_in.awvalid      ), // Input Write Address write channel valid
-  .S{0}_AXI_GEN_AWID   (s{0}_axi_write_in.awid         ), // Input Write Address write channel ID
-  .S{0}_AXI_GEN_AWADDR (s{0}_axi_write_in.awaddr       ), // Input Write Address write channel address
-  .S{0}_AXI_GEN_AWLEN  (s{0}_axi_write_in.awlen        ), // Input Write Address write channel burst length
-  .S{0}_AXI_GEN_AWSIZE (s{0}_axi_write_in.awsize       ), // Input Write Address write channel burst size. This signal indicates the size of each transfer out the burst
-  .S{0}_AXI_GEN_AWBURST(s{0}_axi_write_in.awburst      ), // Input Write Address write channel burst type
-  .S{0}_AXI_GEN_AWLOCK (s{0}_axi_write_in.awlock       ), // Input Write Address write channel lock type
-  .S{0}_AXI_GEN_AWCACHE(s{0}_axi_write_in.awcache      ), // Input Write Address write channel memory type. Transactions set with Normal Non-cacheable Modifiable and Bufferable (0011).
-  .S{0}_AXI_GEN_AWPROT (s{0}_axi_write_in.awprot       ), // Input Write Address write channel protection type. Transactions set with Normal, Secure, and Data attributes (000).
-  .S{0}_AXI_GEN_AWQOS  (s{0}_axi_write_in.awqos        ), // Input Write Address write channel quality of service
-  .S{0}_AXI_GEN_WDATA  (s{0}_axi_write_in.wdata        ), // Input Write channel data
-  .S{0}_AXI_GEN_WSTRB  (s{0}_axi_write_in.wstrb        ), // Input Write channel write strobe
-  .S{0}_AXI_GEN_WLAST  (s{0}_axi_write_in.wlast        ), // Input Write channel last word flag
-  .S{0}_AXI_GEN_WVALID (s{0}_axi_write_in.wvalid       ), // Input Write channel valid
-  .S{0}_AXI_GEN_BREADY (s{0}_axi_write_in.bready       ), // Input Write response channel ready
+  .S{0}_AXI_GEN_RVALID (s{1}_axi_read_out[{2}].rvalid       ), // Output Read channel valid
+  .S{0}_AXI_GEN_ARREADY(s{1}_axi_read_out[{2}].arready      ), // Output Read Address read channel ready
+  .S{0}_AXI_GEN_RLAST  (s{1}_axi_read_out[{2}].rlast        ), // Output Read channel last word
+  .S{0}_AXI_GEN_RDATA  (s{1}_axi_read_out[{2}].rdata        ), // Output Read channel data
+  .S{0}_AXI_GEN_RID    (s{1}_axi_read_out[{2}].rid          ), // Output Read channel ID
+  .S{0}_AXI_GEN_RRESP  (s{1}_axi_read_out[{2}].rresp        ), // Output Read channel response
+  .S{0}_AXI_GEN_ARVALID(s{1}_axi_read_in[{2}].arvalid       ), // Input Read Address read channel valid
+  .S{0}_AXI_GEN_ARADDR (s{1}_axi_read_in[{2}].araddr        ), // Input Read Address read channel address
+  .S{0}_AXI_GEN_ARLEN  (s{1}_axi_read_in[{2}].arlen         ), // Input Read Address channel burst length
+  .S{0}_AXI_GEN_RREADY (s{1}_axi_read_in[{2}].rready        ), // Input Read Read channel ready
+  .S{0}_AXI_GEN_ARID   (s{1}_axi_read_in[{2}].arid          ), // Input Read Address read channel ID
+  .S{0}_AXI_GEN_ARSIZE (s{1}_axi_read_in[{2}].arsize        ), // Input Read Address read channel burst size. This signal indicates the size of each transfer out the burst
+  .S{0}_AXI_GEN_ARBURST(s{1}_axi_read_in[{2}].arburst       ), // Input Read Address read channel burst type
+  .S{0}_AXI_GEN_ARLOCK (s{1}_axi_read_in[{2}].arlock        ), // Input Read Address read channel lock type
+  .S{0}_AXI_GEN_ARCACHE(s{1}_axi_read_in[{2}].arcache       ), // Input Read Address read channel memory type. Transactions set with Normal Non-cacheable Modifiable and Bufferable (0011).
+  .S{0}_AXI_GEN_ARPROT (s{1}_axi_read_in[{2}].arprot        ), // Input Read Address channel protection type. Transactions set with Normal, Secure, and Data attributes (000).
+  .S{0}_AXI_GEN_ARQOS  (s{1}_axi_read_in[{2}].arqos         ), // Input Read Address channel quality of service
+  .S{0}_AXI_GEN_AWREADY(s{1}_axi_write_out[{2}].awready     ), // Output Write Address write channel ready
+  .S{0}_AXI_GEN_WREADY (s{1}_axi_write_out[{2}].wready      ), // Output Write channel ready
+  .S{0}_AXI_GEN_BID    (s{1}_axi_write_out[{2}].bid         ), // Output Write response channel ID
+  .S{0}_AXI_GEN_BRESP  (s{1}_axi_write_out[{2}].bresp       ), // Output Write channel response
+  .S{0}_AXI_GEN_BVALID (s{1}_axi_write_out[{2}].bvalid      ), // Output Write response channel valid
+  .S{0}_AXI_GEN_AWVALID(s{1}_axi_write_in[{2}].awvalid      ), // Input Write Address write channel valid
+  .S{0}_AXI_GEN_AWID   (s{1}_axi_write_in[{2}].awid         ), // Input Write Address write channel ID
+  .S{0}_AXI_GEN_AWADDR (s{1}_axi_write_in[{2}].awaddr       ), // Input Write Address write channel address
+  .S{0}_AXI_GEN_AWLEN  (s{1}_axi_write_in[{2}].awlen        ), // Input Write Address write channel burst length
+  .S{0}_AXI_GEN_AWSIZE (s{1}_axi_write_in[{2}].awsize       ), // Input Write Address write channel burst size. This signal indicates the size of each transfer out the burst
+  .S{0}_AXI_GEN_AWBURST(s{1}_axi_write_in[{2}].awburst      ), // Input Write Address write channel burst type
+  .S{0}_AXI_GEN_AWLOCK (s{1}_axi_write_in[{2}].awlock       ), // Input Write Address write channel lock type
+  .S{0}_AXI_GEN_AWCACHE(s{1}_axi_write_in[{2}].awcache      ), // Input Write Address write channel memory type. Transactions set with Normal Non-cacheable Modifiable and Bufferable (0011).
+  .S{0}_AXI_GEN_AWPROT (s{1}_axi_write_in[{2}].awprot       ), // Input Write Address write channel protection type. Transactions set with Normal, Secure, and Data attributes (000).
+  .S{0}_AXI_GEN_AWQOS  (s{1}_axi_write_in[{2}].awqos        ), // Input Write Address write channel quality of service
+  .S{0}_AXI_GEN_WDATA  (s{1}_axi_write_in[{2}].wdata        ), // Input Write channel data
+  .S{0}_AXI_GEN_WSTRB  (s{1}_axi_write_in[{2}].wstrb        ), // Input Write channel write strobe
+  .S{0}_AXI_GEN_WLAST  (s{1}_axi_write_in[{2}].wlast        ), // Input Write channel last word flag
+  .S{0}_AXI_GEN_WVALID (s{1}_axi_write_in[{2}].wvalid       ), // Input Write channel valid
+  .S{0}_AXI_GEN_BREADY (s{1}_axi_write_in[{2}].bready       ), // Input Write response channel ready
   """
 
 fill_kernel_mxx_axi_system_cache_wrapper_post = """
@@ -8301,24 +8455,24 @@ fill_kernel_mxx_axi_system_cache_wrapper_post = """
     """
 
 fill_kernel_mxx_axi_system_cache_wrapper_ctrl = """
-  .S_AXI_CTRL_AWADDR (s_axi_lite_in.aw.addr       ), // : IN STD_LOGIC_VECTOR(16 DOWNTO 0);
-  .S_AXI_CTRL_AWPROT (s_axi_lite_in.aw.prot       ), // : IN STD_LOGIC_VECTOR(2 DOWNTO 0);
-  .S_AXI_CTRL_AWVALID(s_axi_lite_in.aw_valid      ), // : IN STD_LOGIC;
-  .S_AXI_CTRL_AWREADY(s_axi_lite_out.aw_ready     ),
-  .S_AXI_CTRL_WDATA  (s_axi_lite_in.w.data        ), // : IN STD_LOGIC_VECTOR(63 DOWNTO 0);
-  .S_AXI_CTRL_WVALID (s_axi_lite_in.w_valid       ), // : IN STD_LOGIC;
-  .S_AXI_CTRL_WREADY (s_axi_lite_out.w_ready      ),
-  .S_AXI_CTRL_BRESP  (s_axi_lite_out.b.resp       ), // : OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
-  .S_AXI_CTRL_BVALID (s_axi_lite_out.b_valid      ), // : OUT STD_LOGIC;
-  .S_AXI_CTRL_BREADY (s_axi_lite_in.b_ready       ), // : IN STD_LOGIC;
-  .S_AXI_CTRL_ARADDR (s_axi_lite_in.ar.addr       ), // : IN STD_LOGIC_VECTOR(16 DOWNTO 0);
-  .S_AXI_CTRL_ARPROT (s_axi_lite_in.ar.prot       ), // : IN STD_LOGIC_VECTOR(2 DOWNTO 0);
-  .S_AXI_CTRL_ARVALID(s_axi_lite_in.ar_valid      ), // : IN STD_LOGIC;
-  .S_AXI_CTRL_ARREADY(s_axi_lite_out.ar_ready     ), // : OUT STD_LOGIC;
-  .S_AXI_CTRL_RDATA  (s_axi_lite_out.r.data       ), // : OUT STD_LOGIC_VECTOR(63 DOWNTO 0);
-  .S_AXI_CTRL_RRESP  (s_axi_lite_out.r.resp       ), // : OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
-  .S_AXI_CTRL_RVALID (s_axi_lite_out.r_valid      ), // : OUT STD_LOGIC;
-  .S_AXI_CTRL_RREADY (s_axi_lite_in.r_ready       ), // : IN STD_LOGIC;
+  .S_AXI_CTRL_AWADDR (s_axi_lite_in[0].aw.addr       ), // : IN STD_LOGIC_VECTOR(16 DOWNTO 0);
+  .S_AXI_CTRL_AWPROT (s_axi_lite_in[0].aw.prot       ), // : IN STD_LOGIC_VECTOR(2 DOWNTO 0);
+  .S_AXI_CTRL_AWVALID(s_axi_lite_in[0].aw_valid      ), // : IN STD_LOGIC;
+  .S_AXI_CTRL_AWREADY(s_axi_lite_out[0].aw_ready     ),
+  .S_AXI_CTRL_WDATA  (s_axi_lite_in[0].w.data        ), // : IN STD_LOGIC_VECTOR(63 DOWNTO 0);
+  .S_AXI_CTRL_WVALID (s_axi_lite_in[0].w_valid       ), // : IN STD_LOGIC;
+  .S_AXI_CTRL_WREADY (s_axi_lite_out[0].w_ready      ),
+  .S_AXI_CTRL_BRESP  (s_axi_lite_out[0].b.resp       ), // : OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
+  .S_AXI_CTRL_BVALID (s_axi_lite_out[0].b_valid      ), // : OUT STD_LOGIC;
+  .S_AXI_CTRL_BREADY (s_axi_lite_in[0].b_ready       ), // : IN STD_LOGIC;
+  .S_AXI_CTRL_ARADDR (s_axi_lite_in[0].ar.addr       ), // : IN STD_LOGIC_VECTOR(16 DOWNTO 0);
+  .S_AXI_CTRL_ARPROT (s_axi_lite_in[0].ar.prot       ), // : IN STD_LOGIC_VECTOR(2 DOWNTO 0);
+  .S_AXI_CTRL_ARVALID(s_axi_lite_in[0].ar_valid      ), // : IN STD_LOGIC;
+  .S_AXI_CTRL_ARREADY(s_axi_lite_out[0].ar_ready     ), // : OUT STD_LOGIC;
+  .S_AXI_CTRL_RDATA  (s_axi_lite_out[0].r.data       ), // : OUT STD_LOGIC_VECTOR(63 DOWNTO 0);
+  .S_AXI_CTRL_RRESP  (s_axi_lite_out[0].r.resp       ), // : OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
+  .S_AXI_CTRL_RVALID (s_axi_lite_out[0].r_valid      ), // : OUT STD_LOGIC;
+  .S_AXI_CTRL_RREADY (s_axi_lite_in[0].r_ready       ), // : IN STD_LOGIC;
     """
 
 fill_kernel_mxx_axi_system_cache_wrapper_post_if = """
@@ -8337,7 +8491,11 @@ fill_kernel_mxx_axi_system_cache_wrapper_post_else = """
   .Initializing      (cache_setup_signal_int      )    
 );
 
-assign s_axi_lite_out = 0;
+generate
+    for (genvar i=0; i<NUM_CUS; i++) begin : generate_s_axi_lite_out
+        assign s_axi_lite_out[i] = 0;
+    end
+endgenerate
 
 endmodule : kernel_m{0:02d}_axi_system_cache_be{1}x{2}_mid{3}x{4}_wrapper
 
@@ -8402,18 +8560,20 @@ with open(output_file_kernel_mxx_axi_system_cache_wrapper, "w") as file:
             )
         )
 
-        if CHANNEL_CONFIG_L2_TYPE[index] == 1:
-            CACHE_PORT_COUNT = CHANNEL_CONFIG_L2_MERGE[CACHE_MERGE_COUNT]
-            for CACHE_PORT_INDEX in range(CACHE_PORT_COUNT):
-                fill_kernel_mxx_axi_system_cache_wrapper_module.append(
-                    fill_kernel_mxx_axi_system_cache_wrapper_portmaps.format(
-                        CACHE_PORT_INDEX
+        for ID_CU in range(NUM_CUS):
+            if CHANNEL_CONFIG_L2_TYPE[index] == 1:
+                CACHE_PORT_COUNT = CHANNEL_CONFIG_L2_MERGE[CACHE_MERGE_COUNT]
+                CU_OFFSET = CACHE_PORT_COUNT * ID_CU
+                for CACHE_PORT_INDEX in range(CACHE_PORT_COUNT):
+                    fill_kernel_mxx_axi_system_cache_wrapper_module.append(
+                        fill_kernel_mxx_axi_system_cache_wrapper_portmaps.format(
+                            (CACHE_PORT_INDEX+CU_OFFSET), CACHE_PORT_INDEX, ID_CU
+                        )
                     )
+            else:
+                fill_kernel_mxx_axi_system_cache_wrapper_module.append(
+                    fill_kernel_mxx_axi_system_cache_wrapper_portmaps.format(0, 0, ID_CU)
                 )
-        else:
-            fill_kernel_mxx_axi_system_cache_wrapper_module.append(
-                fill_kernel_mxx_axi_system_cache_wrapper_portmaps.format(0)
-            )
 
         fill_kernel_mxx_axi_system_cache_wrapper_module.append(
             fill_kernel_mxx_axi_system_cache_wrapper_post.format(
