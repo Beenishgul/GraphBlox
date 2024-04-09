@@ -378,7 +378,9 @@ cu_setup #(
 // --------------------------------------------------------------------------------------
 // Bundles CU
 // --------------------------------------------------------------------------------------
-cu_bundles #(`include"set_cu_parameters.vh") inst_cu_bundles (
+cu_bundles #(
+  `include"set_cu_parameters.vh"
+  ) inst_cu_bundles (
   .ap_clk                                      (ap_clk                                      ),
   .areset                                      (areset_bundles                              ),
   .response_memory_in                          (cu_bundles_response_in                      ),
