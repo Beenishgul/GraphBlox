@@ -102,6 +102,7 @@ def run_make_in_parallel(destination_directory, params):
         architecture,
         capability,
         num_kernels,
+        num_kernel_cu,
         target,
         cache_properties,
         synth_strategy,
@@ -115,7 +116,7 @@ def run_make_in_parallel(destination_directory, params):
     # Define the log file path
     log_file = os.path.join(
         destination_directory,
-        f"make_{algorithm}_{architecture}_{capability}_{num_kernels}_{target}_{cache_properties[0]}_{synth_strategy}_{frequency}Hz.log",
+        f"make_{algorithm}_{architecture}_{capability}_{num_kernels}_{num_kernel_cu}_{target}_{cache_properties[0]}_{synth_strategy}_{frequency}Hz.log",
     )
 
     # Run the make commands in its own shell and redirect output to the log file
@@ -135,6 +136,7 @@ def run_make_in_serial(destination_directory, params):
         architecture,
         capability,
         num_kernels,
+        num_kernel_cu,
         target,
         cache_properties,
         synth_strategy,
@@ -148,7 +150,7 @@ def run_make_in_serial(destination_directory, params):
     # Define the log file path
     log_file = os.path.join(
         destination_directory,
-        f"make_{algorithm}_{architecture}_{capability}_{num_kernels}_{target}_{cache_properties[0]}_{synth_strategy}_{frequency}Hz.log",
+        f"make_{algorithm}_{architecture}_{capability}_{num_kernels}_{num_kernel_cu}_{target}_{cache_properties[0]}_{synth_strategy}_{frequency}Hz.log",
     )
 
     try:
