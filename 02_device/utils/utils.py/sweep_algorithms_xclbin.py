@@ -334,9 +334,9 @@ ch_properties = [
 destination_directories = [
     os.path.join(
         base_directory,
-        f"alg_{algorithm}_{architecture}_{capability}_{num_kernels}_{target}_{cache_properties[0]}_{synth_strategy}_{frequency}Hz",
+        f"alg_{algorithm}_{architecture}_{capability}_{num_kernels}_{num_kernel_cu}_{target}_{cache_properties[0]}_{synth_strategy}_{frequency}Hz",
     )
-    for algorithm, architecture, capability, num_kernels, target, cache_properties, synth_strategy, frequency in algorithms
+    for algorithm, architecture, capability, num_kernels, num_kernel_cu,target, cache_properties, synth_strategy, frequency in algorithms
 ]
 
 # Create and copy to each destination directory
@@ -351,6 +351,7 @@ for params, ch_property in zip(algorithms, ch_properties):
         architecture,
         capability,
         num_kernels,
+        num_kernel_cu,
         target,
         cache_properties,
         synth_strategy,
@@ -358,7 +359,7 @@ for params, ch_property in zip(algorithms, ch_properties):
     ) = params
     destination_directory = os.path.join(
         base_directory,
-        f"alg_{algorithm}_{architecture}_{capability}_{num_kernels}_{target}_{cache_properties[0]}_{synth_strategy}_{frequency}Hz",
+        f"alg_{algorithm}_{architecture}_{capability}_{num_kernels}_{num_kernel_cu}_{target}_{cache_properties[0]}_{synth_strategy}_{frequency}Hz",
     )
     topology_directory = os.path.join(
         destination_directory,
@@ -381,6 +382,7 @@ for params, ch_property in zip(algorithms, ch_properties):
         architecture,
         capability,
         num_kernels,
+        num_kernel_cu,
         target,
         cache_properties,
         synth_strategy,
@@ -388,7 +390,7 @@ for params, ch_property in zip(algorithms, ch_properties):
     ) = params
     destination_directory = os.path.join(
         base_directory,
-        f"alg_{algorithm}_{architecture}_{capability}_{num_kernels}_{target}_{cache_properties[0]}_{synth_strategy}_{frequency}Hz",
+        f"alg_{algorithm}_{architecture}_{capability}_{num_kernels}_{num_kernel_cu}_{target}_{cache_properties[0]}_{synth_strategy}_{frequency}Hz",
     )
     xclbin_from_directory = os.path.join(
         destination_directory, "02_device", "utils", "utils.xclbin"
@@ -406,7 +408,7 @@ for params, ch_property in zip(algorithms, ch_properties):
     # Copy each found zip file with appended details
     for zip_file in zip_files:
         filename = os.path.basename(zip_file)
-        new_filename = f"{os.path.splitext(filename)[0]}_{algorithm}_{architecture}_{capability}_{num_kernels}_{target}_{cache_properties[0]}_{synth_strategy}_{frequency}Hz.zip"
+        new_filename = f"{os.path.splitext(filename)[0]}_{algorithm}_{architecture}_{capability}_{num_kernels}_{num_kernel_cu}_{target}_{cache_properties[0]}_{synth_strategy}_{frequency}Hz.zip"
         new_filepath = os.path.join(xclbin_to_directory, new_filename)
         try:
             shutil.copy(zip_file, new_filepath)
