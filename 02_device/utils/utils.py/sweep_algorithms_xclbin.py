@@ -39,6 +39,7 @@ def generate_topology_file(file_path, params, ch_property):
         architecture,
         capability,
         num_kernels,
+        num_kernel_cu,
         target,
         cache_properties,
         synth_strategy,
@@ -50,6 +51,7 @@ def generate_topology_file(file_path, params, ch_property):
     tolopogy["ch_properties"]["channel_1"] = ch_property[1]
     tolopogy["cu_properties"]["synth_strategy"] = str(synth_strategy)
     tolopogy["cu_properties"]["num_kernels"] = str(num_kernels)
+    tolopogy["cu_properties"]["num_kernel_cu"] = str(num_kernel_cu)
     tolopogy["cu_properties"]["frequency"] = str(frequency)
 
     # Any other modifications you need to make can be done in a similar manner
@@ -171,70 +173,22 @@ ignore_patterns = read_gitignore_patterns(gitignore_path)
 # Parameters for different algorithm configurations
 algorithms = [
     # Format: (algorithm, architecture, capability, Number of Kernels, cache_properties[l2_size, l2_num_ways, l2_ram, l2_ctrl, l1_size, l1_num_ways, l1_buffer, l1_ram], synth_strategy, frequency)
+    # (
+    #     1,
+    #     "GLay",
+    #     "Single",
+    #     1,
+    #     4,
+    #     "hw",
+    #     ["1048576", "4", "URAM", "0", "512", "1", "8", "BRAM"],
+    #     1,
+    #     300000000,
+    # ),
     (
         1,
         "GLay",
         "Single",
         1,
-        "hw",
-        ["32768", "4", "URAM", "0", "512", "1", "8", "BRAM"],
-        1,
-        300000000,
-    ),
-    (
-        1,
-        "GLay",
-        "Single",
-        1,
-        "hw",
-        ["32768", "4", "URAM", "0", "512", "1", "8", "BRAM"],
-        1,
-        300000000,
-    ),
-    (
-        1,
-        "GLay",
-        "Single",
-        1,
-        "hw",
-        ["65536", "4", "URAM", "0", "512", "1", "8", "BRAM"],
-        1,
-        300000000,
-    ),
-    (
-        1,
-        "GLay",
-        "Single",
-        1,
-        "hw",
-        ["131072", "4", "URAM", "0", "512", "1", "8", "BRAM"],
-        1,
-        300000000,
-    ),
-    (
-        1,
-        "GLay",
-        "Single",
-        1,
-        "hw",
-        ["262144", "4", "URAM", "0", "512", "1", "8", "BRAM"],
-        1,
-        300000000,
-    ),
-    (
-        1,
-        "GLay",
-        "Single",
-        1,
-        "hw",
-        ["524288", "4", "URAM", "0", "512", "1", "8", "BRAM"],
-        1,
-        300000000,
-    ),
-    (
-        1,
-        "GLay",
-        "Single",
         1,
         "hw",
         ["1048576", "4", "URAM", "0", "512", "1", "8", "BRAM"],
@@ -246,6 +200,62 @@ algorithms = [
         "GLay",
         "Single",
         1,
+        2,
+        "hw",
+        ["1048576", "4", "URAM", "0", "512", "1", "8", "BRAM"],
+        1,
+        300000000,
+    ),
+    (
+        1,
+        "GLay",
+        "Single",
+        1,
+        4,
+        "hw",
+        ["1048576", "4", "URAM", "0", "512", "1", "8", "BRAM"],
+        1,
+        300000000,
+    ),
+    (
+        1,
+        "GLay",
+        "Single",
+        1,
+        8,
+        "hw",
+        ["1048576", "4", "URAM", "0", "512", "1", "8", "BRAM"],
+        1,
+        300000000,
+    ),
+    (
+        1,
+        "GLay",
+        "Single",
+        1,
+        16,
+        "hw",
+        ["1048576", "4", "URAM", "0", "512", "1", "8", "BRAM"],
+        1,
+        300000000,
+    ),
+    (
+        1,
+        "GLay",
+        "Single",
+        1,
+        20,
+        "hw",
+        ["1048576", "4", "URAM", "0", "512", "1", "8", "BRAM"],
+        1,
+        300000000,
+    ),
+    (
+        1,
+        "GLay",
+        "Single",
+        1,
+        32,
         "hw",
         ["2097152", "4", "URAM", "0", "512", "1", "8", "BRAM"],
         1,
@@ -273,36 +283,36 @@ algorithms = [
 
 ch_properties = [
     # Format: (address_width_be, data_width_be, axi_port_full_be, l2_type, address_width_mid, data_width_mid, l1_type, address_width_fe, data_width_fe)
+    # (
+    #     ["33", "32", "0", "0", "33", "32", "2", "33", "32"],
+    #     ["33", "32", "0", "0", "33", "32", "3", "33", "32"],
+    # ),
     (
-        ["33", "32", "0", "0", "33", "32", "4", "33", "32"],
-        ["33", "32", "0", "0", "33", "32", "3", "33", "32"],
-    ),
-    (
-        ["33", "512", "0", "1", "33", "32", "4", "33", "32"],
+        ["33", "512", "0", "1", "33", "32", "2", "33", "32"],
         ["33", "512", "0", "2", "33", "32", "3", "33", "32"],
     ),
     (
-        ["33", "512", "0", "1", "33", "32", "4", "33", "32"],
+        ["33", "512", "0", "1", "33", "32", "2", "33", "32"],
         ["33", "512", "0", "2", "33", "32", "3", "33", "32"],
     ),
     (
-        ["33", "512", "0", "1", "33", "32", "4", "33", "32"],
+        ["33", "512", "0", "1", "33", "32", "2", "33", "32"],
         ["33", "512", "0", "2", "33", "32", "3", "33", "32"],
     ),
     (
-        ["33", "512", "0", "1", "33", "32", "4", "33", "32"],
+        ["33", "512", "0", "1", "33", "32", "2", "33", "32"],
         ["33", "512", "0", "2", "33", "32", "3", "33", "32"],
     ),
     (
-        ["33", "512", "0", "1", "33", "32", "4", "33", "32"],
+        ["33", "512", "0", "1", "33", "32", "2", "33", "32"],
         ["33", "512", "0", "2", "33", "32", "3", "33", "32"],
     ),
     (
-        ["33", "512", "0", "1", "33", "32", "4", "33", "32"],
+        ["33", "512", "0", "1", "33", "32", "2", "33", "32"],
         ["33", "512", "0", "2", "33", "32", "3", "33", "32"],
     ),
     (
-        ["33", "512", "0", "1", "33", "32", "4", "33", "32"],
+        ["33", "512", "0", "1", "33", "32", "2", "33", "32"],
         ["33", "512", "0", "2", "33", "32", "3", "33", "32"],
     ),
     # (
