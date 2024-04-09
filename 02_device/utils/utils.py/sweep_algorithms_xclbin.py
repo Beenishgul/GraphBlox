@@ -85,6 +85,7 @@ def construct_make_arguments(params):
         architecture,
         capability,
         num_kernels,
+        num_kernel_cu,
         target,
         cache_properties,
         synth_strategy,
