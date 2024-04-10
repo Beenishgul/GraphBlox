@@ -217,6 +217,10 @@ open-vitis-project:
 .PHONY: clean-vitis-project
 clean-vitis-project:
 	@$(MAKE) clean-vitis-project $(MAKE_DEVICE)
+
+PHONY: gen-xclbin-zip
+gen-xclbin-zip:
+	@$(MAKE) gen-xclbin-zip $(MAKE_DEVICE)
 # =========================================================
 
 # =========================================================

@@ -1,8 +1,8 @@
 `include "global_timescale.vh"
 
-import PKG_AXI4_FE::*;
-import PKG_AXI4_MID::*;
-import PKG_AXI4_BE::*;
+import PKG_MXX_AXI4_FE::*;
+import PKG_MXX_AXI4_MID::*;
+import PKG_MXX_AXI4_BE::*;
 import PKG_GLOBALS::*;
 import PKG_CACHE::*;
 import PKG_CONTROL::*;

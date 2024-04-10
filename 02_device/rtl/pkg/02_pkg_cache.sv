@@ -15,9 +15,9 @@
 package PKG_CACHE;
 
 import PKG_GLOBALS::*;
-import PKG_AXI4_FE::*;
-import PKG_AXI4_MID::*;
-import PKG_AXI4_BE::*;
+import PKG_MXX_AXI4_FE::*;
+import PKG_MXX_AXI4_MID::*;
+import PKG_MXX_AXI4_BE::*;
 
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
@@ -36,14 +36,20 @@ parameter CACHE_WRITE_BACK    = 1; //write-back allocate: implemented a dirty-me
 
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
+// CACHE STREAM PARAMETERS
+// --------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------
+
+// --------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------
 // CACHE PARAMETERS
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
-parameter CACHE_FRONTEND_ADDR_W = M_AXI4_FE_ADDR_W; //Address width - width of the Master's entire access address (including the LSBs that are discarded, but discarding the Controller's)
-parameter CACHE_FRONTEND_DATA_W = M_AXI4_FE_DATA_W; //Data width - word size used for the cache
-parameter CACHE_N_WAYS          = 1               ; //Number of Cache Ways (Needs to be Potency of 2: 1, 2, 4, 8, ..)
-parameter CACHE_LINE_OFF_W      = 10              ; //Line-Offset Width - 2**NLINE_W total cache lines
-parameter CACHE_WTBUF_DEPTH_W   = $clog2(32)      ; //Depth Width of Write-Through Buffer
+parameter CACHE_FRONTEND_ADDR_W = M00_AXI4_FE_ADDR_W; //Address width - width of the Master's entire access address (including the LSBs that are discarded, but discarding the Controller's)
+parameter CACHE_FRONTEND_DATA_W = M00_AXI4_FE_DATA_W; //Data width - word size used for the cache
+parameter CACHE_N_WAYS          = 1                 ; //Number of Cache Ways (Needs to be Potency of 2: 1, 2, 4, 8, ..)
+parameter CACHE_LINE_OFF_W      = 6                 ; //Line-Offset Width - 2**NLINE_W total cache lines
+parameter CACHE_WTBUF_DEPTH_W   = $clog2(32)        ; //Depth Width of Write-Through Buffer
 //Replacement policy (CACHE_N_WAYS > 1)
 parameter CACHE_REP_POLICY = CACHE_PLRU_TREE; //LRU - Least Recently Used; PLRU_mru (1) - MRU-based pseudoLRU; PLRU_tree (3) - tree-based pseudoLRU
 //Do NOT change - memory cache's parameters - dependency
@@ -52,8 +58,8 @@ parameter CACHE_FRONTEND_NBYTES = CACHE_FRONTEND_DATA_W/8      ; //Number of Byt
 parameter CACHE_FRONTEND_BYTE_W = $clog2(CACHE_FRONTEND_NBYTES); //Byte Offset
 /*---------------------------------------------------*/
 //Higher hierarchy memory (slave) interface parameters
-parameter CACHE_BACKEND_ADDR_W = M_AXI4_MID_ADDR_W           ; //Address width of the higher hierarchy memory
-parameter CACHE_BACKEND_DATA_W = M_AXI4_MID_DATA_W           ; //Data width of the memory
+parameter CACHE_BACKEND_ADDR_W = M00_AXI4_MID_ADDR_W         ; //Address width of the higher hierarchy memory
+parameter CACHE_BACKEND_DATA_W = M00_AXI4_MID_DATA_W         ; //Data width of the memory
 parameter CACHE_BACKEND_NBYTES = CACHE_BACKEND_DATA_W/8      ; //Number of bytes
 parameter CACHE_BACKEND_BYTE_W = $clog2(CACHE_BACKEND_NBYTES); //Offset of Number of Bytes
 //Cache-Memory base Offset
@@ -66,32 +72,14 @@ parameter CACHE_WRITE_POL = CACHE_WRITE_THROUGH; //write policy: write-through (
 parameter CACHE_CTRL_CACHE = 0; //Adds a Controller to the cache, to use functions sent by the master or count the hits and misses
 parameter CACHE_CTRL_CNT   = 0; //Counters for Cache Hits and Misses - Disabling this and previous, the Controller only store the buffer states and allows cache invalidation
 
-/*---------------------------------------------------*/
-//AXI specific parameters
-parameter                      CACHE_AXI_ADDR_W  = CACHE_BACKEND_ADDR_W;
-parameter                      CACHE_AXI_DATA_W  = CACHE_BACKEND_DATA_W;
-parameter                      CACHE_AXI_ID_W    = M_AXI4_MID_ID_W     ; //AXI ID (identification) width
-parameter                      CACHE_AXI_LEN_W   = M_AXI4_MID_LEN_W    ; //AXI ID burst length (log2)
-parameter                      CACHE_AXI_LOCK_W  = M_AXI4_MID_LOCK_W   ;
-parameter                      CACHE_AXI_CACHE_W = M_AXI4_MID_CACHE_W  ;
-parameter                      CACHE_AXI_PROT_W  = M_AXI4_MID_PROT_W   ;
-parameter                      CACHE_AXI_QOS_W   = M_AXI4_MID_QOS_W    ;
-parameter                      CACHE_AXI_BURST_W = M_AXI4_MID_BURST_W  ;
-parameter                      CACHE_AXI_RESP_W  = M_AXI4_MID_RESP_W   ;
-parameter                      CACHE_AXI_SIZE_W  = M_AXI4_MID_SIZE_W   ;
-
-parameter [CACHE_AXI_ID_W-1:0] CACHE_AXI_ID      = 0                   ; //AXI ID value
-
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
 // CACHE FLUSH GENERAL
 // --------------------------------------------------------------------------------------
-parameter SYSTEM_CACHE_NUM_WAYS       = 4                                                                                  ;
-parameter SYSTEM_CACHE_ADDR_WIDTH     = 63                                                                                 ;
-parameter SYSTEM_CACHE_DATA_WIDTH     = CACHE_BACKEND_NBYTES                                                               ;
+parameter SYSTEM_CACHE_NUM_WAYS       = CACHE_CONFIG_MAX_NUM_WAYS                                                          ;
+parameter SYSTEM_CACHE_DATA_WIDTH     = M00_AXI4_BE_DATA_W/8                                                               ;
 parameter SYSTEM_CACHE_LINE_SIZE_LOG  = $clog2(SYSTEM_CACHE_DATA_WIDTH)                                                    ;
-parameter SYSTEM_CACHE_SIZE           = 65536    
-// parameter SYSTEM_CACHE_SIZE           = __SYSTEM_CACHE_SIZE_B__                                                                           ; // Define the total size of the cache
+parameter SYSTEM_CACHE_SIZE           = CACHE_CONFIG_MAX_SIZE                                                              ;
 parameter SYSTEM_CACHE_NUM_SETS       = (SYSTEM_CACHE_SIZE >> (SYSTEM_CACHE_LINE_SIZE_LOG + $clog2(SYSTEM_CACHE_NUM_WAYS))); // Adjusted for shift operations
 parameter SYSTEM_CACHE_SIZE_ITERAIONS = SYSTEM_CACHE_NUM_WAYS * SYSTEM_CACHE_NUM_SETS                                      ;
 parameter SYSTEM_CACHE_COUNT          = SYSTEM_CACHE_NUM_SETS * SYSTEM_CACHE_NUM_WAYS                                      ;
@@ -99,24 +87,33 @@ parameter SYSTEM_CACHE_COUNT          = SYSTEM_CACHE_NUM_SETS * SYSTEM_CACHE_NUM
 // Optimized address calculation using shift operations
 // read char *addr = base_address + (((counter >> $clog2(SYSTEM_CACHE_NUM_WAYS)) << (SYSTEM_CACHE_LINE_SIZE_LOG + $clog2(SYSTEM_CACHE_NUM_WAYS))) | (counter & (SYSTEM_CACHE_NUM_WAYS-1) << SYSTEM_CACHE_LINE_SIZE_LOG));
 // --------------------------------------------------------------------------------------
-
+parameter SRAM_WTBUF_DEPTH_W = $clog2(64);
 // --------------------------------------------------------------------------------------
 //   State Machine input sync
 // --------------------------------------------------------------------------------------
-typedef enum logic[9:0] {
-	CU_CACHE_CMD_RESET        = 1 << 0,
-	CU_CACHE_CMD_READY        = 1 << 1,
-	CU_CACHE_CMD_READ_TRANS   = 1 << 2,
-	CU_CACHE_CMD_READ         = 1 << 3,
-	CU_CACHE_CMD_WRITE_TRANS  = 1 << 4,
-	CU_CACHE_CMD_WRITE        = 1 << 5,
-	CU_CACHE_CMD_PENDING      = 1 << 6,
-	CU_CACHE_CMD_POP_TRANS    = 1 << 7,
-	CU_CACHE_CMD_POP          = 1 << 8,
-	CU_CACHE_CMD_DONE         = 1 << 9
+typedef enum logic[1:0] {
+	CU_CACHE_CMD_RESET       = 1 << 0,
+	CU_CACHE_CMD_READY       = 1 << 1
 } cu_cache_command_generator_state;
 
+typedef enum logic[1:0] {
+	CU_SRAM_CMD_RESET       = 1 << 0,
+	CU_SRAM_CMD_READY       = 1 << 1
+} cu_sram_command_generator_state;
 
+typedef enum logic[4:0] {
+	CU_STREAM_CMD_RESET       = 1 << 0,
+	CU_STREAM_CMD_READY       = 1 << 1,
+	CU_STREAM_CMD_READ_TRANS  = 1 << 2,
+	CU_STREAM_CMD_PENDING     = 1 << 3,
+	CU_STREAM_CMD_DONE        = 1 << 4
+} cu_stream_command_generator_state;
 
+// --------------------------------------------------------------------------------------
+//   SYSTEM CACHE CTRL COMMANDS
+// --------------------------------------------------------------------------------------
+
+parameter [M00_AXI4_LITE_MID_ADDR_W-1 :0] cmd_flush_lh = 17'b1_1100_0000_0001_1000;
+parameter [M00_AXI4_LITE_MID_ADDR_W-1 :0] cmd_flush_rh = 17'b1_1100_0000_0001_1100;
 
 endpackage

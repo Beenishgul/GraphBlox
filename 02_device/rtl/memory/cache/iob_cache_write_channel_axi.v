@@ -29,13 +29,14 @@ module iob_cache_write_channel_axi #(
    input      [           ADDR_W-1 : FE_NBYTES_W + WRITE_POL*WORD_OFFSET_W] addr_i,
    input      [DATA_W + WRITE_POL*(DATA_W*(2**WORD_OFFSET_W)-DATA_W)-1 : 0] wdata_i,
    input      [                                              FE_NBYTES-1:0] wstrb_i,
+      input      [                                                  4-1:0] acache_i     ,
    output reg                                                               ready_o,
    output     [                                               AXI_ID_W-1:0] axi_awid_o,
    output     [                                             AXI_ADDR_W-1:0] axi_awaddr_o,
    output     [                                              AXI_LEN_W-1:0] axi_awlen_o,
    output     [                                                      3-1:0] axi_awsize_o,
    output     [                                                      2-1:0] axi_awburst_o,
-   output     [                                                      2-1:0] axi_awlock_o,
+   output     [                                                      1-1:0] axi_awlock_o,
    output     [                                                      4-1:0] axi_awcache_o,
    output     [                                                      3-1:0] axi_awprot_o,
    output     [                                                      4-1:0] axi_awqos_o,
@@ -72,7 +73,7 @@ module iob_cache_write_channel_axi #(
          assign axi_awsize_o = BE_NBYTES_W;  // verify - Writes data of the size of BE_DATA_W
          assign axi_awburst_o = 2'd0;
          assign axi_awlock_o = 1'b0;  // 00 - Normal Access
-         assign axi_awcache_o = CACHE_AXI_CACHE_MODE;
+         assign axi_awcache_o = acache_i;
          assign axi_awprot_o = 3'd0;
          assign axi_awqos_o = 4'd0;
          assign axi_wlast_o = axi_wvalid_o;
@@ -145,7 +146,7 @@ module iob_cache_write_channel_axi #(
             // Constant AXI signals
             assign axi_awid_o = AXI_ID;
             assign axi_awlock_o = 1'b0;
-            assign axi_awcache_o = CACHE_AXI_CACHE_MODE;
+            assign axi_awcache_o = acache_i;
             assign axi_awprot_o = 3'd0;
             assign axi_awqos_o = 4'd0;
 

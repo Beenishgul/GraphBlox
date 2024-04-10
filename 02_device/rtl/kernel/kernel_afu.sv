@@ -14,83 +14,43 @@
 
 `include "global_package.vh"
 
-module kernel_afu (
+module kernel_afu #(
+  `include "afu_parameters.vh"
+) (
   // System Signals
-  input  logic                         ap_clk         ,
-  input  logic                         ap_rst_n       ,
+  input  logic                           ap_clk     ,
+  input  logic                           ap_rst_n   ,
   // AXI4 master interface m00_axi
-  output logic                         m00_axi_awvalid,
-  input  logic                         m00_axi_awready,
-  output logic [ M_AXI4_BE_ADDR_W-1:0] m00_axi_awaddr ,
-  output logic [  M_AXI4_BE_LEN_W-1:0] m00_axi_awlen  ,
-  output logic                         m00_axi_wvalid ,
-  input  logic                         m00_axi_wready ,
-  output logic [ M_AXI4_BE_DATA_W-1:0] m00_axi_wdata  ,
-  output logic [ M_AXI4_BE_STRB_W-1:0] m00_axi_wstrb  ,
-  output logic                         m00_axi_wlast  ,
-  input  logic                         m00_axi_bvalid ,
-  output logic                         m00_axi_bready ,
-  output logic                         m00_axi_arvalid,
-  input  logic                         m00_axi_arready,
-  output logic [ M_AXI4_BE_ADDR_W-1:0] m00_axi_araddr ,
-  output logic [  M_AXI4_BE_LEN_W-1:0] m00_axi_arlen  ,
-  input  logic                         m00_axi_rvalid ,
-  output logic                         m00_axi_rready ,
-  input  logic [ M_AXI4_BE_DATA_W-1:0] m00_axi_rdata  ,
-  input  logic                         m00_axi_rlast  ,
+  `include "m_axi_ports_afu.vh"
   // Control Signals
-  // AXI4 master interface m00_axi missing ports
-  input  logic [   M_AXI4_BE_ID_W-1:0] m00_axi_bid    ,
-  input  logic [   M_AXI4_BE_ID_W-1:0] m00_axi_rid    ,
-  input  logic [ M_AXI4_BE_RESP_W-1:0] m00_axi_rresp  ,
-  input  logic [ M_AXI4_BE_RESP_W-1:0] m00_axi_bresp  ,
-  output logic [   M_AXI4_BE_ID_W-1:0] m00_axi_awid   ,
-  output logic [ M_AXI4_BE_SIZE_W-1:0] m00_axi_awsize ,
-  output logic [M_AXI4_BE_BURST_W-1:0] m00_axi_awburst,
-  output logic [ M_AXI4_BE_LOCK_W-1:0] m00_axi_awlock ,
-  output logic [M_AXI4_BE_CACHE_W-1:0] m00_axi_awcache,
-  output logic [ M_AXI4_BE_PROT_W-1:0] m00_axi_awprot ,
-  output logic [  M_AXI4_BE_QOS_W-1:0] m00_axi_awqos  ,
-  output logic [   M_AXI4_BE_ID_W-1:0] m00_axi_arid   ,
-  output logic [ M_AXI4_BE_SIZE_W-1:0] m00_axi_arsize ,
-  output logic [M_AXI4_BE_BURST_W-1:0] m00_axi_arburst,
-  output logic [ M_AXI4_BE_LOCK_W-1:0] m00_axi_arlock ,
-  output logic [M_AXI4_BE_CACHE_W-1:0] m00_axi_arcache,
-  output logic [ M_AXI4_BE_PROT_W-1:0] m00_axi_arprot ,
-  output logic [  M_AXI4_BE_QOS_W-1:0] m00_axi_arqos  ,
-  input  logic                         ap_start       ,
-  output logic                         ap_idle        ,
-  output logic                         ap_done        ,
-  output logic                         ap_ready       ,
-  input  logic                         ap_continue    ,
-  input  logic [ M_AXI4_BE_ADDR_W-1:0] buffer_0       ,
-  input  logic [ M_AXI4_BE_ADDR_W-1:0] buffer_1       ,
-  input  logic [ M_AXI4_BE_ADDR_W-1:0] buffer_2       ,
-  input  logic [ M_AXI4_BE_ADDR_W-1:0] buffer_3       ,
-  input  logic [ M_AXI4_BE_ADDR_W-1:0] buffer_4       ,
-  input  logic [ M_AXI4_BE_ADDR_W-1:0] buffer_5       ,
-  input  logic [ M_AXI4_BE_ADDR_W-1:0] buffer_6       ,
-  input  logic [ M_AXI4_BE_ADDR_W-1:0] buffer_7       ,
-  input  logic [ M_AXI4_BE_ADDR_W-1:0] buffer_8       ,
-  input  logic [ M_AXI4_BE_ADDR_W-1:0] buffer_9
+  input  logic                           ap_start   ,
+  output logic                           ap_idle    ,
+  output logic                           ap_done    ,
+  output logic                           ap_ready   ,
+  input  logic                           ap_continue,
+  input  logic [BUFFER_0_WIDTH_BITS-1:0] buffer_0   ,
+  input  logic [BUFFER_1_WIDTH_BITS-1:0] buffer_1   ,
+  input  logic [BUFFER_2_WIDTH_BITS-1:0] buffer_2   ,
+  input  logic [BUFFER_3_WIDTH_BITS-1:0] buffer_3   ,
+  input  logic [BUFFER_4_WIDTH_BITS-1:0] buffer_4   ,
+  input  logic [BUFFER_5_WIDTH_BITS-1:0] buffer_5   ,
+  input  logic [BUFFER_6_WIDTH_BITS-1:0] buffer_6   ,
+  input  logic [BUFFER_7_WIDTH_BITS-1:0] buffer_7   ,
+  input  logic [BUFFER_8_WIDTH_BITS-1:0] buffer_8   ,
+  input  logic [BUFFER_9_WIDTH_BITS-1:0] buffer_9
 );
 
+genvar i;
 // --------------------------------------------------------------------------------------
 // Wires and Variables
 // --------------------------------------------------------------------------------------
-logic areset_m_axi    ;
-logic areset_cu       ;
-logic areset_control  ;
-logic areset_cache    ;
-logic areset_axi_slice;
+logic areset_m_axi               ;
+logic areset_cu     [NUM_CUS-1:0];
+logic areset_control             ;
 
-// --------------------------------------------------------------------------------------
-// AXI
-// --------------------------------------------------------------------------------------
-AXI4BEMasterReadInterface  m_axi4_read     ;
-AXI4BEMasterWriteInterface m_axi4_write    ;
-logic                      endian_read_reg ;
-logic                      endian_write_reg;
+
+logic endian_read_reg ;
+logic endian_write_reg;
 
 // --------------------------------------------------------------------------------------
 // Kernel -> State Control
@@ -101,41 +61,41 @@ ControlChainInterfaceOutput kernel_control_out;
 KernelDescriptorPayload kernel_control_descriptor_in ;
 KernelDescriptor        kernel_control_descriptor_out;
 
-logic kernel_cu_done_out         ;
-logic kernel_cu_fifo_setup_signal;
+logic [NUM_CUS-1:0] kernel_cu_done_out         ;
+logic [NUM_CUS-1:0] kernel_cu_fifo_setup_signal;
 
+logic [NUM_CUS-1:0] cus_flush_int;
+logic [NUM_CUS-1:0] cu_flush_out;
 // --------------------------------------------------------------------------------------
 // CU -> [CU_CACHE|BUNDLES|LANES|ENGINES]
 // --------------------------------------------------------------------------------------
-KernelDescriptor kernel_cu_descriptor_in;
+KernelDescriptor kernel_cu_descriptor_in[NUM_CUS-1:0];
 
 // --------------------------------------------------------------------------------------
-// System Cache -> AXI
+// System Cache -> AXI Mutli channels support
 // --------------------------------------------------------------------------------------
-AXI4MIDSlaveReadInterfaceOutput  kernel_cache_s_axi_read_out ;
-AXI4MIDSlaveReadInterfaceInput   kernel_cache_s_axi_read_in  ;
-AXI4MIDSlaveWriteInterfaceOutput kernel_cache_s_axi_write_out;
-AXI4MIDSlaveWriteInterfaceInput  kernel_cache_s_axi_write_in ;
-
-AXI4BEMasterReadInterfaceInput   kernel_cache_m_axi4_read_in  ;
-AXI4BEMasterReadInterfaceOutput  kernel_cache_m_axi4_read_out ;
-AXI4BEMasterWriteInterfaceInput  kernel_cache_m_axi4_write_in ;
-AXI4BEMasterWriteInterfaceOutput kernel_cache_m_axi4_write_out;
-
-logic kernel_cache_setup_signal;
+logic                    areset_axi_slice         [NUM_CHANNELS-1:0];
+logic                    areset_cache             [NUM_CHANNELS-1:0];
+logic [NUM_CHANNELS-1:0] kernel_cache_setup_signal                  ;
 
 // --------------------------------------------------------------------------------------
 //   Register and invert reset signal.
 // --------------------------------------------------------------------------------------
-parameter PULSE_HOLD    = 100;
-logic     areset_system      ;
+localparam PULSE_HOLD    = 100;
+logic      areset_system      ;
 // --------------------------------------------------------------------------------------
 always_ff @(posedge ap_clk) begin
-  areset_m_axi     <= areset_system;
-  areset_cu        <= areset_system;
-  areset_control   <= areset_system;
-  areset_cache     <= areset_system;
-  areset_axi_slice <= areset_system;
+  areset_m_axi   <= areset_system;
+  areset_control <= areset_system;
+
+  for (int i = 0; i < NUM_CHANNELS; i++) begin
+    areset_cache[i]     <= areset_system;
+    areset_axi_slice[i] <= areset_system;
+  end
+
+  for (int i = 0; i < NUM_CUS; i++) begin
+    areset_cu[i] <= areset_system;
+  end
 end
 
 logic [PULSE_HOLD-1:0] sync_ff;
@@ -166,8 +126,8 @@ always_ff @(posedge ap_clk) begin
   else begin
     kernel_control_in.ap_start    <= ap_start;
     kernel_control_in.ap_continue <= ap_continue;
-    kernel_control_in.setup       <= ~(kernel_cu_fifo_setup_signal | kernel_cache_setup_signal);
-    kernel_control_in.done        <= kernel_cu_done_out;
+    kernel_control_in.setup       <= ~(|kernel_cu_fifo_setup_signal | (|kernel_cache_setup_signal));
+    kernel_control_in.done        <= &kernel_cu_done_out;
   end
 end
 
@@ -189,62 +149,6 @@ always_ff @(posedge ap_clk) begin
 end
 
 // --------------------------------------------------------------------------------------
-// READ AXI4 SIGNALS INPUT
-// --------------------------------------------------------------------------------------
-assign m_axi4_read.in.rvalid  = m00_axi_rvalid ; // Read channel valid
-assign m_axi4_read.in.arready = m00_axi_arready; // Address read channel ready
-assign m_axi4_read.in.rlast   = m00_axi_rlast  ; // Read channel last word
-assign m_axi4_read.in.rdata   = swap_endianness_cacheline_axi_be(m00_axi_rdata, endian_read_reg)  ; // Read channel data
-assign m_axi4_read.in.rid     = m00_axi_rid    ; // Read channel ID
-assign m_axi4_read.in.rresp   = m00_axi_rresp  ; // Read channel response
-
-
-// --------------------------------------------------------------------------------------
-// READ AXI4 SIGNALS OUTPUT
-// --------------------------------------------------------------------------------------
-assign m00_axi_arvalid = m_axi4_read.out.arvalid; // Address read channel valid
-assign m00_axi_araddr  = m_axi4_read.out.araddr ; // Address read channel address
-assign m00_axi_arlen   = m_axi4_read.out.arlen  ; // Address write channel burst length
-assign m00_axi_rready  = m_axi4_read.out.rready ; // Read channel ready
-assign m00_axi_arid    = m_axi4_read.out.arid   ; // Address read channel ID
-assign m00_axi_arsize  = m_axi4_read.out.arsize ; // Address read channel burst size. This signal indicates the size of each transfer in the burst
-assign m00_axi_arburst = m_axi4_read.out.arburst; // Address read channel burst type
-assign m00_axi_arlock  = m_axi4_read.out.arlock ; // Address read channel lock type
-assign m00_axi_arcache = m_axi4_read.out.arcache; // Address read channel memory type. Transactions set with Normal Non-cacheable Modifiable and Bufferable (0011).
-assign m00_axi_arprot  = m_axi4_read.out.arprot ; // Address write channel protection type. Transactions set with Normal, Secure, and Data attributes (000).
-assign m00_axi_arqos   = m_axi4_read.out.arqos  ; // Address write channel quality of service
-
-
-// --------------------------------------------------------------------------------------
-// WRITE AXI4 SIGNALS INPUT
-// --------------------------------------------------------------------------------------
-assign m_axi4_write.in.awready = m00_axi_awready; // Address write channel ready
-assign m_axi4_write.in.wready  = m00_axi_wready ; // Write channel ready
-assign m_axi4_write.in.bid     = m00_axi_bid    ; // Write response channel ID
-assign m_axi4_write.in.bresp   = m00_axi_bresp  ; // Write channel response
-assign m_axi4_write.in.bvalid  = m00_axi_bvalid ; // Write response channel valid
-
-
-// --------------------------------------------------------------------------------------
-// WRITE AXI4 SIGNALS OUTPUT
-// --------------------------------------------------------------------------------------
-assign m00_axi_awvalid = m_axi4_write.out.awvalid; // Address write channel valid
-assign m00_axi_awid    = m_axi4_write.out.awid   ; // Address write channel ID
-assign m00_axi_awaddr  = m_axi4_write.out.awaddr ; // Address write channel address
-assign m00_axi_awlen   = m_axi4_write.out.awlen  ; // Address write channel burst length
-assign m00_axi_awsize  = m_axi4_write.out.awsize ; // Address write channel burst size. This signal indicates the size of each transfer in the burst
-assign m00_axi_awburst = m_axi4_write.out.awburst; // Address write channel burst type
-assign m00_axi_awlock  = m_axi4_write.out.awlock ; // Address write channel lock type
-assign m00_axi_awcache = m_axi4_write.out.awcache; // Address write channel memory type. Transactions set with Normal Non-cacheable Modifiable and Bufferable (0011).
-assign m00_axi_awprot  = m_axi4_write.out.awprot ; // Address write channel protection type. Transactions set with Normal, Secure, and Data attributes (000).
-assign m00_axi_awqos   = m_axi4_write.out.awqos  ; // Address write channel quality of service
-assign m00_axi_wdata   = swap_endianness_cacheline_axi_be(m_axi4_write.out.wdata , endian_write_reg); // Write channel data
-assign m00_axi_wstrb   = m_axi4_write.out.wstrb  ; // Write channel write strobe
-assign m00_axi_wlast   = m_axi4_write.out.wlast  ; // Write channel last word flag
-assign m00_axi_wvalid  = m_axi4_write.out.wvalid ; // Write channel valid
-assign m00_axi_bready  = m_axi4_write.out.bready ; // Write response channel ready
-
-// --------------------------------------------------------------------------------------
 // DRIVE DESCRIPTOR
 // --------------------------------------------------------------------------------------
 always_ff @(posedge ap_clk) begin
@@ -260,67 +164,10 @@ always_ff @(posedge ap_clk) begin
   kernel_control_descriptor_in.buffer_9 <= buffer_9  ;
 end
 
-
-generate
-  if(GLOBAL_SYSTEM_CACHE_IP == 1) begin
 // --------------------------------------------------------------------------------------
-// System Cache -> AXI
+// System Cache CH 0-> AXI
 // --------------------------------------------------------------------------------------
-    kernel_cache inst_kernel_cache (
-      .ap_clk            (ap_clk                       ),
-      .areset            (areset_cache                 ),
-      .s_axi_read_out    (kernel_cache_s_axi_read_out  ),
-      .s_axi_read_in     (kernel_cache_s_axi_read_in   ),
-      .s_axi_write_out   (kernel_cache_s_axi_write_out ),
-      .s_axi_write_in    (kernel_cache_s_axi_write_in  ),
-      .m_axi_read_in     (kernel_cache_m_axi4_read_in  ),
-      .m_axi_read_out    (kernel_cache_m_axi4_read_out ),
-      .m_axi_write_in    (kernel_cache_m_axi4_write_in ),
-      .m_axi_write_out   (kernel_cache_m_axi4_write_out),
-      .cache_setup_signal(kernel_cache_setup_signal    )
-    );
-  end else begin
-    assign kernel_cache_setup_signal     = 0;
-    assign kernel_cache_s_axi_read_out   = kernel_cache_m_axi4_read_in;
-    assign kernel_cache_m_axi4_read_out  = kernel_cache_s_axi_read_in;
-    assign kernel_cache_s_axi_write_out  = kernel_cache_m_axi4_write_in;
-    assign kernel_cache_m_axi4_write_out = kernel_cache_s_axi_write_in;
-  end
-endgenerate
-
-// --------------------------------------------------------------------------------------
-// Kernel CACHE (M->S) Register Slice
-// --------------------------------------------------------------------------------------
-axi_register_slice_back_end inst_axi_register_slice_be (
-  .ap_clk         (ap_clk                       ),
-  .areset         (areset_axi_slice             ),
-  .s_axi_read_out (kernel_cache_m_axi4_read_in  ),
-  .s_axi_read_in  (kernel_cache_m_axi4_read_out ),
-  .s_axi_write_out(kernel_cache_m_axi4_write_in ),
-  .s_axi_write_in (kernel_cache_m_axi4_write_out),
-  .m_axi_read_in  (m_axi4_read.in               ),
-  .m_axi_read_out (m_axi4_read.out              ),
-  .m_axi_write_in (m_axi4_write.in              ),
-  .m_axi_write_out(m_axi4_write.out             )
-);
-
-// --------------------------------------------------------------------------------------
-// CU -> [CU_CACHE|BUNDLES|LANES|ENGINES]
-// --------------------------------------------------------------------------------------
-// Kernel_setup
-assign kernel_cu_descriptor_in = kernel_control_descriptor_out;
-
-kernel_cu #(.ID_CU(0)) inst_kernel_cu (
-  .ap_clk           (ap_clk                      ),
-  .areset           (areset_cu                   ),
-  .descriptor_in    (kernel_cu_descriptor_in     ),
-  .m_axi_read_in    (kernel_cache_s_axi_read_out ),
-  .m_axi_read_out   (kernel_cache_s_axi_read_in  ),
-  .m_axi_write_in   (kernel_cache_s_axi_write_out),
-  .m_axi_write_out  (kernel_cache_s_axi_write_in ),
-  .fifo_setup_signal(kernel_cu_fifo_setup_signal ),
-  .done_out         (kernel_cu_done_out          )
-);
+`include "afu_topology.vh"
 
 // --------------------------------------------------------------------------------------
 // Kernel -> State Control

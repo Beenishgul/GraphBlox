@@ -33,6 +33,7 @@ module iob_cache_memory #(
    // front-end
    input                                      req_i,
    input  [FE_ADDR_W-1:BE_NBYTES_W+LINE2BE_W] addr_i,
+   input [                             4-1:0] acache_i,
    output [                    FE_DATA_W-1:0] rdata_o,
    output                                     ack_o,
 
@@ -41,7 +42,7 @@ module iob_cache_memory #(
    input [FE_ADDR_W-1:FE_NBYTES_W] addr_reg_i,
    input [          FE_DATA_W-1:0] wdata_reg_i,
    input [          FE_NBYTES-1:0] wstrb_reg_i,
-
+   input [                  4-1:0] acache_reg_i,
    // back-end write-channel
    output                                                                        write_req_o,
    output [                   FE_ADDR_W-1:FE_NBYTES_W + WRITE_POL*WORD_OFFSET_W] write_addr_o,
@@ -49,11 +50,13 @@ module iob_cache_memory #(
 
    // write-through[DATA_W]; write-back[DATA_W*2**WORD_OFFSET_W]
    output [FE_NBYTES-1:0] write_wstrb_o,
+   output [4-1:0]         write_acache_o,
    input                  write_ack_i,
 
    // back-end read-channel
    output                                     replace_req_o,
    output [FE_ADDR_W-1:BE_NBYTES_W+LINE2BE_W] replace_addr_o,
+   output [4-1:0] replace_acache_o,
    input                                      replace_i,
    input                                      read_req_i,
    input  [                    LINE2BE_W-1:0] read_addr_i,
@@ -94,7 +97,7 @@ module iob_cache_memory #(
 
    // back-end write channel
    wire buffer_empty, buffer_full;
-   wire [FE_NBYTES+(FE_ADDR_W-FE_NBYTES_W)+(FE_DATA_W)-1:0] buffer_dout;
+   wire [FE_NBYTES+(FE_ADDR_W-FE_NBYTES_W)+(FE_DATA_W)+4-1:0] buffer_dout;
 
    // for write-back write-allocate only
    reg  [                                        NWAYS-1:0] dirty;
@@ -102,7 +105,7 @@ module iob_cache_memory #(
 
    generate
       if (WRITE_POL == `IOB_CACHE_WRITE_THROUGH) begin : g_write_through
-         localparam FIFO_DATA_W = FE_ADDR_W - FE_NBYTES_W + FE_DATA_W + FE_NBYTES;
+         localparam FIFO_DATA_W = FE_ADDR_W - FE_NBYTES_W + FE_DATA_W + FE_NBYTES + 4;
          localparam FIFO_ADDR_W = WTBUF_DEPTH_W;
 
          wire                   mem_clk;
@@ -159,7 +162,7 @@ module iob_cache_memory #(
             .r_empty_o(buffer_empty),
             .r_en_i   (write_ack_i),
 
-            .w_data_i({addr_reg_i, wdata_reg_i, wstrb_reg_i}),
+            .w_data_i({addr_reg_i, wdata_reg_i, wstrb_reg_i, acache_reg_i}),
             .w_full_o(buffer_full),
             .w_en_i  (write_access & ack_o)
          );
@@ -170,22 +173,27 @@ module iob_cache_memory #(
 
          // back-end write channel
          assign write_req_o    = ~buffer_empty;
-         assign write_addr_o   = buffer_dout[FE_NBYTES+FE_DATA_W+:FE_ADDR_W-FE_NBYTES_W];
-         assign write_wdata_o  = buffer_dout[FE_NBYTES+:FE_DATA_W];
-         assign write_wstrb_o  = buffer_dout[0+:FE_NBYTES];
+         assign write_addr_o   = buffer_dout[FE_NBYTES+FE_DATA_W+4+:FE_ADDR_W-FE_NBYTES_W];
+         assign write_wdata_o  = buffer_dout[FE_NBYTES+4+:FE_DATA_W];
+         assign write_wstrb_o  = buffer_dout[4+:FE_NBYTES];
+         assign write_acache_o = buffer_dout[0+:4];
 
          // back-end read channel
          assign replace_req_o  = (~hit & read_access & ~replace_i) & (buffer_empty & write_ack_i);
          assign replace_addr_o = addr_i[FE_ADDR_W-1:BE_NBYTES_W+LINE2BE_W];
+         assign replace_acache_o = acache_i;
       end else begin : g_write_back
          // if (WRITE_POL == WRITE_BACK)
          // back-end write channel
          assign write_wstrb_o  = {FE_NBYTES{1'bx}};
+         assign write_acache_o = 4'b0110;
          // write_req_o, write_addr_o and write_wdata_o assigns are generated bellow (dependencies)
-
+         assign wtbuf_full_o   = 1'b0;
+         assign wtbuf_empty_o  = 1'b0;
          // back-end read channel
          assign replace_req_o  = (~|way_hit) & (write_ack_i) & req_reg_i & ~replace_i;
          assign replace_addr_o = addr_i[FE_ADDR_W-1:BE_NBYTES_W+LINE2BE_W];
+         assign replace_acache_o = acache_i;
       end
    endgenerate
 

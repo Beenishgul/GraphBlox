@@ -19,6 +19,7 @@ module iob_cache_front_end #(
    input  [    ADDR_W-1:0] iob_addr_i,
    input  [    DATA_W-1:0] iob_wdata_i,
    input  [(DATA_W/8)-1:0] iob_wstrb_i,
+   input  [         4-1:0] iob_acache_i,
    output [         1-1:0] iob_rvalid_o,
    output [    DATA_W-1:0] iob_rdata_o,
    output [         1-1:0] iob_ready_o,
@@ -26,6 +27,7 @@ module iob_cache_front_end #(
    // internal input signals
    output                       data_req_o,
    output [ADDR_W-USE_CTRL-1:0] data_addr_o,
+   output  [         4-1:0]     data_acache_o,
    input  [         DATA_W-1:0] data_rdata_i,
    input                        data_ack_i,
 
@@ -34,6 +36,7 @@ module iob_cache_front_end #(
    output [ADDR_W-USE_CTRL-1:0] data_addr_reg_o,
    output [         DATA_W-1:0] data_wdata_reg_o,
    output [       DATA_W/8-1:0] data_wstrb_reg_o,
+   output [              4-1:0] data_acache_reg_o,
 
    // cache-control
    output                               ctrl_req_o,
@@ -69,8 +72,9 @@ module iob_cache_front_end #(
    endgenerate
 
    // data output ports
-   assign data_addr_o  = iob_addr_i[ADDR_W-1 : 0];
-   assign data_req_o   = avalid_int | data_req_reg_o;
+   assign data_addr_o   = iob_addr_i[ADDR_W-1 : 0];
+   assign data_req_o    = avalid_int | data_req_reg_o;
+   assign data_acache_o = iob_acache_i;
 
    assign iob_rvalid_o = we_r ? 1'b0 : ack;
    assign iob_ready_o  = data_req_reg_o ~^ ack;
@@ -123,6 +127,18 @@ module iob_cache_front_end #(
       .en_i  (avalid_int),
       .data_i(iob_wstrb_i),
       .data_o(data_wstrb_reg_o)
+   );
+   iob_reg_re #(
+      .DATA_W (4),
+      .RST_VAL(0)
+   ) iob_reg_acache (
+      .clk_i (clk_i),
+      .arst_i(arst_i),
+      .cke_i (cke_i),
+      .rst_i (1'b0),
+      .en_i  (avalid_int),
+      .data_i(iob_acache_i),
+      .data_o(data_acache_reg_o)
    );
    iob_reg_re #(
       .DATA_W (1),

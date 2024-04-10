@@ -4,25 +4,33 @@
 `default_nettype none
 `timescale 1 ps / 1 ps
 import axi_vip_pkg::*;
-import slv_m00_axi_vip_pkg::*;
+`include "module_slv_m_axi_vip_import.vh"
 import control___KERNEL___vip_pkg::*;
 
 `include "global_package.vh"
 
 class GraphCSR;
 
-string  graph_name                    ;
-integer num_vertices                  ;
-integer num_edges                     ;
-integer num_auxiliary_1               ;
-integer num_auxiliary_2               ;
-integer mem512_num_vertices           ;
-integer mem512_auxiliary_1            ;
-integer mem512_auxiliary_2            ;
-integer mem512_num_edges              ;
-integer mem512_overlay_program_entries;
-integer debug_counter_1               ;
-integer debug_counter_2               ;
+string  graph_name     ;
+integer num_vertices   ;
+integer num_edges      ;
+integer num_auxiliary_1;
+integer num_auxiliary_2;
+integer debug_counter_1;
+integer debug_counter_2;
+integer bfs_source     ;
+
+integer mem_num_vertices      ;
+integer mem_auxiliary_1       ;
+integer mem_auxiliary_2       ;
+integer mem_num_edges         ;
+integer mem_overlay_program   ;
+integer mem_edges_idx         ;
+integer mem_in_degree         ;
+integer mem_out_degree        ;
+integer mem_edges_array_src   ;
+integer mem_edges_array_dest  ;
+integer mem_edges_array_weight;
 
 integer file_error               ;
 integer file_ptr_overlay_program ;
@@ -32,16 +40,16 @@ integer file_ptr_out_degree      ;
 integer file_ptr_edges_array_src ;
 integer file_ptr_edges_array_dest;
 
-bit [M_AXI4_BE_DATA_W-1:0] overlay_program[];
+bit [M00_AXI4_FE_DATA_W/8-1:0][8-1:0] overlay_program[];
 
-bit [M_AXI4_BE_DATA_W-1:0] auxiliary_1[];
-bit [M_AXI4_BE_DATA_W-1:0] auxiliary_2[];
-bit [M_AXI4_BE_DATA_W-1:0] in_degree[];
-bit [M_AXI4_BE_DATA_W-1:0] out_degree[];
-bit [M_AXI4_BE_DATA_W-1:0] edges_idx[];
-bit [M_AXI4_BE_DATA_W-1:0] edges_array_src[];
-bit [M_AXI4_BE_DATA_W-1:0] edges_array_dest[];
-bit [M_AXI4_BE_DATA_W-1:0] edges_array_weight[];
+bit [M00_AXI4_FE_DATA_W/8-1:0][8-1:0] auxiliary_1[];
+bit [M00_AXI4_FE_DATA_W/8-1:0][8-1:0] auxiliary_2[];
+bit [M00_AXI4_FE_DATA_W/8-1:0][8-1:0] in_degree[];
+bit [M00_AXI4_FE_DATA_W/8-1:0][8-1:0] out_degree[];
+bit [M00_AXI4_FE_DATA_W/8-1:0][8-1:0] edges_idx[];
+bit [M01_AXI4_FE_DATA_W/8-1:0][8-1:0] edges_array_src[];
+bit [M01_AXI4_FE_DATA_W/8-1:0][8-1:0] edges_array_dest[];
+bit [M01_AXI4_FE_DATA_W/8-1:0][8-1:0] edges_array_weight[];
 
 function new ();
     this.file_error                = 0;
@@ -53,15 +61,21 @@ function new ();
     this.file_ptr_edges_array_dest = 0;
     this.num_vertices              = 0;
     this.num_edges                 = 0;
-    this.mem512_num_vertices       = 0;
-    this.mem512_num_edges          = 0;
+    this.mem_num_vertices       = 0;
+    this.mem_num_edges          = 0;
     this.num_auxiliary_1           = 0;
     this.num_auxiliary_2           = 0;
-    this.mem512_auxiliary_1        = 0;
-    this.mem512_auxiliary_2        = 0;
+    this.mem_auxiliary_1        = 0;
+    this.mem_auxiliary_2        = 0;
     this.debug_counter_1           = 0;
     this.debug_counter_2           = 0;
-    this.mem512_overlay_program_entries = 4;
+    this.mem_overlay_program    = 4;
+    this.mem_edges_idx          = 0;
+    this.mem_in_degree          = 0;
+    this.mem_out_degree         = 0;
+    this.mem_edges_array_src    = 0;
+    this.mem_edges_array_dest   = 0;
+    this.mem_edges_array_weight = 0;
 endfunction
 
 function void display ();
@@ -72,19 +86,69 @@ function void display ();
     $display("---------------------------------------------------------------------------");
     $display("MSG: debug_counter_1  : %0d", this.debug_counter_1);
     $display("MSG: debug_counter_2  : %0d", this.debug_counter_2);
+    $display("MSG: bfs_source       : %0d", this.bfs_source);
     $display("---------------------------------------------------------------------------");
 endfunction
 
 endclass
+
+    // Function to print sizes of data types
+    function void printDataTypeSizes();
+        $display("Size (bits) ALUOpsConfigurationPayload: %0d ", $bits(ALUOpsConfigurationPayload));
+        $display("Size (bits) CacheRequestPayload: %0d ", $bits(CacheRequestPayload));
+        $display("Size (bits) ControlPacketPayload: %0d ", $bits(ControlPacketPayload));
+        $display("Size (bits) CSRIndexConfigurationPayload: %0d ", $bits(CSRIndexConfigurationPayload));
+        $display("Size (bits) EnginePacketFullPayload: %0d ", $bits(EnginePacketFullPayload));
+        $display("Size (bits) EnginePacketPayload: %0d ", $bits(EnginePacketPayload));
+        $display("Size (bits) FilterCondConfigurationPayload: %0d ", $bits(FilterCondConfigurationPayload));
+        $display("Size (bits) MemoryPacketRequestPayload: %0d ", $bits(MemoryPacketRequestPayload));
+        $display("Size (bits) MemoryPacketResponsePayload: %0d ", $bits(MemoryPacketResponsePayload));
+        $display("Size (bits) MergeDataConfigurationPayload: %0d ", $bits(MergeDataConfigurationPayload));
+        $display("Size (bits) ParallelReadWriteConfigurationPayload: %0d ", $bits(ParallelReadWriteConfigurationPayload));
+        $display("Size (bits) ReadWriteConfigurationPayload: %0d ", $bits(ReadWriteConfigurationPayload));
+        $display("Size (bits) SetOpsConfigurationPayload: %0d ", $bits(SetOpsConfigurationPayload));
+    endfunction
+
+    class __KERNEL__xrtBufferHandlePerKernel;
+
+        integer num_buffers;
+
+        string xrt_buffer_name[];
+        bit [63:0] xrt_buffer_ptr[];
+        bit [63:0] xrt_buffer_host[];
+        bit [63:0] xrt_buffer_device[];
+        bit [63:0] xrt_buffer_size[];
+        bit [63:0] xrt_debug_counter[];
+
+        function new ();
+            this.num_buffers = 9;
+        endfunction
+
+        function void display_buffer (input integer index);
+            $display("---------------------------------------------------------------------------");
+            $display("MSG: XRT BUFFER NAME : %s" , this.xrt_buffer_name[index]);
+            $display("MSG:             PTR : %0d", this.xrt_buffer_ptr[index]);
+            $display("MSG:            HOST : %0d", this.xrt_buffer_host[index]);
+            $display("MSG:          DEVICE : %0d", this.xrt_buffer_device[index]);
+            $display("MSG:            SIZE : %0d", this.xrt_buffer_size[index]);
+            $display("MSG:   DEBUG COUNTER : %0d", this.xrt_debug_counter[index]);
+            $display("---------------------------------------------------------------------------");
+        endfunction
+
+        function void display ();
+            for (int i = 0; i < this.num_buffers; i++) begin
+                display_buffer(i);
+            end
+        endfunction
+
+    endclass
 
 module __KERNEL___testbench ();
         parameter integer LP_MAX_LENGTH              = 8192                    ;
         parameter integer LP_MAX_TRANSFER_LENGTH     = 16384 / 4               ;
         parameter integer C_S_AXI_CONTROL_ADDR_WIDTH = S_AXI_BE_ADDR_WIDTH_BITS;
         parameter integer C_S_AXI_CONTROL_DATA_WIDTH = S_AXI_BE_DATA_WIDTH     ;
-        parameter integer C_M00_AXI_ADDR_WIDTH       = M_AXI4_BE_ADDR_W        ;
-        parameter integer C_M00_AXI_DATA_WIDTH       = M_AXI4_BE_DATA_W        ;
-        parameter integer C_M00_AXI_ID_WIDTH         = M_AXI4_BE_ID_W          ;
+        `include "testbench_parameters.vh"
 
 // Control Register
         parameter KRNL_CTRL_REG_ADDR     = 32'h00000000;
@@ -137,45 +201,7 @@ module __KERNEL___testbench ();
         end
 
 //AXI4 master interface m00_axi
-        wire [                     1-1:0] m00_axi_awvalid;
-        wire [                     1-1:0] m00_axi_awready;
-        wire [  C_M00_AXI_ADDR_WIDTH-1:0] m00_axi_awaddr ;
-        wire [                     8-1:0] m00_axi_awlen  ;
-        wire [                     1-1:0] m00_axi_wvalid ;
-        wire [                     1-1:0] m00_axi_wready ;
-        wire [  C_M00_AXI_DATA_WIDTH-1:0] m00_axi_wdata  ;
-        wire [C_M00_AXI_DATA_WIDTH/8-1:0] m00_axi_wstrb  ;
-        wire [                     1-1:0] m00_axi_wlast  ;
-        wire [                     1-1:0] m00_axi_bvalid ;
-        wire [                     1-1:0] m00_axi_bready ;
-        wire [                     1-1:0] m00_axi_arvalid;
-        wire [                     1-1:0] m00_axi_arready;
-        wire [  C_M00_AXI_ADDR_WIDTH-1:0] m00_axi_araddr ;
-        wire [                     8-1:0] m00_axi_arlen  ;
-        wire [                     1-1:0] m00_axi_rvalid ;
-        wire [                     1-1:0] m00_axi_rready ;
-        wire [  C_M00_AXI_DATA_WIDTH-1:0] m00_axi_rdata  ;
-        wire [                     1-1:0] m00_axi_rlast  ;
-
-        // AXI4 master interface m00_axi missing ports
-        wire [C_M00_AXI_ID_WIDTH-1:0] m00_axi_bid    ;
-        wire [C_M00_AXI_ID_WIDTH-1:0] m00_axi_rid    ;
-        wire [                 2-1:0] m00_axi_rresp  ;
-        wire [                 2-1:0] m00_axi_bresp  ;
-        wire [C_M00_AXI_ID_WIDTH-1:0] m00_axi_awid   ;
-        wire [                 3-1:0] m00_axi_awsize ;
-        wire [                 2-1:0] m00_axi_awburst;
-        wire [                 1-1:0] m00_axi_awlock ;
-        wire [                 4-1:0] m00_axi_awcache;
-        wire [                 3-1:0] m00_axi_awprot ;
-        wire [                 4-1:0] m00_axi_awqos  ;
-        wire [C_M00_AXI_ID_WIDTH-1:0] m00_axi_arid   ;
-        wire [                 3-1:0] m00_axi_arsize ;
-        wire [                 2-1:0] m00_axi_arburst;
-        wire [                 1-1:0] m00_axi_arlock ;
-        wire [                 4-1:0] m00_axi_arcache;
-        wire [                 3-1:0] m00_axi_arprot ;
-        wire [                 4-1:0] m00_axi_arqos  ;
+        `include "m_axi_wires_top.vh"
 
 //AXI4LITE control signals
         wire [                           1-1:0] s_axi_control_awvalid;
@@ -199,52 +225,15 @@ module __KERNEL___testbench ();
 
 // DUT instantiation
     top #(
+        `include "set_top_parameters.vh"
         .C_S_AXI_CONTROL_ADDR_WIDTH(C_S_AXI_CONTROL_ADDR_WIDTH),
-        .C_S_AXI_CONTROL_DATA_WIDTH(C_S_AXI_CONTROL_DATA_WIDTH),
-        .C_M00_AXI_ADDR_WIDTH      (C_M00_AXI_ADDR_WIDTH      ),
-        .C_M00_AXI_DATA_WIDTH      (C_M00_AXI_DATA_WIDTH      )
+        .C_S_AXI_CONTROL_DATA_WIDTH(C_S_AXI_CONTROL_DATA_WIDTH)
     ) inst_dut (
         .ap_clk               (ap_clk               ),
         .ap_rst_n             (ap_rst_n             ),
-        .m00_axi_awvalid      (m00_axi_awvalid      ),
-        .m00_axi_awready      (m00_axi_awready      ),
-        .m00_axi_awaddr       (m00_axi_awaddr       ),
-        .m00_axi_awlen        (m00_axi_awlen        ),
-        .m00_axi_wvalid       (m00_axi_wvalid       ),
-        .m00_axi_wready       (m00_axi_wready       ),
-        .m00_axi_wdata        (m00_axi_wdata        ),
-        .m00_axi_wstrb        (m00_axi_wstrb        ),
-        .m00_axi_wlast        (m00_axi_wlast        ),
-        .m00_axi_bvalid       (m00_axi_bvalid       ),
-        .m00_axi_bready       (m00_axi_bready       ),
-        .m00_axi_arvalid      (m00_axi_arvalid      ),
-        .m00_axi_arready      (m00_axi_arready      ),
-        .m00_axi_araddr       (m00_axi_araddr       ),
-        .m00_axi_arlen        (m00_axi_arlen        ),
-        .m00_axi_rvalid       (m00_axi_rvalid       ),
-        .m00_axi_rready       (m00_axi_rready       ),
-        .m00_axi_rdata        (m00_axi_rdata        ),
-        .m00_axi_rlast        (m00_axi_rlast        ),
-        
-        .m00_axi_bid          (m00_axi_bid          ),
-        .m00_axi_rid          (m00_axi_rid          ),
-        .m00_axi_rresp        (m00_axi_rresp        ),
-        .m00_axi_bresp        (m00_axi_bresp        ),
-        .m00_axi_awid         (m00_axi_awid         ),
-        .m00_axi_awsize       (m00_axi_awsize       ),
-        .m00_axi_awburst      (m00_axi_awburst      ),
-        .m00_axi_awlock       (m00_axi_awlock       ),
-        .m00_axi_awcache      (m00_axi_awcache      ),
-        .m00_axi_awprot       (m00_axi_awprot       ),
-        .m00_axi_awqos        (m00_axi_awqos        ),
-        .m00_axi_arid         (m00_axi_arid         ),
-        .m00_axi_arsize       (m00_axi_arsize       ),
-        .m00_axi_arburst      (m00_axi_arburst      ),
-        .m00_axi_arlock       (m00_axi_arlock       ),
-        .m00_axi_arcache      (m00_axi_arcache      ),
-        .m00_axi_arprot       (m00_axi_arprot       ),
-        .m00_axi_arqos        (m00_axi_arqos        ),
-        
+        // AXI4 master interface m00_axi
+        `include "m_axi_portmap_top.vh"
+        // Control Signals
         .s_axi_control_awvalid(s_axi_control_awvalid),
         .s_axi_control_awready(s_axi_control_awready),
         .s_axi_control_awaddr (s_axi_control_awaddr ),
@@ -290,52 +279,7 @@ module __KERNEL___testbench ();
 
         control___KERNEL___vip_mst_t ctrl;
 
-// Slave MM VIP instantiation
-    slv_m00_axi_vip inst_slv_m00_axi_vip (
-        .aclk         (ap_clk         ),
-        .aresetn      (ap_rst_n       ),
-        .s_axi_awvalid(m00_axi_awvalid),
-        .s_axi_awready(m00_axi_awready),
-        .s_axi_awaddr (m00_axi_awaddr ),
-        .s_axi_awlen  (m00_axi_awlen  ),
-        .s_axi_wvalid (m00_axi_wvalid ),
-        .s_axi_wready (m00_axi_wready ),
-        .s_axi_wdata  (m00_axi_wdata  ),
-        .s_axi_wstrb  (m00_axi_wstrb  ),
-        .s_axi_wlast  (m00_axi_wlast  ),
-        .s_axi_bvalid (m00_axi_bvalid ),
-        .s_axi_bready (m00_axi_bready ),
-        .s_axi_arvalid(m00_axi_arvalid),
-        .s_axi_arready(m00_axi_arready),
-        .s_axi_araddr (m00_axi_araddr ),
-        .s_axi_arlen  (m00_axi_arlen  ),
-        .s_axi_rvalid (m00_axi_rvalid ),
-        .s_axi_rready (m00_axi_rready ),
-        .s_axi_rdata  (m00_axi_rdata  ),
-        .s_axi_rlast  (m00_axi_rlast  ),
-        
-        .s_axi_bid    (m00_axi_bid    ),
-        .s_axi_rid    (m00_axi_rid    ),
-        .s_axi_rresp  (m00_axi_rresp  ),
-        .s_axi_bresp  (m00_axi_bresp  ),
-        .s_axi_awid   (m00_axi_awid   ),
-        .s_axi_awsize (m00_axi_awsize ),
-        .s_axi_awburst(m00_axi_awburst),
-        .s_axi_awlock (m00_axi_awlock ),
-        .s_axi_awcache(m00_axi_awcache),
-        .s_axi_awprot (m00_axi_awprot ),
-        .s_axi_awqos  (m00_axi_awqos  ),
-        .s_axi_arid   (m00_axi_arid   ),
-        .s_axi_arsize (m00_axi_arsize ),
-        .s_axi_arburst(m00_axi_arburst),
-        .s_axi_arlock (m00_axi_arlock ),
-        .s_axi_arcache(m00_axi_arcache),
-        .s_axi_arprot (m00_axi_arprot ),
-        .s_axi_arqos  (m00_axi_arqos  )
-    );
-
-        slv_m00_axi_vip_slv_mem_t m00_axi    ;
-        slv_m00_axi_vip_slv_t     m00_axi_slv;
+        `include "module_slv_m_axi_vip_inst.vh"
 
         parameter NUM_AXIS_MST   = 0;
         parameter NUM_AXIS_SLV   = 0;
@@ -382,41 +326,6 @@ module __KERNEL___testbench ();
 // Pointer for interface : m00_axi
         bit [63:0] buffer_9_ptr = 64'h0;
 
-/////////////////////////////////////////////////////////////////////////////////////////////////
-// Backdoor fill the input buffer AXI vip memory model with 32-bit words
-        function void  m00_axi_buffer_fill_memory(
-                input slv_m00_axi_vip_slv_mem_t mem,      // vip memory model handle
-                input bit [63:0] ptr,                     // start address of memory fill, should allign to 16-byte
-                input bit [M_AXI4_BE_DATA_W-1:0] words_data[$],      // data source to fill memory
-                input integer offset,                 // start index of data source
-                input integer words                   // number of words to fill
-            );
-            int index;
-            // bit [(32/8)-1:0] wr_strb = 4'hf;
-            bit [M_AXI4_BE_DATA_W-1:0] temp;
-            int i;
-            for (index = 0; index < words; index++) begin
-                // $display("Before: %0d ->%0d ->%0h",index, i, words_data[offset+index]);
-                for (i = 0; i < (M_AXI4_BE_DATA_W/8); i = i + 1) begin // endian conversion to emulate general memory little endian behavior
-                    temp[i*8+7-:8] = words_data[offset+index][((M_AXI4_BE_DATA_W/8)-1-i)*8+7-:8];
-                    // $display("%0d ->%0d ->%0h",index, i, temp[i*8+7-:8] );
-                end
-                // $display("After: %0d ->%0d ->%0h",index, i, temp);
-                mem.mem_model.backdoor_memory_write(ptr + index * (M_AXI4_BE_DATA_W/8), temp);
-            end
-        endfunction
-
-/////////////////////////////////////////////////////////////////////////////////////////////////
-// Backdoor fill the m00_axi memory.
-        function void m00_axi_fill_memory(
-                input bit [63:0] ptr,
-                input integer    length
-            );
-            for (longint unsigned slot = 0; slot < length; slot++) begin
-                m00_axi.mem_model.backdoor_memory_write_4byte(ptr + (slot * 4), slot);
-            end
-        endfunction
-
         task automatic system_reset_sequence(input integer unsigned width = 20);
             $display("%t : Starting System Reset Sequence", $time);
             fork
@@ -427,9 +336,23 @@ module __KERNEL___testbench ();
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 // Generate a random 32bit number
+        function bit [$bits(size)-1:0] get_random_nbytes(int size);
+            bit [$bits(size)-1:0] rptr;
+            bit [$bits(size)-1:0] page_mask ;
+
+            assert(std::randomize(rptr));
+            // Create a mask to set lower 12 bits to zero for page alignment
+            page_mask = ~((1 << 12) - 1);
+            rptr &= page_mask;
+
+            return rptr;
+        endfunction
+/////////////////////////////////////////////////////////////////////////////////////////////////
+// Generate a random 32bit number
         function bit [31:0] get_random_4bytes();
             bit [31:0] rptr;
             ptr_random_failed : assert(std::randomize(rptr));
+            rptr[31:0] &= ~(32'h00000fff);
             return(rptr);
         endfunction
 
@@ -449,7 +372,6 @@ module __KERNEL___testbench ();
             ptr_random_failed : assert(std::randomize(rptr));
             return(rptr);
         endfunction
-
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 // Control interface non-blocking write
@@ -554,73 +476,6 @@ module __KERNEL___testbench ();
             $display("MSG: Interrupt Status Register: 0x%0x", rd_value);
             blocking_write_register(KRNL_ISR_REG_ADDR, rd_value);
             $display("Finished Servicing interrupts");
-        endtask
-
-/////////////////////////////////////////////////////////////////////////////////////////////////
-// Start the control VIP, SLAVE memory models and AXI4-Stream.
-        task automatic start_vips();
-
-            $display("///////////////////////////////////////////////////////////////////////////");
-            $display("MSG: Control Master: ctrl");
-            ctrl = new("ctrl", __KERNEL___testbench.inst_control___KERNEL___vip.inst.IF);
-            ctrl.start_master();
-
-            $display("///////////////////////////////////////////////////////////////////////////");
-            $display("Starting Memory slave: m00_axi");
-            m00_axi = new("m00_axi", __KERNEL___testbench.inst_slv_m00_axi_vip.inst.IF);
-            m00_axi.start_slave();
-
-        endtask
-
-/////////////////////////////////////////////////////////////////////////////////////////////////
-// For each of the connected slave interfaces, set the Slave to not de-assert WREADY at any time.
-// This will show the fastest outbound bandwidth from the WRITE channel.
-        task automatic slv_no_backpressure_wready();
-            axi_ready_gen     rgen;
-            $display("%t - Applying slv_no_backpressure_wready", $time);
-
-            rgen = new("m00_axi_no_backpressure_wready");
-            rgen.set_ready_policy(XIL_AXI_READY_GEN_NO_BACKPRESSURE);
-            m00_axi.wr_driver.set_wready_gen(rgen);
-
-        endtask
-
-/////////////////////////////////////////////////////////////////////////////////////////////////
-// For each of the connected slave interfaces, apply a WREADY policy to introduce backpressure.
-// Based on the simulation seed the order/shape of the WREADY per-channel will be different.
-        task automatic slv_random_backpressure_wready();
-            axi_ready_gen     rgen;
-            $display("%t - Applying slv_random_backpressure_wready", $time);
-
-            rgen = new("m00_axi_random_backpressure_wready");
-            rgen.set_ready_policy(XIL_AXI_READY_GEN_RANDOM);
-            rgen.set_low_time_range(0,12);
-            rgen.set_high_time_range(1,12);
-            rgen.set_event_count_range(3,5);
-            m00_axi.wr_driver.set_wready_gen(rgen);
-
-        endtask
-
-/////////////////////////////////////////////////////////////////////////////////////////////////
-// For each of the connected slave interfaces, force the memory model to not insert any inter-beat
-// gaps on the READ channel.
-        task automatic slv_no_delay_rvalid();
-            $display("%t - Applying slv_no_delay_rvalid", $time);
-
-            m00_axi.mem_model.set_inter_beat_gap_delay_policy(XIL_AXI_MEMORY_DELAY_FIXED);
-            m00_axi.mem_model.set_inter_beat_gap(0);
-
-        endtask
-
-/////////////////////////////////////////////////////////////////////////////////////////////////
-// For each of the connected slave interfaces, Allow the memory model to insert any inter-beat
-// gaps on the READ channel.
-        task automatic slv_random_delay_rvalid();
-            $display("%t - Applying slv_random_delay_rvalid", $time);
-
-            m00_axi.mem_model.set_inter_beat_gap_delay_policy(XIL_AXI_MEMORY_DELAY_RANDOM);
-            m00_axi.mem_model.set_inter_beat_gap_range(0,10);
-
         endtask
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -775,16 +630,16 @@ module __KERNEL___testbench ();
         task automatic set_memory_pointers();
             ///////////////////////////////////////////////////////////////////////////
             //Randomly generate memory pointers.
-            buffer_0_ptr[62:0] = get_random_ptr();
-            buffer_1_ptr[62:0] = get_random_ptr();
-            buffer_2_ptr[62:0] = get_random_ptr();
-            buffer_3_ptr[62:0] = get_random_ptr();
-            buffer_4_ptr[62:0] = get_random_ptr();
-            buffer_5_ptr[62:0] = get_random_ptr();
-            buffer_6_ptr[62:0] = get_random_ptr();
-            buffer_7_ptr[62:0] = get_random_ptr();
-            buffer_8_ptr[62:0] = get_random_ptr();
-            buffer_9_ptr = {(SYSTEM_CACHE_SIZE_ITERAIONS +_NUM_ENTRIES_),29'd_NUM_ENTRIES_, 1'b1, 1'b0, 1'b1};
+            buffer_0_ptr[63:0] = get_random_nbytes(M00_AXI4_BE_ADDR_W);
+            buffer_1_ptr[63:0] = get_random_nbytes(M00_AXI4_BE_ADDR_W);
+            buffer_2_ptr[63:0] = get_random_nbytes(M00_AXI4_BE_ADDR_W);
+            buffer_3_ptr[63:0] = get_random_nbytes(M00_AXI4_BE_ADDR_W);
+            buffer_4_ptr[63:0] = get_random_nbytes(M00_AXI4_BE_ADDR_W);
+            buffer_5_ptr[63:0] = get_random_nbytes(M00_AXI4_BE_ADDR_W);
+            buffer_6_ptr[63:0] = get_random_nbytes(M00_AXI4_BE_ADDR_W);
+            buffer_7_ptr[63:0] = get_random_nbytes(M00_AXI4_BE_ADDR_W);
+            buffer_8_ptr[63:0] = get_random_nbytes(M00_AXI4_BE_ADDR_W);
+            buffer_9_ptr = {(SYSTEM_CACHE_SIZE_ITERAIONS +_NUM_ENTRIES_),29'd_NUM_ENTRIES_, 1'b1, 1'b1, 1'b1}; //flush_cache , endian_write_reg , endian_read_reg
 
             ///////////////////////////////////////////////////////////////////////////
             //Write ID 0: buffer_0 (0x010) -> Randomized 4k aligned address (Global memory, lower 32 bits)
@@ -868,205 +723,386 @@ module __KERNEL___testbench ();
 
         endtask
 
-        task automatic set_memory_pointers_bfs();
-            ///////////////////////////////////////////////////////////////////////////
-            //Randomly generate memory pointers.
-            buffer_7_ptr = buffer_7_ptr ^ buffer_8_ptr;
-            buffer_8_ptr = buffer_7_ptr ^ buffer_8_ptr;
-            buffer_7_ptr = buffer_7_ptr ^ buffer_8_ptr;
+        `include "module_slv_m_axi_vip_func.vh"
 
-            ///////////////////////////////////////////////////////////////////////////
-            //Write ID 0: buffer_0 (0x010) -> Randomized 4k aligned address (Global memory, lower 32 bits)
-            write_register(32'h010, buffer_0_ptr[31:0]);
+        task automatic update_BFS_auxiliary_struct(ref GraphCSR graph);
+        /////////////////////////////////////////////////////////////////////////////////////////////////
 
-            ///////////////////////////////////////////////////////////////////////////
-            //Write ID 0: buffer_0 (0x014) -> Randomized 4k aligned address (Global memory, upper 32 bits)
-            write_register(32'h014, buffer_0_ptr[63:32]);
+        `include "module_slv_m_axi_vip_dump.vh"
 
-            ///////////////////////////////////////////////////////////////////////////
-            //Write ID 1: buffer_1 (0x01c) -> Randomized 4k aligned address (Global memory, lower 32 bits)
-            write_register(32'h01c, buffer_1_ptr[31:0]);
+        for (int i = 0; i < graph.num_auxiliary_1; i++) begin
+            graph.auxiliary_1[i] = auxiliary_1[i];
+        end
+        for (int i = graph.num_auxiliary_1; i <  graph.num_auxiliary_1*2 ; i++) begin
+            graph.auxiliary_1[i] = auxiliary_2[i];
+        end
 
-            ///////////////////////////////////////////////////////////////////////////
-            //Write ID 1: buffer_1 (0x020) -> Randomized 4k aligned address (Global memory, upper 32 bits)
-            write_register(32'h020, buffer_1_ptr[63:32]);
-
-            ///////////////////////////////////////////////////////////////////////////
-            //Write ID 2: buffer_2 (0x028) -> Randomized 4k aligned address (Global memory, lower 32 bits)
-            write_register(32'h028, buffer_2_ptr[31:0]);
-
-            ///////////////////////////////////////////////////////////////////////////
-            //Write ID 2: buffer_2 (0x02c) -> Randomized 4k aligned address (Global memory, upper 32 bits)
-            write_register(32'h02c, buffer_2_ptr[63:32]);
-
-            ///////////////////////////////////////////////////////////////////////////
-            //Write ID 3: buffer_3 (0x034) -> Randomized 4k aligned address (Global memory, lower 32 bits)
-            write_register(32'h034, buffer_3_ptr[31:0]);
-
-            ///////////////////////////////////////////////////////////////////////////
-            //Write ID 3: buffer_3 (0x038) -> Randomized 4k aligned address (Global memory, upper 32 bits)
-            write_register(32'h038, buffer_3_ptr[63:32]);
-
-            ///////////////////////////////////////////////////////////////////////////
-            //Write ID 4: edges_array_weight (0x040) -> Randomized 4k aligned address (Global memory, lower 32 bits)
-            write_register(32'h040, buffer_4_ptr[31:0]);
-
-            ///////////////////////////////////////////////////////////////////////////
-            //Write ID 4: edges_array_weight (0x044) -> Randomized 4k aligned address (Global memory, upper 32 bits)
-            write_register(32'h044, buffer_4_ptr[63:32]);
-
-            ///////////////////////////////////////////////////////////////////////////
-            //Write ID 5: edges_array_src (0x04c) -> Randomized 4k aligned address (Global memory, lower 32 bits)
-            write_register(32'h04c, buffer_5_ptr[31:0]);
-
-            ///////////////////////////////////////////////////////////////////////////
-            //Write ID 5: edges_array_src (0x050) -> Randomized 4k aligned address (Global memory, upper 32 bits)
-            write_register(32'h050, buffer_5_ptr[63:32]);
-
-            ///////////////////////////////////////////////////////////////////////////
-            //Write ID 6: edges_array_dest (0x058) -> Randomized 4k aligned address (Global memory, lower 32 bits)
-            write_register(32'h058, buffer_6_ptr[31:0]);
-
-            ///////////////////////////////////////////////////////////////////////////
-            //Write ID 6: edges_array_dest (0x05c) -> Randomized 4k aligned address (Global memory, upper 32 bits)
-            write_register(32'h05c, buffer_6_ptr[63:32]);
-
-            ///////////////////////////////////////////////////////////////////////////
-            //Write ID 7: buffer_7 (0x064) -> Randomized 4k aligned address (Global memory, lower 32 bits)
-            write_register(32'h064, buffer_7_ptr[31:0]);
-
-            ///////////////////////////////////////////////////////////////////////////
-            //Write ID 7: buffer_7 (0x068) -> Randomized 4k aligned address (Global memory, upper 32 bits)
-            write_register(32'h068, buffer_7_ptr[63:32]);
-
-            ///////////////////////////////////////////////////////////////////////////
-            //Write ID 8: buffer_8 (0x070) -> Randomized 4k aligned address (Global memory, lower 32 bits)
-            write_register(32'h070, buffer_8_ptr[31:0]);
-
-            ///////////////////////////////////////////////////////////////////////////
-            //Write ID 8: buffer_8 (0x074) -> Randomized 4k aligned address (Global memory, upper 32 bits)
-            write_register(32'h074, buffer_8_ptr[63:32]);
-
-            ///////////////////////////////////////////////////////////////////////////
-            //Write ID 9: buffer_9 (0x07c) -> Randomized 4k aligned address (Global memory, lower 32 bits)
-            write_register(32'h07c, buffer_9_ptr[31:0]);
-
-            ///////////////////////////////////////////////////////////////////////////
-            //Write ID 9: buffer_9 (0x080) -> Randomized 4k aligned address (Global memory, upper 32 bits)
-            write_register(32'h080, buffer_9_ptr[63:32]);
-
+        for (int i = 0; i <  graph.num_auxiliary_2 ; i++) begin
+            graph.auxiliary_2[i] = auxiliary_1[i];
+        end
+        for (int i = graph.num_auxiliary_2; i < graph.num_auxiliary_2*2; i++) begin
+            graph.auxiliary_2[i] = 0;
+        end
         endtask
 
-        task automatic swap_memory_pointers();
-            buffer_7_ptr = buffer_7_ptr ^ buffer_8_ptr;
-            buffer_8_ptr = buffer_7_ptr ^ buffer_8_ptr;
-            buffer_7_ptr = buffer_7_ptr ^ buffer_8_ptr;
-        endtask
+            function automatic void update_CC_compressNodes(integer num_vertices, ref bit [M00_AXI4_FE_DATA_W/8-1:0][8-1:0] components[]);
+                /////////////////////////////////////////////////////////////////////////////////////////////////
+                integer n;  // Use integer for loop index
+                for (n = 0; n < num_vertices; n++) begin
+                    while (components[n] != components[components[n]]) begin
+                        components[n] = components[components[n]];
+                    end
+                end
+            endfunction
 
-        task automatic backdoor_fill_memories();
+            task automatic update_CC_auxiliary_struct(ref GraphCSR graph);
+                /////////////////////////////////////////////////////////////////////////////////////////////////
+                integer auxiliary_count[];
+                integer n;
+
+                `include "module_slv_m_axi_vip_dump.vh"
+
+                auxiliary_count  = new [graph.num_auxiliary_1];
+                graph.debug_counter_2 = 0;
+
+                for (int i = 0; i < graph.num_auxiliary_1; i++) begin
+                    graph.auxiliary_1[i] = auxiliary_1[i];
+                    auxiliary_count[i] = 0;
+                end
+
+                update_CC_compressNodes(graph.num_auxiliary_1, graph.auxiliary_1);
+
+                for (int i = graph.num_auxiliary_1; i <  graph.num_auxiliary_1*2 ; i++) begin
+                    graph.auxiliary_1[i] = auxiliary_1[i];
+                end
+
+                for (int i = 0; i <  graph.num_auxiliary_2 ; i++) begin
+                    graph.auxiliary_2[i] = 0;
+                end
+                for (int i = graph.num_auxiliary_2; i < graph.num_auxiliary_2*2; i++) begin
+                    graph.auxiliary_2[i] = 0;
+                end
+
+                for (int i = 0; i < graph.num_auxiliary_1; i++) begin
+                    n = graph.auxiliary_1[i];
+                    auxiliary_count[n] += 1;
+                end
+
+                for (int i = 0; i < graph.num_auxiliary_1; i++) begin
+                    if(auxiliary_count[i] > 0)
+                        graph.debug_counter_2 += 1;
+                end
+
+            endtask
+
+            function automatic void initialize_BFS_auxiliary_struct(ref GraphCSR graph);
+                /////////////////////////////////////////////////////////////////////////////////////////////////
+                // Backdoor fill the memory with the content.
+                for (int i = 0; i < graph.num_auxiliary_1; i++) begin
+                    graph.auxiliary_1[i] = {M00_AXI4_FE_DATA_W{1'b1}};
+                    if(i == graph.bfs_source)begin
+                        graph.auxiliary_1[i] = graph.bfs_source;
+                    end
+                end
+                for (int i = graph.num_auxiliary_1; i <  graph.num_auxiliary_1*2 ; i++) begin
+                    graph.auxiliary_1[i] = 0;
+                    if(i == graph.num_auxiliary_1 + graph.bfs_source)begin
+                        graph.auxiliary_1[i] = 1;
+                    end
+                end
+
+                for (int i = 0; i <  graph.num_auxiliary_2 ; i++) begin
+                    graph.auxiliary_2[i] = {M00_AXI4_FE_DATA_W{1'b1}};
+                end
+                for (int i = graph.num_auxiliary_2; i < graph.num_auxiliary_2*2; i++) begin
+                    graph.auxiliary_2[i] = 0;
+                end
+            endfunction
+
+            function automatic void initialize_SPMV_auxiliary_struct(ref GraphCSR graph);
+                /////////////////////////////////////////////////////////////////////////////////////////////////
+                // Backdoor fill the memory with the content.
+                for (int i = 0; i < graph.num_auxiliary_1; i++) begin
+                    graph.auxiliary_1[i] = 1;
+                end
+                for (int i = graph.num_auxiliary_1; i <  graph.num_auxiliary_1*2 ; i++) begin
+                    graph.auxiliary_1[i] = 0;
+                end
+
+                for (int i = 0; i <  graph.num_auxiliary_2 ; i++) begin
+                    graph.auxiliary_2[i] = 0;
+                end
+                for (int i = graph.num_auxiliary_2; i < graph.num_auxiliary_2*2; i++) begin
+                    graph.auxiliary_2[i] = 0;
+                end
+            endfunction
+
+            function automatic void initialize_TC_auxiliary_struct(ref GraphCSR graph);
+                /////////////////////////////////////////////////////////////////////////////////////////////////
+                // Backdoor fill the memory with the content.
+                for (int i = 0; i < graph.num_auxiliary_1; i++) begin
+                    graph.auxiliary_1[i] = 0;
+                end
+                for (int i = graph.num_auxiliary_1; i <  graph.num_auxiliary_1*2 ; i++) begin
+                    graph.auxiliary_1[i] = 0;
+                end
+
+                for (int i = 0; i <  graph.num_auxiliary_2 ; i++) begin
+                    graph.auxiliary_2[i] = 0;
+                end
+                for (int i = graph.num_auxiliary_2; i < graph.num_auxiliary_2*2; i++) begin
+                    graph.auxiliary_2[i] = 0;
+                end
+            endfunction
+
+            function automatic void initialize_MEMCPY_auxiliary_struct(ref GraphCSR graph);
+                /////////////////////////////////////////////////////////////////////////////////////////////////
+                // Backdoor fill the memory with the content.
+                for (int i = 0; i < graph.num_auxiliary_1; i++) begin
+                    graph.auxiliary_1[i] = 0;
+                end
+                for (int i = graph.num_auxiliary_1; i <  graph.num_auxiliary_1*2 ; i++) begin
+                    graph.auxiliary_1[i] = 0;
+                end
+
+                for (int i = 0; i <  graph.num_auxiliary_2 ; i++) begin
+                    graph.auxiliary_2[i] = 0;
+                end
+                for (int i = graph.num_auxiliary_2; i < graph.num_auxiliary_2*2; i++) begin
+                    graph.auxiliary_2[i] = 0;
+                end
+            endfunction
+
+            function automatic void initialize_AUTOMATA_auxiliary_struct(ref GraphCSR graph);
+                /////////////////////////////////////////////////////////////////////////////////////////////////
+                // Backdoor fill the memory with the content.
+                for (int i = 0; i < graph.num_auxiliary_1; i++) begin
+                    graph.auxiliary_1[i] = 0;
+                end
+                for (int i = graph.num_auxiliary_1; i <  graph.num_auxiliary_1*2 ; i++) begin
+                    graph.auxiliary_1[i] = 0;
+                end
+
+                for (int i = 0; i <  graph.num_auxiliary_2 ; i++) begin
+                    graph.auxiliary_2[i] = 0;
+                end
+                for (int i = graph.num_auxiliary_2; i < graph.num_auxiliary_2*2; i++) begin
+                    graph.auxiliary_2[i] = 0;
+                end
+            endfunction
+
+            function automatic void initialize_CC_auxiliary_struct(ref GraphCSR graph);
+                /////////////////////////////////////////////////////////////////////////////////////////////////
+                // Backdoor fill the memory with the content.
+                for (int i = 0; i < graph.num_auxiliary_1; i++) begin
+                    graph.auxiliary_1[i] = i;
+                end
+                for (int i = graph.num_auxiliary_1; i <  graph.num_auxiliary_1*2 ; i++) begin
+                    graph.auxiliary_1[i] = 0;
+                end
+
+                for (int i = 0; i <  graph.num_auxiliary_2 ; i++) begin
+                    graph.auxiliary_2[i] = 0;
+                end
+                for (int i = graph.num_auxiliary_2; i < graph.num_auxiliary_2*2; i++) begin
+                    graph.auxiliary_2[i] = 0;
+                end
+            endfunction
+
+            function automatic void initialize_PR_auxiliary_struct(ref GraphCSR graph);
+                /////////////////////////////////////////////////////////////////////////////////////////////////
+                // Backdoor fill the memory with the content.
+                for (int i = 0; i < graph.num_auxiliary_1; i++) begin
+                    graph.auxiliary_1[i] = 0;
+                end
+                for (int i = graph.num_auxiliary_1; i <  graph.num_auxiliary_1*2 ; i++) begin
+                    graph.auxiliary_1[i] = 1;
+                end
+
+                for (int i = 0; i <  graph.num_auxiliary_2 ; i++) begin
+                    graph.auxiliary_2[i] = 0;
+                end
+                for (int i = graph.num_auxiliary_2; i < graph.num_auxiliary_2*2; i++) begin
+                    graph.auxiliary_2[i] = 0;
+                end
+            endfunction
+
+            function automatic bit check_BFS_result(ref GraphCSR graph);
+                /////////////////////////////////////////////////////////////////////////////////////////////////
+                // Backdoor read the memory with the content.
+                bit error_found;
+                integer error_counter;
+                integer frontier_counter;
+
+                `include "module_slv_m_axi_vip_dump.vh"
+
+                error_found = 0;
+                error_counter = 0;
+                frontier_counter = 0;
+                $display("MSG: // ------------------------------------------------- \n");
+                for (int i = graph.num_auxiliary_2; i < graph.num_auxiliary_2*2; i++) begin
+                    if(auxiliary_2[i])
+                        $display("MSG: %0d \n", i-graph.num_auxiliary_2);
+                    frontier_counter += auxiliary_2[i];
+                end
+                $display("MSG: Frontier_counter: %0d \n", frontier_counter);
+                $display("MSG: // ------------------------------------------------- \n");
+
+                graph.debug_counter_1 = frontier_counter;
+                error_counter = 0;
+                return(error_found);
+            endfunction
+
+            function automatic bit check_PR_result(ref GraphCSR graph);
+                /////////////////////////////////////////////////////////////////////////////////////////////////
+                // Backdoor read the memory with the content.
+                // bit [M00_AXI4_FE_DATA_W/8-1:0][8-1:0]        set_value    = {(M00_AXI4_FE_DATA_W-1){1'b0},1'b1};
+                bit error_found;
+                integer error_counter;
+                integer mismatch_counter;
+
+                `include "module_slv_m_axi_vip_dump.vh"
+
+                error_found = 0;
+                error_counter = 0;
+                mismatch_counter = 0;
+
+                $display("MSG: // ------------------------------------------------- \n");
+                for (int i = graph.num_auxiliary_2; i < graph.num_auxiliary_2*2; i++) begin
+                    if(auxiliary_2[i] != graph.out_degree[i-graph.num_auxiliary_2]) begin
+                        $display("MSG: Starting num_auxiliary_2[%0d]: %0d==%0d\n",i-graph.num_auxiliary_2, auxiliary_2[i], graph.out_degree[i-graph.num_auxiliary_2]);
+                        mismatch_counter += 1;
+                    end
+                end
+                $display("MSG: // ------------------------------------------------- \n");
+                $display("MSG: mismatch_counter: %0d \n", mismatch_counter);
+                $display("MSG: // ------------------------------------------------- \n");
+
+                error_counter = 0;
+
+                return(error_found);
+            endfunction
+
+            function automatic bit check_CC_result(ref GraphCSR graph);
+                /////////////////////////////////////////////////////////////////////////////////////////////////
+                // Backdoor read the memory with the content.
+                bit error_found;
+                integer error_counter;
+                integer CC_change;
+
+                `include "module_slv_m_axi_vip_dump.vh"
+
+                error_found = 0;
+                error_counter = 0;
+                CC_change = auxiliary_2[1];
+                $display("MSG: // ------------------------------------------------- \n");
+                $display("MSG: CC_change: %0d \n", CC_change);
+                $display("MSG: // ------------------------------------------------- \n");
+
+                graph.debug_counter_1 = CC_change;
+                error_counter = 0;
+                return(error_found);
+            endfunction
+
+            function automatic bit check_TC_result(ref GraphCSR graph);
+                /////////////////////////////////////////////////////////////////////////////////////////////////
+                // Backdoor read the memory with the content.
+                bit error_found;
+                integer error_counter;
+                integer triangle_count;
+
+                `include "module_slv_m_axi_vip_dump.vh"
+
+                error_found = 0;
+                error_counter = 0;
+                triangle_count = auxiliary_2[0];
+                $display("MSG: // ------------------------------------------------- \n");
+                $display("MSG: Triangle_count: %0d \n", triangle_count);
+                $display("MSG: // ------------------------------------------------- \n");
+
+                error_counter = 0;
+                return(error_found);
+            endfunction
+
+            function automatic bit check_MEMCPY_result(ref GraphCSR graph);
+                /////////////////////////////////////////////////////////////////////////////////////////////////
+                // Backdoor read the memory with the content.
+                bit error_found;
+                integer error_counter;
+                integer mismatch_counter;
+
+                `include "module_slv_m_axi_vip_dump.vh"
+
+                error_found = 0;
+                error_counter = 0;
+                mismatch_counter = 0;
+
+                $display("MSG: // ------------------------------------------------- \n");
+                for (int i = 0; i < graph.mem_edges_array_src; i++) begin
+                    if(edges_array_src[i] != graph.edges_array_dest[i]) begin
+                        $display("MSG: Starting edges_array_dest[%0d]: %0d==%0d\n",i, edges_array_src[i], graph.edges_array_dest[i]);
+                        mismatch_counter += 1;
+                    end
+                end
+                $display("MSG: // ------------------------------------------------- \n");
+                $display("MSG: mismatch_counter: %0d \n", mismatch_counter);
+                $display("MSG: // ------------------------------------------------- \n");
+
+                error_counter = 0;
+
+                return(error_found);
+            endfunction
+
+            function automatic bit check_AUTOMATA_result(ref GraphCSR graph);
+                /////////////////////////////////////////////////////////////////////////////////////////////////
+                // Backdoor read the memory with the content.
+                bit error_found;
+                integer error_counter;
+                integer mismatch_counter;
+
+                `include "module_slv_m_axi_vip_dump.vh"
+
+                error_found = 0;
+                error_counter = 0;
+                mismatch_counter = 0;
+
+                $display("MSG: // ------------------------------------------------- \n");
+                for (int i = 0; i < graph.mem_edges_array_src; i++) begin
+                    if(edges_array_src[i] != graph.edges_array_dest[i]) begin
+                        $display("MSG: Starting edges_array_dest[%0d]: %0d==%0d\n",i, edges_array_src[i], graph.edges_array_dest[i]);
+                        mismatch_counter += 1;
+                    end
+                end
+                $display("MSG: // ------------------------------------------------- \n");
+                $display("MSG: mismatch_counter: %0d \n", mismatch_counter);
+                $display("MSG: // ------------------------------------------------- \n");
+
+                error_counter = 0;
+
+                return(error_found);
+            endfunction
+
+            function automatic bit check___KERNEL___result(ref GraphCSR graph);
+                /////////////////////////////////////////////////////////////////////////////////////////////////
+                // Backdoor read the memory with the content.
+                bit error_found = 0;
+
+                error_found |= check__ALGORITHM_NAME__result(graph)   ;
+
+                return(error_found);
+            endfunction
 
             /////////////////////////////////////////////////////////////////////////////////////////////////
-            // Backdoor fill the memory with the content.
-            m00_axi_fill_memory(buffer_0_ptr, LP_MAX_LENGTH);
-            m00_axi_fill_memory(buffer_1_ptr, LP_MAX_LENGTH);
-            m00_axi_fill_memory(buffer_2_ptr, LP_MAX_LENGTH);
-            m00_axi_fill_memory(buffer_3_ptr, LP_MAX_LENGTH);
-            m00_axi_fill_memory(buffer_4_ptr, LP_MAX_LENGTH);
-            m00_axi_fill_memory(buffer_5_ptr, LP_MAX_LENGTH);
-            m00_axi_fill_memory(buffer_6_ptr, LP_MAX_LENGTH);
-            m00_axi_fill_memory(buffer_7_ptr, LP_MAX_LENGTH);
-            m00_axi_fill_memory(buffer_8_ptr, LP_MAX_LENGTH);
-
-        endtask
-
-        task automatic backdoor_buffer_fill_memories(ref GraphCSR graph);
+            // Global read the files then send to backdoor memory with the content.
             /////////////////////////////////////////////////////////////////////////////////////////////////
-            // Backdoor fill the memory with the content.
-            m00_axi_buffer_fill_memory(m00_axi, buffer_0_ptr, graph.overlay_program, 0, graph.mem512_overlay_program_entries);
-            m00_axi_buffer_fill_memory(m00_axi, buffer_1_ptr, graph.in_degree, 0, graph.mem512_num_vertices);
-            m00_axi_buffer_fill_memory(m00_axi, buffer_2_ptr, graph.out_degree , 0, graph.mem512_num_vertices);
-            m00_axi_buffer_fill_memory(m00_axi, buffer_3_ptr, graph.edges_idx , 0, graph.mem512_num_vertices);
-            m00_axi_buffer_fill_memory(m00_axi, buffer_4_ptr, graph.edges_array_src, 0, graph.mem512_num_edges);
-            m00_axi_buffer_fill_memory(m00_axi, buffer_5_ptr, graph.edges_array_dest, 0, graph.mem512_num_edges);
-            m00_axi_buffer_fill_memory(m00_axi, buffer_6_ptr, graph.edges_array_weight, 0, graph.mem512_num_edges);
-            m00_axi_buffer_fill_memory(m00_axi, buffer_7_ptr, graph.auxiliary_1 , 0, graph.mem512_auxiliary_1);
-            m00_axi_buffer_fill_memory(m00_axi, buffer_8_ptr, graph.auxiliary_2 , 0, graph.mem512_auxiliary_2);
 
-        endtask
-
-        function automatic bit check___KERNEL___result(ref GraphCSR graph);
-            int o,l;
-            bit [M_AXI4_FE_DATA_W-1:0]        ret_rd_value = {M_AXI4_FE_DATA_W{1'b0}};
-            bit error_found = 0;
-            integer error_counter;
-            error_counter = 0;
-
-            o=0;
-            l=0;
-            $display("MSG: // ------------------------------------------------- \n");
-            for (int i = 0; i < graph.num_auxiliary_1; i++) begin
-                ret_rd_value = m00_axi.mem_model.backdoor_memory_read_4byte(buffer_7_ptr + (i * M_AXI4_FE_DATA_W/8));
-                $display("MSG: Starting num_auxiliary_1: %0d\n", ret_rd_value);
-                // $display("MSG: Starting temp_edges_array_dest: %0d\n", graph.auxiliary_2[l][(M_AXI4_FE_DATA_W*o)+:M_AXI4_FE_DATA_W]);
-                o++;
-                if (o%(M_AXI4_BE_DATA_W/M_AXI4_FE_DATA_W) == 0) begin
-                    l++;
-                    o=0;
-                end
-            end
-
-            // o=0;
-            // l=0;
-            $display("MSG: // ------------------------------------------------- \n");
-            for (int i = graph.num_auxiliary_1; i < graph.num_auxiliary_1*2; i++) begin
-                ret_rd_value = m00_axi.mem_model.backdoor_memory_read_4byte(buffer_7_ptr + (i * M_AXI4_FE_DATA_W/8));
-                $display("MSG: Starting num_auxiliary_1: %0d\n", ret_rd_value);
-                // $display("MSG: Starting temp_edges_array_dest: %0d\n", graph.auxiliary_2[l][(M_AXI4_FE_DATA_W*o)+:M_AXI4_FE_DATA_W]);
-                o++;
-                if (o%(M_AXI4_BE_DATA_W/M_AXI4_FE_DATA_W) == 0) begin
-                    l++;
-                    o=0;
-                end
-            end
-
-            o=0;
-            l=0;
-            $display("MSG: // ------------------------------------------------- \n");
-            for (int i = 0; i < graph.num_auxiliary_2; i++) begin
-                ret_rd_value = m00_axi.mem_model.backdoor_memory_read_4byte(buffer_8_ptr + (i * M_AXI4_FE_DATA_W/8));
-                $display("MSG: Starting num_auxiliary_2: %0d\n", ret_rd_value);
-                // $display("MSG: Starting temp_edges_array_dest: %0d\n", graph.auxiliary_2[l][(M_AXI4_FE_DATA_W*o)+:M_AXI4_FE_DATA_W]);
-                o++;
-                if (o%(M_AXI4_BE_DATA_W/M_AXI4_FE_DATA_W) == 0) begin
-                    l++;
-                    o=0;
-                end
-            end
-
-            // o=0;
-            // l=0;
-            $display("MSG: // ------------------------------------------------- \n");
-            for (int i = graph.num_auxiliary_2; i < graph.num_auxiliary_2*2; i++) begin
-                ret_rd_value = m00_axi.mem_model.backdoor_memory_read_4byte(buffer_8_ptr + (i * M_AXI4_FE_DATA_W/8));
-                $display("MSG: Starting num_auxiliary_2: %0d\n", ret_rd_value);
-                o++;
-                if (o%(M_AXI4_BE_DATA_W/M_AXI4_FE_DATA_W) == 0) begin
-                    l++;
-                    o=0;
-                end
-            end
-            $display("MSG: // ------------------------------------------------- \n");
-
-            error_counter = 0;
-            return(error_found);
-        endfunction
-
-        bit         choose_pressure_type      = 0;
+            bit choose_pressure_type = 0;
         bit         axis_choose_pressure_type = 0;
         bit [0-1:0] axis_tlast_received          ;
 
         GraphCSR graph;
 
+        /////////////////////////////////////////////////////////////////////////////////////////////////
         // Helper function to find the index of a substring within a string
         function int find_str(string str, string substr);
             automatic int i;
@@ -1081,34 +1117,31 @@ module __KERNEL___testbench ();
             end
         endfunction
 
-
         function automatic void read_files_graphCSR(ref GraphCSR graph);
+            /////////////////////////////////////////////////////////////////////////////////////////////////
+            // Backdoor read the files then send to backdoor memory with the content.
             int          realcount                 = 0;
             int          vertexcount               = 0;
-            int o,l;
-            bit [M_AXI4_FE_DATA_W-1:0] temp_overlay_program         ;
-            bit [M_AXI4_FE_DATA_W-1:0] temp_out_degree              ;
-            bit [M_AXI4_FE_DATA_W-1:0] temp_in_degree               ;
-            bit [M_AXI4_FE_DATA_W-1:0] temp_edges_idx               ;
+            int l;
+            bit [M00_AXI4_FE_DATA_W/8-1:0][8-1:0] temp_overlay_program         ;
+            bit [M00_AXI4_FE_DATA_W/8-1:0][8-1:0] temp_out_degree              ;
+            bit [M00_AXI4_FE_DATA_W/8-1:0][8-1:0] temp_in_degree               ;
+            bit [M00_AXI4_FE_DATA_W/8-1:0][8-1:0] temp_edges_idx               ;
 
-            bit [M_AXI4_FE_DATA_W-1:0] temp_edges_array_src ;
-            bit [M_AXI4_FE_DATA_W-1:0] temp_edges_array_dest;
-            bit [M_AXI4_FE_DATA_W-1:0] setup_temp;
+            bit [M00_AXI4_FE_DATA_W/8-1:0][8-1:0] temp_edges_array_src ;
+            bit [M00_AXI4_FE_DATA_W/8-1:0][8-1:0] temp_edges_array_dest;
+            bit [M00_AXI4_FE_DATA_W/8-1:0][8-1:0] setup_temp;
 
             realcount = 0;
             setup_temp = 0;
 
-            for (int i = 0; i < graph.mem512_overlay_program_entries; i++) begin
-                for (int j = 0; j < (M_AXI4_BE_DATA_W/M_AXI4_FE_DATA_W); j++) begin
-                    graph.overlay_program[i][(M_AXI4_FE_DATA_W*j)+:M_AXI4_FE_DATA_W] = realcount;
-                    realcount++;
-                end
+            for (int i = 0; i < graph.mem_overlay_program; i++) begin
+                graph.overlay_program[i] = realcount;
+                realcount++;
             end
 
-            // $display("MSG: File was NOT opened successfully : %0d",graph.file_ptr_overlay_program);
-
-            o=0;
             l=0;
+
             while (!$feof(graph.file_ptr_overlay_program)) begin
                 string line;
                 string hex_str;
@@ -1136,56 +1169,156 @@ module __KERNEL___testbench ();
                     if(num_read == 1) begin
                         // $display("MSG: %d %d Hex number: 32'h%0h",l,o, temp_overlay_program);
                         setup_temp = temp_overlay_program;
-                        graph.overlay_program[l][(M_AXI4_FE_DATA_W*o)+:M_AXI4_FE_DATA_W] = setup_temp;
-                        // $display("MSG: %d %d Hex number: 32'h%0h",l,o, graph.overlay_program[l][(M_AXI4_FE_DATA_W*o)+:M_AXI4_FE_DATA_W]);
-                        o++;
-                        if (o%(M_AXI4_BE_DATA_W/M_AXI4_FE_DATA_W) == 0) begin
-                            l++;
-                            o=0;
-                        end
+                        graph.overlay_program[l] = setup_temp;
+                        // $display("MSG: %d Hex number: 32'h%0h",l, graph.overlay_program[l]);
+                        l++;
                     end
                 end
             end
 
             `include"buffer_mapping._ALGORITHM_NAME_.vh"
 
-            for (int i = 0; i < graph.mem512_num_vertices; i++) begin
-                for (int j = 0; j < (M_AXI4_BE_DATA_W/M_AXI4_FE_DATA_W); j++) begin
-                    graph.file_error =  $fscanf(graph.file_ptr_out_degree, "%0d\n",temp_out_degree);
-                    setup_temp = temp_out_degree;
-                    graph.out_degree[i][(M_AXI4_FE_DATA_W*j)+:M_AXI4_FE_DATA_W] = setup_temp;
-                    // $display("MSG: Starting temp_out_degree: %0d\n", graph.out_degree[i][j+:M_AXI4_FE_DATA_W]);
+            for (int i = 0; i < graph.mem_num_vertices; i++) begin
+                graph.file_error =  $fscanf(graph.file_ptr_out_degree, "%0d\n",temp_out_degree);
+                setup_temp = temp_out_degree;
+                graph.out_degree[i] = setup_temp;
+                // $display("MSG: Starting temp_out_degree: %0d\n", graph.out_degree[i][j+:M00_AXI4_FE_DATA_W]);
 
-                    graph.file_error =  $fscanf(graph.file_ptr_in_degree, "%0d\n",temp_in_degree);
-                    setup_temp = temp_in_degree;
-                    graph.in_degree[i][(M_AXI4_FE_DATA_W*j)+:M_AXI4_FE_DATA_W] = setup_temp;
+                graph.file_error =  $fscanf(graph.file_ptr_in_degree, "%0d\n",temp_in_degree);
+                setup_temp = temp_in_degree;
+                graph.in_degree[i] = setup_temp;
 
-                    // $display("MSG: Starting temp_in_degree: %0d\n", temp_in_degree);
-                    graph.file_error =  $fscanf(graph.file_ptr_edges_idx, "%0d\n",temp_edges_idx);
-                    setup_temp = temp_edges_idx;
-                    graph.edges_idx[i][(M_AXI4_FE_DATA_W*j)+:M_AXI4_FE_DATA_W] = setup_temp;
-                    // $display("MSG: Starting temp_edges_idx: %0d\n", temp_edges_idx);
-                end
+                // $display("MSG: Starting temp_in_degree: %0d\n", temp_in_degree);
+                graph.file_error =  $fscanf(graph.file_ptr_edges_idx, "%0d\n",temp_edges_idx);
+                setup_temp = temp_edges_idx;
+                graph.edges_idx[i] = setup_temp;
+                // $display("MSG: Starting temp_edges_idx: %0d\n", temp_edges_idx);
             end
 
-            `include"initialize_testbench._ALGORITHM_NAME_.vh"
+            // `include"initialize_testbench._ALGORITHM_NAME_.vh"
 
-            for (int i = 0; i < graph.mem512_num_edges; i++) begin
-                for (int j = 0;j < (M_AXI4_BE_DATA_W/M_AXI4_FE_DATA_W); j++) begin
-                    graph.file_error =  $fscanf(graph.file_ptr_edges_array_src, "%0d\n",temp_edges_array_src);
-                    setup_temp = temp_edges_array_src;
-                    graph.edges_array_src[i][(M_AXI4_FE_DATA_W*j)+:M_AXI4_FE_DATA_W] = setup_temp;
-
-                    graph.file_error =  $fscanf(graph.file_ptr_edges_array_dest, "%0d\n",temp_edges_array_dest);
-                    setup_temp = temp_edges_array_dest;
-                    graph.edges_array_dest[i][(M_AXI4_FE_DATA_W*j)+:M_AXI4_FE_DATA_W] = setup_temp;
-                    // $display("MSG: Starting temp_edges_array_dest: %0d\n", temp_edges_array_dest);
-                end
+            for (int i = 0; i < graph.mem_edges_array_src; i++) begin
+                // for (int j = 0;j < (M00_AXI4_BE_DATA_W/M00_AXI4_FE_DATA_W); j++) begin
+                graph.file_error =  $fscanf(graph.file_ptr_edges_array_src, "%0d\n",temp_edges_array_src);
+                setup_temp = temp_edges_array_src;
+                graph.edges_array_src[i]= setup_temp;
+                // end
             end
 
+            for (int i = 0; i < graph.mem_num_edges; i++) begin
+                graph.file_error =  $fscanf(graph.file_ptr_edges_array_dest, "%0d\n",temp_edges_array_dest);
+                setup_temp = temp_edges_array_dest;
+                graph.edges_array_dest[i] = setup_temp;
+                // $display("MSG: Starting temp_edges_array_dest: %0d\n", temp_edges_array_dest);
+            end
+
+            initialize__ALGORITHM_NAME__auxiliary_struct(graph);
         endfunction : read_files_graphCSR
 
-        task automatic initalize_graph (ref GraphCSR graph);
+        typedef struct {
+            string graph_suit   ;
+            string graph_name   ;
+            string file_bin_type;
+        } GraphInitTuple;
+
+        // localparam int NUM_GRAPHS = 5; // Adjust based on actual needs
+        // GraphInitTuple graphInitParams_TEST[NUM_GRAPHS] = '{
+        //     {"TEST", "v500_e500"   , "graph.bin"},
+        //     {"TEST", "v529_e3500"  , "graph.bin"},
+        //     {"TEST", "v1000_e10000", "graph.bin"},
+        //     {"TEST", "v1024_e4096" , "graph.bin"},
+        //     {"TEST", "v8192_e32768", "graph.bin"}
+        // };
+
+        localparam int NUM_GRAPHS = 1; // Adjust based on actual needs
+        GraphInitTuple graphInitParams_TEST[NUM_GRAPHS] = '{
+            {"TEST", "v500_e500"   , "graph.bin"}
+        };
+
+        function automatic void initialize_GraphCSR_Tuple (ref GraphCSR graph, GraphInitTuple graphInitParams, input integer unsigned source = _ROOT_);
+            /////////////////////////////////////////////////////////////////////////////////////////////////
+            // Backdoor read the files then send to backdoor memory with the content.
+
+            string in_degree_path = $sformatf("_GRAPH_DIR_/%0s/%1s/%2s.in_degree", graphInitParams.graph_suit, graphInitParams.graph_name, graphInitParams.file_bin_type);
+            string out_degree_path = $sformatf("_GRAPH_DIR_/%0s/%1s/%2s.out_degree", graphInitParams.graph_suit, graphInitParams.graph_name, graphInitParams.file_bin_type);
+            string edges_idx_path = $sformatf("_GRAPH_DIR_/%0s/%1s/%2s.edges_idx", graphInitParams.graph_suit, graphInitParams.graph_name, graphInitParams.file_bin_type);
+            string edges_array_src_path = $sformatf("_GRAPH_DIR_/%0s/%1s/%2s.edges_array_src", graphInitParams.graph_suit, graphInitParams.graph_name, graphInitParams.file_bin_type);
+            string edges_array_dest_path = $sformatf("_GRAPH_DIR_/%0s/%1s/%2s.edges_array_dest", graphInitParams.graph_suit, graphInitParams.graph_name, graphInitParams.file_bin_type);
+
+            graph.graph_name = graphInitParams.graph_name;
+
+            graph.file_ptr_overlay_program = $fopen("_FULL_SRC_IP_DIR_OVERLAY_/_ARCHITECTURE_/_CAPABILITY_/_CAPABILITY_.ol/_ALGORITHM_NAME_.ol", "r");
+            if(graph.file_ptr_overlay_program) $display("File was opened successfully : %0d",graph.file_ptr_overlay_program);
+            else                   $display("MSG: File was NOT opened successfully : %0d",graph.file_ptr_overlay_program);
+
+            graph.file_ptr_in_degree = $fopen(in_degree_path, "r");
+            if(graph.file_ptr_in_degree) $display("File was opened successfully : %0d",graph.file_ptr_in_degree);
+            else                   $display("MSG: File was NOT opened successfully : %0d",graph.file_ptr_in_degree);
+
+            graph.file_ptr_out_degree = $fopen(out_degree_path, "r");
+            if(graph.file_ptr_out_degree) $display("File was opened successfully : %0d",graph.file_ptr_out_degree);
+            else                    $display("MSG: File was NOT opened successfully : %0d",graph.file_ptr_out_degree);
+
+            graph.file_ptr_edges_idx = $fopen(edges_idx_path, "r");
+            if(graph.file_ptr_edges_idx) $display("File was opened successfully : %0d",graph.file_ptr_edges_idx);
+            else                   $display("MSG: File was NOT opened successfully : %0d",graph.file_ptr_edges_idx);
+
+            graph.file_ptr_edges_array_src = $fopen(edges_array_src_path, "r");
+            if(graph.file_ptr_edges_array_src) $display("File was opened successfully : %0d",graph.file_ptr_edges_array_src);
+            else                         $display("MSG: File was NOT opened successfully : %0d",graph.file_ptr_edges_array_src);
+
+            graph.file_ptr_edges_array_dest= $fopen(edges_array_dest_path, "r");
+            if(graph.file_ptr_edges_array_dest) $display("File was opened successfully : %0d",graph.file_ptr_edges_array_dest);
+            else                          $display("MSG: File was NOT opened successfully : %0d",graph.file_ptr_edges_array_dest);
+
+            graph.file_error =      $fscanf(graph.file_ptr_out_degree, "%d\n",graph.num_vertices);
+            graph.file_error =      $fscanf(graph.file_ptr_edges_array_src, "%d\n",graph.num_edges);
+
+            graph.bfs_source = source;
+
+            graph.num_auxiliary_1 = graph.num_vertices;
+            graph.num_auxiliary_2 = graph.num_vertices;
+
+            graph.mem_overlay_program = int'(buffer_9_ptr[M00_AXI4_FE_DATA_W-1:1] + SYSTEM_CACHE_SIZE_ITERAIONS); // cachelines
+
+            graph.mem_num_vertices = ((graph.num_vertices*M00_AXI4_FE_DATA_W) + (M00_AXI4_FE_DATA_W-1) )/ (M00_AXI4_FE_DATA_W);
+            graph.mem_num_edges = ((graph.num_edges*M00_AXI4_FE_DATA_W) + (M00_AXI4_FE_DATA_W-1) )/ (M00_AXI4_FE_DATA_W);
+
+            graph.mem_edges_idx       = graph.mem_num_vertices ;
+            graph.mem_in_degree       = graph.mem_num_vertices ;
+            graph.mem_out_degree      = graph.mem_num_vertices ;
+
+            graph.mem_edges_array_src   = ((graph.num_edges*M01_AXI4_FE_DATA_W) + (M01_AXI4_FE_DATA_W-1) )/ (M01_AXI4_FE_DATA_W);
+            graph.mem_edges_array_dest  = ((graph.num_edges*M01_AXI4_FE_DATA_W) + (M01_AXI4_FE_DATA_W-1) )/ (M01_AXI4_FE_DATA_W);
+            graph.mem_edges_array_weight= ((graph.num_edges*M01_AXI4_FE_DATA_W) + (M01_AXI4_FE_DATA_W-1) )/ (M01_AXI4_FE_DATA_W);
+
+            graph.mem_auxiliary_1 = ((graph.num_auxiliary_1*M00_AXI4_FE_DATA_W*2) + (M00_AXI4_FE_DATA_W-1) )/ (M00_AXI4_FE_DATA_W);
+            graph.mem_auxiliary_2 = ((graph.num_auxiliary_2*M00_AXI4_FE_DATA_W*2) + (M00_AXI4_FE_DATA_W-1) )/ (M00_AXI4_FE_DATA_W);
+
+            graph.out_degree   = new [graph.mem_num_vertices];
+            graph.in_degree    = new [graph.mem_num_vertices];
+            graph.edges_idx    = new [graph.mem_num_vertices];
+            graph.auxiliary_1  = new [graph.mem_auxiliary_1];
+            graph.auxiliary_2  = new [graph.mem_auxiliary_2];
+            graph.edges_array_src = new [graph.mem_edges_array_src];
+            graph.edges_array_dest= new [graph.mem_edges_array_dest];
+            graph.overlay_program = new [graph.mem_overlay_program];
+
+            read_files_graphCSR(graph);
+
+            $fclose(graph.file_ptr_overlay_program);
+            $fclose(graph.file_ptr_in_degree);
+            $fclose(graph.file_ptr_out_degree);
+            $fclose(graph.file_ptr_edges_idx);
+            $fclose(graph.file_ptr_edges_array_src);
+            $fclose(graph.file_ptr_edges_array_dest);
+
+            graph.display();
+        endfunction
+
+        function automatic void initalize_GraphCSR (ref GraphCSR graph, input integer unsigned source = _ROOT_);
+            /////////////////////////////////////////////////////////////////////////////////////////////////
+            // Backdoor read the files then send to backdoor memory with the content.
             graph.graph_name = "_GRAPH_NAME_";
 
             graph.file_ptr_overlay_program = $fopen("_FULL_SRC_IP_DIR_OVERLAY_/_ARCHITECTURE_/_CAPABILITY_/_CAPABILITY_.ol/_ALGORITHM_NAME_.ol", "r");
@@ -1215,25 +1348,35 @@ module __KERNEL___testbench ();
             graph.file_error =      $fscanf(graph.file_ptr_out_degree, "%d\n",graph.num_vertices);
             graph.file_error =      $fscanf(graph.file_ptr_edges_array_src, "%d\n",graph.num_edges);
 
+            graph.bfs_source = source;
+
             graph.num_auxiliary_1 = graph.num_vertices;
             graph.num_auxiliary_2 = graph.num_vertices;
 
-            graph.mem512_overlay_program_entries = int'(buffer_9_ptr[M_AXI4_FE_DATA_W-1:1] + SYSTEM_CACHE_SIZE_ITERAIONS); // cachelines
+            graph.mem_overlay_program = int'(buffer_9_ptr[M00_AXI4_FE_DATA_W-1:1] + SYSTEM_CACHE_SIZE_ITERAIONS); // cachelines
 
-            graph.mem512_num_vertices = ((graph.num_vertices*M_AXI4_FE_DATA_W) + (M_AXI4_BE_DATA_W-1) )/ (M_AXI4_BE_DATA_W);
-            graph.mem512_num_edges = ((graph.num_edges*M_AXI4_FE_DATA_W) + (M_AXI4_BE_DATA_W-1) )/ (M_AXI4_BE_DATA_W);
+            graph.mem_num_vertices = ((graph.num_vertices*M00_AXI4_FE_DATA_W) + (M00_AXI4_FE_DATA_W-1) )/ (M00_AXI4_FE_DATA_W);
+            graph.mem_num_edges = ((graph.num_edges*M00_AXI4_FE_DATA_W) + (M00_AXI4_FE_DATA_W-1) )/ (M00_AXI4_FE_DATA_W);
 
-            graph.mem512_auxiliary_1 = ((graph.num_auxiliary_1*M_AXI4_FE_DATA_W*2) + (M_AXI4_BE_DATA_W-1) )/ (M_AXI4_BE_DATA_W);
-            graph.mem512_auxiliary_2 = ((graph.num_auxiliary_2*M_AXI4_FE_DATA_W*2) + (M_AXI4_BE_DATA_W-1) )/ (M_AXI4_BE_DATA_W);
+            graph.mem_edges_idx       = graph.mem_num_vertices ;
+            graph.mem_in_degree       = graph.mem_num_vertices ;
+            graph.mem_out_degree      = graph.mem_num_vertices ;
 
-            graph.out_degree   = new [graph.mem512_num_vertices];
-            graph.in_degree    = new [graph.mem512_num_vertices];
-            graph.edges_idx    = new [graph.mem512_num_vertices];
-            graph.auxiliary_1  = new [graph.mem512_auxiliary_1];
-            graph.auxiliary_2  = new [graph.mem512_auxiliary_2];
-            graph.edges_array_src = new [graph.mem512_num_edges];
-            graph.edges_array_dest= new [graph.mem512_num_edges];
-            graph.overlay_program = new [graph.mem512_overlay_program_entries];
+            graph.mem_edges_array_src   = ((graph.num_edges*M01_AXI4_FE_DATA_W) + (M01_AXI4_FE_DATA_W-1) )/ (M01_AXI4_FE_DATA_W);
+            graph.mem_edges_array_dest  = ((graph.num_edges*M01_AXI4_FE_DATA_W) + (M01_AXI4_FE_DATA_W-1) )/ (M01_AXI4_FE_DATA_W);
+            graph.mem_edges_array_weight= ((graph.num_edges*M01_AXI4_FE_DATA_W) + (M01_AXI4_FE_DATA_W-1) )/ (M01_AXI4_FE_DATA_W);
+
+            graph.mem_auxiliary_1 = ((graph.num_auxiliary_1*M00_AXI4_FE_DATA_W*2) + (M00_AXI4_FE_DATA_W-1) )/ (M00_AXI4_FE_DATA_W);
+            graph.mem_auxiliary_2 = ((graph.num_auxiliary_2*M00_AXI4_FE_DATA_W*2) + (M00_AXI4_FE_DATA_W-1) )/ (M00_AXI4_FE_DATA_W);
+
+            graph.out_degree   = new [graph.mem_num_vertices];
+            graph.in_degree    = new [graph.mem_num_vertices];
+            graph.edges_idx    = new [graph.mem_num_vertices];
+            graph.auxiliary_1  = new [graph.mem_auxiliary_1];
+            graph.auxiliary_2  = new [graph.mem_auxiliary_2];
+            graph.edges_array_src = new [graph.mem_edges_array_src];
+            graph.edges_array_dest= new [graph.mem_edges_array_dest];
+            graph.overlay_program = new [graph.mem_overlay_program];
 
             read_files_graphCSR(graph);
 
@@ -1245,18 +1388,19 @@ module __KERNEL___testbench ();
             $fclose(graph.file_ptr_edges_array_dest);
 
             graph.display();
-        endtask
+        endfunction
 
-/////////////////////////////////////////////////////////////////////////////////////////////////
-// Set up the __KERNEL__ for operation and set the __KERNEL__ START bit.
-// The task will poll the DONE bit and check the results when complete.
-        task automatic multiple_iteration(input integer unsigned num_iterations, output bit error_found, ref GraphCSR graph);
+        /////////////////////////////////////////////////////////////////////////////////////////////////
+        // Set up the __KERNEL__ for operation and set the __KERNEL__ START bit.
+        // The task will poll the DONE bit and check the results when complete.
+        task automatic multiple_iteration(input integer unsigned num_trials, output bit error_found);
+            GraphCSR graph;
             error_found = 0;
-
+            graph = new();
             $display("Starting: multiple_iteration");
-            for (integer unsigned iter = 0; iter < num_iterations; iter++) begin
+            for (integer unsigned trial = 0; trial < num_trials; trial++) begin
 
-                $display("Starting iteration: %d / %d", iter+1, num_iterations);
+                $display("Starting iteration: %d / %d", trial+1, num_trials);
                 RAND_WREADY_PRESSURE_FAILED : assert(std::randomize(choose_pressure_type));
                 case(choose_pressure_type)
                     0 : slv_no_backpressure_wready();
@@ -1270,7 +1414,7 @@ module __KERNEL___testbench ();
 
                 set_scalar_registers();
                 set_memory_pointers();
-                initalize_graph (graph);
+                initalize_GraphCSR (graph);
                 // backdoor_fill_memories();
                 backdoor_buffer_fill_memories(graph);
                 // Check that __KERNEL__ is IDLE before starting.
@@ -1296,22 +1440,18 @@ module __KERNEL___testbench ();
                 ///////////////////////////////////////////////////////////////////////////
                 error_found |= check___KERNEL___result(graph)   ;
 
-                $display("Finished iteration: %d / %d", iter+1, num_iterations);
+                $display("Finished iteration: %d / %d", trial+1, num_trials);
             end
         endtask
 
-        task automatic multiple_iteration_bfs(input integer unsigned num_iterations, output bit error_found, ref GraphCSR graph);
+        task automatic multiple_iteration_MEMCPY(input integer unsigned num_trials, output bit error_found);
+            GraphCSR graph;
             error_found = 0;
+            graph = new();
+            $display("Starting: multiple_iteration MEMCPY");
+            for (integer unsigned trial = 0; trial < num_trials; trial++) begin
 
-
-            initalize_graph (graph);
-            // backdoor_fill_memories();
-            backdoor_buffer_fill_memories(graph);
-
-            $display("Starting: multiple_iteration BFS");
-            for (integer unsigned iter = 0; iter < num_iterations; iter++) begin
-
-                $display("Starting iteration: %d / %d", iter+1, num_iterations);
+                $display("Starting iteration: %d / %d", trial+1, num_trials);
                 RAND_WREADY_PRESSURE_FAILED : assert(std::randomize(choose_pressure_type));
                 case(choose_pressure_type)
                     0 : slv_no_backpressure_wready();
@@ -1323,9 +1463,11 @@ module __KERNEL___testbench ();
                     1 : slv_random_delay_rvalid();
                 endcase
 
-
                 set_scalar_registers();
-                set_memory_pointers_bfs();
+                set_memory_pointers();
+                initalize_GraphCSR (graph);
+                // backdoor_fill_memories();
+                backdoor_buffer_fill_memories(graph);
                 // Check that __KERNEL__ is IDLE before starting.
                 poll_idle_register();
                 ///////////////////////////////////////////////////////////////////////////
@@ -1347,17 +1489,356 @@ module __KERNEL___testbench ();
                 // wait(interrupt == 0);
 
                 ///////////////////////////////////////////////////////////////////////////
-                // error_found |= check___KERNEL___result()   ;
+                error_found |= check___KERNEL___result(graph)   ;
 
-                $display("Finished iteration: %d / %d", iter+1, num_iterations);
+                $display("Finished iteration: %d / %d", trial+1, num_trials);
+            end
+        endtask
+
+        task automatic multiple_iteration_AUTOMATA(input integer unsigned num_trials, output bit error_found);
+            GraphCSR graph;
+            error_found = 0;
+            graph = new();
+            $display("Starting: multiple_iteration AUTOMATA");
+            for (integer unsigned trial = 0; trial < num_trials; trial++) begin
+
+                $display("Starting iteration: %d / %d", trial+1, num_trials);
+                RAND_WREADY_PRESSURE_FAILED : assert(std::randomize(choose_pressure_type));
+                case(choose_pressure_type)
+                    0 : slv_no_backpressure_wready();
+                    1 : slv_random_backpressure_wready();
+                endcase
+                RAND_RVALID_PRESSURE_FAILED : assert(std::randomize(choose_pressure_type));
+                case(choose_pressure_type)
+                    0 : slv_no_delay_rvalid();
+                    1 : slv_random_delay_rvalid();
+                endcase
+
+                set_scalar_registers();
+                set_memory_pointers();
+                initalize_GraphCSR (graph);
+                // backdoor_fill_memories();
+                backdoor_buffer_fill_memories(graph);
+                // Check that __KERNEL__ is IDLE before starting.
+                poll_idle_register();
+                ///////////////////////////////////////////////////////////////////////////
+                //Start transfers
+                blocking_write_register(KRNL_CTRL_REG_ADDR, CTRL_START_MASK);
+
+                ctrl.wait_drivers_idle();
+
+                poll_ready_register();
+
+                poll_done_register();
+                ///////////////////////////////////////////////////////////////////////////
+                //Wait for interrupt being asserted or poll done register
+                // @(posedge interrupt);
+                // poll_done_register();
+                ///////////////////////////////////////////////////////////////////////////
+                // Service the interrupt
+                // service_interrupts();
+                // wait(interrupt == 0);
+
+                ///////////////////////////////////////////////////////////////////////////
+                error_found |= check___KERNEL___result(graph)   ;
+
+                $display("Finished iteration: %d / %d", trial+1, num_trials);
+            end
+        endtask
+
+        task automatic multiple_iteration_PR(input integer unsigned num_trials, output bit error_found);
+            GraphCSR graph;
+            error_found = 0;
+            graph = new();
+            for (integer unsigned trial = 0; trial < num_trials; trial++) begin
+
+                $display("Starting - PR Trial: %0d / %0d", trial+1, num_trials);
+                RAND_WREADY_PRESSURE_FAILED : assert(std::randomize(choose_pressure_type));
+                case(choose_pressure_type)
+                    0 : slv_no_backpressure_wready();
+                    1 : slv_random_backpressure_wready();
+                endcase
+                RAND_RVALID_PRESSURE_FAILED : assert(std::randomize(choose_pressure_type));
+                case(choose_pressure_type)
+                    0 : slv_no_delay_rvalid();
+                    1 : slv_random_delay_rvalid();
+                endcase
+                // slv_random_backpressure_wready();
+                // slv_random_delay_rvalid();
+
+                set_scalar_registers();
+                set_memory_pointers();
+                initalize_GraphCSR (graph);
+                // backdoor_fill_memories();
+                backdoor_buffer_fill_memories(graph);
+                // Check that __KERNEL__ is IDLE before starting.
+                poll_idle_register();
+                ///////////////////////////////////////////////////////////////////////////
+                //Start transfers
+                blocking_write_register(KRNL_CTRL_REG_ADDR, CTRL_START_MASK);
+
+                ctrl.wait_drivers_idle();
+
+                poll_ready_register();
+
+                poll_done_register();
+                ///////////////////////////////////////////////////////////////////////////
+                //Wait for interrupt being asserted or poll done register
+                // @(posedge interrupt);
+                // poll_done_register();
+                ///////////////////////////////////////////////////////////////////////////
+                // Service the interrupt
+                // service_interrupts();
+                // wait(interrupt == 0);
+
+                ///////////////////////////////////////////////////////////////////////////
+                error_found |= check___KERNEL___result(graph)   ;
+
+                $display("Finished iteration: %d / %d", trial+1, num_trials);
+            end
+        endtask
+
+        task automatic multiple_iteration_CC(input integer unsigned num_trials, output bit error_found);
+            GraphCSR graph;
+            integer unsigned trial = 0;
+            integer unsigned iter  = 0;
+            error_found = 0;
+            graph = new();
+            for (int trial = 0; trial < num_trials; trial++) begin
+                graph.bfs_source = trial;
+                graph.debug_counter_1 = 0;
+                graph.debug_counter_2 = 0;
+
+                // RAND_WREADY_PRESSURE_FAILED : assert(std::randomize(choose_pressure_type));
+                // case(choose_pressure_type)
+                //     0 : slv_no_backpressure_wready();
+                //     1 : slv_random_backpressure_wready();
+                // endcase
+                // RAND_RVALID_PRESSURE_FAILED : assert(std::randomize(choose_pressure_type));
+                // case(choose_pressure_type)
+                //     0 : slv_no_delay_rvalid();
+                //     1 : slv_random_delay_rvalid();
+                // endcase
+                slv_random_backpressure_wready();
+                slv_random_delay_rvalid();
+                if(trial == 0)
+                    initalize_GraphCSR (graph);
+                else
+                    initalize_GraphCSR (graph);
+
+                $display("Starting - CC Trial: %0d / %0d", trial, num_trials);
+                $display("Starting - Iteration: %0d - Components: %0d", iter, graph.debug_counter_2);
+                set_scalar_registers();
+                set_memory_pointers();
+                backdoor_buffer_fill_memories(graph);
+                // Check that __KERNEL__ is IDLE before starting.
+                poll_idle_register();
+                ///////////////////////////////////////////////////////////////////////////
+                //Start transfers
+                blocking_write_register(KRNL_CTRL_REG_ADDR, CTRL_START_MASK);
+
+                ctrl.wait_drivers_idle();
+
+                poll_ready_register();
+
+                poll_done_register();
+
+                ///////////////////////////////////////////////////////////////////////////
+                error_found |= check___KERNEL___result(graph)   ;
+
+                $display("Starting - Multiple Iterations:");
+                while (graph.debug_counter_1) begin
+                    RAND_WREADY_PRESSURE_FAILED_ITER : assert(std::randomize(choose_pressure_type));
+                    case(choose_pressure_type)
+                        0 : slv_no_backpressure_wready();
+                        1 : slv_random_backpressure_wready();
+                    endcase
+                    RAND_RVALID_PRESSURE_FAILED_ITER : assert(std::randomize(choose_pressure_type));
+                    case(choose_pressure_type)
+                        0 : slv_no_delay_rvalid();
+                        1 : slv_random_delay_rvalid();
+                    endcase
+                    update_CC_auxiliary_struct(graph);
+                    $display("Starting - Iteration: %0d - Components: %0d", iter+1, graph.debug_counter_2);
+                    set_scalar_registers();
+                    set_memory_pointers();
+                    backdoor_buffer_fill_memories(graph);
+                    // Check that __KERNEL__ is IDLE before starting.
+                    poll_idle_register();
+                    ///////////////////////////////////////////////////////////////////////////
+                    //Start transfers
+                    blocking_write_register(KRNL_CTRL_REG_ADDR, CTRL_START_MASK);
+
+                    ctrl.wait_drivers_idle();
+
+                    poll_ready_register();
+
+                    poll_done_register();
+
+                    ///////////////////////////////////////////////////////////////////////////
+                    error_found |= check___KERNEL___result(graph)   ;
+                    if(graph.debug_counter_1 == 0)
+                        break;
+                    iter++;
+                end
+                update_BFS_auxiliary_struct(graph);
+                $display("Finished - Iteration: %0d - Components: %0d", iter+1, graph.debug_counter_1);
+            end
+        endtask
+
+
+        task automatic multiple_iteration_TC(input integer unsigned num_trials, output bit error_found);
+            GraphCSR graph;
+            error_found = 0;
+            graph = new();
+            $display("Starting: multiple_iteration TC");
+            for (integer unsigned trial = 0; trial < num_trials; trial++) begin
+
+                $display("Starting iteration: %d / %d", trial+1, num_trials);
+                RAND_WREADY_PRESSURE_FAILED : assert(std::randomize(choose_pressure_type));
+                case(choose_pressure_type)
+                    0 : slv_no_backpressure_wready();
+                    1 : slv_random_backpressure_wready();
+                endcase
+                RAND_RVALID_PRESSURE_FAILED : assert(std::randomize(choose_pressure_type));
+                case(choose_pressure_type)
+                    0 : slv_no_delay_rvalid();
+                    1 : slv_random_delay_rvalid();
+                endcase
+
+                set_scalar_registers();
+                set_memory_pointers();
+                initalize_GraphCSR (graph);
+                // backdoor_fill_memories();
+                backdoor_buffer_fill_memories(graph);
+                // Check that __KERNEL__ is IDLE before starting.
+                poll_idle_register();
+                ///////////////////////////////////////////////////////////////////////////
+                //Start transfers
+                blocking_write_register(KRNL_CTRL_REG_ADDR, CTRL_START_MASK);
+
+                ctrl.wait_drivers_idle();
+
+                poll_ready_register();
+
+                poll_done_register();
+                ///////////////////////////////////////////////////////////////////////////
+                //Wait for interrupt being asserted or poll done register
+                // @(posedge interrupt);
+                // poll_done_register();
+                ///////////////////////////////////////////////////////////////////////////
+                // Service the interrupt
+                // service_interrupts();
+                // wait(interrupt == 0);
+
+                ///////////////////////////////////////////////////////////////////////////
+                error_found |= check___KERNEL___result(graph)   ;
+
+                $display("Finished iteration: %d / %d", trial+1, num_trials);
+            end
+        endtask
+
+        localparam int     NUM_SOURCES              = 4              ; // Example, adjust based on actual needs
+        integer            sources    [NUM_SOURCES] = '{1, 3, 543, 2}; // Initialize the array with your specific source values
+
+        task automatic multiple_iteration_BFS(input integer unsigned num_trials, output bit error_found);
+            GraphCSR graph;
+            integer unsigned trial;
+            integer unsigned iter;
+
+            error_found = 0;
+            graph = new();
+            foreach (graphInitParams_TEST[i]) begin
+                iter  = 0;
+                trial = 0;
+                for (int trial = 0; trial < num_trials; trial++) begin
+                    graph.bfs_source = trial;
+                    graph.debug_counter_1 = 1;
+
+                    // RAND_WREADY_PRESSURE_FAILED : assert(std::randomize(choose_pressure_type));
+                    // case(choose_pressure_type)
+                    //     0 : slv_no_backpressure_wready();
+                    //     1 : slv_random_backpressure_wready();
+                    // endcase
+                    // RAND_RVALID_PRESSURE_FAILED : assert(std::randomize(choose_pressure_type));
+                    // case(choose_pressure_type)
+                    //     0 : slv_no_delay_rvalid();
+                    //     1 : slv_random_delay_rvalid();
+                    // endcase
+                    slv_random_backpressure_wready();
+                    slv_random_delay_rvalid();
+                    if(trial == 0)
+                        initialize_GraphCSR_Tuple (graph, graphInitParams_TEST[i]);
+                    else
+                        initialize_GraphCSR_Tuple (graph, graphInitParams_TEST[i], trial);
+
+                    $display("Starting - BFS Trial: %0d / %0d - Source: %0d", trial, num_trials, graph.bfs_source);
+                    $display("Starting - Iteration: %0d - Frontier: %0d", iter, graph.debug_counter_1);
+                    set_scalar_registers();
+                    set_memory_pointers();
+                    backdoor_buffer_fill_memories(graph);
+                    // Check that __KERNEL__ is IDLE before starting.
+                    poll_idle_register();
+                    ///////////////////////////////////////////////////////////////////////////
+                    //Start transfers
+                    blocking_write_register(KRNL_CTRL_REG_ADDR, CTRL_START_MASK);
+
+                    ctrl.wait_drivers_idle();
+
+                    poll_ready_register();
+
+                    poll_done_register();
+
+                    ///////////////////////////////////////////////////////////////////////////
+                    error_found |= check___KERNEL___result(graph)   ;
+
+                    $display("Starting - Multiple Iterations:");
+                    while (graph.debug_counter_1) begin
+                        RAND_WREADY_PRESSURE_FAILED_ITER : assert(std::randomize(choose_pressure_type));
+                        case(choose_pressure_type)
+                            0 : slv_no_backpressure_wready();
+                            1 : slv_random_backpressure_wready();
+                        endcase
+                        RAND_RVALID_PRESSURE_FAILED_ITER : assert(std::randomize(choose_pressure_type));
+                        case(choose_pressure_type)
+                            0 : slv_no_delay_rvalid();
+                            1 : slv_random_delay_rvalid();
+                        endcase
+                        // slv_random_backpressure_wready();
+                        // slv_random_delay_rvalid();
+                        update_BFS_auxiliary_struct(graph);
+                        $display("Starting - Iteration: %0d - Frontier: %0d", iter+1, graph.debug_counter_1);
+                        set_scalar_registers();
+                        set_memory_pointers();
+                        backdoor_buffer_fill_memories(graph);
+                        // Check that __KERNEL__ is IDLE before starting.
+                        poll_idle_register();
+                        ///////////////////////////////////////////////////////////////////////////
+                        //Start transfers
+                        blocking_write_register(KRNL_CTRL_REG_ADDR, CTRL_START_MASK);
+
+                        ctrl.wait_drivers_idle();
+
+                        poll_ready_register();
+
+                        poll_done_register();
+
+                        ///////////////////////////////////////////////////////////////////////////
+                        error_found |= check___KERNEL___result(graph)   ;
+                        if(graph.debug_counter_1 == 0)
+                            break;
+                        iter++;
+                    end
+                    update_BFS_auxiliary_struct(graph);
+                    $display("Finished - Iteration: %0d - Frontier: %0d", iter+1, graph.debug_counter_1);
+                end
             end
         endtask
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 //Instantiate AXI4 LITE VIP
         initial begin : STIMULUS
-
-            graph = new();
+            printDataTypeSizes();
 
             #200000;
             start_vips();
@@ -1376,26 +1857,17 @@ module __KERNEL___testbench ();
 
             // enable_interrupts();
             disable_interrupts();
-
             #1000
-                multiple_iteration(1, error_found, graph);
+                multiple_iteration__ALGORITHM_NAME_(_NUM_TRIALS_, error_found);
+
             if (error_found == 1) begin
                 $display( "ERROR: Test Failed!");
                 $finish();
+            end else begin
+                $display( "Test completed successfully");
             end
 
-            // #1000
-            //     multiple_iteration(5, error_found, graph);
-
-            // if (error_found == 1) begin
-            //     $display( "ERROR: Test Failed!");
-            //     $finish();
-            // end else begin
-            //     $display( "Test completed successfully");
-            // end
-
             #1000  $finish;
-
         end
 
 // Waveform dump

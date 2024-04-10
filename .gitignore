@@ -1,21 +1,18 @@
+*.err
+*.log
+logs
+node_modules
+package-lock.json
+package.json
 .vscode
 .Xil
-*.log
-*.err
-glay.sublime-project
-glay.sublime-workspace
-nohup.out
-vivado.jou  
-vivado.log 
-vivado_pid*.str
-xilinx_* 
-alg_*
-00_make/params.tcl
 00_make/params.sh
+00_make/params.tcl
 01_host/*.err
 01_host/*.log
 01_host/.vscode
 01_host/.Xil
+01_host/alg_*
 01_host/bin
 01_host/build
 01_host/glay.sublime-project
@@ -30,15 +27,54 @@ alg_*
 02_device/*.log
 02_device/.vscode
 02_device/.Xil
+02_device/alg_*
 02_device/glay.sublime-project
 02_device/glay.sublime-workspace
 02_device/ip/glay_kernel_ex
 02_device/nohup.out
+02_device/ol/*/template.*.json
+02_device/ol/*/template.*.ol
+02_device/rtl/utils/include/global/config_parameters.vh
+02_device/rtl/utils/include/parameters/set_top_parameters.vh
+02_device/rtl/utils/include/parameters/testbench_parameters.vh
+02_device/rtl/utils/include/parameters/topology_parameters.vh
+02_device/rtl/utils/include/parameters/top_parameters.vh
+02_device/rtl/utils/include/portmaps/m_axi_portmap_kernel_cu.vh
+02_device/rtl/utils/include/portmaps/m_axi_portmap_afu.vh
+02_device/rtl/utils/include/portmaps/m_axi_portmap_top.vh
+02_device/rtl/utils/include/portmaps/m_axi_ports_kernel_cu.vh
+02_device/rtl/utils/include/portmaps/m_axi_ports_afu.vh
+02_device/rtl/utils/include/portmaps/m_axi_ports_top.vh
+02_device/rtl/utils/include/portmaps/m_axi_wires_top.vh
+02_device/rtl/utils/include/testbench/*
+02_device/rtl/utils/include/topology/bundle_arbitration.vh
+02_device/rtl/utils/include/topology/bundle_topology.vh
+02_device/rtl/utils/include/topology/afu_topology.vh
+02_device/rtl/utils/include/topology/kernel_cu_topology.vh
+02_device/rtl/utils/include/topology/cu_arbitration.vh
+02_device/rtl/utils/include/topology/lane_arbitration.vh
+02_device/rtl/utils/include/topology/lane_topology.vh
+02_device/rtl/utils/include/topology/fifo_wrapper_topology.vh
+02_device/rtl/utils/include/topology/engine_template_topology.vh
+# !02_device/rtl/cu/cu_m00_axi_cu_*.sv
+# 02_device/rtl/cu/cu_m*_axi_cu_*.sv
+# !02_device/rtl/cu/cu_mxx_axi_cu_*.sv
+# !02_device/rtl/kernel/kernel_m00_axi_system_cache_*.sv
+# 02_device/rtl/kernel/kernel_m*_axi_system_cache_*.sv
+# !02_device/rtl/kernel/kernel_mxx_axi_system_cache_*.sv
+# !02_device/rtl/utils/slice/m00_axi_register_slice_*.sv
+# 02_device/rtl/utils/slice/m*_axi_register_slice_*.sv
+# !02_device/rtl/utils/slice/mxx_axi_register_slice_*.sv
+
 02_device/vivado.jou  
 02_device/vivado.log 
 02_device/vivado_pid*.str   
 02_device/xilinx_*
-02_device/ol/*/template.*.ol
-02_device/ol/*/template.*.json
-02_device/alg_*
-01_host/alg_*
+alg_*
+glay.sublime-project
+glay.sublime-workspace
+nohup.out
+vivado.jou  
+vivado.log 
+vivado_pid*.str
+xilinx_*

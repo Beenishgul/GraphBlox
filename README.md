@@ -57,17 +57,12 @@ GLay is a promising new approach to graph processing on FPGAs. It has the potent
 The design has been verified with the following software/hardware environment and tool chain versions:  
 * Hardware and Platform for your Alveo card (you need both the deployment and development platforms):
   * Alveo U250: xilinx_u250_gen3x16_xdma_4_1_202210_1
-    * XRT: 2.13.466 
-    * Vitis: 2022.1
+  * Alveo U280: xilinx_u280_gen3x16_xdma_1_202211_1
+    * XRT: 2.15.225
+    * Vitis: 2023.1
     * Operating Systems:
-      * Ubuntu 20.04 (See [Additional Requirements for Ubuntu](#cpu-dependencies))
-      * GCC 9
-  * Alveo U280: xilinx_u280_xdma_201920_3
-    * XRT: 2.11.634
-    * Vitis: 2021.1
-    * Operating Systems:
-      * Ubuntu 18.04 (See [Additional Requirements for Ubuntu](#cpu-dependencies))
-      * GCC 7
+      * Ubuntu 22.04 (See [Additional Requirements for Ubuntu](#cpu-dependencies))
+      * GCC 11
 * Perl package installed for Verilog simulation (**required**)
 
 ## CPU Dependencies
@@ -407,7 +402,7 @@ neighbor list and updates the frontier data.
 
 ![Figure 6: BFS algorithm on GLay](./04_docs/fig/glay/fig6.png "Figure 6: BFS algorithm on GLay")
 
-GLay Graph Description Language (GGDL)
+GraphIt integration ... Comming soon. -- GLay Graph Description Language (GGDL)
 ======================================
 
 GGDL is a description language that helps compile and port any graph
@@ -715,65 +710,135 @@ Usage: glay-openmp [OPTION...]
 # GLay Organization
 
 ```console
-00_GLay
-│ 
-├── 00_host
-│           ├── include
-│           │           ├── algorithms
-│           │           │           ├── ggdl
-│           │           │           └── openmp
-│           │           ├── config
-│           │           ├── preprocess
-│           │           ├── structures
-│           │           ├── utils_fpga_c
-│           │           ├── utils_fpga_cpp
-│           │           └── utils_graph
-│           └── src
-│               ├── algorithms
-│               │           ├── ggdl
-│               │           └── openmp
-│               ├── config
-│               ├── main
-│               ├── preprocess
-│               ├── structures
-│               ├── tests_c
-│               ├── tests_cpp
-│               ├── utils_fpga_c
-│               ├── utils_fpga_cpp
-│               └── utils_graph
-├── 01_device
-│           ├── glay_ip
-│           │           ├── cache
-│           │           │           ├── iob_fifo_sync
-│           │           │           ├── iob_include
-│           │           │           │           └── portmaps
-│           │           │           ├── iob_ram_2p
-│           │           │           ├── iob_ram_2p_asym
-│           │           │           ├── iob_ram_sp
-│           │           │           ├── iob_regfile_sp
-│           │           │           └── iob_src_cache
-│           │           ├── kernel
-│           │           ├── kernel_testbench
-│           │           ├── pkgs
-│           │           └── top
-│           └── scripts
-├── 04_docs
-│           └── fig
-│               ├── datastructures
-│               └── glay
-├── 03_test_graphs
-│   ├── LAW
-│   │           ├── LAW-amazon-2008
-│   │           ├── LAW-cnr-2000
-│   │           ├── LAW-dblp-2010
-│   │           └── LAW-enron
-│   └── TEST
-│       ├── graphbrew
-│       ├── test
-│       ├── v300_e2730
-│       └── v51_e1021
-│
-└── Makefile - Global makefile
+.
+├── 00_make
+├── 01_host
+│   ├── include
+│   │   ├── algorithms
+│   │   │   ├── ggdl
+│   │   │   └── openmp
+│   │   ├── config
+│   │   ├── preprocess
+│   │   ├── structures
+│   │   ├── utils_fpga_cpp
+│   │   └── utils_graph
+│   └── src
+│       ├── algorithms
+│       │   ├── ggdl
+│       │   └── openmp
+│       ├── config
+│       ├── main
+│       ├── preprocess
+│       ├── structures
+│       ├── tests_c
+│       ├── tests_cpp
+│       ├── utils_fpga_cpp
+│       └── utils_graph
+├── 02_device
+│   ├── hls
+│   │   ├── include
+│   │   │   ├── config
+│   │   │   └── pkg
+│   │   └── src
+│   │       ├── engines
+│   │       └── testbench
+│   │           └── glay
+│   ├── ol
+│   │   └── GLay
+│   │       ├── Engines
+│   │       │   ├── Templates.json
+│   │       │   └── Templates.ol
+│   │       ├── Full
+│   │       │   ├── Full.json
+│   │       │   ├── Full.ol
+│   │       │   └── Templates
+│   │       ├── Lite
+│   │       │   ├── Lite.json
+│   │       │   ├── Lite.ol
+│   │       │   └── Templates
+│   │       └── Single
+│   │           ├── Single.json
+│   │           ├── Single.ol
+│   │           └── Templates
+│   ├── rtl
+│   │   ├── bundle
+│   │   ├── control
+│   │   ├── cu
+│   │   ├── engines
+│   │   │   ├── engine_alu_ops
+│   │   │   ├── engine_csr_index
+│   │   │   ├── engine_cu_setup
+│   │   │   ├── engine_filter_cond
+│   │   │   ├── engine_forward_data
+│   │   │   ├── engine_m_axi
+│   │   │   ├── engine_merge_data
+│   │   │   ├── engine_pipeline
+│   │   │   ├── engine_read_write
+│   │   │   └── engine_template
+│   │   ├── kernel
+│   │   ├── lane
+│   │   ├── memory
+│   │   │   ├── cache
+│   │   │   │   └── iob_include
+│   │   │   └── sram_axi
+│   │   │       └── include
+│   │   ├── pkg
+│   │   ├── testbench
+│   │   │   ├── integration
+│   │   │   └── unit
+│   │   │       ├── alu_operations
+│   │   │       ├── arbiter
+│   │   │       ├── bus_arbiter
+│   │   │       ├── conditional_break
+│   │   │       ├── conditional_continue
+│   │   │       ├── conditional_filter
+│   │   │       ├── integration_dual_ch
+│   │   │       ├── kernel_setup
+│   │   │       ├── random_read_engine
+│   │   │       ├── random_write_engine
+│   │   │       ├── serial_read_engine
+│   │   │       ├── serial_write_engine
+│   │   │       └── stride_index_generator
+│   │   ├── top
+│   │   └── utils
+│   │       ├── arbiter
+│   │       ├── counter
+│   │       ├── fifo
+│   │       ├── include
+│   │       │   ├── global
+│   │       │   ├── initialize
+│   │       │   ├── mapping
+│   │       │   ├── parameters
+│   │       │   ├── portmaps
+│   │       │   ├── testbench
+│   │       │   └── topology
+│   │       └── slice
+│   └── utils
+│       ├── utils.pl
+│       ├── utils.py
+│       ├── utils.sh
+│       ├── utils.tcl
+│       ├── utils.wcfg
+│       └── utils.xdc
+│           ├── U250
+│           ├── U280
+│           └── U55
+├── 03_data
+│   ├── LAW
+│   │   ├── LAW-amazon-2008
+│   │   ├── LAW-cnr-2000
+│   │   ├── LAW-dblp-2010
+│   │   └── LAW-enron
+│   └── TEST
+│       ├── graphbrew
+│       ├── test
+│       ├── v300_e2730
+│       └── v51_e1021
+└── 04_docs
+    └── fig
+        ├── datastructures
+        └── glay
+
 
 ```
 
@@ -793,32 +858,23 @@ Usage: glay-openmp [OPTION...]
   - [x] CC    (Connected Components)
   - [x] TC    (Triangle Counting)
   - [x] BC    (Betweenness Centrality)
-- [ ] Finish graph algorithms suite GLay
-  - [ ] BFS   (Breadth First Search)
-  - [ ] PR    (Page-Rank)
+- [x] Finish graph algorithms suite GLay
+  - [x] BFS   (Breadth First Search)
+  - [x] PR    (Page-Rank)
   - [ ] DFS   (Depth First Search)
   - [ ] SSSP  (BellmanFord)
-  - [ ] SPMV  (Sparse Matrix Vector Multiplication)
-  - [ ] CC    (Connected Components)
-  - [ ] TC    (Triangle Counting)
+  - [x] SPMV  (Sparse Matrix Vector Multiplication)
+  - [x] CC    (Connected Components)
+  - [x] TC    (Triangle Counting)
   - [ ] BC    (Betweenness Centrality)
-- [ ] Finish GLay FPGA Graph Description Language (GGDL)
-  - [x] Serial\_Read\_Engine
-  - [x] Serial\_Write\_Engine
-  - [x] Random\_Read\_Engine / Random\_Write\_Engine
-  - [x] Stride\_Index\_Generator
-  - [x] CSR\_Index\_Generator
-  - [ ] ALU\_Operation\_\<Mul, Add, Sub, Acc\>
-  - [ ] Conditional\_Break\_\<GT, LT, EQ\>
-  - [ ] Conditional\_Filter\_\<GT, LT, EQ\>
-- [ ] Finish graph algorithms suite GLay FPGA
-  - [ ] BFS   (Breadth First Search)
-  - [ ] PR    (Page-Rank)
+- [x] Finish graph algorithms suite GLay FPGA
+  - [x] BFS   (Breadth First Search)
+  - [x] PR    (Page-Rank)
   - [ ] DFS   (Depth First Search)
   - [ ] SSSP  (BellmanFord)
-  - [ ] SPMV  (Sparse Matrix Vector Multiplication)
-  - [ ] CC    (Connected Components)
-  - [ ] TC    (Triangle Counting)
+  - [x] SPMV  (Sparse Matrix Vector Multiplication)
+  - [x] CC    (Connected Components)
+  - [x] TC    (Triangle Counting)
   - [ ] BC    (Betweenness Centrality)
 - [x] Support testing
 

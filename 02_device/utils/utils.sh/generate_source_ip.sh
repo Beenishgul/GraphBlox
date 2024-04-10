@@ -23,9 +23,9 @@ fi
 # GRAPH_SUIT=$6
 # GRAPH_NAME=$7
 
-PARAMS_SH_DIR=$1
+ACTIVE_PARAMS_SH_DIR=$1
 
-source ${PARAMS_SH_DIR}
+source ${ACTIVE_PARAMS_SH_DIR}
 
 pkgs="pkg"
 engines="engines"
@@ -43,10 +43,14 @@ cu="cu"
 lane="lane"
 
 utils="utils"
+utils_include="include"
 
 iob_include="iob_include"
 portmaps="portmaps"
 
+FULL_SRC_IP_DIR_UTILS_TCL=${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${UTILS_TCL}
+FULL_SRC_IP_DIR_UTILS=${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}
+FULL_SRC_IP_DIR_GEN_VIP=${APP_DIR_ACTIVE}/${VIVADO_VIP_DIR}/${KERNEL_NAME}/${KERNEL_NAME}.gen/sources_1/ip
 
 mkdir -p ${FULL_SRC_IP_DIR_RTL_ACTIVE}/${pkgs}
 mkdir -p ${FULL_SRC_IP_DIR_RTL_ACTIVE}/${engines}
@@ -60,11 +64,12 @@ mkdir -p ${FULL_SRC_IP_DIR_RTL_ACTIVE}/${cu}
 mkdir -p ${FULL_SRC_IP_DIR_RTL_ACTIVE}/${lane}
 mkdir -p ${FULL_SRC_IP_DIR_RTL_ACTIVE}/${utils}
 
-eval $(python3 ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${UTILS_PYTHON}/generate_overlay_template_ol.py ${FULL_SRC_IP_DIR_OVERLAY} ${FULL_SRC_IP_DIR_RTL} ${FULL_SRC_FPGA_UTILS_CPP} ${utils} ${ARCHITECTURE} ${CAPABILITY} ${ALGORITHM_NAME} "include")
-python3 ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${UTILS_PYTHON}/generate_shared_parameters_vh.py ${FULL_SRC_IP_DIR_OVERLAY} ${FULL_SRC_IP_DIR_RTL} ${utils} ${ARCHITECTURE} ${CAPABILITY} ${ALGORITHM_NAME} "include"
-# python ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${UTILS_PYTHON}/generate_shared_parameters_vh.py ${FULL_SRC_IP_DIR_CONFIG} ${FULL_SRC_IP_DIR_RTL_ACTIVE} ${utils} ${ARCHITECTURE} ${CAPABILITY} ${ALGORITHM_NAME} "include";\
+eval $(python3 ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${UTILS_PYTHON}/generate_overlay_template_ol.py  ${FULL_SRC_IP_DIR_OVERLAY} ${FULL_SRC_IP_DIR_RTL} ${FULL_SRC_FPGA_UTILS_CPP} ${utils} ${ARCHITECTURE} ${CAPABILITY} ${ALGORITHM_NAME} "include")
 
-rm -r -f ${FULL_SRC_IP_DIR_RTL_ACTIVE}/${pkgs}/02_pkg_cache.sv
+python3 ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${UTILS_PYTHON}/generate_topology_parameters_vh.py ${XILINX_VIVADO} ${FULL_SRC_IP_DIR_GEN_VIP} ${KERNEL_NAME} ${FULL_SRC_IP_DIR_OVERLAY} ${FULL_SRC_IP_DIR_RTL} ${FULL_SRC_IP_DIR_UTILS} ${FULL_SRC_IP_DIR_UTILS_TCL} ${utils} ${ARCHITECTURE} ${CAPABILITY} ${ALGORITHM_NAME} ${PAUSE_FILE_GENERATION} "include"
+# python ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${UTILS_PYTHON}/generate_topology_parameters_vh.py ${FULL_SRC_IP_DIR_CONFIG} ${FULL_SRC_IP_DIR_RTL_ACTIVE} ${utils} ${ARCHITECTURE} ${CAPABILITY} ${ALGORITHM_NAME} "include";\
+
+    rm -r -f ${FULL_SRC_IP_DIR_RTL_ACTIVE}/${pkgs}/02_pkg_cache.sv
 rm -r -f ${FULL_SRC_IP_DIR_RTL_ACTIVE}/${testbench}/${TESTBENCH_MODULE}/testbench.sv
 
 cp -r -u ${FULL_SRC_IP_DIR_RTL}/${pkgs}/* ${FULL_SRC_IP_DIR_RTL_ACTIVE}/${pkgs}
@@ -92,20 +97,27 @@ else
     cp -r -u ${FULL_SRC_IP_DIR_RTL}/${control}/kernel_control_user_managed.sv ${FULL_SRC_IP_DIR_RTL_ACTIVE}/${control}/kernel_control.sv
 fi
 
-
-# The file to be modified
-FILE_PKG_CACHE_NAME="${FULL_SRC_IP_DIR_RTL_ACTIVE}/${pkgs}/02_pkg_cache.sv"
-# Use sed to comment out the specific line and then add the new line below it
-sed -i "/SYSTEM_CACHE_SIZE\s*=\s*[0-9]\+/s/^/\/\/ /; /SYSTEM_CACHE_SIZE\s*=\s*[0-9]\+/a parameter SYSTEM_CACHE_SIZE           = ${SYSTEM_CACHE_SIZE_B} ;" ${FILE_PKG_CACHE_NAME}
+# # The file to be modified
+# FILE_PKG_CACHE_NAME="${FULL_SRC_IP_DIR_RTL_ACTIVE}/${pkgs}/02_pkg_cache.sv"
+# # Use sed to comment out the specific line and then add the new line below it
+# sed -i "/SYSTEM_CACHE_SIZE\s*=\s*[0-9]\+/s/^/\/\/ /; /SYSTEM_CACHE_SIZE\s*=\s*[0-9]\+/a parameter SYSTEM_CACHE_SIZE           = ${SYSTEM_CACHE_SIZE_B} ;" ${FILE_PKG_CACHE_NAME}
 
 # Copy testbench rename auto generated AXI modules (default kernel) to kenrel_name
 if [[ "$TESTBENCH_MODULE" == "integration" ]]
 then
     newtext="${FULL_SRC_IP_DIR_RTL_ACTIVE}/${testbench}/${TESTBENCH_MODULE}/testbench.sv"
+    newtextvh="${FULL_SRC_IP_DIR_RTL_ACTIVE}/${utils}/${utils_include}/${testbench}/module_slv_m_axi_vip_func.vh"
+
     search="__KERNEL__"
     replace=${KERNEL_NAME}
     if [[ $search != "" && $replace != "" ]]; then
         sed -i "s/$search/$replace/g" $newtext
+    fi
+
+    search="__KERNEL__"
+    replace=${KERNEL_NAME}
+    if [[ $search != "" && $replace != "" ]]; then
+        sed -i "s/$search/$replace/g" $newtextvh
     fi
 
     search="_GRAPH_DIR_"
@@ -164,6 +176,18 @@ then
 
     search="_ALGORITHM_NAME_"
     replace=${ALGORITHM_NAME}
+    if [[ $search != "" && $replace != "" ]]; then
+        sed -i "s/$search/$replace/g" $newtext
+    fi
+
+    search="_NUM_TRIALS_"
+    replace=${NUM_TRIALS}
+    if [[ $search != "" && $replace != "" ]]; then
+        sed -i "s/$search/$replace/g" $newtext
+    fi
+
+    search="_ROOT_"
+    replace=${ROOT}
     if [[ $search != "" && $replace != "" ]]; then
         sed -i "s/$search/$replace/g" $newtext
     fi

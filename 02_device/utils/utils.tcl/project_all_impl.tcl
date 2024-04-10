@@ -1,6 +1,6 @@
-set PARAMS_TCL_DIR                  [lindex $argv 0]
+set ACTIVE_PARAMS_TCL_DIR                  [lindex $argv 0]
 
-source ${PARAMS_TCL_DIR}
+source ${ACTIVE_PARAMS_TCL_DIR}
 
 
 proc create_run_impl {run_name parent_run flow KERNEL_NAME strategy} {

@@ -11,13 +11,16 @@
 // Revise : 2023-06-17 16:37:19
 // Editor : sublime text4, tab size (2)
 // -----------------------------------------------------------------------------
+`include "global_package.vh"
 
 module xpm_fifo_sync_wrapper #(
-  parameter FIFO_WRITE_DEPTH = 16   ,
-  parameter WRITE_DATA_WIDTH = 32   ,
-  parameter READ_DATA_WIDTH  = 32   ,
-  parameter PROG_THRESH      = 6    ,
-  parameter READ_MODE        = "std"
+  parameter FIFO_WRITE_DEPTH = 16             ,
+  parameter WRITE_DATA_WIDTH = 32             ,
+  parameter READ_DATA_WIDTH  = 32             ,
+  parameter PROG_THRESH      = 6              ,
+  parameter XPM_ENABLE       = XPM_FIFO_ENABLE,
+  parameter READ_MODE        = "std"          ,
+  parameter FIFO_MEMORY_TYPE = "auto"
 ) (
   input  logic                        clk        ,
   input  logic                        srst       ,
@@ -33,52 +36,6 @@ module xpm_fifo_sync_wrapper #(
   output logic                        rd_rst_busy
 );
 
-// xpm_fifo_sync: Synchronous FIFO
-// Xilinx Parameterized Macro
-  xpm_fifo_sync #(
-    .FIFO_MEMORY_TYPE   ("auto"                        ), //string; "auto", "block", "distributed", or "ultra";
-    .ECC_MODE           ("no_ecc"                      ), //string; "no_ecc" or "en_ecc";
-    .FIFO_WRITE_DEPTH   (FIFO_WRITE_DEPTH              ), //positive integer
-    .WRITE_DATA_WIDTH   (WRITE_DATA_WIDTH              ), //positive integer
-    .WR_DATA_COUNT_WIDTH($clog2(WRITE_DATA_WIDTH)      ), //positive integer
-    .PROG_FULL_THRESH   (FIFO_WRITE_DEPTH - PROG_THRESH), //positive integer
-    .FULL_RESET_VALUE   (0                             ), //positive integer; 0 or 1
-    .USE_ADV_FEATURES   ("1002"                        ), //string; "0000" to "1F1F", "1A0A", "1002";
-    .READ_MODE          (READ_MODE                     ), //string; "std" or "fwft";
-    .FIFO_READ_LATENCY  (1                             ), //positive integer;
-    .READ_DATA_WIDTH    (READ_DATA_WIDTH               ), //positive integer
-    .RD_DATA_COUNT_WIDTH($clog2(READ_DATA_WIDTH)       ), //positive integer
-    .PROG_EMPTY_THRESH  (PROG_THRESH                   ), //positive integer
-    .DOUT_RESET_VALUE   ("0"                           ), //string
-    .WAKEUP_TIME        (0                             )  //positive integer; 0 or 2;
-  ) xpm_fifo_sync_inst (
-    .sleep        (1'b0       ),
-    .rst          (srst       ),
-    .wr_clk       (clk        ),
-    .wr_en        (wr_en      ),
-    .din          (din        ),
-    .full         (full       ),
-    .overflow     (           ),
-    .prog_full    (prog_full  ),
-    .wr_data_count(           ),
-    .almost_full  (           ),
-    .wr_ack       (           ),
-    .wr_rst_busy  (wr_rst_busy),
-    .rd_en        (rd_en      ),
-    .dout         (dout       ),
-    .empty        (empty      ),
-    .prog_empty   (           ),
-    .rd_data_count(           ),
-    .almost_empty (           ),
-    .data_valid   (valid      ),
-    .underflow    (           ),
-    .rd_rst_busy  (rd_rst_busy),
-    .injectsbiterr(1'b0       ),
-    .injectdbiterr(1'b0       ),
-    .sbiterr      (           ),
-    .dbiterr      (           )
-  );
-// End of xpm_fifo_sync instance declaration
-
+`include "fifo_wrapper_topology.vh"
 
 endmodule : xpm_fifo_sync_wrapper

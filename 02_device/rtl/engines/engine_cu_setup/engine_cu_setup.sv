@@ -35,7 +35,7 @@ module engine_cu_setup #(parameter COUNTER_WIDTH      = 32) (
     input  logic                      ap_clk                  ,
     input  logic                      areset                  ,
     input  CUSetupEngineConfiguration configuration_in        ,
-    output MemoryPacket               request_out             ,
+    output MemoryPacketRequest        request_out             ,
     input  FIFOStateSignalsInput      fifo_request_signals_in ,
     output FIFOStateSignalsOutput     fifo_request_signals_out,
     output logic                      fifo_setup_signal       ,
@@ -52,7 +52,7 @@ module engine_cu_setup #(parameter COUNTER_WIDTH      = 32) (
     logic areset_fifo   ;
 
     CUSetupEngineConfiguration configuration_reg;
-    MemoryPacket               request_out_int  ;
+    MemoryPacketRequest        request_out_int  ;
 
 // --------------------------------------------------------------------------------------
 //   Setup state machine signals
@@ -62,17 +62,16 @@ module engine_cu_setup #(parameter COUNTER_WIDTH      = 32) (
 
     logic done_int_reg ;
     logic start_in_reg ;
-    logic pause_in_reg ;
     logic ready_out_reg;
     logic done_out_reg ;
 
 // --------------------------------------------------------------------------------------
 //   Engine FIFO signals
 // --------------------------------------------------------------------------------------
-    MemoryPacketPayload           fifo_request_din             ;
-    MemoryPacket                  fifo_request_din_reg         ;
-    MemoryPacketPayload           fifo_request_dout            ;
-    MemoryPacket                  fifo_request_comb            ;
+    MemoryPacketRequestPayload    fifo_request_din             ;
+    MemoryPacketRequest           fifo_request_din_reg         ;
+    MemoryPacketRequestPayload    fifo_request_dout            ;
+    MemoryPacketRequestPayload    fifo_request_comb            ;
     FIFOStateSignalsInput         fifo_request_signals_in_reg  ;
     FIFOStateSignalsInputInternal fifo_request_signals_in_int  ;
     FIFOStateSignalsOutInternal   fifo_request_signals_out_int ;
@@ -201,6 +200,9 @@ module engine_cu_setup #(parameter COUNTER_WIDTH      = 32) (
                 else
                     next_state = ENGINE_CU_SETUP_IDLE;
             end
+            default : begin
+                next_state = ENGINE_CU_SETUP_RESET;
+            end
         endcase
     end // always_comb
 
@@ -325,29 +327,30 @@ module engine_cu_setup #(parameter COUNTER_WIDTH      = 32) (
 // Serial Read Engine Generate
 // --------------------------------------------------------------------------------------
 
-    assign fifo_request_comb.payload.meta.route         = configuration_reg.payload.meta.route;
-    assign fifo_request_comb.payload.meta.address.base  = configuration_reg.payload.param.array_pointer;
-    assign fifo_request_comb.payload.meta.address.shift = configuration_reg.payload.meta.address.shift;
-    assign fifo_request_comb.payload.meta.subclass      = configuration_reg.payload.meta.subclass;
+    assign fifo_request_comb.meta.route                = configuration_reg.payload.meta.route;
+    assign fifo_request_comb.meta.address.id_channel   = configuration_reg.payload.meta.address.id_channel;
+    assign fifo_request_comb.meta.address.id_buffer    = configuration_reg.payload.meta.address.id_buffer;
+    assign fifo_request_comb.meta.address.shift        = configuration_reg.payload.meta.address.shift;
+    assign fifo_request_comb.meta.address.burst_length = configuration_reg.payload.meta.address.burst_length;
+    assign fifo_request_comb.meta.address.mode_cache   = configuration_reg.payload.meta.address.mode_cache;
+    assign fifo_request_comb.meta.subclass             = configuration_reg.payload.meta.subclass;
 
     always_comb begin
         if(configuration_reg.payload.meta.address.shift.direction & ~configuration_reg.payload.param.flush_mode) begin
-            fifo_request_comb.payload.meta.address.offset = counter_count << configuration_reg.payload.meta.address.shift.amount;
+            fifo_request_comb.meta.address.offset = counter_count << configuration_reg.payload.meta.address.shift.amount;
         end else if(~configuration_reg.payload.meta.address.shift.direction & ~configuration_reg.payload.param.flush_mode) begin
-            fifo_request_comb.payload.meta.address.offset = counter_count >> configuration_reg.payload.meta.address.shift.amount;
+            fifo_request_comb.meta.address.offset = counter_count >> configuration_reg.payload.meta.address.shift.amount;
         end else begin
-            fifo_request_comb.payload.meta.address.offset = (((counter_count >> $clog2(SYSTEM_CACHE_NUM_WAYS)) << (SYSTEM_CACHE_LINE_SIZE_LOG + $clog2(SYSTEM_CACHE_NUM_WAYS))) | ((counter_count & (SYSTEM_CACHE_NUM_WAYS-1)) << SYSTEM_CACHE_LINE_SIZE_LOG));
+            fifo_request_comb.meta.address.offset = (((counter_count >> $clog2(SYSTEM_CACHE_NUM_WAYS)) << (SYSTEM_CACHE_LINE_SIZE_LOG + $clog2(SYSTEM_CACHE_NUM_WAYS))) | ((counter_count & (SYSTEM_CACHE_NUM_WAYS-1)) << SYSTEM_CACHE_LINE_SIZE_LOG));
         end
     end
 
     always_comb begin
-        for (int j = 0; j<NUM_FIELDS_MEMORYPACKETDATA; j++) begin
-            fifo_request_comb.payload.data.field[j] = counter_count;
-        end
+        fifo_request_comb.data.field = counter_count;
     end
 
     always_ff @(posedge ap_clk) begin
-        fifo_request_din_reg.payload <= fifo_request_comb.payload;
+        fifo_request_din_reg.payload <= fifo_request_comb;
     end
 
     counter #(.C_WIDTH(COUNTER_WIDTH)) inst_counter (
@@ -364,7 +367,7 @@ module engine_cu_setup #(parameter COUNTER_WIDTH      = 32) (
     );
 
 // --------------------------------------------------------------------------------------
-// FIFO cache requests out fifo_814x16_MemoryPacket
+// FIFO cache requests out fifo_814x16_MemoryPacketRequest
 // --------------------------------------------------------------------------------------
     // FIFO is resetting
     assign fifo_request_setup_signal_int = fifo_request_signals_out_int.wr_rst_busy | fifo_request_signals_out_int.rd_rst_busy ;
@@ -379,11 +382,11 @@ module engine_cu_setup #(parameter COUNTER_WIDTH      = 32) (
     assign request_out_int.payload           = fifo_request_dout;
 
     xpm_fifo_sync_wrapper #(
-        .FIFO_WRITE_DEPTH(16                        ),
-        .WRITE_DATA_WIDTH($bits(MemoryPacketPayload)),
-        .READ_DATA_WIDTH ($bits(MemoryPacketPayload)),
-        .PROG_THRESH     (8                         )
-    ) inst_fifo_MemoryPacketRequest (
+        .FIFO_WRITE_DEPTH(16                               ),
+        .WRITE_DATA_WIDTH($bits(MemoryPacketRequestPayload)),
+        .READ_DATA_WIDTH ($bits(MemoryPacketRequestPayload)),
+        .PROG_THRESH     (8                                )
+    ) inst_fifo_MemoryPacketRequestRequest (
         .clk        (ap_clk                                  ),
         .srst       (areset_fifo                             ),
         .din        (fifo_request_din                        ),
