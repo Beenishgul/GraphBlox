@@ -9,7 +9,7 @@ void GLAYxrtBufferHandlePerKernel::mapGLAYOverlayProgramBuffersTC(struct GraphCS
    // --  2  - Index_End
     overlay_program[2] = ( graph->num_edges );
    // --  7  - Array_size
-    overlay_program[7] = ( graph->num_edges )-( 0 );
+    overlay_program[7] = (( graph->num_edges )-( 0 ))/1;
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
 // Name ENGINE_FILTER_COND            ID 1    mapping 3    cycles 10   None-None ( 0 )-( 0 )
@@ -23,7 +23,7 @@ void GLAYxrtBufferHandlePerKernel::mapGLAYOverlayProgramBuffersTC(struct GraphCS
    // --  2  - Index_End
     overlay_program[23] = ( graph->num_vertices );
    // --  7  - Array_size
-    overlay_program[28] = ( graph->num_vertices )-( 0 );
+    overlay_program[28] = (( graph->num_vertices )-( 0 ))/1;
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
 // Name ENGINE_FORWARD_DATA           ID 3    mapping 6    cycles 0    None-None ( 0 )-( 0 )
@@ -69,7 +69,7 @@ void GLAYxrtBufferHandlePerKernel::mapGLAYOverlayProgramBuffersTC(struct GraphCS
    // --  2  - Index_End
     overlay_program[106] = ( graph->num_edges );
    // --  7  - Array_size
-    overlay_program[111] = ( graph->num_edges )-( 0 );
+    overlay_program[111] = (( graph->num_edges )-( 0 ))/1;
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
 // Name ENGINE_FILTER_COND            ID 8    mapping 3    cycles 10   None-None ( 0 )-( 0 )
@@ -83,7 +83,7 @@ void GLAYxrtBufferHandlePerKernel::mapGLAYOverlayProgramBuffersTC(struct GraphCS
    // --  2  - Index_End
     overlay_program[127] = ( graph->num_edges );
    // --  7  - Array_size
-    overlay_program[132] = ( graph->num_edges )-( 0 );
+    overlay_program[132] = (( graph->num_edges )-( 0 ))/1;
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
 // Name ENGINE_FILTER_COND            ID 10   mapping 3    cycles 10   None-None ( 0 )-( 0 )

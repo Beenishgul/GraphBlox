@@ -1,7 +1,7 @@
 // --------------------------------------------------------------------------------------
 // Engine: ENGINE_CSR_INDEX, Number of entries: 11
 // --------------------------------------------------------------------------------------
-0x00000000 // entry_0    cacheline[  0][ 0] < 5b>: increment[0:0]=0 || decrement[1:1]=0 || mode_sequence[2:2]=0 || mode_buffer[3:3]=0 || mode_break[4:4]=0
+0x00000000 // entry_0    cacheline[  0][ 0] < 6b>: increment[0:0]=0 || decrement[1:1]=0 || mode_sequence[2:2]=0 || mode_buffer[3:3]=0 || mode_break[4:4]=0 || mode_parallel[5:5]=0
 0x00000000 // entry_1    cacheline[  0][ 1] <32b>: index_start[0:31]=0x00000000
 0x00000000 // entry_2    cacheline[  0][ 2] <32b>: index_end[0:31]=0x00000000
 0x00000000 // entry_3    cacheline[  0][ 3] <32b>: stride[0:31]=0x00000000

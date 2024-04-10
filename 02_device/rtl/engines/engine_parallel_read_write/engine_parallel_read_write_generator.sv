@@ -153,8 +153,8 @@ module engine_parallel_read_write_generator #(parameter
 // --------------------------------------------------------------------------------------
     EnginePacket                  request_pending_out_int              ;
     EnginePacket                  request_pending_out_reg              ;
-    EnginePacketPayload           fifo_request_pending_din             ;
-    EnginePacketPayload           fifo_request_pending_dout            ;
+    EnginePacketFullPayload       fifo_request_pending_din             ;
+    EnginePacketFullPayload       fifo_request_pending_dout            ;
     FIFOStateSignalsInputInternal fifo_request_pending_signals_in_int  ;
     FIFOStateSignalsOutInternal   fifo_request_pending_signals_out_int ;
     logic                         fifo_request_pending_setup_signal_int;
@@ -213,6 +213,9 @@ module engine_parallel_read_write_generator #(parameter
 // --------------------------------------------------------------------------------------
     logic                                        pulse_out                                       ;
     logic [ENGINE_PACKET_DATA_NUM_FIELDS-1:0]    generator_engine_response_engine_in_kernel_valid;
+    logic [ENGINE_PACKET_DATA_NUM_FIELDS-1:0]    param_select_id                                 ;
+    logic [ENGINE_PACKET_DATA_NUM_FIELDS-1:0]    param_select_id_reg                             ;
+    logic [ENGINE_PACKET_DATA_NUM_FIELDS-1:0]    request_pending_out_int_param_select_id         ;
     ParallelReadWriteConfigurationMeta           configure_engine_int_meta                       ;
     ParallelReadWriteConfigurationMeta           configure_engine_select_meta                    ;
     ParallelReadWriteConfigurationParameterField config_params_in                                ;
@@ -519,6 +522,15 @@ module engine_parallel_read_write_generator #(parameter
     );
 // --------------------------------------------------------------------------------------
     hyper_pipeline_noreset #(
+        .STAGES(RESPONSE_ENGINE_PARALLEL_IN_INT_STAGES),
+        .WIDTH (ENGINE_PACKET_DATA_NUM_FIELDS           )
+    ) inst_hyper_pipeline_configure_engine_int_meta_id (
+        .ap_clk(ap_clk             ),
+        .din   (param_select_id    ),
+        .dout  (param_select_id_reg)
+    );
+// --------------------------------------------------------------------------------------
+    hyper_pipeline_noreset #(
         .STAGES(RESPONSE_ENGINE_PARALLEL_IN_INT_STAGES+1 ),
         .WIDTH ($bits(ParallelReadWriteConfigurationMeta))
     ) inst_hyper_pipeline_configure_engine_int_meta (
@@ -554,6 +566,7 @@ module engine_parallel_read_write_generator #(parameter
         generator_engine_request_engine_start_Stage.payload.meta.route.sequence_id        = response_engine_reg_int.route.sequence_id;
         generator_engine_request_engine_start_Stage.payload.meta.route.hops               = response_engine_reg_int.route.hops;
         generator_engine_request_engine_start_Stage.payload.meta.subclass                 = configure_engine_select_meta.subclass;
+        generator_engine_request_engine_start_Stage.payload.meta.field_id                 = param_select_id_reg;
     end
 // --------------------------------------------------------------------------------------
     hyper_pipeline_noreset #(
@@ -573,6 +586,7 @@ module engine_parallel_read_write_generator #(parameter
         .pulse_out                 (pulse_out                                       ),
         .config_params_out         (config_params_in                                ),
         .config_meta_out           (configure_engine_int_meta                       ),
+        .param_select_out          (param_select_id                                 ),
         .config_params_kernel_valid(generator_engine_response_engine_in_kernel_valid)
     );
 
@@ -631,18 +645,19 @@ module engine_parallel_read_write_generator #(parameter
 
     // Push
     assign fifo_request_pending_signals_in_int.wr_en = request_memory_out_reg.valid;
-    assign fifo_request_pending_din                  = map_EnginePacketFull_to_EnginePacket(request_memory_out_reg.payload);
+    assign fifo_request_pending_din                  = request_memory_out_reg.payload;
 
     // Pop
     assign fifo_request_pending_signals_in_int.rd_en  = ~fifo_request_pending_signals_out_int.empty & response_memory_in_reg.valid;
     assign request_pending_out_int.valid              = fifo_request_pending_signals_out_int.valid;
     assign request_pending_out_int.payload.meta.route = fifo_request_pending_dout.meta.route;
     assign request_pending_out_int.payload.data       = map_MemoryResponsePacketData_to_EnginePacketData(response_memory_in_reg_S2.payload.data, fifo_request_pending_dout.data);
+    assign request_pending_out_int_param_select_id    = fifo_request_pending_dout.meta.field_id;
 
     xpm_fifo_sync_wrapper #(
         .FIFO_WRITE_DEPTH(BURST_LENGTH * 2                     ),
-        .WRITE_DATA_WIDTH($bits(EnginePacketPayload)           ),
-        .READ_DATA_WIDTH ($bits(EnginePacketPayload)           ),
+        .WRITE_DATA_WIDTH($bits(EnginePacketFullPayload)       ),
+        .READ_DATA_WIDTH ($bits(EnginePacketFullPayload)       ),
         .PROG_THRESH     ((ENGINE_PACKET_DATA_NUM_FIELDS * 2)+1)
     ) inst_fifo_EnginePacketRequestPending (
         .clk        (ap_clk                                          ),
@@ -760,7 +775,8 @@ module engine_parallel_read_write_generator #(parameter
             generator_engine_response_pending_in_merge_valid_int[0][i] = configure_engine_int.payload.param.merge_mask[0][i] ? request_pending_out_int.valid &
                 (configure_engine_int.payload.param.param_field[i].id_buffer ==  response_memory_in_reg_S2.payload.meta.address.id_buffer) &
                     (request_pending_out_int.payload.meta.route.sequence_source.id_bundle == configure_engine_int.payload.param.meta[i].ops_bundle) &
-                        (request_pending_out_int.payload.meta.route.sequence_source.id_lane == configure_engine_int.payload.param.meta[i].ops_lane) : 1'b0;
+                        (request_pending_out_int.payload.meta.route.sequence_source.id_lane == configure_engine_int.payload.param.meta[i].ops_lane) &
+                            (request_pending_out_int_param_select_id == (1 << i)) : 1'b0;
         end
     end
 // --------------------------------------------------------------------------------------
@@ -769,7 +785,8 @@ module engine_parallel_read_write_generator #(parameter
             generator_engine_response_pending_in_merge_valid_int[1][i] = configure_engine_int.payload.param.merge_mask[1][i] ? request_pending_out_int.valid &
                 (configure_engine_int.payload.param.param_field[i].id_buffer ==  response_memory_in_reg_S2.payload.meta.address.id_buffer) &
                     (request_pending_out_int.payload.meta.route.sequence_source.id_bundle == configure_engine_int.payload.param.meta[i].ops_bundle) &
-                        (request_pending_out_int.payload.meta.route.sequence_source.id_lane == configure_engine_int.payload.param.meta[i].ops_lane) : 1'b0;
+                        (request_pending_out_int.payload.meta.route.sequence_source.id_lane == configure_engine_int.payload.param.meta[i].ops_lane) &
+                            (request_pending_out_int_param_select_id == (1 << i)) : 1'b0;
         end
     end
 // --------------------------------------------------------------------------------------

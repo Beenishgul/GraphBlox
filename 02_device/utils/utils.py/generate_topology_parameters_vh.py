@@ -3623,7 +3623,7 @@ assign kernel_cu_descriptor_in[{0}] = kernel_control_descriptor_out;
 assign cus_flush_int[{0}] = cu_flush_out[{0}];
 
 kernel_cu #(
-  .ID_CU       ({0}           ),
+  .ID_CU       ({0}         ),
   .NUM_CHANNELS(NUM_CHANNELS)
 ) inst_kernel_cu_{0} (
     .ap_clk           (ap_clk                     ),

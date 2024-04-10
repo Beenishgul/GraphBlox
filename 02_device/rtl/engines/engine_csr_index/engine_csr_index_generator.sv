@@ -732,6 +732,7 @@ module engine_csr_index_generator #(parameter
     assign fifo_request_comb.payload.meta.address.mode_cache       = configure_memory_reg.payload.meta.address.mode_cache;
     assign fifo_request_comb.payload.meta.address.burst_length     = 1;
     assign fifo_request_comb.payload.meta.subclass                 = configure_engine_int.payload.meta.subclass;
+    assign fifo_request_comb.payload.meta.field_id                 = 1;
 // --------------------------------------------------------------------------------------
     always_comb begin
         if(configure_engine_int.payload.meta.address.shift.direction) begin
