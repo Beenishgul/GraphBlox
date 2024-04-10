@@ -232,6 +232,7 @@ typedef struct packed{
   EnginePacketRouteAttributes route;
 } EnginePacketMeta;
 
+parameter ENGINE_PACKET_DATA_NUM_FIELDS = 5;
 typedef struct packed{
   EnginePacketRouteAttributes               route   ;
   PacketRequestDataAddress                  address ;
@@ -239,7 +240,6 @@ typedef struct packed{
   logic [ENGINE_PACKET_DATA_NUM_FIELDS-1:0] field_id;
 } EnginePacketMetaFull;
 
-parameter ENGINE_PACKET_DATA_NUM_FIELDS = 5;
 typedef struct packed{
   logic               [ENGINE_PACKET_DATA_NUM_FIELDS-1:0][M00_AXI4_FE_DATA_W-1:0] field      ;
   type_sequence_state [ENGINE_PACKET_DATA_NUM_FIELDS-1:0]                         field_state;

@@ -772,21 +772,13 @@ module engine_parallel_read_write_generator #(parameter
 // --------------------------------------------------------------------------------------
     always_comb begin
         for (int i = 0; i < ENGINE_PACKET_DATA_NUM_FIELDS; i++) begin
-            generator_engine_response_pending_in_merge_valid_int[0][i] = configure_engine_int.payload.param.merge_mask[0][i] ? request_pending_out_int.valid &
-                (configure_engine_int.payload.param.param_field[i].id_buffer ==  response_memory_in_reg_S2.payload.meta.address.id_buffer) &
-                    (request_pending_out_int.payload.meta.route.sequence_source.id_bundle == configure_engine_int.payload.param.meta[i].ops_bundle) &
-                        (request_pending_out_int.payload.meta.route.sequence_source.id_lane == configure_engine_int.payload.param.meta[i].ops_lane) &
-                            (request_pending_out_int_param_select_id == (1 << i)) : 1'b0;
+            generator_engine_response_pending_in_merge_valid_int[0][i] = configure_engine_int.payload.param.merge_mask[0][i] ? request_pending_out_int.valid & (request_pending_out_int_param_select_id == (1 << i)) : 1'b0;
         end
     end
 // --------------------------------------------------------------------------------------
     always_comb begin
         for (int i = 0; i < ENGINE_PACKET_DATA_NUM_FIELDS; i++) begin
-            generator_engine_response_pending_in_merge_valid_int[1][i] = configure_engine_int.payload.param.merge_mask[1][i] ? request_pending_out_int.valid &
-                (configure_engine_int.payload.param.param_field[i].id_buffer ==  response_memory_in_reg_S2.payload.meta.address.id_buffer) &
-                    (request_pending_out_int.payload.meta.route.sequence_source.id_bundle == configure_engine_int.payload.param.meta[i].ops_bundle) &
-                        (request_pending_out_int.payload.meta.route.sequence_source.id_lane == configure_engine_int.payload.param.meta[i].ops_lane) &
-                            (request_pending_out_int_param_select_id == (1 << i)) : 1'b0;
+            generator_engine_response_pending_in_merge_valid_int[1][i] = configure_engine_int.payload.param.merge_mask[1][i] ? request_pending_out_int.valid & (request_pending_out_int_param_select_id == (1 << i)) : 1'b0;
         end
     end
 // --------------------------------------------------------------------------------------

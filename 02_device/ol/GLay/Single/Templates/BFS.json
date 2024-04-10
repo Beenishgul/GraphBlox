@@ -554,6 +554,10 @@
                 "mode_break": {
                     "bits": "1",
                     "value": "0"
+                },
+                "mode_parallel": {
+                    "bits": "1",
+                    "value": "0"
                 }
             },
             "entry_1": {
@@ -1386,6 +1390,10 @@
                     "value": "0"
                 },
                 "mode_break": {
+                    "bits": "1",
+                    "value": "0"
+                },
+                "mode_parallel": {
                     "bits": "1",
                     "value": "0"
                 }
