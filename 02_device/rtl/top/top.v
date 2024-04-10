@@ -18,12 +18,8 @@
 `include "global_timescale.vh"
 // Top level of the kernel. Do not modify module name, parameters or ports.
 module top #(
-  parameter integer C_S_AXI_CONTROL_ADDR_WIDTH = 12 ,
-  parameter integer C_S_AXI_CONTROL_DATA_WIDTH = 32 ,
-  parameter integer C_M00_AXI_ADDR_WIDTH       = 64 ,
-  parameter integer C_M00_AXI_DATA_WIDTH       = 512,
-  parameter integer C_M00_AXI_ID_WIDTH         = 1
-) (
+  `include "top_parameters.vh"
+  ) (
   // System Signals
   input  wire                                    ap_clk               ,
   input  wire                                    ap_rst_n             ,
@@ -54,44 +50,7 @@ module top #(
   // RESP - Not useful in most acceleration platforms.
   //
   // AXI4 master interface m00_axi
-  input  wire                                    m00_axi_awready      , // Address write channel ready
-  input  wire                                    m00_axi_wready       , // Write channel ready
-  output wire                                    m00_axi_awvalid      , // Address write channel valid
-  output wire                                    m00_axi_wlast        , // Write channel last word flag
-  output wire                                    m00_axi_wvalid       , // Write channel valid
-  output wire [                           8-1:0] m00_axi_awlen        , // Address write channel burst length
-  output wire [        C_M00_AXI_ADDR_WIDTH-1:0] m00_axi_awaddr       , // Address write channel address
-  output wire [        C_M00_AXI_DATA_WIDTH-1:0] m00_axi_wdata        , // Write channel data
-  output wire [      C_M00_AXI_DATA_WIDTH/8-1:0] m00_axi_wstrb        , // Write channel write strobe
-  input  wire                                    m00_axi_bvalid       , // Write response channel valid
-  output wire                                    m00_axi_bready       , // Write response channel ready
-  input  wire                                    m00_axi_arready      , // Address read channel ready
-  input  wire                                    m00_axi_rlast        , // Read channel last word
-  input  wire                                    m00_axi_rvalid       , // Read channel valid
-  input  wire [        C_M00_AXI_DATA_WIDTH-1:0] m00_axi_rdata        , // Read channel data
-  output wire                                    m00_axi_arvalid      , // Address read channel valid
-  output wire                                    m00_axi_rready       , // Read channel ready
-  output wire [                           8-1:0] m00_axi_arlen        , // Address write channel burst length
-  output wire [        C_M00_AXI_ADDR_WIDTH-1:0] m00_axi_araddr       , // Address read channel address
-  // AXI4 master interface m00_axi missing ports
-  input  wire [          C_M00_AXI_ID_WIDTH-1:0] m00_axi_bid          , // Write response channel ID
-  input  wire [          C_M00_AXI_ID_WIDTH-1:0] m00_axi_rid          , // Read channel ID
-  input  wire [                           2-1:0] m00_axi_rresp        , // Read channel response
-  input  wire [                           2-1:0] m00_axi_bresp        , // Write channel response
-  output wire [          C_M00_AXI_ID_WIDTH-1:0] m00_axi_awid         , // Address write channel ID
-  output wire [                           3-1:0] m00_axi_awsize       , // Address write channel burst size. This signal indicates the size of each transfer in the burst
-  output wire [                           2-1:0] m00_axi_awburst      , // Address write channel burst type
-  output wire [                           1-1:0] m00_axi_awlock       , // Address write channel lock type
-  output wire [                           4-1:0] m00_axi_awcache      , // Address write channel memory type. Transactions set with Normal Non-cacheable Modifiable and Bufferable (0011).
-  output wire [                           3-1:0] m00_axi_awprot       , // Address write channel protection type. Transactions set with Normal, Secure, and Data attributes (000).
-  output wire [                           4-1:0] m00_axi_awqos        , // Address write channel quality of service
-  output wire [          C_M00_AXI_ID_WIDTH-1:0] m00_axi_arid         , // Address read channel ID
-  output wire [                           3-1:0] m00_axi_arsize       , // Address read channel burst size. This signal indicates the size of each transfer in the burst
-  output wire [                           2-1:0] m00_axi_arburst      , // Address read channel burst type
-  output wire [                           1-1:0] m00_axi_arlock       , // Address read channel lock type
-  output wire [                           4-1:0] m00_axi_arcache      , // Address read channel memory type. Transactions set with Normal Non-cacheable Modifiable and Bufferable (0011).
-  output wire [                           3-1:0] m00_axi_arprot       , // Address read channel protection type. Transactions set with Normal, Secure, and Data attributes (000).
-  output wire [                           4-1:0] m00_axi_arqos        , // Address read channel quality of service
+  `include "m_axi_ports_top.vh"
   // AXI4-Lite slave interface
   input  wire                                    s_axi_control_awvalid,
   output wire                                    s_axi_control_awready,
@@ -194,60 +153,26 @@ module top #(
 // --------------------------------------------------------------------------------------
 
   kernel_afu inst_kernel_afu (
-    .ap_clk         (ap_clk         ),
-    .ap_rst_n       (ap_rst_n       ),
-    .m00_axi_awvalid(m00_axi_awvalid),
-    .m00_axi_awready(m00_axi_awready),
-    .m00_axi_awaddr (m00_axi_awaddr ),
-    .m00_axi_awlen  (m00_axi_awlen  ),
-    .m00_axi_wvalid (m00_axi_wvalid ),
-    .m00_axi_wready (m00_axi_wready ),
-    .m00_axi_wdata  (m00_axi_wdata  ),
-    .m00_axi_wstrb  (m00_axi_wstrb  ),
-    .m00_axi_wlast  (m00_axi_wlast  ),
-    .m00_axi_bvalid (m00_axi_bvalid ),
-    .m00_axi_bready (m00_axi_bready ),
-    .m00_axi_arvalid(m00_axi_arvalid),
-    .m00_axi_arready(m00_axi_arready),
-    .m00_axi_araddr (m00_axi_araddr ),
-    .m00_axi_arlen  (m00_axi_arlen  ),
-    .m00_axi_rvalid (m00_axi_rvalid ),
-    .m00_axi_rready (m00_axi_rready ),
-    .m00_axi_rdata  (m00_axi_rdata  ),
-    .m00_axi_rlast  (m00_axi_rlast  ),
-    .m00_axi_bid    (m00_axi_bid    ),
-    .m00_axi_rid    (m00_axi_rid    ),
-    .m00_axi_rresp  (m00_axi_rresp  ),
-    .m00_axi_bresp  (m00_axi_bresp  ),
-    .m00_axi_awid   (m00_axi_awid   ),
-    .m00_axi_awsize (m00_axi_awsize ),
-    .m00_axi_awburst(m00_axi_awburst),
-    .m00_axi_awlock (m00_axi_awlock ),
-    .m00_axi_awcache(m00_axi_awcache),
-    .m00_axi_awprot (m00_axi_awprot ),
-    .m00_axi_awqos  (m00_axi_awqos  ),
-    .m00_axi_arid   (m00_axi_arid   ),
-    .m00_axi_arsize (m00_axi_arsize ),
-    .m00_axi_arburst(m00_axi_arburst),
-    .m00_axi_arlock (m00_axi_arlock ),
-    .m00_axi_arcache(m00_axi_arcache),
-    .m00_axi_arprot (m00_axi_arprot ),
-    .m00_axi_arqos  (m00_axi_arqos  ),
-    .ap_start       (ap_start       ),
-    .ap_idle        (ap_idle        ),
-    .ap_done        (ap_done        ),
-    .ap_ready       (ap_ready       ),
-    .ap_continue    (ap_continue    ),
-    .buffer_0       (buffer_0       ),
-    .buffer_1       (buffer_1       ),
-    .buffer_2       (buffer_2       ),
-    .buffer_3       (buffer_3       ),
-    .buffer_4       (buffer_4       ),
-    .buffer_5       (buffer_5       ),
-    .buffer_6       (buffer_6       ),
-    .buffer_7       (buffer_7       ),
-    .buffer_8       (buffer_8       ),
-    .buffer_9       (buffer_9       )
+    .ap_clk     (ap_clk     ),
+    .ap_rst_n   (ap_rst_n   ),
+    // AXI4 master interface m00_axi
+    `include "m_axi_portmap_afu.vh"
+    // Control Signals
+    .ap_start   (ap_start   ),
+    .ap_idle    (ap_idle    ),
+    .ap_done    (ap_done    ),
+    .ap_ready   (ap_ready   ),
+    .ap_continue(ap_continue),
+    .buffer_0   (buffer_0   ),
+    .buffer_1   (buffer_1   ),
+    .buffer_2   (buffer_2   ),
+    .buffer_3   (buffer_3   ),
+    .buffer_4   (buffer_4   ),
+    .buffer_5   (buffer_5   ),
+    .buffer_6   (buffer_6   ),
+    .buffer_7   (buffer_7   ),
+    .buffer_8   (buffer_8   ),
+    .buffer_9   (buffer_9   )
   );
 
 endmodule

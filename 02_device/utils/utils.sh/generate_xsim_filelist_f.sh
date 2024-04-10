@@ -38,9 +38,13 @@ engine_filter_cond="engine_filter_cond"
 engine_forward_data="engine_forward_data"
 engine_m_axi="engine_m_axi"
 engine_merge_data="engine_merge_data"
+engine_set_ops="engine_set_ops"
 engine_pipeline="engine_pipeline"
 engine_read_write="engine_read_write"
 engine_template="engine_template"
+engine_parallel_read_write="engine_parallel_read_write"
+engine_automata_nfa="engine_automata_nfa"
+
 engines="engines"
 
 kernel="kernel"
@@ -49,8 +53,8 @@ testbench="testbench"
 
 memory="memory"
 memory_cache="cache"
-memory_generator="generator"
-memory_ram="ram"
+memory_sram="sram_axi"
+memory_sram_include="include"
 
 control="control"
 bundle="bundle"
@@ -120,14 +124,16 @@ echo $newtext > ${CFG_FILE_NAME_SV}
 echo $newtext > ${CFG_FILE_NAME_VHDL}
 echo $newtext > ${CFG_FILE_NAME_VH}
 
-echo $newtext > ${CFG_FILE_NAME_IP_SV}
-echo $newtext > ${CFG_FILE_NAME_IP_VHDL}
-echo $newtext > ${CFG_FILE_NAME_IP_V}
+# echo $newtext > ${CFG_FILE_NAME_IP_SV}
+# echo $newtext > ${CFG_FILE_NAME_IP_VHDL}
+# echo $newtext > ${CFG_FILE_NAME_IP_V}
 
 echo $newtext > ${CFG_FILE_NAME_V}
 
 # Add include ip_directory
 generate_xsim_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${memory}/${memory_cache}/${iob_include}/ ${CFG_FILE_NAME_VH} "vh"
+
+generate_xsim_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${memory}/${memory_sram}/${memory_sram_include}/ ${CFG_FILE_NAME_VH} "svh"
 
 generate_xsim_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${utils}/${utils_include}/ ${CFG_FILE_NAME_VH} "vh"
 
@@ -141,11 +147,9 @@ generate_xsim_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${utils}/${utils
 
 generate_xsim_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${utils}/${utils_fifo}/ ${CFG_FILE_NAME_SV} "sv"
 
-generate_xsim_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${memory}/${memory_ram}/ ${CFG_FILE_NAME_SV} "sv"
+generate_xsim_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${memory}/${memory_sram}/ ${CFG_FILE_NAME_SV} "sv"
 
 generate_xsim_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${memory}/${memory_cache}/ ${CFG_FILE_NAME_V} "v"
-
-generate_xsim_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${memory}/${memory_generator}/ ${CFG_FILE_NAME_SV} "sv"
 
 generate_xsim_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${bundle}/ ${CFG_FILE_NAME_SV} "sv"
 
@@ -155,8 +159,6 @@ generate_xsim_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${lane}/ ${CFG_F
 
 generate_xsim_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${control}/ ${CFG_FILE_NAME_SV} "sv"
 
-# generate_xsim_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${engines}/ ${CFG_FILE_NAME_SV} "sv"
-
 generate_xsim_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${engines}/${engine_alu_ops}      ${CFG_FILE_NAME_SV} "sv"
 generate_xsim_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${engines}/${engine_csr_index}    ${CFG_FILE_NAME_SV} "sv"
 generate_xsim_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${engines}/${engine_cu_setup}     ${CFG_FILE_NAME_SV} "sv"
@@ -164,63 +166,67 @@ generate_xsim_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${engines}/${eng
 generate_xsim_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${engines}/${engine_forward_data} ${CFG_FILE_NAME_SV} "sv"
 generate_xsim_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${engines}/${engine_m_axi}        ${CFG_FILE_NAME_SV} "sv"
 generate_xsim_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${engines}/${engine_merge_data}   ${CFG_FILE_NAME_SV} "sv"
+generate_xsim_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${engines}/${engine_set_ops}      ${CFG_FILE_NAME_SV} "sv"
 generate_xsim_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${engines}/${engine_pipeline}     ${CFG_FILE_NAME_SV} "sv"
 generate_xsim_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${engines}/${engine_read_write}   ${CFG_FILE_NAME_SV} "sv"
+generate_xsim_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${engines}/${engine_parallel_read_write}   ${CFG_FILE_NAME_SV} "sv"
+generate_xsim_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${engines}/${engine_automata_nfa}   ${CFG_FILE_NAME_SV} "sv"
+generate_xsim_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${engines}/${engine_automata_nfa}   ${CFG_FILE_NAME_V} "v"
 generate_xsim_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${engines}/${engine_template}     ${CFG_FILE_NAME_SV} "sv"
 
 generate_xsim_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${kernel}/ ${CFG_FILE_NAME_SV} "sv"
 
 generate_xsim_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${top}/ ${CFG_FILE_NAME_V} "v"
 
-newtext="${APP_DIR_ACTIVE}/${VIVADO_VIP_DIR}/${KERNEL_NAME}/${KERNEL_NAME}.gen/sources_1/ip/control_${KERNEL_NAME}_vip/sim/control_${KERNEL_NAME}_vip_pkg.sv"
-echo $newtext >> ${CFG_FILE_NAME_IP_SV}
+# newtext="${APP_DIR_ACTIVE}/${VIVADO_VIP_DIR}/${KERNEL_NAME}/${KERNEL_NAME}.gen/sources_1/ip/control_${KERNEL_NAME}_vip/sim/control_${KERNEL_NAME}_vip_pkg.sv"
+# echo $newtext >> ${CFG_FILE_NAME_IP_SV}
 
-newtext="${APP_DIR_ACTIVE}/${VIVADO_VIP_DIR}/${KERNEL_NAME}/${KERNEL_NAME}.gen/sources_1/ip/control_${KERNEL_NAME}_vip/sim/control_${KERNEL_NAME}_vip.sv"
-echo $newtext >> ${CFG_FILE_NAME_IP_SV}
+# newtext="${APP_DIR_ACTIVE}/${VIVADO_VIP_DIR}/${KERNEL_NAME}/${KERNEL_NAME}.gen/sources_1/ip/control_${KERNEL_NAME}_vip/sim/control_${KERNEL_NAME}_vip.sv"
+# echo $newtext >> ${CFG_FILE_NAME_IP_SV}
 
-newtext="${APP_DIR_ACTIVE}/${VIVADO_VIP_DIR}/${KERNEL_NAME}/${KERNEL_NAME}.gen/sources_1/ip/control_${KERNEL_NAME}_vip/hdl/axi_vip_v1_1_vl_rfs.sv"
-echo $newtext >> ${CFG_FILE_NAME_IP_SV}
+# newtext="${APP_DIR_ACTIVE}/${VIVADO_VIP_DIR}/${KERNEL_NAME}/${KERNEL_NAME}.gen/sources_1/ip/control_${KERNEL_NAME}_vip/hdl/axi_vip_v1_1_vl_rfs.sv"
+# echo $newtext >> ${CFG_FILE_NAME_IP_SV}
 
-newtext="${APP_DIR_ACTIVE}/${VIVADO_VIP_DIR}/${KERNEL_NAME}/${KERNEL_NAME}.gen/sources_1/ip/control_${KERNEL_NAME}_vip/hdl/axi_infrastructure_v1_1_vl_rfs.v"
-echo $newtext >> ${CFG_FILE_NAME_IP_V}
+# newtext="${APP_DIR_ACTIVE}/${VIVADO_VIP_DIR}/${KERNEL_NAME}/${KERNEL_NAME}.gen/sources_1/ip/control_${KERNEL_NAME}_vip/hdl/axi_infrastructure_v1_1_vl_rfs.v"
+# echo $newtext >> ${CFG_FILE_NAME_IP_V}
 
-newtext="${APP_DIR_ACTIVE}/${VIVADO_VIP_DIR}/${KERNEL_NAME}/${KERNEL_NAME}.gen/sources_1/ip/slv_m00_axi_vip/sim/slv_m00_axi_vip_pkg.sv"
-echo $newtext >> ${CFG_FILE_NAME_IP_SV}
+# newtext="${APP_DIR_ACTIVE}/${VIVADO_VIP_DIR}/${KERNEL_NAME}/${KERNEL_NAME}.gen/sources_1/ip/slv_m00_axi_vip/sim/slv_m00_axi_vip_pkg.sv"
+# echo $newtext >> ${CFG_FILE_NAME_IP_SV}
 
-newtext="${APP_DIR_ACTIVE}/${VIVADO_VIP_DIR}/${KERNEL_NAME}/${KERNEL_NAME}.gen/sources_1/ip/slv_m00_axi_vip/sim/slv_m00_axi_vip.sv"
-echo $newtext >> ${CFG_FILE_NAME_IP_SV}
+# newtext="${APP_DIR_ACTIVE}/${VIVADO_VIP_DIR}/${KERNEL_NAME}/${KERNEL_NAME}.gen/sources_1/ip/slv_m00_axi_vip/sim/slv_m00_axi_vip.sv"
+# echo $newtext >> ${CFG_FILE_NAME_IP_SV}
 
-newtext="${APP_DIR_ACTIVE}/${VIVADO_VIP_DIR}/${KERNEL_NAME}/${KERNEL_NAME}.gen/sources_1/ip/system_cache_512x64/hdl/system_cache_v5_0_vh_rfs.vhd"
-echo $newtext >> ${CFG_FILE_NAME_IP_VHDL}
+# newtext="${APP_DIR_ACTIVE}/${VIVADO_VIP_DIR}/${KERNEL_NAME}/${KERNEL_NAME}.gen/sources_1/ip/system_cache_512x64/hdl/system_cache_v5_0_vh_rfs.vhd"
+# echo $newtext >> ${CFG_FILE_NAME_IP_VHDL}
 
-newtext="${APP_DIR_ACTIVE}/${VIVADO_VIP_DIR}/${KERNEL_NAME}/${KERNEL_NAME}.gen/sources_1/ip/system_cache_512x64/sim/system_cache_512x64.vhd"
-echo $newtext >> ${CFG_FILE_NAME_IP_VHDL}
+# newtext="${APP_DIR_ACTIVE}/${VIVADO_VIP_DIR}/${KERNEL_NAME}/${KERNEL_NAME}.gen/sources_1/ip/system_cache_512x64/sim/system_cache_512x64.vhd"
+# echo $newtext >> ${CFG_FILE_NAME_IP_VHDL}
 
-newtext="${APP_DIR_ACTIVE}/${VIVADO_VIP_DIR}/${KERNEL_NAME}/${KERNEL_NAME}.gen/sources_1/ip/axi_register_slice_be/hdl/axi_register_slice_v2_1_vl_rfs.v"
-echo $newtext >> ${CFG_FILE_NAME_IP_V}
+# newtext="${APP_DIR_ACTIVE}/${VIVADO_VIP_DIR}/${KERNEL_NAME}/${KERNEL_NAME}.gen/sources_1/ip/axi_register_slice_be/hdl/axi_register_slice_v2_1_vl_rfs.v"
+# echo $newtext >> ${CFG_FILE_NAME_IP_V}
 
-newtext="${APP_DIR_ACTIVE}/${VIVADO_VIP_DIR}/${KERNEL_NAME}/${KERNEL_NAME}.gen/sources_1/ip/axi_register_slice_be/sim/axi_register_slice_be.v"
-echo $newtext >> ${CFG_FILE_NAME_IP_V}
+# newtext="${APP_DIR_ACTIVE}/${VIVADO_VIP_DIR}/${KERNEL_NAME}/${KERNEL_NAME}.gen/sources_1/ip/axi_register_slice_be/sim/axi_register_slice_be.v"
+# echo $newtext >> ${CFG_FILE_NAME_IP_V}
 
 # newtext="${APP_DIR_ACTIVE}/${VIVADO_VIP_DIR}/${KERNEL_NAME}/${KERNEL_NAME}.gen/sources_1/ip/axi_register_slice_mid/hdl/axi_register_slice_v2_1_vl_rfs.v"
 # echo $newtext >> ${CFG_FILE_NAME_IP_V}
 
-newtext="${APP_DIR_ACTIVE}/${VIVADO_VIP_DIR}/${KERNEL_NAME}/${KERNEL_NAME}.gen/sources_1/ip/axi_register_slice_mid/sim/axi_register_slice_mid.v"
-echo $newtext >> ${CFG_FILE_NAME_IP_V}
+# newtext="${APP_DIR_ACTIVE}/${VIVADO_VIP_DIR}/${KERNEL_NAME}/${KERNEL_NAME}.gen/sources_1/ip/axi_register_slice_mid/sim/axi_register_slice_mid.v"
+# echo $newtext >> ${CFG_FILE_NAME_IP_V}
 
 generate_xsim_filelist_f ${APP_DIR_ACTIVE}/${IP_DIR_RTL_ACTIVE}/${testbench}/${TESTBENCH_MODULE}/ ${CFG_FILE_NAME_SV} "sv"
 
-newtext="${XILINX_VIVADO}/data/verilog/src/glbl.v"
-echo $newtext >> ${CFG_FILE_NAME_IP_V}
+# newtext="${XILINX_VIVADO}/data/verilog/src/glbl.v"
+# echo $newtext >> ${CFG_FILE_NAME_IP_V}
 
 newtext=""
 echo $newtext >> ${CFG_FILE_NAME_SV}
 echo $newtext >> ${CFG_FILE_NAME_VHDL}
 echo $newtext >> ${CFG_FILE_NAME_V}
 
-echo $newtext >> ${CFG_FILE_NAME_IP_SV}
-echo $newtext >> ${CFG_FILE_NAME_IP_VHDL}
-echo $newtext >> ${CFG_FILE_NAME_IP_V}
+# echo $newtext >> ${CFG_FILE_NAME_IP_SV}
+# echo $newtext >> ${CFG_FILE_NAME_IP_VHDL}
+# echo $newtext >> ${CFG_FILE_NAME_IP_V}
 
 echo $newtext >> ${CFG_FILE_NAME_VH}
 
@@ -228,8 +234,8 @@ rm_xsim_filelist_f ${CFG_FILE_NAME_SV}
 rm_xsim_filelist_f ${CFG_FILE_NAME_VHDL}
 rm_xsim_filelist_f ${CFG_FILE_NAME_V}
 
-rm_xsim_filelist_f ${CFG_FILE_NAME_IP_SV}
-rm_xsim_filelist_f ${CFG_FILE_NAME_IP_VHDL}
-rm_xsim_filelist_f ${CFG_FILE_NAME_IP_V}
+# rm_xsim_filelist_f ${CFG_FILE_NAME_IP_SV}
+# rm_xsim_filelist_f ${CFG_FILE_NAME_IP_VHDL}
+# rm_xsim_filelist_f ${CFG_FILE_NAME_IP_V}
 
 rm_xsim_filelist_f ${CFG_FILE_NAME_VH}

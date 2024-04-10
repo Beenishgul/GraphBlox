@@ -1,10 +1,7 @@
 {
-    "entries": {
-        "entry_0": {
-            "hops": {
-                "bits": "4",
-                "value": "0x0"
-            }
+    "ENGINE_FORWARD_DATA": {
+        "entries": {
+
         }
     }
 }

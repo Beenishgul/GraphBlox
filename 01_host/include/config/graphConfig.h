@@ -10,7 +10,7 @@ extern "C" {
 #include <stdint.h>
 #include "mt19937.h"
 
-#define WEIGHTED 1
+#define WEIGHTED 0
 #define DIRECTED 0
 #define DYNAMIC  0
 
@@ -51,10 +51,15 @@ struct Arguments
     // GLay Xilinx Parameters
 
     char *kernel_name;
+    int cu_id;
     int device_index;
     char *xclbin_path;
     char *overlay_path;
-    struct xrtGLAYHandle *glayHandle;
+    int ctrl_mode;
+    int endian_read;
+    int endian_write;
+    int flush_cache;
+    int bankGroupIndex;
 };
 
 

@@ -139,6 +139,40 @@ void writeSerializedGraphDataStructure(struct Arguments *arguments)  // for now 
         Stop(timer);
         generateGraphPrintMessageWithtime("Free Graph CSR (Seconds)", Seconds(timer));
     }
+    else if(arguments->fnameb_format == 0 && arguments->convert_format == 3)   // for Glay testbench
+    {
+        void *graph = NULL;
+        struct GraphCSR *graphCSR = NULL;
+
+        Start(timer);
+        arguments->fnameb = readEdgeListstxt(arguments->fnameb, arguments->weighted);
+        arguments->fnameb_format = 1; // now you have a bin file
+#if WEIGHTED
+        arguments->weighted = 1; // no need to generate weights again this affects readedgelistbin
+#else
+        arguments->weighted = 0;
+#endif
+        Stop(timer);
+        generateGraphPrintMessageWithtime("Serialize EdgeList text to binary (Seconds)", Seconds(timer));
+
+
+        Start(timer);
+        graph = (void *)graphCSRPreProcessingStep (arguments);
+        Stop(timer);
+        generateGraphPrintMessageWithtime("GraphCSR Preprocessing Step Time (Seconds)", Seconds(timer));
+
+
+        graphCSR = (struct GraphCSR *)graph;
+        Start(timer);
+        writetoTextFilesGraphCSR (arguments->fnameb, graphCSR);
+        Stop(timer);
+        generateGraphPrintMessageWithtime("GraphCSR Preprocessing Step Time (Seconds)", Seconds(timer));
+
+        Start(timer);
+        graphCSRFree(graphCSR);
+        Stop(timer);
+        generateGraphPrintMessageWithtime("Free Graph CSR (Seconds)", Seconds(timer));
+    }
     else if(arguments->fnameb_format == 1 && arguments->convert_format == 2)   // for now it edge list is text only convert to binary
     {
         void *graph = NULL;
@@ -448,8 +482,6 @@ void runGraphAlgorithms(struct Arguments *arguments, void *graph)
             struct PageRankStats *stats = runPageRankAlgorithm(arguments, graph);
             if(stats)
             {
-                time_total += stats->time_total;
-
                 if(arguments->Sflag) // output page rank error statistics
                 {
                     arguments->pushpull = 0;

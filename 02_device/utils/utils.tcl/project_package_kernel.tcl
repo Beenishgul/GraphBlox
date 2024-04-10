@@ -18,9 +18,9 @@
 # =========================================================
 # create ip project with part name in command line argvs
 # =========================================================
-set PARAMS_TCL_DIR                  [lindex $argv 0]
+set ACTIVE_PARAMS_TCL_DIR                  [lindex $argv 0]
 
-source ${PARAMS_TCL_DIR}
+source ${ACTIVE_PARAMS_TCL_DIR}
 
 set package_full_dir ${APP_DIR_ACTIVE}/${VIVADO_PACKAGE_DIR}
 set log_file         ${package_full_dir}/generate_${KERNEL_NAME}_package.log
@@ -130,14 +130,26 @@ set vitis_dir $::env(XILINX_VITIS)
 # Add IP and design sources into project
 # =========================================================
 puts "[color 4 "                        Add VIP into project"]"
-set argv [list ${PARAMS_TCL_DIR} ${package_full_dir}]
+set argv [list ${ACTIVE_PARAMS_TCL_DIR} ${package_full_dir}]
 set argc 2
 source ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${UTILS_TCL}/project_generate_vip.tcl 
+
+# Construct the path to the Python script
+set XCI_XDC_PythonScriptPath "${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${UTILS_PYTHON}/generate_xci_xdc_filelist_f.py"
+
+# Use catch to handle any errors that occur during execution
+if {[catch {exec python3 ${XCI_XDC_PythonScriptPath} ${ACTIVE_PARAMS_SH_DIR}} result]} {
+    # If an error occurs, print the error message
+    puts "An error occurred in the Python command: $result ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${UTILS_PYTHON}/generate_xci_xdc_filelist_f.py"
+} else {
+    # If the command succeeds, you can use the result if needed
+    puts "[color 4 "                        Add design XCI/XDC into project ${KERNEL_NAME}"]" 
+}
 
 puts "[color 4 "                        Add design sources into project ${KERNEL_NAME}"]" 
 add_filelist_if_exists sources_1 ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${KERNEL_NAME}_filelist_package.vh.f $log_file
 add_filelist_if_exists sources_1 ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${KERNEL_NAME}_filelist_package.src.f $log_file
-# add_filelist_if_exists sources_1 ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${KERNEL_NAME}_filelist_package.xci.f $log_file
+add_filelist_if_exists sources_1 ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${KERNEL_NAME}_filelist_package.xci.f $log_file
 # add_filelist_if_exists sources_1 ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${KERNEL_NAME}_filelist_package.xdc.f $log_file
 
 puts "[color 4 "                        Add design sources into sim_1 ${KERNEL_NAME}"]" 
@@ -145,9 +157,10 @@ add_filelist_if_exists sim_1 ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${KERNEL_NAME
 add_filelist_if_exists sim_1 ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${KERNEL_NAME}_filelist_xsim.sv.f $log_file
 add_filelist_if_exists sim_1 ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${KERNEL_NAME}_filelist_xsim.vhdl.f $log_file
 add_filelist_if_exists sim_1 ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${KERNEL_NAME}_filelist_xsim.vh.f $log_file
-# add_filelist_if_exists sim_1 ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${KERNEL_NAME}_filelist_xsim.ip.v.f $log_file
-# add_filelist_if_exists sim_1 ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${KERNEL_NAME}_filelist_xsim.ip.sv.f $log_file
-# add_filelist_if_exists sim_1 ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${KERNEL_NAME}_filelist_xsim.ip.vhdl.f $log_file
+# add_filelist_if_exists sim_1 ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${KERNEL_NAME}_filelist_package.xci.f $log_file
+add_filelist_if_exists sim_1 ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${KERNEL_NAME}_filelist_xsim.ip.v.f $log_file
+add_filelist_if_exists sim_1 ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${KERNEL_NAME}_filelist_xsim.ip.sv.f $log_file
+add_filelist_if_exists sim_1 ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${KERNEL_NAME}_filelist_xsim.ip.vhdl.f $log_file
 
 puts "[color 4 "                        Add design xdc into constrs_1"]" 
 add_filelist_if_exists constrs_1 ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${KERNEL_NAME}_filelist_package.xdc.f $log_file
@@ -166,11 +179,15 @@ set_property -name {xsim.simulate.no_quit} -value {true} -objects [get_filesets 
 puts "[color 4 "                        Update compile order: sources_1"]"
 update_compile_order -fileset sources_1  >> $log_file
 
+puts "[color 4 "                        Update compile order: constrs_1"]"
+update_compile_order -fileset constrs_1  >> $log_file
+
 puts "[color 4 "                        Update compile order: sim_1"]"
 update_compile_order -fileset sim_1      >> $log_file
 
 puts "[color 4 "                        Create OOC synthesis: synth_1"]"
-set_property AUTO_INCREMENTAL_CHECKPOINT 1 [get_runs synth_1]
+# set_property AUTO_INCREMENTAL_CHECKPOINT 1 [get_runs synth_1]
+set_property STEPS.SYNTH_DESIGN.ARGS.FLATTEN_HIERARCHY rebuilt [get_runs synth_1]
 set_property -name {STEPS.SYNTH_DESIGN.ARGS.MORE OPTIONS} -value {-mode out_of_context -directive sdx_optimization_effort_high} -objects [get_runs synth_1]
 # set_property -name {STEPS.SYNTH_DESIGN.ARGS.MORE OPTIONS} -value {-directive sdx_optimization_effort_high} -objects [get_runs synth_1]
 
@@ -179,13 +196,15 @@ set_property AUTO_INCREMENTAL_CHECKPOINT 1 [get_runs impl_1]
 set_property STEPS.POST_ROUTE_PHYS_OPT_DESIGN.IS_ENABLED 1 [get_runs impl_1]
 set_property STEPS.PHYS_OPT_DESIGN.IS_ENABLED 1 [get_runs impl_1]
 set_property -name {STEPS.PLACE_DESIGN.ARGS.MORE OPTIONS} -value {-retiming} -objects [get_runs impl_1]
+set_property AUTO_RQS 1 [get_runs impl_1]
+set_property AUTO_RQS.SUGGESTION_RUN impl_1 [get_runs synth_1]
 
-set argv [list ${PARAMS_TCL_DIR}]
+set argv [list ${ACTIVE_PARAMS_TCL_DIR}]
 set argc 1
 source ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${UTILS_TCL}/project_all_impl.tcl >> $log_file
 
 puts "[color 4 "                        Create IDR implementation strategies: i_impl_strategies"]"
-set argv [list ${PARAMS_TCL_DIR}]
+set argv [list ${ACTIVE_PARAMS_TCL_DIR}]
 set argc 1
 source ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${UTILS_TCL}/project_all_idr_impl.tcl >> $log_file
 
@@ -209,20 +228,20 @@ foreach user_parameter [ipx::get_user_parameters] {
 puts "[color 3 "                Step 2: Inference clock, reset, AXI interfaces and associate them with clock"]" 
 
 # inference clock and reset signals
-puts "[color 4 "                        Inference clock and reset signals"]" 
-set bif      [ipx::get_bus_interfaces -of $core  "m00_axi"] 
-set bifparam [ipx::add_bus_parameter -quiet "MAX_BURST_LENGTH" $bif]
-set_property value        64           $bifparam
-set_property value_source constant     $bifparam
-set bifparam [ipx::add_bus_parameter -quiet "NUM_READ_OUTSTANDING" $bif]
-set_property value        32           $bifparam
-set_property value_source constant     $bifparam
-set bifparam [ipx::add_bus_parameter -quiet "NUM_WRITE_OUTSTANDING" $bif]
-set_property value        32           $bifparam
-set_property value_source constant     $bifparam
+# puts "[color 4 "                        Inference clock and reset signals"]" 
+# set bif      [ipx::get_bus_interfaces -of $core  "m00_axi"] 
+# set bifparam [ipx::add_bus_parameter -quiet "MAX_BURST_LENGTH" $bif]
+# set_property value        32           $bifparam
+# set_property value_source constant     $bifparam
+# set bifparam [ipx::add_bus_parameter -quiet "NUM_READ_OUTSTANDING" $bif]
+# set_property value        32           $bifparam
+# set_property value_source constant     $bifparam
+# set bifparam [ipx::add_bus_parameter -quiet "NUM_WRITE_OUTSTANDING" $bif]
+# set_property value        32           $bifparam
+# set_property value_source constant     $bifparam
 
-ipx::associate_bus_interfaces -busif "m00_axi" -clock "ap_clk" $core >> $log_file
-ipx::associate_bus_interfaces -busif "s_axi_control" -clock "ap_clk" $core >> $log_file
+# ipx::associate_bus_interfaces -busif "m00_axi" -clock "ap_clk" $core >> $log_file
+# ipx::associate_bus_interfaces -busif "s_axi_control" -clock "ap_clk" $core >> $log_file
 
 # =========================================================
 # Specify the freq_hz parameter
@@ -248,9 +267,13 @@ set_property value_resolve_type user $clkbifparam
 # =========================================================
 # associate AXI/AXIS interface with clock
 # =========================================================
-puts "[color 4 "                        Associate AXI/AXIS interface with clock"]" 
-ipx::associate_bus_interfaces -busif "s_axi_control"  -clock "ap_clk" $core
-ipx::associate_bus_interfaces -busif "m00_axi"       -clock "ap_clk" $core
+puts "[color 4 "                        Associate AXIS interface with clock"]" 
+ipx::associate_bus_interfaces -busif "s_axi_control"  -clock "ap_clk" $core >> $log_file
+
+puts "[color 4 "                        Associate AXI interface with clock"]" 
+set argv [list ${ACTIVE_PARAMS_TCL_DIR} $core]
+set argc 2
+source ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${UTILS_TCL}/project_generate_m_axi_ports.tcl 
 
 # =========================================================
 # associate reset signal with clock
@@ -268,7 +291,7 @@ puts "[color 3 "                        including CTRL and user kernel arguments
 # =========================================================
 # Add RTL kernel registers
 # =========================================================
-puts "[color 4 "                        Add RTL kernel registers"]" 
+puts "[color 4 "                        Add RTL kernel registers s_axi_control"]" 
 ipx::add_register CTRL [ipx::get_address_blocks reg0 -of_objects [ipx::get_memory_maps s_axi_control -of_objects $core]]
 
 set mem_map    [ipx::add_memory_map -quiet "s_axi_control" $core]
@@ -376,75 +399,9 @@ puts "[color 3 "                        (Name, Offsets, Descriptions, and Size)"
 
 puts "[color 4 "                        Set RTL kernel (${KERNEL_NAME}) registers property"]" 
 
-puts_reg_info "buffer_0" "graph overlay program" "0x010" [expr {8*8}]
-  set reg      [ipx::add_register -quiet "buffer_0" $addr_block]
-  set_property address_offset 0x010 $reg
-  set_property size           [expr {8*8}]   $reg
-  set regparam [ipx::add_register_parameter -quiet {ASSOCIATED_BUSIF} $reg] 
-  set_property value m00_axi $regparam 
-
-puts_reg_info "buffer_1" "vertex in degree" "0x01c" [expr {8*8}]
-  set reg      [ipx::add_register -quiet "buffer_1" $addr_block]
-  set_property address_offset 0x01c $reg
-  set_property size           [expr {8*8}]   $reg
-  set regparam [ipx::add_register_parameter -quiet {ASSOCIATED_BUSIF} $reg] 
-  set_property value m00_axi $regparam 
-
-puts_reg_info "buffer_2" "vertex out degree" "0x028" [expr {8*8}]
-  set reg      [ipx::add_register -quiet "buffer_2" $addr_block]
-  set_property address_offset 0x028 $reg
-  set_property size           [expr {8*8}]   $reg
-  set regparam [ipx::add_register_parameter -quiet {ASSOCIATED_BUSIF} $reg] 
-  set_property value m00_axi $regparam 
-
-puts_reg_info "buffer_3" "vertex edges CSR index" "0x034" [expr {8*8}]
-  set reg      [ipx::add_register -quiet "buffer_3" $addr_block]
-  set_property address_offset 0x034 $reg
-  set_property size           [expr {8*8}]   $reg
-  set regparam [ipx::add_register_parameter -quiet {ASSOCIATED_BUSIF} $reg] 
-  set_property value m00_axi $regparam 
-
-puts_reg_info "buffer_4" "edges array src" "0x040" [expr {8*8}]
-  set reg      [ipx::add_register -quiet "buffer_4" $addr_block]
-  set_property address_offset 0x040 $reg
-  set_property size           [expr {8*8}]   $reg
-  set regparam [ipx::add_register_parameter -quiet {ASSOCIATED_BUSIF} $reg] 
-  set_property value m00_axi $regparam 
-
-puts_reg_info "buffer_5" "edges array dest" "0x04c" [expr {8*8}]
-  set reg      [ipx::add_register -quiet "buffer_5" $addr_block]
-  set_property address_offset 0x04c $reg
-  set_property size           [expr {8*8}]   $reg
-  set regparam [ipx::add_register_parameter -quiet {ASSOCIATED_BUSIF} $reg] 
-  set_property value m00_axi $regparam 
-
-puts_reg_info "buffer_6" "edges array weight" "0x058" [expr {8*8}]
-  set reg      [ipx::add_register -quiet "buffer_6" $addr_block]
-  set_property address_offset 0x058 $reg
-  set_property size           [expr {8*8}]   $reg
-  set regparam [ipx::add_register_parameter -quiet {ASSOCIATED_BUSIF} $reg] 
-  set_property value m00_axi $regparam 
-
-puts_reg_info "buffer_7" "auxiliary 1" "0x064" [expr {8*8}]
-  set reg      [ipx::add_register -quiet "buffer_7" $addr_block]
-  set_property address_offset 0x064 $reg
-  set_property size           [expr {8*8}]   $reg
-  set regparam [ipx::add_register_parameter -quiet {ASSOCIATED_BUSIF} $reg] 
-  set_property value m00_axi $regparam 
-
-puts_reg_info "buffer_8" "auxiliary 2" "0x070" [expr {8*8}]
-  set reg      [ipx::add_register -quiet "buffer_8" $addr_block]
-  set_property address_offset 0x070 $reg
-  set_property size           [expr {8*8}]   $reg
-  set regparam [ipx::add_register_parameter -quiet {ASSOCIATED_BUSIF} $reg] 
-  set_property value m00_axi $regparam 
-
-puts_reg_info "buffer_9" "auxiliary 3" "0x07c" [expr {8*8}]
-  set reg      [ipx::add_register -quiet "buffer_9" $addr_block]
-  set_property address_offset 0x07c $reg
-  set_property size           [expr {8*8}]   $reg
-  set regparam [ipx::add_register_parameter -quiet {ASSOCIATED_BUSIF} $reg] 
-  set_property value m00_axi $regparam 
+set argv [list ${ACTIVE_PARAMS_TCL_DIR} $addr_block]
+set argc 2
+source ${APP_DIR_ACTIVE}/${UTILS_DIR_ACTIVE}/${UTILS_TCL}/project_map_buffers_m_axi_ports.tcl 
 
   set_property slave_memory_map_ref "s_axi_control" [ipx::get_bus_interfaces -of $core "s_axi_control"]
 

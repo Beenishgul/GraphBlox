@@ -29,35 +29,42 @@
 // uint32_t *csrIndexGenerator(uint32_t indexStart, uint32_t indexEnd, uint32_t granularity)
 
 module engine_read_write_generator #(parameter
-    ID_CU            = 0                    ,
-    ID_BUNDLE        = 0                    ,
-    ID_LANE          = 0                    ,
-    ID_ENGINE        = 0                    ,
-    ID_MODULE        = 1                    ,
-    ENGINES_CONFIG   = 0                    ,
-    FIFO_WRITE_DEPTH = 16                   ,
-    PROG_THRESH      = 8                    ,
-    PIPELINE_STAGES  = 2                    ,
-    COUNTER_WIDTH    = CACHE_FRONTEND_DATA_W
+    ID_CU               = 0                    ,
+    ID_BUNDLE           = 0                    ,
+    ID_LANE             = 0                    ,
+    ID_ENGINE           = 0                    ,
+    ID_MODULE           = 1                    ,
+    ENGINES_CONFIG      = 0                    ,
+    FIFO_WRITE_DEPTH    = 16                   ,
+    PROG_THRESH         = 8                    ,
+    PIPELINE_STAGES     = 2                    ,
+    COUNTER_WIDTH       = CACHE_FRONTEND_DATA_W,
+    NUM_BACKTRACK_LANES = 4                    ,
+    NUM_CHANNELS        = 2                    ,
+    ENGINE_CAST_WIDTH   = 1                    ,
+    NUM_BUNDLES         = 4
 ) (
     // System Signals
-    input  logic                  ap_clk                             ,
-    input  logic                  areset                             ,
-    input  KernelDescriptor       descriptor_in                      ,
-    input  ReadWriteConfiguration configure_memory_in                ,
-    input  FIFOStateSignalsInput  fifo_configure_memory_in_signals_in,
-    input  MemoryPacket           response_engine_in                 ,
-    input  FIFOStateSignalsInput  fifo_response_engine_in_signals_in ,
-    output FIFOStateSignalsOutput fifo_response_engine_in_signals_out,
-    input  MemoryPacket           response_memory_in                 ,
-    input  FIFOStateSignalsInput  fifo_response_memory_in_signals_in ,
-    output FIFOStateSignalsInput  fifo_response_memory_in_signals_out,
-    output MemoryPacket           request_engine_out                 ,
-    input  FIFOStateSignalsInput  fifo_request_engine_out_signals_in ,
-    output MemoryPacket           request_memory_out                 ,
-    input  FIFOStateSignalsInput  fifo_request_memory_out_signals_in ,
-    output logic                  fifo_setup_signal                  ,
-    output logic                  configure_memory_setup             ,
+    input  logic                  ap_clk                                                                             ,
+    input  logic                  areset                                                                             ,
+    input  ReadWriteConfiguration configure_memory_in                                                                ,
+    input  FIFOStateSignalsInput  fifo_configure_memory_in_signals_in                                                ,
+    input  EnginePacket           response_engine_in                                                                 ,
+    input  FIFOStateSignalsInput  fifo_response_engine_in_signals_in                                                 ,
+    output FIFOStateSignalsOutput fifo_response_engine_in_signals_out                                                ,
+    input  FIFOStateSignalsOutput fifo_response_lanes_backtrack_signals_in[NUM_BACKTRACK_LANES+ENGINE_CAST_WIDTH-1:0],
+    input  MemoryPacketResponse   response_memory_in                                                                 ,
+    input  FIFOStateSignalsInput  fifo_response_memory_in_signals_in                                                 ,
+    output FIFOStateSignalsOutput fifo_response_memory_in_signals_out                                                ,
+    output EnginePacket           request_engine_out                                                                 ,
+    input  FIFOStateSignalsInput  fifo_request_engine_out_signals_in                                                 ,
+    output FIFOStateSignalsOutput fifo_request_engine_out_signals_out                                                ,
+    output MemoryPacketRequest    request_memory_out                                                                 ,
+    input  FIFOStateSignalsInput  fifo_request_memory_out_signals_in                                                 ,
+    output FIFOStateSignalsOutput fifo_request_memory_out_signals_out                                                ,
+    input  FIFOStateSignalsOutput fifo_request_memory_out_backtrack_signals_in[NUM_CHANNELS-1:0]                     ,
+    output logic                  fifo_setup_signal                                                                  ,
+    output logic                  configure_memory_setup                                                             ,
     output logic                  done_out
 );
 
@@ -67,16 +74,14 @@ module engine_read_write_generator #(parameter
     logic areset_generator;
     logic areset_counter  ;
     logic areset_fifo     ;
-    logic areset_kernel   ;
 
-    KernelDescriptor descriptor_in_reg;
+    logic                  configure_memory_setup_reg;
+    ReadWriteConfiguration configure_memory_reg      ;
+    ReadWriteConfiguration configure_engine_int      ;
 
-    ReadWriteConfiguration configure_memory_reg;
-    ReadWriteConfiguration configure_engine_reg;
-    MemoryPacket           request_out_int     ;
-
-    logic fifo_empty_int;
-    logic fifo_empty_reg;
+    logic fifo_empty_int     ;
+    logic fifo_empty_reg     ;
+    logic cmd_stream_mode_pop;
 
 // --------------------------------------------------------------------------------------
 //  Setup state machine signals
@@ -84,64 +89,119 @@ module engine_read_write_generator #(parameter
     engine_read_write_generator_state current_state;
     engine_read_write_generator_state next_state   ;
 
-    logic done_int_reg;
     logic done_out_reg;
+
+    logic enter_gen_pause_int;
+    logic exit_gen_pause_int ;
 
 // --------------------------------------------------------------------------------------
 //   Engine FIFO signals
 // --------------------------------------------------------------------------------------
-    MemoryPacketPayload           fifo_request_din             ;
-    MemoryPacketPayload           fifo_request_dout            ;
-    MemoryPacket                  fifo_response_comb           ;
-    FIFOStateSignalsInput         fifo_request_signals_in_reg  ;
-    FIFOStateSignalsInputInternal fifo_request_signals_in_int  ;
-    FIFOStateSignalsOutInternal   fifo_request_signals_out_int ;
-    logic                         fifo_request_setup_signal_int;
-
-    MemoryPacket response_engine_in_reg    ;
-    MemoryPacket response_memory_in_reg    ;
-    logic        configure_memory_setup_reg;
-
-    logic                            configure_engine_param_valid;
-    ReadWriteConfigurationParameters configure_engine_param_int  ;
-
-    MemoryPacket generator_engine_request_engine_reg;
-    MemoryPacket request_engine_out_reg             ;
-    MemoryPacket request_memory_out_reg             ;
-
-    FIFOStateSignalsInput fifo_response_memory_in_signals_out_reg;
+    EnginePacket         response_engine_in_reg                     ;
+    EnginePacket         request_engine_out_reg                     ;
+    EnginePacket         fifo_response_comb                         ;
+    EnginePacketFull     generator_engine_request_engine_start_Stage;
+    EnginePacketFull     generator_engine_request_engine_final_Stage;
+    EnginePacketFull     request_memory_out_reg                     ;
+    MemoryPacketResponse response_memory_in_reg                     ;
+    MemoryPacketResponse response_memory_in_reg_S2                  ;
 
     FIFOStateSignalsInput fifo_configure_memory_in_signals_in_reg;
-    FIFOStateSignalsInput fifo_response_engine_in_signals_in_reg ;
-    FIFOStateSignalsInput fifo_response_memory_in_signals_in_reg ;
     FIFOStateSignalsInput fifo_request_engine_out_signals_in_reg ;
     FIFOStateSignalsInput fifo_request_memory_out_signals_in_reg ;
+    FIFOStateSignalsInput fifo_response_engine_in_signals_in_reg ;
+    FIFOStateSignalsInput fifo_response_memory_in_signals_in_reg ;
 
 // --------------------------------------------------------------------------------------
 // Generation Logic - read/write data [0-4] -> Gen
 // --------------------------------------------------------------------------------------
-    logic               read_write_response_engine_in_valid_reg    ;
-    logic               read_write_response_engine_in_valid_flag   ;
-    logic               read_write_response_engine_in_valid_flag_S2;
-    MemoryPacketData    result_int                                 ;
-    MemoryPacketAddress address_int                                ;
+    EnginePacketData         result_int ;
+    PacketRequestDataAddress address_int;
 
 // --------------------------------------------------------------------------------------
-// FIFO Engine INPUT Response MemoryPacket
+// FIFO Engine INPUT Response EnginePacket
 // --------------------------------------------------------------------------------------
-    MemoryPacket                  response_engine_in_int                  ;
-    MemoryPacketPayload           fifo_response_engine_in_din             ;
-    MemoryPacketPayload           fifo_response_engine_in_dout            ;
+    EnginePacket                  response_engine_in_int                  ;
+    EnginePacketMeta              response_engine_reg_int                 ;
+    logic                         response_engine_reg_int_valid           ;
+    EnginePacketPayload           fifo_response_engine_in_din             ;
+    EnginePacketPayload           fifo_response_engine_in_dout            ;
     FIFOStateSignalsInputInternal fifo_response_engine_in_signals_in_int  ;
     FIFOStateSignalsOutInternal   fifo_response_engine_in_signals_out_int ;
     logic                         fifo_response_engine_in_setup_signal_int;
+
+// --------------------------------------------------------------------------------------
+// FIFO Engine INPUT Response EnginePacket
+// --------------------------------------------------------------------------------------
+    EnginePacketFull              request_send_out_int              ;
+    EnginePacketFullPayload       fifo_request_send_din             ;
+    EnginePacketFullPayload       fifo_request_send_dout            ;
+    FIFOStateSignalsInputInternal fifo_request_send_signals_in_int  ;
+    FIFOStateSignalsOutInternal   fifo_request_send_signals_out_int ;
+    logic                         fifo_request_send_setup_signal_int;
+
+// --------------------------------------------------------------------------------------
+// FIFO pending cache requests out fifo_oending_EnginePacket
+// --------------------------------------------------------------------------------------
+    EnginePacket                  request_pending_out_int              ;
+    EnginePacketPayload           fifo_request_pending_din             ;
+    EnginePacketPayload           fifo_request_pending_dout            ;
+    FIFOStateSignalsInputInternal fifo_request_pending_signals_in_int  ;
+    FIFOStateSignalsOutInternal   fifo_request_pending_signals_out_int ;
+    logic                         fifo_request_pending_setup_signal_int;
+
+// --------------------------------------------------------------------------------------
+// FIFO commit cache requests out fifo_oending_EnginePacket
+// --------------------------------------------------------------------------------------
+    EnginePacket                  request_commit_out_int              ;
+    EnginePacketPayload           fifo_request_commit_din             ;
+    EnginePacketPayload           fifo_request_commit_dout            ;
+    FIFOStateSignalsInputInternal fifo_request_commit_signals_in_int  ;
+    FIFOStateSignalsOutInternal   fifo_request_commit_signals_out_int ;
+    logic                         fifo_request_commit_setup_signal_int;
+
 // --------------------------------------------------------------------------------------
 // Cache/Memory response counter
 // --------------------------------------------------------------------------------------
-    logic                     counter_load                      ;
-    logic                     response_memory_counter_is_zero   ;
-    logic [COUNTER_WIDTH-1:0] response_memory_counter_          ;
-    logic [COUNTER_WIDTH-1:0] response_memory_counter_load_value;
+    logic                     counter_load                   ;
+    logic                     response_memory_counter_is_zero;
+    logic [COUNTER_WIDTH-1:0] response_memory_counter_       ;
+
+// --------------------------------------------------------------------------------------
+// Backtrack FIFO module - Bundle i <- Bundle i-1
+// --------------------------------------------------------------------------------------
+    logic                  areset_backtrack                                                                             ;
+    logic                  backtrack_configure_route_valid                                                              ;
+    PacketRouteAddress     backtrack_configure_route_in                                                                 ;
+    FIFOStateSignalsOutput backtrack_fifo_response_lanes_backtrack_signals_in[NUM_BACKTRACK_LANES+ENGINE_CAST_WIDTH-1:0];
+    FIFOStateSignalsInput  backtrack_fifo_response_engine_in_signals_out                                                ;
+
+// --------------------------------------------------------------------------------------
+// Backtrack FIFO module - Engine i <- Channel i-1
+// --------------------------------------------------------------------------------------
+    logic                    backtrack_configure_address_valid                                       ;
+    PacketRequestDataAddress backtrack_configure_address_in                                          ;
+    FIFOStateSignalsOutput   backtrack_fifo_request_memory_out_backtrack_signals_in[NUM_CHANNELS-1:0];
+    FIFOStateSignalsInput    backtrack_fifo_request_memory_out_signals_out                           ;
+
+// --------------------------------------------------------------------------------------
+// Backtrack FIFO module - Bundle i <- Bundle i-1
+// --------------------------------------------------------------------------------------
+    EnginePacketRouteAttributes engine_read_write_route;
+// --------------------------------------------------------------------------------------
+    assign engine_read_write_route.packet_destination        = 0;
+    assign engine_read_write_route.sequence_source.id_cu     = 1 << ID_CU;
+    assign engine_read_write_route.sequence_source.id_bundle = 1 << ID_BUNDLE;
+    assign engine_read_write_route.sequence_source.id_lane   = 1 << ID_LANE;
+    assign engine_read_write_route.sequence_source.id_engine = 1 << ID_ENGINE;
+    assign engine_read_write_route.sequence_source.id_module = 1 << ID_MODULE;
+    assign engine_read_write_route.sequence_state            = SEQUENCE_INVALID;
+    assign engine_read_write_route.sequence_id               = 0;
+    assign engine_read_write_route.hops                      = NUM_BUNDLES_WIDTH_BITS;
+// --------------------------------------------------------------------------------------
+    localparam             PULSE_HOLD           = 6;
+    logic [PULSE_HOLD-1:0] cmd_in_flight_hold      ;
+    logic                  cmd_in_flight_assert    ;
 
 // --------------------------------------------------------------------------------------
 //   Register reset signal
@@ -150,23 +210,7 @@ module engine_read_write_generator #(parameter
         areset_generator <= areset;
         areset_counter   <= areset;
         areset_fifo      <= areset;
-        areset_kernel    <= areset;
-    end
-
-// --------------------------------------------------------------------------------------
-// READ Descriptor
-// --------------------------------------------------------------------------------------
-    always_ff @(posedge ap_clk) begin
-        if (areset_generator) begin
-            descriptor_in_reg.valid <= 1'b0;
-        end
-        else begin
-            descriptor_in_reg.valid <= descriptor_in.valid;
-        end
-    end
-
-    always_ff @(posedge ap_clk) begin
-        descriptor_in_reg.payload <= descriptor_in.payload;
+        areset_backtrack <= areset;
     end
 
 // --------------------------------------------------------------------------------------
@@ -203,7 +247,6 @@ module engine_read_write_generator #(parameter
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
         if (areset_generator) begin
-            configure_engine_reg.valid <= 1'b0;
             configure_memory_reg.valid <= 1'b0;
         end
         else begin
@@ -220,36 +263,40 @@ module engine_read_write_generator #(parameter
 // --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
         if (areset_generator) begin
-            fifo_setup_signal                   <= 1'b1;
-            request_engine_out.valid            <= 1'b0;
-            request_memory_out.valid            <= 1'b0;
             configure_memory_setup              <= 1'b0;
             done_out                            <= 1'b0;
             fifo_empty_reg                      <= 1'b1;
-            fifo_response_engine_in_signals_out <= 0;
-            fifo_response_memory_in_signals_out <= 0;
+            fifo_request_engine_out_signals_out <= 2'b10;
+            fifo_request_memory_out_signals_out <= 2'b10;
+            fifo_response_engine_in_signals_out <= 2'b10;
+            fifo_response_memory_in_signals_out <= 2'b10;
+            fifo_setup_signal                   <= 1'b1;
+            request_engine_out.valid            <= 1'b0;
+            request_memory_out.valid            <= 1'b0;
         end
         else begin
-            fifo_setup_signal                   <= fifo_request_setup_signal_int | fifo_response_engine_in_setup_signal_int;
-            request_engine_out.valid            <= request_engine_out_reg.valid;
-            request_memory_out.valid            <= request_memory_out_reg.valid;
             configure_memory_setup              <= configure_memory_setup_reg;
             done_out                            <= done_out_reg & response_memory_counter_is_zero & fifo_empty_reg;
             fifo_empty_reg                      <= fifo_empty_int;
+            fifo_request_engine_out_signals_out <= map_internal_dual_fifo_signals_to_output_internal(fifo_request_pending_signals_out_int, fifo_request_commit_signals_out_int);
+            fifo_request_memory_out_signals_out <= map_internal_fifo_signals_to_output(fifo_request_send_signals_out_int);
             fifo_response_engine_in_signals_out <= map_internal_fifo_signals_to_output(fifo_response_engine_in_signals_out_int);
-            fifo_response_memory_in_signals_out <= fifo_response_memory_in_signals_out_reg;
+            fifo_response_memory_in_signals_out <= map_internal_fifo_signals_to_output(fifo_request_commit_signals_out_int);
+            fifo_setup_signal                   <= fifo_request_send_setup_signal_int | fifo_request_pending_setup_signal_int | fifo_request_commit_setup_signal_int | fifo_response_engine_in_setup_signal_int;
+            request_engine_out.valid            <= request_engine_out_reg.valid;
+            request_memory_out.valid            <= request_memory_out_reg.valid;
         end
     end
 
-    assign fifo_empty_int = fifo_request_signals_out_int.empty & fifo_response_engine_in_signals_out_int.empty;
+    assign fifo_empty_int = fifo_request_pending_signals_out_int.empty &  fifo_request_commit_signals_out_int.empty & fifo_request_send_signals_out_int.empty & fifo_response_engine_in_signals_out_int.empty;
 
     always_ff @(posedge ap_clk) begin
         request_engine_out.payload <= request_engine_out_reg.payload;
-        request_memory_out.payload <= request_memory_out_reg.payload;
+        request_memory_out.payload <= map_EnginePacket_to_MemoryRequestPacket(request_memory_out_reg.payload, engine_read_write_route.sequence_source);
     end
 
 // --------------------------------------------------------------------------------------
-// FIFO INPUT Engine Response MemoryPacket
+// FIFO INPUT Engine Response EnginePacket
 // --------------------------------------------------------------------------------------
     // FIFO is resetting
     assign fifo_response_engine_in_setup_signal_int = fifo_response_engine_in_signals_out_int.wr_rst_busy | fifo_response_engine_in_signals_out_int.rd_rst_busy;
@@ -259,16 +306,16 @@ module engine_read_write_generator #(parameter
     assign fifo_response_engine_in_din                  = response_engine_in_reg.payload;
 
     // Pop
-    assign fifo_response_engine_in_signals_in_int.rd_en = (~fifo_response_engine_in_signals_out_int.empty & fifo_response_engine_in_signals_in_reg.rd_en & ~read_write_response_engine_in_valid_reg & ~response_engine_in_int.valid & configure_engine_param_valid & ~fifo_request_signals_out_int.prog_full);
+    assign fifo_response_engine_in_signals_in_int.rd_en = ~fifo_response_engine_in_signals_out_int.empty & fifo_response_engine_in_signals_in_reg.rd_en & ~fifo_request_send_signals_out_int.prog_full & ~cmd_stream_mode_pop & configure_engine_int.valid ;
     assign response_engine_in_int.valid                 = fifo_response_engine_in_signals_out_int.valid;
     assign response_engine_in_int.payload               = fifo_response_engine_in_dout;
 
     xpm_fifo_sync_wrapper #(
-        .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH          ),
-        .WRITE_DATA_WIDTH($bits(MemoryPacketPayload)),
-        .READ_DATA_WIDTH ($bits(MemoryPacketPayload)),
-        .PROG_THRESH     (PROG_THRESH               )
-    ) inst_fifo_MemoryPacketResponseEngineInput (
+        .FIFO_WRITE_DEPTH(64                        ),
+        .WRITE_DATA_WIDTH($bits(EnginePacketPayload)),
+        .READ_DATA_WIDTH ($bits(EnginePacketPayload)),
+        .PROG_THRESH     (48                        )
+    ) inst_fifo_EnginePacketResponseEngineInput (
         .clk        (ap_clk                                             ),
         .srst       (areset_fifo                                        ),
         .din        (fifo_response_engine_in_din                        ),
@@ -286,6 +333,11 @@ module engine_read_write_generator #(parameter
 // --------------------------------------------------------------------------------------
 // Serial Read Engine State Machine
 // --------------------------------------------------------------------------------------
+    localparam BURST_LENGTH = 16;
+// --------------------------------------------------------------------------------------
+    assign enter_gen_pause_int = fifo_request_pending_signals_out_int.prog_full | fifo_request_send_signals_out_int.prog_full;
+    assign exit_gen_pause_int  = fifo_request_pending_signals_out_int.empty & fifo_request_send_signals_out_int.empty & ~cmd_in_flight_assert;
+// --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
         if(areset_generator)
             current_state <= ENGINE_READ_WRITE_GEN_RESET;
@@ -301,13 +353,10 @@ module engine_read_write_generator #(parameter
                 next_state = ENGINE_READ_WRITE_GEN_IDLE;
             end
             ENGINE_READ_WRITE_GEN_IDLE : begin
-                if(descriptor_in_reg.valid)
-                    next_state = ENGINE_READ_WRITE_GEN_SETUP_MEMORY_IDLE;
-                else
-                    next_state = ENGINE_READ_WRITE_GEN_IDLE;
+                next_state = ENGINE_READ_WRITE_GEN_SETUP_MEMORY_IDLE;
             end
             ENGINE_READ_WRITE_GEN_SETUP_MEMORY_IDLE : begin
-                if(fifo_configure_memory_in_signals_in.rd_en)
+                if(fifo_configure_memory_in_signals_in_reg.rd_en)
                     next_state = ENGINE_READ_WRITE_GEN_SETUP_MEMORY_TRANS;
                 else
                     next_state = ENGINE_READ_WRITE_GEN_SETUP_MEMORY_IDLE;
@@ -331,9 +380,7 @@ module engine_read_write_generator #(parameter
                 next_state = ENGINE_READ_WRITE_GEN_BUSY;
             end
             ENGINE_READ_WRITE_GEN_BUSY : begin
-                if (done_int_reg)
-                    next_state = ENGINE_READ_WRITE_GEN_DONE_TRANS;
-                else if (fifo_request_signals_out_int.prog_full)
+                if (enter_gen_pause_int)
                     next_state = ENGINE_READ_WRITE_GEN_PAUSE_TRANS;
                 else
                     next_state = ENGINE_READ_WRITE_GEN_BUSY;
@@ -342,22 +389,13 @@ module engine_read_write_generator #(parameter
                 next_state = ENGINE_READ_WRITE_GEN_PAUSE;
             end
             ENGINE_READ_WRITE_GEN_PAUSE : begin
-                if (~fifo_request_signals_out_int.prog_full)
+                if (exit_gen_pause_int)
                     next_state = ENGINE_READ_WRITE_GEN_BUSY_TRANS;
                 else
                     next_state = ENGINE_READ_WRITE_GEN_PAUSE;
             end
-            ENGINE_READ_WRITE_GEN_DONE_TRANS : begin
-                if (done_int_reg & (response_memory_counter_is_zero | ~configure_engine_param_int.mode_counter))
-                    next_state = ENGINE_READ_WRITE_GEN_DONE;
-                else
-                    next_state = ENGINE_READ_WRITE_GEN_DONE_TRANS;
-            end
-            ENGINE_READ_WRITE_GEN_DONE : begin
-                if (done_int_reg)
-                    next_state = ENGINE_READ_WRITE_GEN_IDLE;
-                else
-                    next_state = ENGINE_READ_WRITE_GEN_DONE;
+            default : begin
+                next_state = ENGINE_READ_WRITE_GEN_RESET;
             end
         endcase
     end // always_comb
@@ -365,89 +403,71 @@ module engine_read_write_generator #(parameter
     always_ff @(posedge ap_clk) begin
         case (current_state)
             ENGINE_READ_WRITE_GEN_RESET : begin
-                done_int_reg                 <= 1'b1;
-                done_out_reg                 <= 1'b1;
-                configure_memory_setup_reg   <= 1'b0;
-                configure_engine_param_valid <= 1'b0;
-                configure_engine_param_int   <= 0;
-
-                counter_load                       <= 1'b0;
-                response_memory_counter_load_value <= 0;
+                done_out_reg               <= 1'b1;
+                configure_memory_setup_reg <= 1'b0;
+                configure_engine_int.valid <= 1'b0;
+                counter_load               <= 1'b0;
+                cmd_stream_mode_pop        <= 1'b0;
             end
             ENGINE_READ_WRITE_GEN_IDLE : begin
-                done_int_reg               <= 1'b1;
                 done_out_reg               <= 1'b0;
                 configure_memory_setup_reg <= 1'b0;
-
-                counter_load                       <= 1'b0;
-                response_memory_counter_load_value <= 0;
+                counter_load               <= 1'b0;
+                cmd_stream_mode_pop        <= 1'b0;
             end
             ENGINE_READ_WRITE_GEN_SETUP_MEMORY_IDLE : begin
-                done_int_reg                       <= 1'b1;
-                done_out_reg                       <= 1'b0;
-                configure_memory_setup_reg         <= 1'b0;
-                counter_load                       <= 1'b0;
-                response_memory_counter_load_value <= 0;
+                done_out_reg               <= 1'b0;
+                configure_memory_setup_reg <= 1'b0;
+                counter_load               <= 1'b0;
+                cmd_stream_mode_pop        <= 1'b0;
             end
             ENGINE_READ_WRITE_GEN_SETUP_MEMORY_TRANS : begin
                 configure_memory_setup_reg <= 1'b1;
             end
             ENGINE_READ_WRITE_GEN_SETUP_MEMORY : begin
-                configure_memory_setup_reg   <= 1'b0;
-                configure_engine_param_valid <= 1'b0;
+                configure_memory_setup_reg <= 1'b0;
                 if(configure_memory_reg.valid)
-                    configure_engine_param_int <= configure_memory_reg.payload.param;
+                    configure_engine_int.valid <= 1'b1;
             end
             ENGINE_READ_WRITE_GEN_START_TRANS : begin
-                done_int_reg                 <= 1'b0;
-                done_out_reg                 <= 1'b0;
-                configure_engine_param_valid <= 1'b1;
-
-                counter_load <= 1'b1;
-                // if(|configure_engine_param_int.index_end & ~configure_engine_param_int.mode_sequence) begin
-                //     response_memory_counter_load_value <= configure_engine_param_int.index_end-1;
-                // end
+                done_out_reg               <= 1'b0;
+                configure_engine_int.valid <= 1'b1;
+                counter_load               <= 1'b1;
+                cmd_stream_mode_pop        <= 1'b0;
             end
             ENGINE_READ_WRITE_GEN_START : begin
-                done_int_reg                 <= 1'b0;
-                done_out_reg                 <= 1'b0;
-                configure_engine_param_valid <= 1'b1;
-                counter_load                 <= 1'b0;
+                done_out_reg               <= 1'b0;
+                configure_engine_int.valid <= 1'b1;
+                counter_load               <= 1'b0;
+                cmd_stream_mode_pop        <= 1'b0;
             end
             ENGINE_READ_WRITE_GEN_PAUSE_TRANS : begin
-                done_int_reg <= 1'b0;
-                done_out_reg <= 1'b0;
-                counter_load <= 1'b0;
+                done_out_reg        <= 1'b0;
+                counter_load        <= 1'b0;
+                cmd_stream_mode_pop <= 1'b1;
             end
             ENGINE_READ_WRITE_GEN_BUSY : begin
-                done_int_reg <= 1'b0;
-                done_out_reg <= 1'b1;
-                counter_load <= 1'b0;
+                done_out_reg        <= 1'b1;
+                counter_load        <= 1'b0;
+                cmd_stream_mode_pop <= 1'b0;
             end
             ENGINE_READ_WRITE_GEN_BUSY_TRANS : begin
-                done_int_reg <= 1'b0;
-                done_out_reg <= 1'b0;
-                counter_load <= 1'b0;
+                done_out_reg        <= 1'b0;
+                counter_load        <= 1'b0;
+                cmd_stream_mode_pop <= 1'b0;
             end
             ENGINE_READ_WRITE_GEN_PAUSE : begin
-                done_int_reg <= 1'b0;
-                done_out_reg <= 1'b0;
-                counter_load <= 1'b0;
-            end
-            ENGINE_READ_WRITE_GEN_DONE_TRANS : begin
-                done_int_reg <= 1'b1;
-                done_out_reg <= 1'b0;
-                counter_load <= 1'b0;
-            end
-            ENGINE_READ_WRITE_GEN_DONE : begin
-                done_int_reg                 <= 1'b1;
-                done_out_reg                 <= 1'b1;
-                configure_engine_param_valid <= 1'b0;
-                configure_engine_param_int   <= 0;
-                counter_load                 <= 1'b0;
+                done_out_reg        <= 1'b0;
+                counter_load        <= 1'b0;
+                cmd_stream_mode_pop <= 1'b1;
             end
         endcase
     end // always_ff @(posedge ap_clk)
+
+    always_ff @(posedge ap_clk) begin
+        if(configure_memory_reg.valid)
+            configure_engine_int.payload <= configure_memory_reg.payload;
+    end
 
 // --------------------------------------------------------------------------------------
 // Cache/Memory response counter
@@ -459,7 +479,7 @@ module engine_read_write_generator #(parameter
         .load        (counter_load                      ),
         .incr        (request_memory_out_reg.valid      ),
         .decr        (request_engine_out_reg.valid      ),
-        .load_value  (response_memory_counter_load_value),
+        .load_value  ({{(COUNTER_WIDTH){1'b0}}}         ),
         .stride_value({{(COUNTER_WIDTH-1){1'b0}},{1'b1}}),
         .count       (response_memory_counter_          ),
         .is_zero     (response_memory_counter_is_zero   )
@@ -468,126 +488,244 @@ module engine_read_write_generator #(parameter
 // --------------------------------------------------------------------------------------
 // Generation Logic - Read/Write data [0-4] -> Gen
 // --------------------------------------------------------------------------------------
-    assign read_write_response_engine_in_valid_flag = read_write_response_engine_in_valid_reg;
-
-    always_ff @(posedge ap_clk) begin
-        if (areset_generator) begin
-            read_write_response_engine_in_valid_reg     <= 1'b0;
-            read_write_response_engine_in_valid_flag_S2 <= 1'b0;
-            generator_engine_request_engine_reg.valid   <= 1'b0;
-        end
-        else begin
-            read_write_response_engine_in_valid_flag_S2 <= read_write_response_engine_in_valid_flag;
-            generator_engine_request_engine_reg.valid   <= read_write_response_engine_in_valid_flag_S2;
-            if(response_engine_in_int.valid & configure_engine_param_valid) begin
-                read_write_response_engine_in_valid_reg <= 1'b1;
-            end else begin
-                if(read_write_response_engine_in_valid_flag)
-                    read_write_response_engine_in_valid_reg <= 1'b0;
-                else
-                    read_write_response_engine_in_valid_reg <= read_write_response_engine_in_valid_reg;
-            end
-        end
-    end
-
-    always_ff @(posedge ap_clk) begin
-        generator_engine_request_engine_reg.payload.data                      <= result_int;
-        generator_engine_request_engine_reg.payload.meta.address              <= address_int;
-        generator_engine_request_engine_reg.payload.meta.route.from.id_module <= 1 << ID_MODULE;
-        generator_engine_request_engine_reg.payload.meta.route.from.id_cu     <= configure_memory_reg.payload.meta.route.from.id_cu ;
-        generator_engine_request_engine_reg.payload.meta.route.from.id_bundle <= configure_memory_reg.payload.meta.route.from.id_bundle;
-        generator_engine_request_engine_reg.payload.meta.route.from.id_lane   <= configure_memory_reg.payload.meta.route.from.id_lane;
-        generator_engine_request_engine_reg.payload.meta.route.from.id_engine <= configure_memory_reg.payload.meta.route.from.id_engine;
-        generator_engine_request_engine_reg.payload.meta.route.from.id_buffer <= configure_memory_reg.payload.meta.route.from.id_buffer;
-        generator_engine_request_engine_reg.payload.meta.route.to             <= configure_memory_reg.payload.meta.route.to;
-        generator_engine_request_engine_reg.payload.meta.route.seq_src        <= response_engine_in_int.payload.meta.route.seq_src;
-        generator_engine_request_engine_reg.payload.meta.route.seq_state      <= response_engine_in_int.payload.meta.route.seq_state;
-        generator_engine_request_engine_reg.payload.meta.route.seq_id         <= response_engine_in_int.payload.meta.route.seq_id;
-        generator_engine_request_engine_reg.payload.meta.route.hops           <= response_engine_in_int.payload.meta.route.hops;
-        generator_engine_request_engine_reg.payload.meta.subclass             <= configure_memory_reg.payload.meta.subclass;
-    end
-
+    localparam RESPONSE_ENGINE_IN_INT_STAGES  = 3;
+    localparam RESPONSE_ENGINE_GEN_INT_STAGES = 1;
+// --------------------------------------------------------------------------------------
+    hyper_pipeline_noreset #(
+        .STAGES(RESPONSE_ENGINE_IN_INT_STAGES),
+        .WIDTH ($bits(EnginePacketMeta)      )
+    ) inst_hyper_pipeline_response_engine_in_int (
+        .ap_clk(ap_clk                             ),
+        .din   (response_engine_in_int.payload.meta),
+        .dout  (response_engine_reg_int            )
+    );
+// --------------------------------------------------------------------------------------
+    hyper_pipeline_noreset #(
+        .STAGES(RESPONSE_ENGINE_IN_INT_STAGES),
+        .WIDTH (1                            )
+    ) inst_hyper_pipeline_response_engine_in_int_valid (
+        .ap_clk(ap_clk                       ),
+        .din   (response_engine_in_int.valid ),
+        .dout  (response_engine_reg_int_valid)
+    );
+// --------------------------------------------------------------------------------------
     engine_read_write_kernel inst_engine_read_write_kernel (
-        .ap_clk                (ap_clk                             ),
-        .areset                (areset_kernel                      ),
-        .clear_in              (~(configure_engine_param_valid)    ),
-        .config_params_valid_in(configure_engine_param_valid       ),
-        .config_params_in      (configure_engine_param_int         ),
-        .data_valid_in         (response_engine_in_int.valid       ),
-        .data_in               (response_engine_in_int.payload.data),
-        .address_out           (address_int                        ),
-        .result_out            (result_int                         )
+        .ap_clk          (ap_clk                             ),
+        .config_params_in(configure_engine_int.payload.param ),
+        .data_in         (response_engine_in_int.payload.data),
+        .address_out     (address_int                        ),
+        .result_out      (result_int                         )
+    );
+// --------------------------------------------------------------------------------------
+    always_comb begin
+        generator_engine_request_engine_start_Stage.valid                                 = response_engine_reg_int_valid;
+        generator_engine_request_engine_start_Stage.payload.data                          = result_int;
+        generator_engine_request_engine_start_Stage.payload.meta.address                  = address_int;
+        generator_engine_request_engine_start_Stage.payload.meta.route.packet_destination = configure_engine_int.payload.meta.route.packet_destination;
+        generator_engine_request_engine_start_Stage.payload.meta.route.sequence_source    = response_engine_reg_int.route.sequence_source;
+        generator_engine_request_engine_start_Stage.payload.meta.route.sequence_state     = response_engine_reg_int.route.sequence_state;
+        generator_engine_request_engine_start_Stage.payload.meta.route.sequence_id        = response_engine_reg_int.route.sequence_id;
+        generator_engine_request_engine_start_Stage.payload.meta.route.hops               = response_engine_reg_int.route.hops;
+        generator_engine_request_engine_start_Stage.payload.meta.subclass                 = configure_engine_int.payload.meta.subclass;
+        generator_engine_request_engine_start_Stage.payload.meta.field_id                 = 1;
+    end
+// --------------------------------------------------------------------------------------
+    hyper_pipeline_noreset #(
+        .STAGES(RESPONSE_ENGINE_GEN_INT_STAGES),
+        .WIDTH ($bits(EnginePacketFull)       )
+    ) inst_hyper_pipeline_generator_engine_request (
+        .ap_clk(ap_clk                                     ),
+        .din   (generator_engine_request_engine_start_Stage),
+        .dout  (generator_engine_request_engine_final_Stage)
     );
 
 // --------------------------------------------------------------------------------------
-// FIFO cache requests out fifo_814x16_MemoryPacket
+// FIFO cache requests out fifo_814x16_EnginePacket
 // --------------------------------------------------------------------------------------
     // FIFO is resetting
-    assign fifo_request_setup_signal_int = fifo_request_signals_out_int.wr_rst_busy | fifo_request_signals_out_int.rd_rst_busy ;
+    assign fifo_request_send_setup_signal_int = fifo_request_send_signals_out_int.wr_rst_busy | fifo_request_send_signals_out_int.rd_rst_busy ;
 
     // Push
-    assign fifo_request_signals_in_int.wr_en = generator_engine_request_engine_reg.valid;
-    assign fifo_request_din                  = generator_engine_request_engine_reg.payload;
+    assign fifo_request_send_signals_in_int.wr_en = generator_engine_request_engine_final_Stage.valid;
+    assign fifo_request_send_din                  = generator_engine_request_engine_final_Stage.payload;
 
     // Pop
-    assign fifo_request_signals_in_int.rd_en = ~fifo_request_signals_out_int.empty & fifo_request_signals_in_reg.rd_en;
-    assign request_out_int.valid             = fifo_request_signals_out_int.valid;
-    assign request_out_int.payload           = fifo_request_dout;
+    assign fifo_request_send_signals_in_int.rd_en = ~fifo_request_send_signals_out_int.empty & ~fifo_request_pending_signals_out_int.prog_full & ~fifo_request_commit_signals_out_int.prog_full & fifo_request_memory_out_signals_in_reg.rd_en & backtrack_fifo_request_memory_out_signals_out.rd_en;
+    assign request_send_out_int.valid             = fifo_request_send_signals_out_int.valid;
+    assign request_send_out_int.payload           = fifo_request_send_dout;
 
     xpm_fifo_sync_wrapper #(
-        .FIFO_WRITE_DEPTH(FIFO_WRITE_DEPTH          ),
-        .WRITE_DATA_WIDTH($bits(MemoryPacketPayload)),
-        .READ_DATA_WIDTH ($bits(MemoryPacketPayload)),
-        .PROG_THRESH     (PROG_THRESH               )
-    ) inst_fifo_MemoryPacketRequest (
-        .clk        (ap_clk                                  ),
-        .srst       (areset_fifo                             ),
-        .din        (fifo_request_din                        ),
-        .wr_en      (fifo_request_signals_in_int.wr_en       ),
-        .rd_en      (fifo_request_signals_in_int.rd_en       ),
-        .dout       (fifo_request_dout                       ),
-        .full       (fifo_request_signals_out_int.full       ),
-        .empty      (fifo_request_signals_out_int.empty      ),
-        .valid      (fifo_request_signals_out_int.valid      ),
-        .prog_full  (fifo_request_signals_out_int.prog_full  ),
-        .wr_rst_busy(fifo_request_signals_out_int.wr_rst_busy),
-        .rd_rst_busy(fifo_request_signals_out_int.rd_rst_busy)
+        .FIFO_WRITE_DEPTH(BURST_LENGTH * 2              ),
+        .WRITE_DATA_WIDTH($bits(EnginePacketFullPayload)),
+        .READ_DATA_WIDTH ($bits(EnginePacketFullPayload)),
+        .PROG_THRESH     (6                             )
+    ) inst_fifo_EnginePacketRequestSend (
+        .clk        (ap_clk                                       ),
+        .srst       (areset_fifo                                  ),
+        .din        (fifo_request_send_din                        ),
+        .wr_en      (fifo_request_send_signals_in_int.wr_en       ),
+        .rd_en      (fifo_request_send_signals_in_int.rd_en       ),
+        .dout       (fifo_request_send_dout                       ),
+        .full       (fifo_request_send_signals_out_int.full       ),
+        .empty      (fifo_request_send_signals_out_int.empty      ),
+        .valid      (fifo_request_send_signals_out_int.valid      ),
+        .prog_full  (fifo_request_send_signals_out_int.prog_full  ),
+        .wr_rst_busy(fifo_request_send_signals_out_int.wr_rst_busy),
+        .rd_rst_busy(fifo_request_send_signals_out_int.rd_rst_busy)
+    );
+
+// --------------------------------------------------------------------------------------
+    assign cmd_in_flight_assert = (request_send_out_int.valid|response_engine_in_int.valid) | (|cmd_in_flight_hold);
+// --------------------------------------------------------------------------------------
+    always_ff @(posedge ap_clk) begin
+        if (areset_generator) begin
+            cmd_in_flight_hold <= 0;
+        end else begin
+            cmd_in_flight_hold <= {cmd_in_flight_hold[PULSE_HOLD-2:0],(request_send_out_int.valid|response_engine_in_int.valid)};
+        end
+    end
+// --------------------------------------------------------------------------------------
+// Backtrack FIFO module - Bundle i <- Bundle i-1
+// --------------------------------------------------------------------------------------
+    assign backtrack_configure_route_valid                    = configure_engine_int.valid;
+    assign backtrack_configure_route_in                       = configure_engine_int.payload.meta.route.packet_destination;
+    assign backtrack_fifo_response_lanes_backtrack_signals_in = fifo_response_lanes_backtrack_signals_in;
+
+    backtrack_fifo_lanes_response_signal #(
+        .ID_CU              (ID_CU              ),
+        .ID_BUNDLE          (ID_BUNDLE          ),
+        .ID_LANE            (ID_LANE            ),
+        .ID_ENGINE          (ID_ENGINE          ),
+        .ID_MODULE          (2                  ),
+        .NUM_BACKTRACK_LANES(NUM_BACKTRACK_LANES),
+        .ENGINE_CAST_WIDTH  (ENGINE_CAST_WIDTH  ),
+        .NUM_BUNDLES        (NUM_BUNDLES        )
+    ) inst_backtrack_fifo_lanes_response_signal (
+        .ap_clk                                  (ap_clk                                            ),
+        .areset                                  (areset_backtrack                                  ),
+        .configure_route_valid                   (backtrack_configure_route_valid                   ),
+        .configure_route_in                      (backtrack_configure_route_in                      ),
+        .fifo_response_lanes_backtrack_signals_in(backtrack_fifo_response_lanes_backtrack_signals_in),
+        .fifo_response_engine_in_signals_out     (backtrack_fifo_response_engine_in_signals_out     )
+    );
+
+// --------------------------------------------------------------------------------------
+// Backtrack FIFO module - Engine i <- Channel i-1
+// --------------------------------------------------------------------------------------
+    assign backtrack_configure_address_valid                      = configure_engine_int.valid;
+    assign backtrack_configure_address_in                         = configure_engine_int.payload.meta.address;
+    assign backtrack_fifo_request_memory_out_backtrack_signals_in = fifo_request_memory_out_backtrack_signals_in;
+
+    backtrack_fifo_request_memory_out_signals #(
+        .ID_CU       (ID_CU       ),
+        .ID_BUNDLE   (ID_BUNDLE   ),
+        .ID_LANE     (ID_LANE     ),
+        .ID_ENGINE   (ID_ENGINE   ),
+        .ID_MODULE   (ID_MODULE   ),
+        .NUM_CHANNELS(NUM_CHANNELS)
+    ) inst_backtrack_fifo_request_memory_out_signals (
+        .ap_clk                                      (ap_clk                                                ),
+        .areset                                      (areset_backtrack                                      ),
+        .configure_address_valid                     (backtrack_configure_address_valid                     ),
+        .configure_address_in                        (backtrack_configure_address_in                        ),
+        .fifo_request_memory_out_backtrack_signals_in(backtrack_fifo_request_memory_out_backtrack_signals_in),
+        .fifo_request_memory_out_signals_out         (backtrack_fifo_request_memory_out_signals_out         )
+    );
+
+// --------------------------------------------------------------------------------------
+// FIFO pending cache requests out fifo_oending_EnginePacket
+// --------------------------------------------------------------------------------------
+    // FIFO is resetting
+    assign fifo_request_pending_setup_signal_int = fifo_request_pending_signals_out_int.wr_rst_busy | fifo_request_pending_signals_out_int.rd_rst_busy;
+
+    // Push
+    assign fifo_request_pending_signals_in_int.wr_en = request_memory_out_reg.valid;
+    assign fifo_request_pending_din                  = map_EnginePacketFull_to_EnginePacket(request_memory_out_reg.payload);
+
+    // Pop
+    assign fifo_request_pending_signals_in_int.rd_en  = ~fifo_request_pending_signals_out_int.empty & response_memory_in_reg.valid;
+    assign request_pending_out_int.valid              = fifo_request_pending_signals_out_int.valid;
+    assign request_pending_out_int.payload.meta.route = fifo_request_pending_dout.meta.route;
+    assign request_pending_out_int.payload.data       = map_MemoryResponsePacketData_to_EnginePacketData(response_memory_in_reg_S2.payload.data, fifo_request_pending_dout.data);
+
+    xpm_fifo_sync_wrapper #(
+        .FIFO_WRITE_DEPTH(BURST_LENGTH * 2          ),
+        .WRITE_DATA_WIDTH($bits(EnginePacketPayload)),
+        .READ_DATA_WIDTH ($bits(EnginePacketPayload)),
+        .PROG_THRESH     (6                         )
+    ) inst_fifo_EnginePacketRequestPending (
+        .clk        (ap_clk                                          ),
+        .srst       (areset_fifo                                     ),
+        .din        (fifo_request_pending_din                        ),
+        .wr_en      (fifo_request_pending_signals_in_int.wr_en       ),
+        .rd_en      (fifo_request_pending_signals_in_int.rd_en       ),
+        .dout       (fifo_request_pending_dout                       ),
+        .full       (fifo_request_pending_signals_out_int.full       ),
+        .empty      (fifo_request_pending_signals_out_int.empty      ),
+        .valid      (fifo_request_pending_signals_out_int.valid      ),
+        .prog_full  (fifo_request_pending_signals_out_int.prog_full  ),
+        .wr_rst_busy(fifo_request_pending_signals_out_int.wr_rst_busy),
+        .rd_rst_busy(fifo_request_pending_signals_out_int.rd_rst_busy)
+    );
+
+// --------------------------------------------------------------------------------------
+// FIFO commit cache requests out fifo_oending_EnginePacket
+// --------------------------------------------------------------------------------------
+    // FIFO is resetting
+    assign fifo_request_commit_setup_signal_int = fifo_request_commit_signals_out_int.wr_rst_busy | fifo_request_commit_signals_out_int.rd_rst_busy;
+
+    // Push
+    assign fifo_request_commit_signals_in_int.wr_en = request_pending_out_int.valid;
+    assign fifo_request_commit_din                  = request_pending_out_int.payload;
+
+    // Pop
+    assign fifo_request_commit_signals_in_int.rd_en = ~fifo_request_commit_signals_out_int.empty & backtrack_fifo_response_engine_in_signals_out.rd_en & fifo_request_engine_out_signals_in_reg.rd_en;
+    assign request_commit_out_int.valid             = fifo_request_commit_signals_out_int.valid;
+    assign request_commit_out_int.payload           = fifo_request_commit_dout;
+
+    xpm_fifo_sync_wrapper #(
+        .FIFO_WRITE_DEPTH(BURST_LENGTH * 4          ),
+        .WRITE_DATA_WIDTH($bits(EnginePacketPayload)),
+        .READ_DATA_WIDTH ($bits(EnginePacketPayload)),
+        .PROG_THRESH     (BURST_LENGTH * 2          )
+    ) inst_fifo_EnginePacketRequestCommit (
+        .clk        (ap_clk                                         ),
+        .srst       (areset_fifo                                    ),
+        .din        (fifo_request_commit_din                        ),
+        .wr_en      (fifo_request_commit_signals_in_int.wr_en       ),
+        .rd_en      (fifo_request_commit_signals_in_int.rd_en       ),
+        .dout       (fifo_request_commit_dout                       ),
+        .full       (fifo_request_commit_signals_out_int.full       ),
+        .empty      (fifo_request_commit_signals_out_int.empty      ),
+        .valid      (fifo_request_commit_signals_out_int.valid      ),
+        .prog_full  (fifo_request_commit_signals_out_int.prog_full  ),
+        .wr_rst_busy(fifo_request_commit_signals_out_int.wr_rst_busy),
+        .rd_rst_busy(fifo_request_commit_signals_out_int.rd_rst_busy)
     );
 
 // --------------------------------------------------------------------------------------
 // Generator FLow logic
 // --------------------------------------------------------------------------------------
-    assign fifo_response_comb.valid                     = response_memory_in_reg.valid;
-    assign fifo_response_comb.payload.meta.route        = response_memory_in_reg.payload.meta.route;
-    assign fifo_response_comb.payload.meta.address      = response_memory_in_reg.payload.meta.address;
-    assign fifo_response_comb.payload.meta.subclass.cmd = CMD_ENGINE;
-    assign fifo_response_comb.payload.data              = response_memory_in_reg.payload.data;
-
-    always_comb begin
-        if(response_memory_in_reg.payload.meta.route.to.id_module == 2'b01) begin
-            fifo_response_comb.payload.meta.subclass.buffer = STRUCT_ENGINE_SETUP;
-        end else begin
-            fifo_response_comb.payload.meta.subclass.buffer = STRUCT_ENGINE_DATA;
-        end
+    assign fifo_response_comb.valid   = request_commit_out_int.valid;
+    assign fifo_response_comb.payload = request_commit_out_int.payload;
+// --------------------------------------------------------------------------------------
+    always_ff @(posedge ap_clk) begin
+        response_memory_in_reg_S2 <= response_memory_in_reg;
     end
-
+// --------------------------------------------------------------------------------------
     always_ff @(posedge ap_clk) begin
         if (areset_generator) begin
-            fifo_request_signals_in_reg                   <= 0;
-            request_engine_out_reg.valid                  <= 1'b0;
-            request_memory_out_reg.valid                  <= 1'b0;
-            fifo_response_memory_in_signals_out_reg.rd_en <= 1'b0;
+            request_engine_out_reg.valid <= 1'b0;
+            request_memory_out_reg.valid <= 1'b0;
         end
         else begin
-            fifo_request_signals_in_reg                   <= fifo_request_memory_out_signals_in_reg;
-            request_memory_out_reg.valid                  <= request_out_int.valid ;
-            fifo_response_memory_in_signals_out_reg.rd_en <= ~fifo_request_engine_out_signals_in_reg.rd_en;
-            request_engine_out_reg.valid                  <= fifo_response_comb.valid ;
+            request_engine_out_reg.valid <= fifo_response_comb.valid;
+            request_memory_out_reg.valid <= request_send_out_int.valid;
         end
     end
 
     always_ff @(posedge ap_clk) begin
-        request_memory_out_reg.payload <= request_out_int.payload;
+        request_memory_out_reg.payload <= request_send_out_int.payload;
         request_engine_out_reg.payload <= fifo_response_comb.payload;
     end
 

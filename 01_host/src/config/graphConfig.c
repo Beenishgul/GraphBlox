@@ -88,8 +88,12 @@ struct Arguments *argumentsNew()
     arguments->device_index = 0;
     arguments->xclbin_path = NULL;
     arguments->overlay_path = NULL;
-    arguments->glayHandle = NULL;
-
+    arguments->ctrl_mode = 0;
+    arguments->endian_read = 0;
+    arguments->endian_write = 0;
+    arguments->flush_cache = 1;
+    arguments->bankGroupIndex = 0;
+    arguments->cu_id = 0;
     return arguments;
 
 }
@@ -134,4 +138,20 @@ void argumentsCopy (struct Arguments *argFrom, struct Arguments *argTo)
 
     argTo->fnameb_format =  argFrom->fnameb_format;
     argTo->fnameb_format = argFrom->fnameb_format;
+
+    // GLay Xilinx Parameters
+    argTo->bankGroupIndex = argTo->bankGroupIndex;
+    argTo->ctrl_mode = argFrom->ctrl_mode;
+    argTo->device_index = argFrom->device_index;
+    argTo->endian_read = argFrom->endian_read;
+    argTo->endian_write = argFrom->endian_write;
+    argTo->flush_cache = argFrom->flush_cache;
+
+    argTo->kernel_name = (char *) malloc((strlen(argFrom->kernel_name) + 10) * sizeof(char));
+    argTo->overlay_path = (char *) malloc((strlen(argFrom->overlay_path) + 10) * sizeof(char));
+    argTo->xclbin_path = (char *) malloc((strlen(argFrom->xclbin_path) + 10) * sizeof(char));
+
+    argTo->kernel_name  = strcpy (argTo->kernel_name, argFrom->kernel_name);
+    argTo->overlay_path  = strcpy (argTo->overlay_path, argFrom->overlay_path);
+    argTo->xclbin_path  = strcpy (argTo->xclbin_path, argFrom->xclbin_path);
 }

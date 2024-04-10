@@ -183,6 +183,9 @@ always_comb begin
             else
                 next_state = CTRL_CHAIN_SYNC_DONE;
         end
+        default : begin
+            next_state = CTRL_CHAIN_SYNC_RESET;
+        end
     endcase
 end // always_comb
 
