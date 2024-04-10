@@ -41,7 +41,7 @@
 // --------------------------------------------------------------------------------------
 // Name ENGINE_CSR_INDEX              ID 1    mapping 2    cycles 11   None-NONE ( 0 )-( graph->num_vertices )
 // --------------------------------------------------------------------------------------
-0x00000000 // entry 36   cacheline 2    offset 4    -- // entry_0    cacheline[  0][ 0] < 5b>: increment[0:0]=0 || decrement[1:1]=0 || mode_sequence[2:2]=0 || mode_buffer[3:3]=0 || mode_break[4:4]=0
+0x00000000 // entry 36   cacheline 2    offset 4    -- // entry_0    cacheline[  0][ 0] < 6b>: increment[0:0]=0 || decrement[1:1]=0 || mode_sequence[2:2]=0 || mode_buffer[3:3]=0 || mode_break[4:4]=0 || mode_parallel[5:5]=0
 0x00000000 // entry 37   cacheline 2    offset 5    -- // entry_1    cacheline[  0][ 1] <32b>: index_start[0:31]=0x00000000
 0x00000000 // entry 38   cacheline 2    offset 6    -- // entry_2    cacheline[  0][ 2] <32b>: index_end[0:31]=0x00000000
 0x00000000 // entry 39   cacheline 2    offset 7    -- // entry_3    cacheline[  0][ 3] <32b>: stride[0:31]=0x00000000
@@ -118,7 +118,7 @@
 // --------------------------------------------------------------------------------------
 // Name ENGINE_CSR_INDEX              ID 6    mapping 2    cycles 11   buffer_5-edges_array_dest ( 0 )-( graph->num_edges )
 // --------------------------------------------------------------------------------------
-0x00000000 // entry 93   cacheline 5    offset 13   -- // entry_0    cacheline[  0][ 0] < 5b>: increment[0:0]=0 || decrement[1:1]=0 || mode_sequence[2:2]=0 || mode_buffer[3:3]=0 || mode_break[4:4]=0
+0x00000000 // entry 93   cacheline 5    offset 13   -- // entry_0    cacheline[  0][ 0] < 6b>: increment[0:0]=0 || decrement[1:1]=0 || mode_sequence[2:2]=0 || mode_buffer[3:3]=0 || mode_break[4:4]=0 || mode_parallel[5:5]=0
 0x00000000 // entry 94   cacheline 5    offset 14   -- // entry_1    cacheline[  0][ 1] <32b>: index_start[0:31]=0x00000000
 0x00000000 // entry 95   cacheline 5    offset 15   -- // entry_2    cacheline[  0][ 2] <32b>: index_end[0:31]=0x00000000
 0x00000000 // entry 96   cacheline 6    offset 0    -- // entry_3    cacheline[  0][ 3] <32b>: stride[0:31]=0x00000000
