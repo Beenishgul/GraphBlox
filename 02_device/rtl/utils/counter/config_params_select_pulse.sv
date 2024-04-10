@@ -21,17 +21,19 @@ module config_params_select_pulse #(parameter int MASK_WIDTH = 8 // Default para
     output logic                                        pulse_out                 , // Single valid_in bit asserted for 'count' number of cycles
     output ParallelReadWriteConfigurationParameterField config_params_out         ,
     output ParallelReadWriteConfigurationMeta           config_meta_out           ,
+    output logic [MASK_WIDTH-1:0]                       param_select_out          ,
     output logic [MASK_WIDTH-1:0]                       config_params_kernel_valid
 );
 // Derived parameter for counter size
     localparam int COUNTER_WIDTH = $clog2(MASK_WIDTH) + 1;
 
-    logic [   MASK_WIDTH-1:0] config_params_cast_valid;
-    logic [   MASK_WIDTH-1:0] config_params_lane_valid;
-    logic [   MASK_WIDTH-1:0] param_select_out_int    ;
-    logic [   MASK_WIDTH-1:0] param_select_out        ;
-    logic [COUNTER_WIDTH-1:0] count                   ; // To hold the count of '1's mask_in 'mask_in'
-    logic [COUNTER_WIDTH-1:0] pulse_counter_reg       ; // Counter for the output pulse
+    logic [MASK_WIDTH-1:0] config_params_cast_valid;
+    logic [MASK_WIDTH-1:0] config_params_lane_valid;
+    logic [MASK_WIDTH-1:0] param_select_out_int    ;
+    logic                  param_select_out_stop   ;
+    // logic [   MASK_WIDTH-1:0] param_select_out        ;
+    logic [COUNTER_WIDTH-1:0] count            ; // To hold the count of '1's mask_in 'mask_in'
+    logic [COUNTER_WIDTH-1:0] pulse_counter_reg; // Counter for the output pulse
 
     logic [MASK_WIDTH-1:0]         config_params_lane_valid_reg;
     ParallelReadWriteConfiguration config_params_in_reg        ;
@@ -46,10 +48,19 @@ module config_params_select_pulse #(parameter int MASK_WIDTH = 8 // Default para
     end
 
     always_comb begin
-        param_select_out    = {MASK_WIDTH{1'b0}};
-        param_select_out[0] = param_select_out_int[0];
+        param_select_out      = {MASK_WIDTH{1'b0}};
+        param_select_out[0]   = param_select_out_int[0];
+        param_select_out_stop = param_select_out_int[0] ? 1'b1 : 1'b0;
         for (int i = 1; i < MASK_WIDTH; i++) begin
-            param_select_out[i] = param_select_out_int[i] & ~param_select_out[i-1];
+            if(param_select_out_stop) begin
+                param_select_out[i] = 1'b0; // Optionally, keep the line or remove if the default zero is fine
+            end else begin
+                if(param_select_out[i-1]) begin
+                    param_select_out_stop = 1'b1; // Set stop when condition to break would have been true
+                end else begin
+                    param_select_out[i] = param_select_out_int[i];
+                end
+            end
         end
     end
 

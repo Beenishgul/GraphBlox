@@ -1,7 +1,7 @@
 // --------------------------------------------------------------------------------------
 // Name ENGINE_CSR_INDEX              ID 0    mapping 2    cycles 11   buffer_5-edges_array_dest ( 0 )-( graph->num_edges )
 // --------------------------------------------------------------------------------------
-0x00000000 // entry 0    cacheline 0    offset 0    -- // entry_0    cacheline[  0][ 0] < 5b>: increment[0:0]=0 || decrement[1:1]=0 || mode_sequence[2:2]=0 || mode_buffer[3:3]=0 || mode_break[4:4]=0
+0x00000000 // entry 0    cacheline 0    offset 0    -- // entry_0    cacheline[  0][ 0] < 6b>: increment[0:0]=0 || decrement[1:1]=0 || mode_sequence[2:2]=0 || mode_buffer[3:3]=0 || mode_break[4:4]=0 || mode_parallel[5:5]=0
 0x00000000 // entry 1    cacheline 0    offset 1    -- // entry_1    cacheline[  0][ 1] <32b>: index_start[0:31]=0x00000000
 0x00000000 // entry 2    cacheline 0    offset 2    -- // entry_2    cacheline[  0][ 2] <32b>: index_end[0:31]=0x00000000
 0x00000000 // entry 3    cacheline 0    offset 3    -- // entry_3    cacheline[  0][ 3] <32b>: stride[0:31]=0x00000000
@@ -30,7 +30,7 @@
 // --------------------------------------------------------------------------------------
 // Name ENGINE_CSR_INDEX              ID 2    mapping 2    cycles 11   None-NONE ( 0 )-( graph->num_vertices )
 // --------------------------------------------------------------------------------------
-0x00000000 // entry 21   cacheline 1    offset 5    -- // entry_0    cacheline[  0][ 0] < 5b>: increment[0:0]=0 || decrement[1:1]=0 || mode_sequence[2:2]=0 || mode_buffer[3:3]=0 || mode_break[4:4]=0
+0x00000000 // entry 21   cacheline 1    offset 5    -- // entry_0    cacheline[  0][ 0] < 6b>: increment[0:0]=0 || decrement[1:1]=0 || mode_sequence[2:2]=0 || mode_buffer[3:3]=0 || mode_break[4:4]=0 || mode_parallel[5:5]=0
 0x00000000 // entry 22   cacheline 1    offset 6    -- // entry_1    cacheline[  0][ 1] <32b>: index_start[0:31]=0x00000000
 0x00000000 // entry 23   cacheline 1    offset 7    -- // entry_2    cacheline[  0][ 2] <32b>: index_end[0:31]=0x00000000
 0x00000000 // entry 24   cacheline 1    offset 8    -- // entry_3    cacheline[  0][ 3] <32b>: stride[0:31]=0x00000000
@@ -133,7 +133,7 @@
 // --------------------------------------------------------------------------------------
 // Name ENGINE_CSR_INDEX              ID 7    mapping 2    cycles 11   buffer_5-edges_array_dest ( 0 )-( graph->num_edges )
 // --------------------------------------------------------------------------------------
-0x00000000 // entry 104  cacheline 6    offset 8    -- // entry_0    cacheline[  0][ 0] < 5b>: increment[0:0]=0 || decrement[1:1]=0 || mode_sequence[2:2]=0 || mode_buffer[3:3]=0 || mode_break[4:4]=0
+0x00000000 // entry 104  cacheline 6    offset 8    -- // entry_0    cacheline[  0][ 0] < 6b>: increment[0:0]=0 || decrement[1:1]=0 || mode_sequence[2:2]=0 || mode_buffer[3:3]=0 || mode_break[4:4]=0 || mode_parallel[5:5]=0
 0x00000000 // entry 105  cacheline 6    offset 9    -- // entry_1    cacheline[  0][ 1] <32b>: index_start[0:31]=0x00000000
 0x00000000 // entry 106  cacheline 6    offset 10   -- // entry_2    cacheline[  0][ 2] <32b>: index_end[0:31]=0x00000000
 0x00000000 // entry 107  cacheline 6    offset 11   -- // entry_3    cacheline[  0][ 3] <32b>: stride[0:31]=0x00000000
@@ -162,7 +162,7 @@
 // --------------------------------------------------------------------------------------
 // Name ENGINE_CSR_INDEX              ID 9    mapping 2    cycles 11   buffer_5-edges_array_dest ( 0 )-( graph->num_edges )
 // --------------------------------------------------------------------------------------
-0x00000000 // entry 125  cacheline 7    offset 13   -- // entry_0    cacheline[  0][ 0] < 5b>: increment[0:0]=0 || decrement[1:1]=0 || mode_sequence[2:2]=0 || mode_buffer[3:3]=0 || mode_break[4:4]=0
+0x00000000 // entry 125  cacheline 7    offset 13   -- // entry_0    cacheline[  0][ 0] < 6b>: increment[0:0]=0 || decrement[1:1]=0 || mode_sequence[2:2]=0 || mode_buffer[3:3]=0 || mode_break[4:4]=0 || mode_parallel[5:5]=0
 0x00000000 // entry 126  cacheline 7    offset 14   -- // entry_1    cacheline[  0][ 1] <32b>: index_start[0:31]=0x00000000
 0x00000000 // entry 127  cacheline 7    offset 15   -- // entry_2    cacheline[  0][ 2] <32b>: index_end[0:31]=0x00000000
 0x00000000 // entry 128  cacheline 8    offset 0    -- // entry_3    cacheline[  0][ 3] <32b>: stride[0:31]=0x00000000

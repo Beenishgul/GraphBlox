@@ -1,7 +1,7 @@
 // --------------------------------------------------------------------------------------
 // Engine: ENGINE_CSR_INDEX_0, Number of entries: 11
 // --------------------------------------------------------------------------------------
-0x0000000D // entry_0    cacheline[  0][ 0] < 5b>: increment[0:0]=1 || decrement[1:1]=0 || mode_sequence[2:2]=1 || mode_buffer[3:3]=1 || mode_break[4:4]=0
+0x0000000D // entry_0    cacheline[  0][ 0] < 6b>: increment[0:0]=1 || decrement[1:1]=0 || mode_sequence[2:2]=1 || mode_buffer[3:3]=1 || mode_break[4:4]=0 || mode_parallel[5:5]=0
 0x00000000 // entry_1    cacheline[  0][ 1] <32b>: index_start[0:31]=0x00000000
 0x00000000 // entry_2    cacheline[  0][ 2] <32b>: index_end[0:31]=0x00000000
 0x00000001 // entry_3    cacheline[  0][ 3] <32b>: stride[0:31]=0x00000001
@@ -11,7 +11,7 @@
 0x00000000 // entry_7    cacheline[  0][ 7] <32b>: array_size[0:31]=0x00000000
 0x00000000 // entry_8    cacheline[  0][ 8] < 9b>: const_mask[0:4]=0x0 || mode_cache[5:8]=0x0
 0x00000000 // entry_9    cacheline[  0][ 9] <32b>: const_value[0:31]=0x00000000
-0x00002096 // entry_10   cacheline[  0][10] <25b>: field_1[0:4]=0x16 || field_2[5:9]=0x4 || field_3[10:14]=0x8 || field_4[15:19]=0x0 || field_5[20:24]=0x0
+0x00005888 // entry_10   cacheline[  0][10] <25b>: field_1[0:4]=0x8 || field_2[5:9]=0x4 || field_3[10:14]=0x16 || field_4[15:19]=0x0 || field_5[20:24]=0x0
 // --------------------------------------------------------------------------------------
 // Engine: ENGINE_FILTER_COND_1, Number of entries: 10
 // --------------------------------------------------------------------------------------
@@ -28,7 +28,7 @@
 // --------------------------------------------------------------------------------------
 // Engine: ENGINE_CSR_INDEX_2, Number of entries: 11
 // --------------------------------------------------------------------------------------
-0x00000001 // entry_0    cacheline[  1][ 5] < 5b>: increment[0:0]=1 || decrement[1:1]=0 || mode_sequence[2:2]=0 || mode_buffer[3:3]=0 || mode_break[4:4]=0
+0x00000021 // entry_0    cacheline[  1][ 5] < 6b>: increment[0:0]=1 || decrement[1:1]=0 || mode_sequence[2:2]=0 || mode_buffer[3:3]=0 || mode_break[4:4]=0 || mode_parallel[5:5]=1
 0x00000000 // entry_1    cacheline[  1][ 6] <32b>: index_start[0:31]=0x00000000
 0x00000000 // entry_2    cacheline[  1][ 7] <32b>: index_end[0:31]=0x00000000
 0x00000001 // entry_3    cacheline[  1][ 8] <32b>: stride[0:31]=0x00000001
@@ -126,7 +126,7 @@
 // --------------------------------------------------------------------------------------
 // Engine: ENGINE_CSR_INDEX_7, Number of entries: 11
 // --------------------------------------------------------------------------------------
-0x0000000D // entry_0    cacheline[  6][ 8] < 5b>: increment[0:0]=1 || decrement[1:1]=0 || mode_sequence[2:2]=1 || mode_buffer[3:3]=1 || mode_break[4:4]=0
+0x0000000D // entry_0    cacheline[  6][ 8] < 6b>: increment[0:0]=1 || decrement[1:1]=0 || mode_sequence[2:2]=1 || mode_buffer[3:3]=1 || mode_break[4:4]=0 || mode_parallel[5:5]=0
 0x00000000 // entry_1    cacheline[  6][ 9] <32b>: index_start[0:31]=0x00000000
 0x00000000 // entry_2    cacheline[  6][10] <32b>: index_end[0:31]=0x00000000
 0x00000001 // entry_3    cacheline[  6][11] <32b>: stride[0:31]=0x00000001
@@ -153,7 +153,7 @@
 // --------------------------------------------------------------------------------------
 // Engine: ENGINE_CSR_INDEX_9, Number of entries: 11
 // --------------------------------------------------------------------------------------
-0x0000000D // entry_0    cacheline[  7][13] < 5b>: increment[0:0]=1 || decrement[1:1]=0 || mode_sequence[2:2]=1 || mode_buffer[3:3]=1 || mode_break[4:4]=0
+0x0000000D // entry_0    cacheline[  7][13] < 6b>: increment[0:0]=1 || decrement[1:1]=0 || mode_sequence[2:2]=1 || mode_buffer[3:3]=1 || mode_break[4:4]=0 || mode_parallel[5:5]=0
 0x00000000 // entry_1    cacheline[  7][14] <32b>: index_start[0:31]=0x00000000
 0x00000000 // entry_2    cacheline[  7][15] <32b>: index_end[0:31]=0x00000000
 0x00000001 // entry_3    cacheline[  8][ 0] <32b>: stride[0:31]=0x00000001
@@ -197,7 +197,7 @@
 0x02010101 // entry_11   cacheline[  9][13] <32b>: id_cu[0:7]=0x01 || id_bundle[8:15]=0x01 || id_lane[16:23]=0x01 || id_buffer[24:31]=buffer_2
 0x00020800 // entry_12   cacheline[  9][14] <25b>: const_mask[0:4]=0x0 || mode_cache[5:8]=0x0 || op_bundle[9:16]=0x04 || op_lane[17:24]=0x01
 0x00000000 // entry_13   cacheline[  9][15] <32b>: const_value[0:31]=0x00000000
-0x00022022 // entry_14   cacheline[ 10][ 0] <25b>: field_1[0:4]=0x2 || field_2[5:9]=0x1 || field_3[10:14]=0x8 || field_4[15:19]=0x4 || field_5[20:24]=0x0
+0x00041022 // entry_14   cacheline[ 10][ 0] <25b>: field_1[0:4]=0x2 || field_2[5:9]=0x1 || field_3[10:14]=0x4 || field_4[15:19]=0x8 || field_5[20:24]=0x0
 0x00000000 // entry_15   cacheline[ 10][ 1] <32b>: index_start[0:31]=0x00000000
 0x80000002 // entry_16   cacheline[ 10][ 2] <32b>: shift.amount[0:30]=2 || shift.direction[31:31]=1
 0x00400042 // entry_17   cacheline[ 10][ 3] <30b>: cmd[0:5]=CMD_MEM_READ || id_module[6:13]=0x01 || id_engine[14:21]=0x00 || id_channel[22:29]=buffer_3

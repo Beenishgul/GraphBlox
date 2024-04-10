@@ -233,9 +233,10 @@ typedef struct packed{
 } EnginePacketMeta;
 
 typedef struct packed{
-  EnginePacketRouteAttributes route   ;
-  PacketRequestDataAddress    address ;
-  MemoryPacketType            subclass;
+  EnginePacketRouteAttributes               route   ;
+  PacketRequestDataAddress                  address ;
+  MemoryPacketType                          subclass;
+  logic [ENGINE_PACKET_DATA_NUM_FIELDS-1:0] field_id;
 } EnginePacketMetaFull;
 
 parameter ENGINE_PACKET_DATA_NUM_FIELDS = 5;

@@ -29,6 +29,10 @@
                 "mode_break": {
                     "bits": "1",
                     "value": "0"
+                },
+                "mode_parallel": {
+                    "bits": "1",
+                    "value": "0"
                 }
             },
             "entry_1": {
@@ -121,7 +125,7 @@
                 "ops_mask":{},
                 "field_1": {
                     "bits": "5",
-                    "value": "0x16"
+                    "value": "0x08"
                 },
                 "field_2": {
                     "bits": "5",
@@ -129,7 +133,7 @@
                 },
                 "field_3": {
                     "bits": "5",
-                    "value": "0x08"
+                    "value": "0x16"
                 },
                 "field_4": {
                     "bits": "5",
@@ -332,6 +336,10 @@
                 "mode_break": {
                     "bits": "1",
                     "value": "0"
+                },
+                "mode_parallel": {
+                    "bits": "1",
+                    "value": "1"
                 }
             },
             "entry_1": {
@@ -1531,6 +1539,10 @@
                 "mode_break": {
                     "bits": "1",
                     "value": "0"
+                },
+                "mode_parallel": {
+                    "bits": "1",
+                    "value": "0"
                 }
             },
             "entry_1": {
@@ -1832,6 +1844,10 @@
                     "value": "1"
                 },
                 "mode_break": {
+                    "bits": "1",
+                    "value": "0"
+                },
+                "mode_parallel": {
                     "bits": "1",
                     "value": "0"
                 }
@@ -2325,11 +2341,11 @@
                 },
                 "field_3": {
                     "bits": "5",
-                    "value": "0x8"
+                    "value": "0x4"
                 },
                 "field_4": {
                     "bits": "5",
-                    "value": "0x4"
+                    "value": "0x8"
                 },
                 "field_5": {
                     "bits": "5",
