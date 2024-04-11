@@ -156,6 +156,12 @@ then
         sed -i "s~$search~$replace~g" $newtext
     fi
 
+    search="_CU_VECTOR_"
+    replace=${CU_VECTOR}
+    if [[ $search != "" && $replace != "" ]]; then
+        sed -i "s~$search~$replace~g" $newtext
+    fi
+
     search="_ARCHITECTURE_"
     replace=${ARCHITECTURE}
     if [[ $search != "" && $replace != "" ]]; then

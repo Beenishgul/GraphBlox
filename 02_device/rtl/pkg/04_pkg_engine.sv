@@ -473,6 +473,7 @@ typedef struct packed{
     logic                                  decrement   ;
     logic                                  flush_mode  ;
     logic                                  flush_enable;
+    logic [                   NUM_CUS-1:0] cu_vector   ;
     logic [   NUM_CHANNELS_WIDTH_BITS-1:0] id_channel  ;
     logic [CU_BUFFER_COUNT_WIDTH_BITS-1:0] id_buffer   ;
     logic [        M00_AXI4_FE_DATA_W-1:0] array_size  ;
