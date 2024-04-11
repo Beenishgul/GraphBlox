@@ -639,7 +639,7 @@ module __KERNEL___testbench ();
             buffer_6_ptr[63:0] = get_random_nbytes(M00_AXI4_BE_ADDR_W);
             buffer_7_ptr[63:0] = get_random_nbytes(M00_AXI4_BE_ADDR_W);
             buffer_8_ptr[63:0] = get_random_nbytes(M00_AXI4_BE_ADDR_W);
-            buffer_9_ptr = {(SYSTEM_CACHE_SIZE_ITERAIONS +_NUM_ENTRIES_),29'd_NUM_ENTRIES_, 1'b1, 1'b1, 1'b1}; //flush_cache , endian_write_reg , endian_read_reg
+            buffer_9_ptr = {(SYSTEM_CACHE_SIZE_ITERAIONS +_NUM_ENTRIES_),16'd_CU_VECTOR_,13'd_NUM_ENTRIES_, 1'b1, 1'b1, 1'b1}; //flush_cache , endian_write_reg , endian_read_reg
 
             ///////////////////////////////////////////////////////////////////////////
             //Write ID 0: buffer_0 (0x010) -> Randomized 4k aligned address (Global memory, lower 32 bits)

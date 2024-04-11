@@ -210,8 +210,9 @@ entry_index_cpp = 0
 engine_index_cpp = 0
 
 entries_vh = []
-entry_index_vh = 0
+entry_index_vh  = 0
 engine_index_vh = 0
+cu_vector       = 0
 
 combined_engine_template_json = {}
 entry_index_json = 0
@@ -402,7 +403,7 @@ def extract_buffer(token):
 def extract_buffer_details(token):
     """Extracts details of multiple buffers from a token, handling formats including mathematical operations and parallelism indications.
     Ensures at least four tuples are returned, each tuple now includes a parallelism level as the fourth element."""
-    
+    global cu_vector
     # Regex patterns to extract buffer details and parallelism level
     buffer_pattern = r"\(B:([^\)]+)\)"
     parallel_pattern = r"\(P:(\d+)\)"
@@ -414,7 +415,8 @@ def extract_buffer_details(token):
     
     # Determine the parallelism level, default to "1" if not specified
     parallel_level = parallel_matches[0] if parallel_matches else "1"
-    
+    cu_vector = parallel_matches[0] if parallel_matches else cu_vector
+
     buffer_details_list = []
 
     # Process each buffer match
@@ -1164,6 +1166,7 @@ append_to_file(
 )
 append_to_file(output_file_path_cpp, f"// -->  CPP.{topology}  <-- ")
 append_to_file(output_file_path_cpp, f"// Number of entries {entry_index_cpp}")
+append_to_file(output_file_path_cpp, f"// CU vector {cu_vector}")
 
 append_to_file(
     output_file_path_ol,
@@ -1171,6 +1174,7 @@ append_to_file(
 )
 append_to_file(output_file_path_ol, f"// -->  Template.{topology}  <-- ")
 append_to_file(output_file_path_ol, f"// Number of entries {entry_index}")
+append_to_file(output_file_path_ol, f"// CU vector {cu_vector}")
 
 append_to_file(
     output_file_path_vh,
@@ -1178,6 +1182,7 @@ append_to_file(
 )
 append_to_file(output_file_path_vh, f"// -->  Benchmark.{topology}  <-- ")
 append_to_file(output_file_path_vh, f"// Number of entries {entry_index_vh}")
+append_to_file(output_file_path_vh, f"// CU vector {cu_vector}")
 
 # Write the combined data to a new file
 with open(output_file_path_json, "w") as f:
@@ -1189,3 +1194,4 @@ process_entries_json_v2(
 )
 
 print(f"export NUM_ENTRIES={entry_index_vh}")
+print(f"export CU_VECTOR={cu_vector}")
