@@ -13,7 +13,7 @@ void GLAYxrtBufferHandlePerKernel::mapGLAYOverlayProgramBuffersPR(struct GraphCS
    // --  2  - Index_End
     overlay_program[8] = ( graph->num_vertices );
    // --  7  - Array_size
-    overlay_program[13] = (( graph->num_vertices )-( 0 ))/8;
+    overlay_program[13] = (( graph->num_vertices )-( 0 ))/2;
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
 // Name ENGINE_FORWARD_DATA           ID 2    mapping 6    cycles 0    None-None ( 0 )-( 0 )
@@ -71,3 +71,4 @@ void GLAYxrtBufferHandlePerKernel::mapGLAYOverlayProgramBuffersPR(struct GraphCS
 // --------------------------------------------------------------------------------------
 // -->  CPP.Single.PR  <-- 
 // Number of entries 78
+// CU vector 1100000000000000

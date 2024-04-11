@@ -101,6 +101,8 @@ public:
   static const uint32_t CONTROL_CONTINUE = 0x10;
   static const int MAX_XRT_BUFFERS =
       32; // Adjust this to your maximum expected number of buffers
+  static const int MAX_CUS =
+      32; // Adjust this to your maximum expected number of buffers
 
   // Each Memory bank contains a Graph CSR segment
   bool endian;
@@ -108,6 +110,7 @@ public:
   int xrt_buffers_num = 10;
   size_t xrt_buffer_size[10];
   std::bitset<MAX_XRT_BUFFERS> xrt_buffer_sync;
+  std::bitset<MAX_CUS> cu_vector;
   uint32_t *overlay_program;
   uint64_t xrt_buffer_device[10];
   void *xrt_buffer_host[10];

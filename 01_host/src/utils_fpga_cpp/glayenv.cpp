@@ -228,6 +228,11 @@ GLAYxrtBufferHandlePerKernel::GLAYxrtBufferHandlePerKernel(
   }
 
   // ********************************************************************************************
+  // ***************                  Setup Device CUs **************
+  for (int i = 0; i < arguments->ker_numThreads; ++i) {
+    cu_vector.set(i); // Set the first 'activeCUs' bits to 1
+  }
+  // ********************************************************************************************
   // ***************                  Setup Device pointers **************
   // ********************************************************************************************
   // ***************                  Setup Device to Host Sync **************
@@ -242,6 +247,7 @@ GLAYxrtBufferHandlePerKernel::GLAYxrtBufferHandlePerKernel(
   // ********************************************************************************************
   xrt_buffer_device[xrt_buffers_num - 1] =
       (uint64_t)((uint64_t)(glayHandle->cacheSize) << 32) |
+      (uint64_t)(cu_vector.to_ullong() << 16) |
       (uint64_t)(overlay_program_entries << 3) |
       (uint64_t)(glayHandle->flush_enable << 2) |
       ((uint64_t)glayHandle->endian_write << 1) |
