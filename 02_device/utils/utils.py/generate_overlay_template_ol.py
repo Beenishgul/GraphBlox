@@ -405,9 +405,11 @@ def create_cu_vector(num_active_cus, total_bits=16):
     if num_active_cus > total_bits:
         raise ValueError("Number of active CUs cannot exceed the total number of bits.")
     
-    # Create a binary string with `num_active_cus` ones
-    result = '1' * num_active_cus + '0' * (total_bits - num_active_cus)
-    return result
+    # Create a binary string with `num_active_cus` ones, aligned to the right
+    result = '0' * (total_bits - num_active_cus) + '1' * num_active_cus
+    
+    # Convert the binary string to an integer
+    return int(result, 2)
 
 def extract_buffer_details(token):
     """Extracts details of multiple buffers from a token, handling formats including mathematical operations and parallelism indications.
