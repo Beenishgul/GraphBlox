@@ -117,7 +117,7 @@
 0x00000000 // entry_2    cacheline[  5][15] <32b>: index_end[0:31]=0x00000000
 0x00000001 // entry_3    cacheline[  6][ 0] <32b>: stride[0:31]=0x00000001
 0x80000002 // entry_4    cacheline[  6][ 1] <32b>: shift.amount[0:30]=2 || shift.direction[31:31]=1
-0x00800008 // entry_5    cacheline[  6][ 2] <30b>: cmd[0:5]=CMD_STREAM_READ || id_module[6:13]=0x00 || id_engine[14:21]=0x00 || id_channel[22:29]=buffer_5
+0x00400002 // entry_5    cacheline[  6][ 2] <30b>: cmd[0:5]=CMD_MEM_READ || id_module[6:13]=0x00 || id_engine[14:21]=0x00 || id_channel[22:29]=buffer_5
 0x10010801 // entry_6    cacheline[  6][ 3] <32b>: id_cu[0:7]=0x01 || id_bundle[8:15]=0x08 || id_lane[16:23]=0x01 || id_buffer[24:31]=buffer_5
 0x00000000 // entry_7    cacheline[  6][ 4] <32b>: array_size[0:31]=0x00000000
 0x00000060 // entry_8    cacheline[  6][ 5] < 9b>: const_mask[0:4]=0x0 || mode_cache[5:8]=0x3
@@ -154,3 +154,4 @@
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
 // Number of entries 121
+// CU vector 255

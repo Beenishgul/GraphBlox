@@ -47,9 +47,9 @@ bit [M00_AXI4_FE_DATA_W/8-1:0][8-1:0] auxiliary_2[];
 bit [M00_AXI4_FE_DATA_W/8-1:0][8-1:0] in_degree[];
 bit [M00_AXI4_FE_DATA_W/8-1:0][8-1:0] out_degree[];
 bit [M00_AXI4_FE_DATA_W/8-1:0][8-1:0] edges_idx[];
-bit [M01_AXI4_FE_DATA_W/8-1:0][8-1:0] edges_array_src[];
-bit [M01_AXI4_FE_DATA_W/8-1:0][8-1:0] edges_array_dest[];
-bit [M01_AXI4_FE_DATA_W/8-1:0][8-1:0] edges_array_weight[];
+bit [M00_AXI4_FE_DATA_W/8-1:0][8-1:0] edges_array_src[];
+bit [M00_AXI4_FE_DATA_W/8-1:0][8-1:0] edges_array_dest[];
+bit [M00_AXI4_FE_DATA_W/8-1:0][8-1:0] edges_array_weight[];
 
 function new ();
     this.file_error                = 0;
@@ -1288,9 +1288,9 @@ module __KERNEL___testbench ();
             graph.mem_in_degree       = graph.mem_num_vertices ;
             graph.mem_out_degree      = graph.mem_num_vertices ;
 
-            graph.mem_edges_array_src   = ((graph.num_edges*M01_AXI4_FE_DATA_W) + (M01_AXI4_FE_DATA_W-1) )/ (M01_AXI4_FE_DATA_W);
-            graph.mem_edges_array_dest  = ((graph.num_edges*M01_AXI4_FE_DATA_W) + (M01_AXI4_FE_DATA_W-1) )/ (M01_AXI4_FE_DATA_W);
-            graph.mem_edges_array_weight= ((graph.num_edges*M01_AXI4_FE_DATA_W) + (M01_AXI4_FE_DATA_W-1) )/ (M01_AXI4_FE_DATA_W);
+            graph.mem_edges_array_src   = ((graph.num_edges*M00_AXI4_FE_DATA_W) + (M00_AXI4_FE_DATA_W-1) )/ (M00_AXI4_FE_DATA_W);
+            graph.mem_edges_array_dest  = ((graph.num_edges*M00_AXI4_FE_DATA_W) + (M00_AXI4_FE_DATA_W-1) )/ (M00_AXI4_FE_DATA_W);
+            graph.mem_edges_array_weight= ((graph.num_edges*M00_AXI4_FE_DATA_W) + (M00_AXI4_FE_DATA_W-1) )/ (M00_AXI4_FE_DATA_W);
 
             graph.mem_auxiliary_1 = ((graph.num_auxiliary_1*M00_AXI4_FE_DATA_W*2) + (M00_AXI4_FE_DATA_W-1) )/ (M00_AXI4_FE_DATA_W);
             graph.mem_auxiliary_2 = ((graph.num_auxiliary_2*M00_AXI4_FE_DATA_W*2) + (M00_AXI4_FE_DATA_W-1) )/ (M00_AXI4_FE_DATA_W);
@@ -1362,9 +1362,9 @@ module __KERNEL___testbench ();
             graph.mem_in_degree       = graph.mem_num_vertices ;
             graph.mem_out_degree      = graph.mem_num_vertices ;
 
-            graph.mem_edges_array_src   = ((graph.num_edges*M01_AXI4_FE_DATA_W) + (M01_AXI4_FE_DATA_W-1) )/ (M01_AXI4_FE_DATA_W);
-            graph.mem_edges_array_dest  = ((graph.num_edges*M01_AXI4_FE_DATA_W) + (M01_AXI4_FE_DATA_W-1) )/ (M01_AXI4_FE_DATA_W);
-            graph.mem_edges_array_weight= ((graph.num_edges*M01_AXI4_FE_DATA_W) + (M01_AXI4_FE_DATA_W-1) )/ (M01_AXI4_FE_DATA_W);
+            graph.mem_edges_array_src   = ((graph.num_edges*M00_AXI4_FE_DATA_W) + (M00_AXI4_FE_DATA_W-1) )/ (M00_AXI4_FE_DATA_W);
+            graph.mem_edges_array_dest  = ((graph.num_edges*M00_AXI4_FE_DATA_W) + (M00_AXI4_FE_DATA_W-1) )/ (M00_AXI4_FE_DATA_W);
+            graph.mem_edges_array_weight= ((graph.num_edges*M00_AXI4_FE_DATA_W) + (M00_AXI4_FE_DATA_W-1) )/ (M00_AXI4_FE_DATA_W);
 
             graph.mem_auxiliary_1 = ((graph.num_auxiliary_1*M00_AXI4_FE_DATA_W*2) + (M00_AXI4_FE_DATA_W-1) )/ (M00_AXI4_FE_DATA_W);
             graph.mem_auxiliary_2 = ((graph.num_auxiliary_2*M00_AXI4_FE_DATA_W*2) + (M00_AXI4_FE_DATA_W-1) )/ (M00_AXI4_FE_DATA_W);

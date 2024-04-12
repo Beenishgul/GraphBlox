@@ -83,3 +83,4 @@ void GLAYxrtBufferHandlePerKernel::mapGLAYOverlayProgramBuffersBFS(struct GraphC
 // --------------------------------------------------------------------------------------
 // -->  CPP.Single.BFS  <-- 
 // Number of entries 121
+// CU vector 255
