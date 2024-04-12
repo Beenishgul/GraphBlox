@@ -165,7 +165,7 @@
                 "ENGINE_ALU_OPS"
             ],
             [
-                "ENGINE_CSR_INDEX(P:3)(B:NONE,0,num_vertices)"
+                "ENGINE_CSR_INDEX(P:8)(B:NONE,0,num_vertices)"
             ],
             [
                 "ENGINE_FORWARD_DATA"
