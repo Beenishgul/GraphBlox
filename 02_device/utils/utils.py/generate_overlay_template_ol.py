@@ -197,7 +197,7 @@ NUM_ENGINES_MAX = max(
     len(lane) for bundle in CU_BUNDLES_CONFIG_ARRAY for lane in bundle
 )
 
-NUM_CUS = NUM_CUS_MAX
+NUM_CUS = int(NUM_CUS_MAX)
 NUM_BUNDLES = NUM_BUNDLES_MAX
 NUM_LANES = NUM_LANES_MAX
 NUM_ENGINES = NUM_ENGINES_MAX
@@ -426,7 +426,15 @@ def extract_buffer_details(token):
     parallel_matches = re.findall(parallel_pattern, token)
 
     # Determine the parallelism level, default to "1" if not specified
-    parallel_level = parallel_matches[0] if parallel_matches else "1"
+    # parallel_level = parallel_matches[0] if parallel_matches else "1"
+
+    if parallel_matches:
+        parallel_level = int(parallel_matches[0])
+        if parallel_level > NUM_CUS:
+                parallel_level = NUM_CUS
+    else:
+        parallel_level = 1
+
     cu_vector = create_cu_vector(int(parallel_matches[0])) if parallel_matches else cu_vector
 
     buffer_details_list = []

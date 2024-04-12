@@ -10,7 +10,7 @@
    // --  2  - Index_End
     graph.overlay_program[8]  = ( graph.num_vertices );
    // --  7  - Array_size
-    graph.overlay_program[13]  = (( graph.num_vertices )-( 0 ))/2;
+    graph.overlay_program[13]  = (( graph.num_vertices )-( 0 ))/4;
 // --------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------
 // Name ENGINE_FORWARD_DATA           ID 2    mapping 6    cycles 0    None-None ( 0 )-( 0 )
@@ -67,4 +67,4 @@
 // --------------------------------------------------------------------------------------
 // -->  Benchmark.Single.PR  <-- 
 // Number of entries 78
-// CU vector 3
+// CU vector 255
