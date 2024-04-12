@@ -928,7 +928,7 @@
             "entry_5": {
                 "cmd": {
                     "bits": "6",
-                    "value": "CMD_STREAM_READ"
+                    "value": "CMD_MEM_READ"
                 },
                 "id_module": {
                     "bits": "8",
