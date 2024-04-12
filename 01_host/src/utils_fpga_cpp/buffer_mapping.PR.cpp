@@ -71,4 +71,4 @@ void GLAYxrtBufferHandlePerKernel::mapGLAYOverlayProgramBuffersPR(struct GraphCS
 // --------------------------------------------------------------------------------------
 // -->  CPP.Single.PR  <-- 
 // Number of entries 78
-// CU vector 1100000000000000
+// CU vector 3
