@@ -119,7 +119,7 @@
     "Single.CC": {
         "0": [
             [
-                "ENGINE_CSR_INDEX(B:NONE,0,num_vertices)"
+                "ENGINE_CSR_INDEX(P:1)(B:NONE,0,num_vertices)"
             ],
             [
                 "ENGINE_READ_WRITE(B:auxiliary_1,0,num_vertices)",
