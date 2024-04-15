@@ -4,6 +4,7 @@ logs
 node_modules
 package-lock.json
 package.json
+graph_statistics.csv
 .vscode
 .Xil
 00_make/params.sh
