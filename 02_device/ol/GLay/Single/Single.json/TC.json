@@ -469,11 +469,11 @@
             "entry_0": {
                 "lane_mask": {
                     "bits": "5",
-                    "value": "0x1F"
+                    "value": "0x03"
                 },
                 "cast_mask": {
                     "bits": "5",
-                    "value": "0x0F"
+                    "value": "0x03"
                 },
                 "merge_mask_1": {
                     "bits": "5",
@@ -481,7 +481,7 @@
                 },
                 "merge_mask_2": {
                     "bits": "5",
-                    "value": "0x0C"
+                    "value": "0x03"
                 }
             },
             "entry_1": {
@@ -994,11 +994,11 @@
             "entry_0": {
                 "lane_mask": {
                     "bits": "5",
-                    "value": "0x1F"
+                    "value": "0x13"
                 },
                 "cast_mask": {
                     "bits": "5",
-                    "value": "0x0F"
+                    "value": "0x03"
                 },
                 "merge_mask_1": {
                     "bits": "5",
@@ -1006,7 +1006,7 @@
                 },
                 "merge_mask_2": {
                     "bits": "5",
-                    "value": "0x0C"
+                    "value": "0x03"
                 }
             },
             "entry_1": {
@@ -1054,7 +1054,7 @@
                 },
                 "id_lane": {
                     "bits": "8",
-                    "value": "0x01"
+                    "value": "0x02"
                 },
                 "id_buffer": {
                     "bits": "8",
@@ -1076,7 +1076,7 @@
                 },
                 "op_lane": {
                     "bits": "8",
-                    "value": "0x02"
+                    "value": "0x01"
                 }
             },
             "entry_6": {
@@ -1089,23 +1089,23 @@
                 "ops_mask":{},
                 "field_1": {
                     "bits": "5",
-                    "value": "0x2"
+                    "value": "0x01"
                 },
                 "field_2": {
                     "bits": "5",
-                    "value": "0x1"
+                    "value": "0x02"
                 },
                 "field_3": {
                     "bits": "5",
-                    "value": "0x4"
+                    "value": "0x04"
                 },
                 "field_4": {
                     "bits": "5",
-                    "value": "0x8"
+                    "value": "0x08"
                 },
                 "field_5": {
                     "bits": "5",
-                    "value": "0x0"
+                    "value": "0x16"
                 }
             },
             "entry_8": {
@@ -1153,7 +1153,7 @@
                 },
                 "id_lane": {
                     "bits": "8",
-                    "value": "0x01"
+                    "value": "0x02"
                 },
                 "id_buffer": {
                     "bits": "8",
@@ -1175,7 +1175,7 @@
                 },
                 "op_lane": {
                     "bits": "8",
-                    "value": "0x02"
+                    "value": "0x01"
                 }
             },
             "entry_13": {
@@ -1188,23 +1188,23 @@
                 "ops_mask":{},
                 "field_1": {
                     "bits": "5",
-                    "value": "0x2"
+                    "value": "0x01"
                 },
                 "field_2": {
                     "bits": "5",
-                    "value": "0x1"
+                    "value": "0x02"
                 },
                 "field_3": {
                     "bits": "5",
-                    "value": "0x4"
+                    "value": "0x04"
                 },
                 "field_4": {
                     "bits": "5",
-                    "value": "0x8"
+                    "value": "0x08"
                 },
                 "field_5": {
                     "bits": "5",
-                    "value": "0x0"
+                    "value": "0x16"
                 }
             },
             "entry_15": {
@@ -2139,19 +2139,19 @@
             "entry_0": {
                 "lane_mask": {
                     "bits": "5",
-                    "value": "0x07"
+                    "value": "0x03"
                 },
                 "cast_mask": {
                     "bits": "5",
-                    "value": "0x07"
+                    "value": "0x03"
                 },
                 "merge_mask_1": {
                     "bits": "5",
-                    "value": "0x07"
+                    "value": "0x03"
                 },
                 "merge_mask_2": {
                     "bits": "5",
-                    "value": "0x07"
+                    "value": "0x03"
                 }
             },
             "entry_1": {
