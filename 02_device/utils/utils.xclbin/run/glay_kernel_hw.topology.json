@@ -83,7 +83,7 @@
                 "ENGINE_PARALLEL_READ_WRITE(B:auxiliary_2,num_vertices,num_vertices*2)(B:auxiliary_1,0,num_vertices)"
             ],
             [
-                "ENGINE_CSR_INDEX(P:4)(B:NONE,0,num_vertices)"
+                "ENGINE_CSR_INDEX(P:8)(B:NONE,0,num_vertices)"
             ],
             [
                 "ENGINE_FORWARD_DATA"
@@ -335,15 +335,15 @@
             "64"
         ],
         "buffer_4": [
-            "1",
+            "0",
             "64"
         ],
         "buffer_5": [
-            "1",
+            "0",
             "64"
         ],
         "buffer_6": [
-            "1",
+            "0",
             "64"
         ],
         "buffer_7": [
@@ -378,10 +378,10 @@
             "33",
             "512",
             "0",
-            "2",
+            "0",
             "33",
             "32",
-            "3",
+            "0",
             "33",
             "32"
         ],
@@ -619,7 +619,7 @@
         "frequency_scale": "1",
         "ctrl_mode": "USER_MANAGED",
         "num_kernels": "1",
-        "num_kernel_cu": "4",
+        "num_kernel_cu": "8",
         "xpm_fifo": "3",
         "slr_percent": [
             33,
