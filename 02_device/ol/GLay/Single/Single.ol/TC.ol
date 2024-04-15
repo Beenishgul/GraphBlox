@@ -45,7 +45,7 @@
 // --------------------------------------------------------------------------------------
 // Engine: ENGINE_PARALLEL_READ_WRITE_4, Number of entries: 36
 // --------------------------------------------------------------------------------------
-0x00060DFF // entry_0    cacheline[  2][ 0] <20b>: lane_mask[0:4]=0x1F || cast_mask[5:9]=0xF || merge_mask_1[10:14]=0x3 || merge_mask_2[15:19]=0xC
+0x00018C63 // entry_0    cacheline[  2][ 0] <20b>: lane_mask[0:4]=0x3 || cast_mask[5:9]=0x3 || merge_mask_1[10:14]=0x3 || merge_mask_2[15:19]=0x3
 0x00000000 // entry_1    cacheline[  2][ 1] <32b>: index_start[0:31]=0x00000000
 0x80000002 // entry_2    cacheline[  2][ 2] <32b>: shift.amount[0:30]=2 || shift.direction[31:31]=1
 0x00400042 // entry_3    cacheline[  2][ 3] <30b>: cmd[0:5]=CMD_MEM_READ || id_module[6:13]=0x01 || id_engine[14:21]=0x00 || id_channel[22:29]=buffer_3
@@ -84,21 +84,21 @@
 // --------------------------------------------------------------------------------------
 // Engine: ENGINE_PARALLEL_READ_WRITE_5, Number of entries: 36
 // --------------------------------------------------------------------------------------
-0x00060DFF // entry_0    cacheline[  4][ 4] <20b>: lane_mask[0:4]=0x1F || cast_mask[5:9]=0xF || merge_mask_1[10:14]=0x3 || merge_mask_2[15:19]=0xC
+0x00018C73 // entry_0    cacheline[  4][ 4] <20b>: lane_mask[0:4]=0x13 || cast_mask[5:9]=0x3 || merge_mask_1[10:14]=0x3 || merge_mask_2[15:19]=0x3
 0x00000000 // entry_1    cacheline[  4][ 5] <32b>: index_start[0:31]=0x00000000
 0x80000002 // entry_2    cacheline[  4][ 6] <32b>: shift.amount[0:30]=2 || shift.direction[31:31]=1
 0x00400042 // entry_3    cacheline[  4][ 7] <30b>: cmd[0:5]=CMD_MEM_READ || id_module[6:13]=0x01 || id_engine[14:21]=0x00 || id_channel[22:29]=buffer_3
-0x04010401 // entry_4    cacheline[  4][ 8] <32b>: id_cu[0:7]=0x01 || id_bundle[8:15]=0x04 || id_lane[16:23]=0x01 || id_buffer[24:31]=buffer_3
-0x00040200 // entry_5    cacheline[  4][ 9] <25b>: const_mask[0:4]=0x0 || mode_cache[5:8]=0x0 || op_bundle[9:16]=0x01 || op_lane[17:24]=0x02
+0x04020401 // entry_4    cacheline[  4][ 8] <32b>: id_cu[0:7]=0x01 || id_bundle[8:15]=0x04 || id_lane[16:23]=0x02 || id_buffer[24:31]=buffer_3
+0x00020200 // entry_5    cacheline[  4][ 9] <25b>: const_mask[0:4]=0x0 || mode_cache[5:8]=0x0 || op_bundle[9:16]=0x01 || op_lane[17:24]=0x01
 0x00000000 // entry_6    cacheline[  4][10] <32b>: const_value[0:31]=0x00000000
-0x00041022 // entry_7    cacheline[  4][11] <25b>: field_1[0:4]=0x2 || field_2[5:9]=0x1 || field_3[10:14]=0x4 || field_4[15:19]=0x8 || field_5[20:24]=0x0
+0x01641041 // entry_7    cacheline[  4][11] <25b>: field_1[0:4]=0x1 || field_2[5:9]=0x2 || field_3[10:14]=0x4 || field_4[15:19]=0x8 || field_5[20:24]=0x16
 0x00000000 // entry_8    cacheline[  4][12] <32b>: index_start[0:31]=0x00000000
 0x80000002 // entry_9    cacheline[  4][13] <32b>: shift.amount[0:30]=2 || shift.direction[31:31]=1
 0x00400042 // entry_10   cacheline[  4][14] <30b>: cmd[0:5]=CMD_MEM_READ || id_module[6:13]=0x01 || id_engine[14:21]=0x00 || id_channel[22:29]=buffer_2
-0x02010401 // entry_11   cacheline[  4][15] <32b>: id_cu[0:7]=0x01 || id_bundle[8:15]=0x04 || id_lane[16:23]=0x01 || id_buffer[24:31]=buffer_2
-0x00040200 // entry_12   cacheline[  5][ 0] <25b>: const_mask[0:4]=0x0 || mode_cache[5:8]=0x0 || op_bundle[9:16]=0x01 || op_lane[17:24]=0x02
+0x02020401 // entry_11   cacheline[  4][15] <32b>: id_cu[0:7]=0x01 || id_bundle[8:15]=0x04 || id_lane[16:23]=0x02 || id_buffer[24:31]=buffer_2
+0x00020200 // entry_12   cacheline[  5][ 0] <25b>: const_mask[0:4]=0x0 || mode_cache[5:8]=0x0 || op_bundle[9:16]=0x01 || op_lane[17:24]=0x01
 0x00000000 // entry_13   cacheline[  5][ 1] <32b>: const_value[0:31]=0x00000000
-0x00041022 // entry_14   cacheline[  5][ 2] <25b>: field_1[0:4]=0x2 || field_2[5:9]=0x1 || field_3[10:14]=0x4 || field_4[15:19]=0x8 || field_5[20:24]=0x0
+0x01641041 // entry_14   cacheline[  5][ 2] <25b>: field_1[0:4]=0x1 || field_2[5:9]=0x2 || field_3[10:14]=0x4 || field_4[15:19]=0x8 || field_5[20:24]=0x16
 0x00000000 // entry_15   cacheline[  5][ 3] <32b>: index_start[0:31]=0x00000000
 0x80000002 // entry_16   cacheline[  5][ 4] <32b>: shift.amount[0:30]=2 || shift.direction[31:31]=1
 0x00400042 // entry_17   cacheline[  5][ 5] <30b>: cmd[0:5]=CMD_MEM_READ || id_module[6:13]=0x01 || id_engine[14:21]=0x00 || id_channel[22:29]=buffer_3
@@ -183,7 +183,7 @@
 // --------------------------------------------------------------------------------------
 // Engine: ENGINE_PARALLEL_READ_WRITE_12, Number of entries: 36
 // --------------------------------------------------------------------------------------
-0x00039CE7 // entry_0    cacheline[  9][ 2] <20b>: lane_mask[0:4]=0x7 || cast_mask[5:9]=0x7 || merge_mask_1[10:14]=0x7 || merge_mask_2[15:19]=0x7
+0x00018C63 // entry_0    cacheline[  9][ 2] <20b>: lane_mask[0:4]=0x3 || cast_mask[5:9]=0x3 || merge_mask_1[10:14]=0x3 || merge_mask_2[15:19]=0x3
 0x00000000 // entry_1    cacheline[  9][ 3] <32b>: index_start[0:31]=0x00000000
 0x80000002 // entry_2    cacheline[  9][ 4] <32b>: shift.amount[0:30]=2 || shift.direction[31:31]=1
 0x00400042 // entry_3    cacheline[  9][ 5] <30b>: cmd[0:5]=CMD_MEM_READ || id_module[6:13]=0x01 || id_engine[14:21]=0x00 || id_channel[22:29]=buffer_3
