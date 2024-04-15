@@ -13,4 +13,4 @@
 0x00000000 // entry_9    cacheline[  0][ 9] <32b>: if_id_module[0:7]=0x00 || if_id_engine[8:15]=0x00 || else_id_module[16:23]=0x00 || else_id_engine[24:31]=0x00
 // --------------------------------------------------------------------------------------
 // Number of entries 10
-// CU vector 1
+// CU vector 0
