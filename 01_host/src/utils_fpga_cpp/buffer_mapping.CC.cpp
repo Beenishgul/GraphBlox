@@ -93,4 +93,4 @@ void GLAYxrtBufferHandlePerKernel::mapGLAYOverlayProgramBuffersCC(struct GraphCS
 // --------------------------------------------------------------------------------------
 // -->  CPP.Single.CC  <-- 
 // Number of entries 138
-// CU vector 0
+// CU vector 1
