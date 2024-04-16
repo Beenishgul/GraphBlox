@@ -232,7 +232,7 @@ typedef struct packed{
   EnginePacketRouteAttributes route;
 } EnginePacketMeta;
 
-parameter ENGINE_PACKET_DATA_NUM_FIELDS = 5;
+parameter ENGINE_PACKET_DATA_NUM_FIELDS = 4;
 typedef struct packed{
   EnginePacketRouteAttributes               route   ;
   PacketRequestDataAddress                  address ;

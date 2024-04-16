@@ -458,7 +458,7 @@ def extract_buffer_details(token):
         )
 
     # Ensure there are at least four tuples in the list
-    while len(buffer_details_list) < 5:
+    while len(buffer_details_list) < 4:
         buffer_details_list.append(("None", ["0"], ["0"], "1"))
 
     return buffer_details_list
@@ -762,21 +762,21 @@ def process_file_vh_v2(
                             output_file_path_vh,
                             f"    graph.overlay_program[{entry_index_vh}] = {local_buffer_start_ops};",
                         )
-                    elif local_count == 29:
-                        (
-                            local_buffer_name,
-                            local_buffer_start,
-                            local_buffer_end,
-                            parallel_level,
-                        ) = detail_pattern[4]
-                        local_buffer_start_ops = print_operations_vh(local_buffer_start)
-                        append_to_file(
-                            output_file_path_vh, f"   // --  5  - Index_Start"
-                        )
-                        append_to_file(
-                            output_file_path_vh,
-                            f"    graph.overlay_program[{entry_index_vh}] = {local_buffer_start_ops};",
-                        )
+                    # elif local_count == 29:
+                    #     (
+                    #         local_buffer_name,
+                    #         local_buffer_start,
+                    #         local_buffer_end,
+                    #         parallel_level,
+                    #     ) = detail_pattern[4]
+                    #     local_buffer_start_ops = print_operations_vh(local_buffer_start)
+                    #     append_to_file(
+                    #         output_file_path_vh, f"   // --  5  - Index_Start"
+                    #     )
+                    #     append_to_file(
+                    #         output_file_path_vh,
+                    #         f"    graph.overlay_program[{entry_index_vh}] = {local_buffer_start_ops};",
+                    #     )
 
                 entry_index_vh += 1
                 local_count += 1
@@ -942,23 +942,23 @@ def process_file_cpp_v2(
                             output_file_path_cpp,
                             f"    overlay_program[{entry_index_cpp}] = {local_buffer_start_ops};",
                         )
-                    elif local_count == 29:
-                        (
-                            local_buffer_name,
-                            local_buffer_start,
-                            local_buffer_end,
-                            parallel_level,
-                        ) = detail_pattern[4]
-                        local_buffer_start_ops = print_operations_cpp(
-                            local_buffer_start
-                        )
-                        append_to_file(
-                            output_file_path_cpp, f"   // --  5  - Index_Start"
-                        )
-                        append_to_file(
-                            output_file_path_cpp,
-                            f"    overlay_program[{entry_index_cpp}] = {local_buffer_start_ops};",
-                        )
+                    # elif local_count == 29:
+                    #     (
+                    #         local_buffer_name,
+                    #         local_buffer_start,
+                    #         local_buffer_end,
+                    #         parallel_level,
+                    #     ) = detail_pattern[4]
+                    #     local_buffer_start_ops = print_operations_cpp(
+                    #         local_buffer_start
+                    #     )
+                    #     append_to_file(
+                    #         output_file_path_cpp, f"   // --  5  - Index_Start"
+                    #     )
+                    #     append_to_file(
+                    #         output_file_path_cpp,
+                    #         f"    overlay_program[{entry_index_cpp}] = {local_buffer_start_ops};",
+                    #     )
 
                 entry_index_cpp += 1
                 local_count += 1
