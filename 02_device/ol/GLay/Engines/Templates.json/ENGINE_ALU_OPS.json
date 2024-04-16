@@ -17,7 +17,7 @@
             },
             "entry_1": {
                 "alu_mask": {
-                    "bits": "5",
+                    "bits": "4",
                     "value": "0x00"
                 },
                 "id_engine": {
@@ -31,7 +31,7 @@
             },
             "entry_2": {
                 "const_mask": {
-                    "bits": "5",
+                    "bits": "4",
                     "value": "0x00"
                 }
             },
@@ -44,23 +44,19 @@
             "entry_4": {
                 "ops_mask":{},
                 "field_1": {
-                    "bits": "5",
+                    "bits": "4",
                     "value": "0x00"
                 },
                 "field_2": {
-                    "bits": "5",
+                    "bits": "4",
                     "value": "0x00"
                 },
                 "field_3": {
-                    "bits": "5",
+                    "bits": "4",
                     "value": "0x00"
                 },
                 "field_4": {
-                    "bits": "5",
-                    "value": "0x00"
-                },
-                "field_5": {
-                    "bits": "5",
+                    "bits": "4",
                     "value": "0x00"
                 }
             },

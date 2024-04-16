@@ -9,7 +9,7 @@
         "entries": {
             "entry_0": {
                 "set_mask": {
-                    "bits": "5",
+                    "bits": "4",
                     "value": "0x00"
                 }
             },
