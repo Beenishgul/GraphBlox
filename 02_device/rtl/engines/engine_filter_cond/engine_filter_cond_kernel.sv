@@ -48,9 +48,7 @@ always_ff @(posedge ap_clk) begin
       end
     end
   end
-end
 
-always_ff @(posedge ap_clk) begin
   for (int i = 0; i<ENGINE_PACKET_DATA_NUM_FIELDS; i++) begin
     if(config_params_in.const_mask[i] & (|config_params_in.set_mask)) begin
       org_value_reg.field[i]       <= config_params_in.const_value;
