@@ -1681,7 +1681,7 @@ module __KERNEL___testbench ();
                         break;
                     iter++;
                 end
-                update_BFS_auxiliary_struct(graph);
+                update_CC_auxiliary_struct(graph);
                 $display("Finished - Iteration: %0d - Components: %0d", iter+1, graph.debug_counter_1);
             end
         endtask
