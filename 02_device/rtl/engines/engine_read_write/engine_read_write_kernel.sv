@@ -47,9 +47,7 @@ always_ff @(posedge ap_clk) begin
       end
     end
   end
-end
 
-always_ff @(posedge ap_clk) begin
   for (int i = 0; i<ENGINE_PACKET_DATA_NUM_FIELDS; i++) begin
     if(|config_params_in.ops_mask[i])begin
       for (int j = 0; j<ENGINE_PACKET_DATA_NUM_FIELDS; j++) begin
