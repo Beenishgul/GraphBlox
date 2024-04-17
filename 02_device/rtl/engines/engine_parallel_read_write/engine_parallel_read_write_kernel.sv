@@ -22,27 +22,12 @@ module engine_parallel_read_write_kernel (
 );
 
 // Define internal signals
-logic [M00_AXI4_FE_DATA_W-1:0]               index_offset     ;
 PacketRequestDataAddress                     address_int      ;
 EnginePacketData                             org_value_reg    ;
 EnginePacketData                             org_data_int     ;
 ParallelReadWriteConfigurationParameterField config_params_reg;
 
 always_ff @(posedge ap_clk) begin
-  if(config_params_in.const_mask[1]) begin
-    index_offset <= config_params_in.const_value;
-  end else  begin
-    if(|config_params_in.ops_mask[1])begin
-      for (int j = 0; j<ENGINE_PACKET_DATA_NUM_FIELDS; j++) begin
-        if(config_params_in.ops_mask[1][j]) begin
-          index_offset <= data_in.field[j];
-        end
-      end
-    end else begin
-      index_offset <= 0;
-    end
-  end
-
   for (int i = 0; i<ENGINE_PACKET_DATA_NUM_FIELDS; i++) begin
     if(config_params_in.const_mask[i]) begin
       org_value_reg.field[i]       <= config_params_in.const_value;
@@ -73,9 +58,9 @@ always_ff @(posedge ap_clk) begin
   address_int.id_buffer       <= config_params_reg.id_buffer;
   address_int.burst_length    <= 1;
   if(config_params_reg.direction) begin
-    address_int.offset <= (config_params_reg.index_start + index_offset) << config_params_reg.granularity;
+    address_int.offset <= (config_params_reg.index_start + org_value_reg.field[1]) << config_params_reg.granularity;
   end else begin
-    address_int.offset <= (config_params_reg.index_start + index_offset) >> config_params_reg.granularity;
+    address_int.offset <= (config_params_reg.index_start + org_value_reg.field[1]) >> config_params_reg.granularity;
   end
   org_data_int <= org_value_reg;
 end

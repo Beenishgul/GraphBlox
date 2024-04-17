@@ -78,8 +78,8 @@ always_ff @(posedge ap_clk) begin
   case (config_params_reg.filter_operation)
 // --------------------------------------------------------------------------------------
     FILTER_NOP : begin
-      result_reg      <= ops_value_reg; // No operation
-      result_bool_reg <= ~0;
+      result_reg.field  <= org_value_reg.field; // No operation
+      result_bool_reg   <= ~0;
     end
 // --------------------------------------------------------------------------------------
     FILTER_GT : begin
