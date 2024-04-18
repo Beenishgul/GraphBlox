@@ -433,7 +433,7 @@ int main(int argc, char **argv)
     arguments->ctrl_mode = 0;
     arguments->endian_read = 0;
     arguments->endian_write = 0;
-    arguments->flush_cache = 0;
+    arguments->flush_cache = 1;
     arguments->bankGroupIndex = 0;
 
     omp_set_nested(1);
@@ -446,8 +446,20 @@ int main(int argc, char **argv)
     arguments->ctrl_mode = 0;
     struct GraphAuxiliary *graphAuxiliary =
         (struct GraphAuxiliary *)my_malloc(sizeof(struct GraphAuxiliary));
-    struct GraphCSR *graph =
-        (struct GraphCSR *)generateGraphDataStructure(arguments);
+    // struct GraphCSR *graph =
+    //     (struct GraphCSR *)generateGraphDataStructure(arguments);
+
+    arguments->datastructure = 5;
+    struct GraphCSRSegments *graphSegments =
+        (struct GraphCSRSegments *)generateGraphDataStructure(arguments);
+
+    //   for ( uint32_t i = 0; i < (graphSegments->csrSegments->num_vertices); ++i)
+    // {
+    //     printf("v:%u --> s:%u \n", i, graphSegments->csrSegments->vertex_segment_index[i]);
+    //     edgeListPrintBasic(graphSegments->csrSegments->segments[i].edgeList);
+    // }
+
+    struct GraphCSR *graph = (struct GraphCSR *)(graphSegments->csrSegments->segments[1].graphCSR);
 
     switch (arguments->algorithm)
     {
@@ -525,7 +537,7 @@ int main(int argc, char **argv)
     // releaseGLAY();
     free(timer);
     free_auxiliary_struct(graphAuxiliary);
-    freeGraphDataStructure((void *)graph, arguments->datastructure);
+    freeGraphDataStructure((void *)graphSegments, arguments->datastructure);
     argumentsFree(arguments);
     exit(0);
 }
@@ -700,8 +712,8 @@ void multiple_iteration_BFS(struct GraphCSR *graph,
         printf(" -----------------------------------------------------\n");
         for (uint32_t i = 0; i < graph->num_vertices; i++)
         {
-            DEBUG_PRINT("%u \n",
-                        static_cast<uint32_t *>(graphAuxiliary->auxiliary_1)[i]);
+            // DEBUG_PRINT("%u \n",
+            //             static_cast<uint32_t *>(graphAuxiliary->auxiliary_1)[i]);
             frontier += static_cast<uint32_t *>(
                             graphAuxiliary->auxiliary_2)[graph->num_vertices + i];
             static_cast<uint32_t *>(
