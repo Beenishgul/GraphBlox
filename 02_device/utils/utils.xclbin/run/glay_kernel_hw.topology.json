@@ -83,7 +83,7 @@
                 "ENGINE_PARALLEL_READ_WRITE(B:auxiliary_2,num_vertices,num_vertices*2)(B:auxiliary_1,0,num_vertices)"
             ],
             [
-                "ENGINE_CSR_INDEX(P:8)(B:NONE,0,num_vertices)"
+                "ENGINE_CSR_INDEX(P:1)(B:NONE,0,num_vertices)"
             ],
             [
                 "ENGINE_FORWARD_DATA"
@@ -119,7 +119,7 @@
     "Single.CC": {
         "0": [
             [
-                "ENGINE_CSR_INDEX(B:NONE,0,num_vertices)"
+                "ENGINE_CSR_INDEX(P:1)(B:NONE,0,num_vertices)"
             ],
             [
                 "ENGINE_READ_WRITE(B:auxiliary_1,0,num_vertices)",
@@ -205,6 +205,7 @@
                 "ENGINE_CSR_INDEX(B:NONE,0,num_vertices)"
             ],
             [
+                "ENGINE_ALU_OPS",
                 "ENGINE_ALU_OPS"
             ],
             [
@@ -213,29 +214,13 @@
         ],
         "1": [
             [
-                "ENGINE_READ_WRITE(B:edges_idx,0,num_vertices)",
-                "ENGINE_MERGE_DATA(W:4)"
-            ],
-            [
-                "ENGINE_READ_WRITE(C:0)(B:out_degree,0,num_vertices)"
-            ],
-            [
-                "ENGINE_READ_WRITE(C:0)(B:auxiliary_2,num_vertices,num_vertices*2)"
-            ],
-            [
-                "ENGINE_CSR_INDEX(C:0)(B:NONE,0,num_vertices)"
-            ],
-            [
-                "ENGINE_ALU_OPS"
+                "ENGINE_PARALLEL_READ_WRITE(B:edges_idx,0,num_vertices)(B:out_degree,0,num_vertices)(B:auxiliary_2,0,num_vertices)"
             ],
             [
                 "ENGINE_FORWARD_DATA"
             ]
         ],
         "2": [
-            [
-                "ENGINE_READ_WRITE(C:0)(B:out_degree,0,num_vertices)"
-            ],
             [
                 "ENGINE_CSR_INDEX(B:edges_array_dest,0,num_edges)"
             ],
@@ -245,7 +230,7 @@
         ],
         "3": [
             [
-                "ENGINE_READ_WRITE(B:auxiliary_1,num_vertices,num_vertices*2)"
+                "ENGINE_PARALLEL_READ_WRITE(B:auxiliary_1,num_vertices,num_vertices*2)(B:auxiliary_2,num_vertices,num_vertices*2)"
             ],
             [
                 "ENGINE_FORWARD_DATA"
@@ -619,7 +604,7 @@
         "frequency_scale": "1",
         "ctrl_mode": "USER_MANAGED",
         "num_kernels": "1",
-        "num_kernel_cu": "8",
+        "num_kernel_cu": "4",
         "xpm_fifo": "3",
         "slr_percent": [
             33,
@@ -752,7 +737,7 @@
             ],
             "ENGINE_PARALLEL_READ_WRITE": [
                 8,
-                36,
+                29,
                 2374,
                 16,
                 32,
@@ -836,7 +821,7 @@
         ],
         "ENGINE_PARALLEL_READ_WRITE": [
             7,
-            36,
+            29,
             2374,
             16,
             32,
