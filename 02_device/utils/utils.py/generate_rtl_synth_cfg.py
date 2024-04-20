@@ -489,7 +489,7 @@ config += f"log_dir={KERNEL_NAME}.build/logs\n"
 config += "save-temps=1\n"
 config += "link=1\n"
 
-if DEBUG_IP == "1" and TARGET == "hw_emu":
+if TARGET == "hw_emu":
     config += "debug=1\n"
 #     config +=f"""
 # [advanced]

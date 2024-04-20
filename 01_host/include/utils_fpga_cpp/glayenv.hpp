@@ -2,6 +2,7 @@
 #define GLAYENV_H
 
 #include <bitset>
+#include <cmath>
 #include <cstdint>
 #include <cstdlib>
 #include <fstream>
@@ -93,16 +94,24 @@ public:
 class GLAYxrtBufferHandlePerKernel {
 public:
   // User Managed Kernel MASK
-  static const uint32_t CONTROL_OFFSET = 0x00;
-  static const uint32_t CONTROL_START = 0x01;
-  static const uint32_t CONTROL_DONE = 0x02;
-  static const uint32_t CONTROL_IDLE = 0x04;
-  static const uint32_t CONTROL_READY = 0x08;
-  static const uint32_t CONTROL_CONTINUE = 0x10;
+  const uint32_t CONTROL_OFFSET = 0x00;
+  const uint32_t CONTROL_START = 0x01;
+  const uint32_t CONTROL_DONE = 0x02;
+  const uint32_t CONTROL_IDLE = 0x04;
+  const uint32_t CONTROL_READY = 0x08;
+  const uint32_t CONTROL_CONTINUE = 0x10;
   static const int MAX_XRT_BUFFERS =
       32; // Adjust this to your maximum expected number of buffers
   static const int MAX_CUS =
       32; // Adjust this to your maximum expected number of buffers
+          // Now we convert the parameters to C++ constants
+  uint32_t system_cache_num_ways;
+  uint32_t system_cache_data_width;
+  uint32_t system_cache_size;
+
+  uint32_t system_cache_line_size_log;
+  uint32_t system_cache_num_sets;
+  uint32_t system_cache_count;
 
   // Each Memory bank contains a Graph CSR segment
   bool endian;
