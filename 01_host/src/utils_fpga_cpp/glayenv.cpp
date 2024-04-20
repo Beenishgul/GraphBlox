@@ -241,12 +241,23 @@ GLAYxrtBufferHandlePerKernel::GLAYxrtBufferHandlePerKernel(
   // xrt_buffer_sync.set(8, true); // auxiliary 2 read back to host
   std::string syncPattern = "0000000110";
   SetSyncBuffersBasedOnString(syncPattern);
+
+  system_cache_num_ways = 4;
+  system_cache_data_width = 512 / 8;
+  system_cache_size = glayHandle->cacheSize;
+  system_cache_line_size_log = (uint32_t)log2(system_cache_data_width);
+  system_cache_num_sets =
+      (system_cache_size >>
+       (system_cache_line_size_log + (uint32_t)log2(system_cache_num_ways)));
+  system_cache_count = system_cache_num_sets * system_cache_num_ways;
+
+ DEBUG_PRINT("system_cache_count %u \n\n", system_cache_count);
   // ********************************************************************************************
   // Each read is 4-Bytes granularity (256 cycles to configure) | / endian mode
   // 0-big endian 1-little endian
   // ********************************************************************************************
   xrt_buffer_device[xrt_buffers_num - 1] =
-      (uint64_t)((uint64_t)(glayHandle->cacheSize) << 32) |
+      (uint64_t)((uint64_t)(system_cache_count) << 32) |
       (uint64_t)(cu_vector.to_ullong() << 16) |
       (uint64_t)(overlay_program_entries << 3) |
       (uint64_t)(glayHandle->flush_enable << 2) |
@@ -301,8 +312,8 @@ void GLAYxrtBufferHandlePerKernel::assignGraphtoXRTBufferSize(
   {
     overlay_program_entries = glayHandle->overlay_program_entries;
     xrt_buffer_size[0] =
-        (glayHandle->overlay_program_entries * sizeof(uint32_t)) +
-        glayHandle->cacheSize;
+        ((glayHandle->overlay_program_entries + system_cache_count) *
+         sizeof(uint32_t));
     xrt_buffer_size[1] = graph->num_vertices * sizeof(uint32_t);
     xrt_buffer_size[2] = graph->num_vertices * sizeof(uint32_t);
     xrt_buffer_size[3] = graph->num_vertices * sizeof(uint32_t);
@@ -401,7 +412,7 @@ int GLAYxrtBufferHandlePerKernel::
     writeRegistersAddressGLAYHostToDeviceBuffersPerKernel() {
   auto args = glayHandle->cuHandles[glayHandle->cu_id].get_args();
   DEBUG_PRINT("IP::START::GLAYxrtBufferHandlePerKernel::"
-              "writeRegistersAddressGLAYHostToDeviceBuffersPerKernel");
+              "writeRegistersAddressGLAYHostToDeviceBuffersPerKernel\n");
   for (int i = 0; i < xrt_buffers_num; i++) {
     glayHandle->ipHandle.write_register(args[i].get_offset(),
                                         xrt_buffer_device[i]);

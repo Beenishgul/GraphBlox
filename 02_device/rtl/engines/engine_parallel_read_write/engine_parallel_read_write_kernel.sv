@@ -62,6 +62,9 @@ always_ff @(posedge ap_clk) begin
   end else begin
     address_int.offset <= (config_params_reg.index_start + org_value_reg.field[1]) >> config_params_reg.granularity;
   end
+end
+
+always_ff @(posedge ap_clk) begin
   org_data_int <= org_value_reg;
 end
 
