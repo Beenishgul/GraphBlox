@@ -142,6 +142,7 @@ public:
   int writeGLAYHostToDeviceBuffersPerKernel();
   int mapGLAYHostToDeviceBuffersPerKernel();
   int readGLAYDeviceToHostBuffersPerKernel();
+  int updateGLAYDeviceToHostBuffersPerKernel();
   int writeRegistersAddressGLAYHostToDeviceBuffersPerKernel();
   int setArgsKernelAddressGLAYHostToDeviceBuffersPerKernel();
   void initializeGLAYOverlayConfiguration(struct GraphCSR *graph);

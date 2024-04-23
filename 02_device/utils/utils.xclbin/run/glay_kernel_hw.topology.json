@@ -604,7 +604,7 @@
         "frequency_scale": "1",
         "ctrl_mode": "USER_MANAGED",
         "num_kernels": "1",
-        "num_kernel_cu": "4",
+        "num_kernel_cu": "1",
         "xpm_fifo": "3",
         "slr_percent": [
             33,

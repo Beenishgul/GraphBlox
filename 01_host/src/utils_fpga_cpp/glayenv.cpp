@@ -379,7 +379,7 @@ int GLAYxrtBufferHandlePerKernel::writeGLAYHostToDeviceBuffersPerKernel() {
                 i, xrt_buffer_size[i]);
   }
   for (int i = 0; i < xrt_buffers_num; i++) {
-    xrt_buffer_object[i].sync(XCL_BO_SYNC_BO_TO_DEVICE, xrt_buffer_size[i], 0);
+
     DEBUG_PRINT("SYNC::XCL_BO_SYNC_BO_TO_DEVICE xrt_buffer_object[%d] "
                 "xrt_buffer_size[%ld]\n",
                 i, xrt_buffer_size[i]);
@@ -395,6 +395,18 @@ int GLAYxrtBufferHandlePerKernel::mapGLAYHostToDeviceBuffersPerKernel() {
   }
   return 0;
 }
+
+int GLAYxrtBufferHandlePerKernel::updateGLAYDeviceToHostBuffersPerKernel() {
+  for (int i = 0; i < xrt_buffers_num; i++) {
+    if (xrt_buffer_sync.test(i)) // Check if sync is enabled
+    {
+      xrt_buffer_object[i].write(xrt_buffer_host[i], xrt_buffer_size[i], 0);
+      xrt_buffer_object[i].sync(XCL_BO_SYNC_BO_TO_DEVICE, xrt_buffer_size[i], 0);
+    }
+  }
+  return 0;
+}
+
 
 int GLAYxrtBufferHandlePerKernel::readGLAYDeviceToHostBuffersPerKernel() {
   for (int i = 0; i < xrt_buffers_num; i++) {

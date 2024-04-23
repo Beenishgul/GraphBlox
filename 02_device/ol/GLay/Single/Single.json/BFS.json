@@ -86,7 +86,7 @@
                 },
                 "mode_cache": {
                     "bits": "4",
-                    "value": "0xF"
+                    "value": "0x3"
                 },
                 "op_bundle": {
                     "bits": "8",

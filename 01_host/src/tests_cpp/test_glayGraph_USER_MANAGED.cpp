@@ -56,11 +56,11 @@ void multiple_iteration_PR(struct GraphCSR *graph,
                            struct GraphAuxiliary *graphAuxiliary,
                            struct Arguments *arguments, struct Timer *timer);
 void initialize_SPMV_auxiliary_struct(struct GraphCSR *graph,
-                                    struct GraphAuxiliary *graphAuxiliary,
-                                    struct Arguments *arguments);
+                                      struct GraphAuxiliary *graphAuxiliary,
+                                      struct Arguments *arguments);
 void multiple_iteration_SPMV(struct GraphCSR *graph,
-                           struct GraphAuxiliary *graphAuxiliary,
-                           struct Arguments *arguments, struct Timer *timer);
+                             struct GraphAuxiliary *graphAuxiliary,
+                             struct Arguments *arguments, struct Timer *timer);
 void initialize_BFS_auxiliary_struct(struct GraphCSR *graph,
                                      struct GraphAuxiliary *graphAuxiliary,
                                      struct Arguments *arguments);
@@ -194,785 +194,792 @@ static struct argp_option options[] = {
      "\nHardware overlay algorithm configuration path file filename.ol.\n"},
     {"device-index", 'q', "[DEFAULT:0]\n", 0,
      "\nDevice ID of your target card use \"xbutil list\" command.\n"},
-    {0}};
+    {0}
+};
 
 /* Parse a single option. */
 static error_t parse_opt(int key, char *arg, struct argp_state *state) {
-  /* Get the input argument from argp_parse, which we
-     know is a pointer to our arguments structure. */
-  struct Arguments *arguments = (struct Arguments *)state->input;
+    /* Get the input argument from argp_parse, which we
+       know is a pointer to our arguments structure. */
+    struct Arguments *arguments = (struct Arguments *)state->input;
 
-  switch (key) {
-  case 'f':
-    arguments->fnameb = (char *)malloc((strlen(arg) + 10) * sizeof(char));
-    arguments->fnameb = strcpy(arguments->fnameb, arg);
-    break;
-  case 'F':
-    arguments->fnamel = (char *)malloc((strlen(arg) + 10) * sizeof(char));
-    arguments->fnamel = strcpy(arguments->fnamel, arg);
-    break;
-  case 'z':
-    arguments->fnameb_format = atoi(arg);
-    break;
-  case 'd':
-    arguments->datastructure = atoi(arg);
-    break;
-  case 'a':
-    arguments->algorithm = atoi(arg);
-    break;
-  case 'r':
-    arguments->source = atoi(arg);
-    break;
-  case 'n':
-    arguments->pre_numThreads = atoi(arg);
-    break;
-  case 'N':
-    arguments->algo_numThreads = atoi(arg);
-    break;
-  case 'K':
-    arguments->ker_numThreads = atoi(arg);
-    break;
-  case 'i':
-    arguments->iterations = atoi(arg);
-    break;
-  case 't':
-    arguments->trials = atoi(arg);
-    break;
-  case 'e':
-    arguments->epsilon = atof(arg);
-    break;
-  case 'p':
-    arguments->pushpull = atoi(arg);
-    break;
-  case 'o':
-    arguments->sort = atoi(arg);
-    break;
-  case 'l':
-    arguments->lmode = atoi(arg);
-    break;
-  case 'L':
-    arguments->lmode_l2 = atoi(arg);
-    break;
-  case 'O':
-    arguments->lmode_l3 = atoi(arg);
-    break;
-  case 'b':
-    arguments->delta = atoi(arg);
-    break;
-  case 's':
-    arguments->symmetric = 1;
-    break;
-  case 'S':
-    arguments->Sflag = 1;
-    break;
-  case 'w':
-    arguments->weighted = 1;
-    break;
-  case 'x':
-    arguments->xflag = 1;
-    break;
-  case 'c':
-    arguments->convert_format = atoi(arg);
-    break;
-  case 'C':
-    arguments->cache_size = atoi(arg);
-    break;
-  case 'g':
-    arguments->binSize = atoi(arg);
-    break;
-  case 'j':
-    arguments->verbosity = atoi(arg);
-    break;
-  case 'k':
-    arguments->dflag = 1;
-    break;
-  case 'M':
-    arguments->mmode = atoi(arg);
-    break;
-  case 'm':
-    arguments->device_index = atoi(arg);
-    break;
-  case 'Q':
-    arguments->kernel_name = (char *)malloc(strlen(arg) + 1 + 20);
+    switch (key) {
+    case 'f':
+        arguments->fnameb = (char *)malloc((strlen(arg) + 10) * sizeof(char));
+        arguments->fnameb = strcpy(arguments->fnameb, arg);
+        break;
+    case 'F':
+        arguments->fnamel = (char *)malloc((strlen(arg) + 10) * sizeof(char));
+        arguments->fnamel = strcpy(arguments->fnamel, arg);
+        break;
+    case 'z':
+        arguments->fnameb_format = atoi(arg);
+        break;
+    case 'd':
+        arguments->datastructure = atoi(arg);
+        break;
+    case 'a':
+        arguments->algorithm = atoi(arg);
+        break;
+    case 'r':
+        arguments->source = atoi(arg);
+        break;
+    case 'n':
+        arguments->pre_numThreads = atoi(arg);
+        break;
+    case 'N':
+        arguments->algo_numThreads = atoi(arg);
+        break;
+    case 'K':
+        arguments->ker_numThreads = atoi(arg);
+        break;
+    case 'i':
+        arguments->iterations = atoi(arg);
+        break;
+    case 't':
+        arguments->trials = atoi(arg);
+        break;
+    case 'e':
+        arguments->epsilon = atof(arg);
+        break;
+    case 'p':
+        arguments->pushpull = atoi(arg);
+        break;
+    case 'o':
+        arguments->sort = atoi(arg);
+        break;
+    case 'l':
+        arguments->lmode = atoi(arg);
+        break;
+    case 'L':
+        arguments->lmode_l2 = atoi(arg);
+        break;
+    case 'O':
+        arguments->lmode_l3 = atoi(arg);
+        break;
+    case 'b':
+        arguments->delta = atoi(arg);
+        break;
+    case 's':
+        arguments->symmetric = 1;
+        break;
+    case 'S':
+        arguments->Sflag = 1;
+        break;
+    case 'w':
+        arguments->weighted = 1;
+        break;
+    case 'x':
+        arguments->xflag = 1;
+        break;
+    case 'c':
+        arguments->convert_format = atoi(arg);
+        break;
+    case 'C':
+        arguments->cache_size = atoi(arg);
+        break;
+    case 'g':
+        arguments->binSize = atoi(arg);
+        break;
+    case 'j':
+        arguments->verbosity = atoi(arg);
+        break;
+    case 'k':
+        arguments->dflag = 1;
+        break;
+    case 'M':
+        arguments->mmode = atoi(arg);
+        break;
+    case 'm':
+        arguments->device_index = atoi(arg);
+        break;
+    case 'Q':
+        arguments->kernel_name = (char *)malloc(strlen(arg) + 1 + 20);
 
-    if (arguments->kernel_name == NULL) {
-      // Handle memory allocation failure
-      fprintf(stderr, "Memory allocation failed for kernel_name\n");
-      exit(1);
+        if (arguments->kernel_name == NULL) {
+            // Handle memory allocation failure
+            fprintf(stderr, "Memory allocation failed for kernel_name\n");
+            exit(1);
+        }
+
+        // Copy the arg string into kernel_name
+        strcpy(arguments->kernel_name, arg);
+
+        // Append "_1" to the string if ker_numThreads is greater than one
+        // if (arguments->ker_numThreads > 1)
+        // {
+        //     strcat(arguments->kernel_name, "_1");
+        // }
+        break;
+    case 'q':
+        arguments->xclbin_path = (char *)malloc((strlen(arg) + 20) * sizeof(char));
+        arguments->xclbin_path = strcpy(arguments->xclbin_path, arg);
+        break;
+    case 'X':
+        arguments->overlay_path = (char *)malloc((strlen(arg) + 20) * sizeof(char));
+        arguments->overlay_path = strcpy(arguments->overlay_path, arg);
+        break;
+
+    default:
+        return ARGP_ERR_UNKNOWN;
     }
-
-    // Copy the arg string into kernel_name
-    strcpy(arguments->kernel_name, arg);
-
-    // Append "_1" to the string if ker_numThreads is greater than one
-    // if (arguments->ker_numThreads > 1)
-    // {
-    //     strcat(arguments->kernel_name, "_1");
-    // }
-    break;
-  case 'q':
-    arguments->xclbin_path = (char *)malloc((strlen(arg) + 20) * sizeof(char));
-    arguments->xclbin_path = strcpy(arguments->xclbin_path, arg);
-    break;
-  case 'X':
-    arguments->overlay_path = (char *)malloc((strlen(arg) + 20) * sizeof(char));
-    arguments->overlay_path = strcpy(arguments->overlay_path, arg);
-    break;
-
-  default:
-    return ARGP_ERR_UNKNOWN;
-  }
-  return 0;
+    return 0;
 }
 
 static struct argp argp = {options, parse_opt, args_doc, doc};
 
 int main(int argc, char **argv) {
-  struct Arguments *arguments = argumentsNew();
-  struct Timer *timer = (struct Timer *)malloc(sizeof(struct Timer));
-  struct GraphCSR *graph;
+    struct Arguments *arguments = argumentsNew();
+    struct Timer *timer = (struct Timer *)malloc(sizeof(struct Timer));
+    struct GraphCSR *graph;
 
-  /* Default values. */
-  arguments->wflag = 0;
-  arguments->xflag = 0;
-  arguments->sflag = 0;
-  arguments->Sflag = 0;
-  arguments->dflag = 0;
-  arguments->binSize = 512;
-  arguments->verbosity = 0;
-  arguments->iterations = 20;
-  arguments->trials = 1;
-  arguments->epsilon = 0.0001;
-  arguments->source = 0;
-  arguments->algorithm = 0;
-  arguments->datastructure = 5;
-  arguments->pushpull = 0;
-  arguments->sort = 0;
-  arguments->mmode = 0;
-  arguments->cache_size =
-      32768; // 32KB for DBG reordering or GRID based structures
+    /* Default values. */
+    arguments->wflag = 0;
+    arguments->xflag = 0;
+    arguments->sflag = 0;
+    arguments->Sflag = 0;
+    arguments->dflag = 0;
+    arguments->binSize = 512;
+    arguments->verbosity = 0;
+    arguments->iterations = 20;
+    arguments->trials = 1;
+    arguments->epsilon = 0.0001;
+    arguments->source = 0;
+    arguments->algorithm = 0;
+    arguments->datastructure = 0;
+    arguments->pushpull = 0;
+    arguments->sort = 0;
+    arguments->mmode = 0;
+    arguments->cache_size =
+        32768; // 32KB for DBG reordering or GRID based structures
 
-  arguments->lmode = 0;
-  arguments->lmode_l2 = 0;
-  arguments->lmode_l3 = 0;
+    arguments->lmode = 0;
+    arguments->lmode_l2 = 0;
+    arguments->lmode_l3 = 0;
 
-  arguments->symmetric = 0;
-  arguments->weighted = 0;
-  arguments->delta = 1;
-  arguments->pre_numThreads = omp_get_max_threads();
-  arguments->algo_numThreads = omp_get_max_threads();
-  arguments->ker_numThreads = arguments->algo_numThreads;
-  arguments->fnameb = NULL;
-  arguments->fnamel = NULL;
-  arguments->fnameb_format = 1;
-  arguments->convert_format = 1;
-  initializeMersenneState(&(arguments->mt19937var), 27491095);
+    arguments->symmetric = 0;
+    arguments->weighted = 0;
+    arguments->delta = 1;
+    arguments->pre_numThreads = omp_get_max_threads();
+    arguments->algo_numThreads = omp_get_max_threads();
+    arguments->ker_numThreads = arguments->algo_numThreads;
+    arguments->fnameb = NULL;
+    arguments->fnamel = NULL;
+    arguments->fnameb_format = 1;
+    arguments->convert_format = 1;
+    initializeMersenneState(&(arguments->mt19937var), 27491095);
 
-  // GLay Xilinx Parameters
-  arguments->kernel_name = NULL;
-  arguments->device_index = 0;
-  arguments->xclbin_path = NULL;
-  arguments->overlay_path = NULL;
-  arguments->ctrl_mode = 0;
-  arguments->endian_read = 0;
-  arguments->endian_write = 0;
-  arguments->flush_cache = 1;
-  arguments->bankGroupIndex = 0;
+    // GLay Xilinx Parameters
+    arguments->kernel_name = NULL;
+    arguments->device_index = 0;
+    arguments->xclbin_path = NULL;
+    arguments->overlay_path = NULL;
+    arguments->ctrl_mode = 0;
+    arguments->endian_read = 0;
+    arguments->endian_write = 0;
+    arguments->flush_cache = 1;
+    arguments->bankGroupIndex = 0;
 
-  omp_set_nested(1);
-  argp_parse(&argp, argc, argv, 0, 0, arguments);
+    omp_set_nested(1);
+    argp_parse(&argp, argc, argv, 0, 0, arguments);
 
-  arguments->trials = 1;
-  if (arguments->dflag)
-    arguments->sort = 1;
+    arguments->trials = 1;
+    if (arguments->dflag)
+        arguments->sort = 1;
 
-  arguments->ctrl_mode = 0;
+    arguments->ctrl_mode = 0;
 
-  struct GraphAuxiliary *graphAuxiliary =
-      (struct GraphAuxiliary *)my_malloc(sizeof(struct GraphAuxiliary));
+    struct GraphAuxiliary *graphAuxiliary =
+        (struct GraphAuxiliary *)my_malloc(sizeof(struct GraphAuxiliary));
 
-  arguments->datastructure = 5;
-  struct GraphCSRSegments *graphSegments =
-      (struct GraphCSRSegments *)generateGraphDataStructure(arguments);
+    arguments->datastructure = 0;
+    // uint32_t seg_num =  (graphSegments->csrSegments->num_segments);
+    // struct GraphCSRSegments *graphSegments =
+    //     (struct GraphCSRSegments *)generateGraphDataStructure(arguments);
 
-  for (uint32_t i = 0; i < (graphSegments->csrSegments->num_segments); ++i) {
+    uint32_t seg_num =  1;
+    graph =  (struct GraphCSR *)generateGraphDataStructure(arguments);
 
-    graph =
-        (struct GraphCSR *)(graphSegments->csrSegments->segments[i].graphCSR);
+    for (uint32_t i = 0; i < (seg_num); ++i) {
 
-    switch (arguments->algorithm) {
-    case 0: // bfs
-    {
-      // struct BFSStats *stats = runBreadthFirstSearchAlgorithm(arguments,
-      // graph);
-      initialize_BFS_auxiliary_struct(graph, graphAuxiliary, arguments);
-      multiple_iteration_BFS(graph, graphAuxiliary, arguments, timer);
-      // freeBFSStats(stats);
-    } break;
-    case 1: // pagerank
-    {
-      // struct PageRankStats *stats = runPageRankAlgorithm(arguments, graph);
-      initialize_PR_auxiliary_struct(graph, graphAuxiliary, arguments);
-      multiple_iteration_PR(graph, graphAuxiliary, arguments, timer);
-      // freePageRankStats(stats);
-    } break;
-    case 5: // SPMV
-    {
-      // struct SPMVStats *stats = runSPMVAlgorithm(arguments, graph);
-      initialize_SPMV_auxiliary_struct(graph, graphAuxiliary, arguments);
-      multiple_iteration_SPMV(graph, graphAuxiliary, arguments, timer);
-      // freeSPMVStats(stats);
-    } break;
-    case 6: // Connected Components (CC)
-    {
-      // struct CCStats *stats = runConnectedComponentsAlgorithm(arguments,
-      // graph);
-      initialize_CC_auxiliary_struct(graph, graphAuxiliary, arguments);
-      multiple_iteration_CC(graph, graphAuxiliary, arguments, timer);
-      // freeCCStats(stats);
-    } break;
-    case 8: // Triangle Counting
-    {
-      // struct TCStats *stats = runTriangleCountAlgorithm(arguments, graph);
-      initialize_TC_auxiliary_struct(graph, graphAuxiliary, arguments);
-      multiple_iteration_TC(graph, graphAuxiliary, arguments, timer);
-      // freeTCStats(stats);
-    } break;
-    default: // BFS
-    {
-      // struct BFSStats *stats = runBreadthFirstSearchAlgorithm(arguments,
-      // graph);
-      initialize_BFS_auxiliary_struct(graph, graphAuxiliary, arguments);
-      multiple_iteration_BFS(graph, graphAuxiliary, arguments, timer);
-      // freeBFSStats(stats);
-    } break;
+        // graph =
+        //     (struct GraphCSR *)(graphSegments->csrSegments->segments[i].graphCSR);
+
+        switch (arguments->algorithm) {
+        case 0: // bfs
+        {
+            // struct BFSStats *stats = runBreadthFirstSearchAlgorithm(arguments,
+            // graph);
+            initialize_BFS_auxiliary_struct(graph, graphAuxiliary, arguments);
+            multiple_iteration_BFS(graph, graphAuxiliary, arguments, timer);
+            // freeBFSStats(stats);
+        } break;
+        case 1: // pagerank
+        {
+            // struct PageRankStats *stats = runPageRankAlgorithm(arguments, graph);
+            initialize_PR_auxiliary_struct(graph, graphAuxiliary, arguments);
+            multiple_iteration_PR(graph, graphAuxiliary, arguments, timer);
+            // freePageRankStats(stats);
+        } break;
+        case 5: // SPMV
+        {
+            // struct SPMVStats *stats = runSPMVAlgorithm(arguments, graph);
+            initialize_SPMV_auxiliary_struct(graph, graphAuxiliary, arguments);
+            multiple_iteration_SPMV(graph, graphAuxiliary, arguments, timer);
+            // freeSPMVStats(stats);
+        } break;
+        case 6: // Connected Components (CC)
+        {
+            // struct CCStats *stats = runConnectedComponentsAlgorithm(arguments,
+            // graph);
+            initialize_CC_auxiliary_struct(graph, graphAuxiliary, arguments);
+            multiple_iteration_CC(graph, graphAuxiliary, arguments, timer);
+            // freeCCStats(stats);
+        } break;
+        case 8: // Triangle Counting
+        {
+            // struct TCStats *stats = runTriangleCountAlgorithm(arguments, graph);
+            initialize_TC_auxiliary_struct(graph, graphAuxiliary, arguments);
+            multiple_iteration_TC(graph, graphAuxiliary, arguments, timer);
+            // freeTCStats(stats);
+        } break;
+        default: // BFS
+        {
+            // struct BFSStats *stats = runBreadthFirstSearchAlgorithm(arguments,
+            // graph);
+            initialize_BFS_auxiliary_struct(graph, graphAuxiliary, arguments);
+            multiple_iteration_BFS(graph, graphAuxiliary, arguments, timer);
+            // freeBFSStats(stats);
+        } break;
+        }
     }
-  }
 
-  // releaseGLAY();
-  free(timer);
-  free_auxiliary_struct(graphAuxiliary);
-  freeGraphDataStructure((void *)graphSegments, arguments->datastructure);
-  argumentsFree(arguments);
-  exit(0);
+    // releaseGLAY();
+    free(timer);
+    free_auxiliary_struct(graphAuxiliary);
+    freeGraphDataStructure((void *)graph, arguments->datastructure);
+    argumentsFree(arguments);
+    exit(0);
 }
 
 void multiple_iteration_PR(struct GraphCSR *graph,
                            struct GraphAuxiliary *graphAuxiliary,
                            struct Arguments *arguments, struct Timer *timer) {
-  GLAYxrtBufferHandlePerKernel *glayGraphCSRxrtBufferHandlePerKernel;
-  Start(timer);
-  printf("-----------------------------------------------------\n");
-  printf(" Start PR Iterations\n");
-  printf("-----------------------------------------------------\n");
-  glayGraphCSRxrtBufferHandlePerKernel =
-      new GLAYxrtBufferHandlePerKernel(arguments, graph, graphAuxiliary);
-  glayGraphCSRxrtBufferHandlePerKernel->setupGLAY();
-  glayGraphCSRxrtBufferHandlePerKernel->printGLAYxrtBufferHandlePerKernel();
-  printf("-----------------------------------------------------\n");
-  printf(" setupGLAYUserManaged\n");
-  printf("-----------------------------------------------------\n");
+    GLAYxrtBufferHandlePerKernel *glayGraphCSRxrtBufferHandlePerKernel;
+    Start(timer);
+    printf("-----------------------------------------------------\n");
+    printf(" Start PR Iterations\n");
+    printf("-----------------------------------------------------\n");
+    glayGraphCSRxrtBufferHandlePerKernel =
+        new GLAYxrtBufferHandlePerKernel(arguments, graph, graphAuxiliary);
+    glayGraphCSRxrtBufferHandlePerKernel->setupGLAY();
+    glayGraphCSRxrtBufferHandlePerKernel->printGLAYxrtBufferHandlePerKernel();
+    printf("-----------------------------------------------------\n");
+    printf(" setupGLAYUserManaged\n");
+    printf("-----------------------------------------------------\n");
 
-  glayGraphCSRxrtBufferHandlePerKernel->startGLAY();
-  Stop(timer);
-  printf(" -----------------------------------------------------\n");
-  printf("| %-9s | \n", "Setup Time (S)");
-  printf(" -----------------------------------------------------\n");
-  printf("| %-9f | \n", Seconds(timer));
-  printf(" -----------------------------------------------------\n");
+    glayGraphCSRxrtBufferHandlePerKernel->startGLAY();
+    Stop(timer);
+    printf(" -----------------------------------------------------\n");
+    printf("| %-9s | \n", "Setup Time (S)");
+    printf(" -----------------------------------------------------\n");
+    printf("| %-9f | \n", Seconds(timer));
+    printf(" -----------------------------------------------------\n");
 
-  Start(timer);
-  glayGraphCSRxrtBufferHandlePerKernel->waitGLAY();
-  Stop(timer);
-  printf(" -----------------------------------------------------\n");
-  printf("| %-9s | \n", "Algorithm Time (S)");
-  printf(" -----------------------------------------------------\n");
-  printf("| %-9f | \n", Seconds(timer));
-  printf(" -----------------------------------------------------\n");
+    Start(timer);
+    glayGraphCSRxrtBufferHandlePerKernel->waitGLAY();
+    Stop(timer);
+    printf(" -----------------------------------------------------\n");
+    printf("| %-9s | \n", "Algorithm Time (S)");
+    printf(" -----------------------------------------------------\n");
+    printf("| %-9f | \n", Seconds(timer));
+    printf(" -----------------------------------------------------\n");
 
-  Start(timer);
-  glayGraphCSRxrtBufferHandlePerKernel->readGLAYDeviceToHostBuffersPerKernel();
-  Stop(timer);
-  printf(" -----------------------------------------------------\n");
-  printf("| %-9s | \n", "Result Time (S)");
-  printf(" -----------------------------------------------------\n");
-  printf("| %-9f | \n", Seconds(timer));
-  printf(" -----------------------------------------------------\n");
+    Start(timer);
+    glayGraphCSRxrtBufferHandlePerKernel->readGLAYDeviceToHostBuffersPerKernel();
+    Stop(timer);
+    printf(" -----------------------------------------------------\n");
+    printf("| %-9s | \n", "Result Time (S)");
+    printf(" -----------------------------------------------------\n");
+    printf("| %-9f | \n", Seconds(timer));
+    printf(" -----------------------------------------------------\n");
 
-  struct Vertex *vertices = NULL;
-  // struct EdgeList *sorted_edges_array = NULL;
+    struct Vertex *vertices = NULL;
+    // struct EdgeList *sorted_edges_array = NULL;
 
 #if DIRECTED
-  vertices = graph->inverse_vertices;
-  // sorted_edges_array = graph->inverse_sorted_edges_array;
+    vertices = graph->inverse_vertices;
+    // sorted_edges_array = graph->inverse_sorted_edges_array;
 #else
-  vertices = graph->vertices;
-  // sorted_edges_array = graph->sorted_edges_array;
+    vertices = graph->vertices;
+    // sorted_edges_array = graph->sorted_edges_array;
 #endif
 
-  for (uint32_t i = 0; i < graph->num_vertices; i++) {
+    for (uint32_t i = 0; i < graph->num_vertices; i++) {
 
-    if (static_cast<uint32_t *>(
-            graphAuxiliary->auxiliary_2)[i + graph->num_vertices] !=
-        vertices->out_degree[i]) {
-      DEBUG_PRINT("%u %u \n",
-                  static_cast<uint32_t *>(
-                      graphAuxiliary->auxiliary_2)[i + graph->num_vertices],
-                  vertices->out_degree[i]);
+        if (static_cast<uint32_t *>(
+                graphAuxiliary->auxiliary_2)[i + graph->num_vertices] !=
+            vertices->out_degree[i]) {
+            DEBUG_PRINT("%u %u \n",
+                        static_cast<uint32_t *>(
+                        graphAuxiliary->auxiliary_2)[i + graph->num_vertices],
+                        vertices->out_degree[i]);
+        }
     }
-  }
-  DEBUG_PRINT(" -----------------------------------------------------\n");
+    DEBUG_PRINT(" -----------------------------------------------------\n");
 }
 
 void multiple_iteration_SPMV(struct GraphCSR *graph,
                              struct GraphAuxiliary *graphAuxiliary,
                              struct Arguments *arguments, struct Timer *timer) {
-  GLAYxrtBufferHandlePerKernel *glayGraphCSRxrtBufferHandlePerKernel;
-  Start(timer);
-  printf("-----------------------------------------------------\n");
-  printf(" Start SPMV Iterations\n");
-  printf("-----------------------------------------------------\n");
-  glayGraphCSRxrtBufferHandlePerKernel =
-      new GLAYxrtBufferHandlePerKernel(arguments, graph, graphAuxiliary);
-  glayGraphCSRxrtBufferHandlePerKernel->setupGLAY();
-  glayGraphCSRxrtBufferHandlePerKernel->printGLAYxrtBufferHandlePerKernel();
-  printf("-----------------------------------------------------\n");
-  printf(" setupGLAYUserManaged\n");
-  printf("-----------------------------------------------------\n");
+    GLAYxrtBufferHandlePerKernel *glayGraphCSRxrtBufferHandlePerKernel;
+    Start(timer);
+    printf("-----------------------------------------------------\n");
+    printf(" Start SPMV Iterations\n");
+    printf("-----------------------------------------------------\n");
+    glayGraphCSRxrtBufferHandlePerKernel =
+        new GLAYxrtBufferHandlePerKernel(arguments, graph, graphAuxiliary);
+    glayGraphCSRxrtBufferHandlePerKernel->setupGLAY();
+    glayGraphCSRxrtBufferHandlePerKernel->printGLAYxrtBufferHandlePerKernel();
+    printf("-----------------------------------------------------\n");
+    printf(" setupGLAYUserManaged\n");
+    printf("-----------------------------------------------------\n");
 
-  glayGraphCSRxrtBufferHandlePerKernel->startGLAY();
-  Stop(timer);
-  printf(" -----------------------------------------------------\n");
-  printf("| %-9s | \n", "Setup Time (S)");
-  printf(" -----------------------------------------------------\n");
-  printf("| %-9f | \n", Seconds(timer));
-  printf(" -----------------------------------------------------\n");
+    glayGraphCSRxrtBufferHandlePerKernel->startGLAY();
+    Stop(timer);
+    printf(" -----------------------------------------------------\n");
+    printf("| %-9s | \n", "Setup Time (S)");
+    printf(" -----------------------------------------------------\n");
+    printf("| %-9f | \n", Seconds(timer));
+    printf(" -----------------------------------------------------\n");
 
-  Start(timer);
-  glayGraphCSRxrtBufferHandlePerKernel->waitGLAY();
-  Stop(timer);
-  printf(" -----------------------------------------------------\n");
-  printf("| %-9s | \n", "Algorithm Time (S)");
-  printf(" -----------------------------------------------------\n");
-  printf("| %-9f | \n", Seconds(timer));
-  printf(" -----------------------------------------------------\n");
+    Start(timer);
+    glayGraphCSRxrtBufferHandlePerKernel->waitGLAY();
+    Stop(timer);
+    printf(" -----------------------------------------------------\n");
+    printf("| %-9s | \n", "Algorithm Time (S)");
+    printf(" -----------------------------------------------------\n");
+    printf("| %-9f | \n", Seconds(timer));
+    printf(" -----------------------------------------------------\n");
 
-  Start(timer);
-  glayGraphCSRxrtBufferHandlePerKernel->readGLAYDeviceToHostBuffersPerKernel();
-  Stop(timer);
-  printf(" -----------------------------------------------------\n");
-  printf("| %-9s | \n", "Result Time (S)");
-  printf(" -----------------------------------------------------\n");
-  printf("| %-9f | \n", Seconds(timer));
-  printf(" -----------------------------------------------------\n");
+    Start(timer);
+    glayGraphCSRxrtBufferHandlePerKernel->readGLAYDeviceToHostBuffersPerKernel();
+    Stop(timer);
+    printf(" -----------------------------------------------------\n");
+    printf("| %-9s | \n", "Result Time (S)");
+    printf(" -----------------------------------------------------\n");
+    printf("| %-9f | \n", Seconds(timer));
+    printf(" -----------------------------------------------------\n");
 
-  struct Vertex *vertices = NULL;
-  // struct EdgeList *sorted_edges_array = NULL;
+    struct Vertex *vertices = NULL;
+    // struct EdgeList *sorted_edges_array = NULL;
 
 #if DIRECTED
-  vertices = graph->inverse_vertices;
-  // sorted_edges_array = graph->inverse_sorted_edges_array;
+    vertices = graph->inverse_vertices;
+    // sorted_edges_array = graph->inverse_sorted_edges_array;
 #else
-  vertices = graph->vertices;
-  // sorted_edges_array = graph->sorted_edges_array;
+    vertices = graph->vertices;
+    // sorted_edges_array = graph->sorted_edges_array;
 #endif
 
-  for (uint32_t i = 0; i < graph->num_vertices; i++) {
+    for (uint32_t i = 0; i < graph->num_vertices; i++) {
 
-    if (static_cast<uint32_t *>(
-            graphAuxiliary->auxiliary_2)[i + graph->num_vertices] !=
-        vertices->out_degree[i]) {
-      DEBUG_PRINT("%u %u \n",
-                  static_cast<uint32_t *>(
-                      graphAuxiliary->auxiliary_2)[i + graph->num_vertices],
-                  vertices->out_degree[i]);
+        if (static_cast<uint32_t *>(
+                graphAuxiliary->auxiliary_2)[i + graph->num_vertices] !=
+            vertices->out_degree[i]) {
+            DEBUG_PRINT("%u %u \n",
+                        static_cast<uint32_t *>(
+                        graphAuxiliary->auxiliary_2)[i + graph->num_vertices],
+                        vertices->out_degree[i]);
+        }
     }
-  }
-  DEBUG_PRINT(" -----------------------------------------------------\n");
+    DEBUG_PRINT(" -----------------------------------------------------\n");
 }
 
 void multiple_iteration_TC(struct GraphCSR *graph,
                            struct GraphAuxiliary *graphAuxiliary,
                            struct Arguments *arguments, struct Timer *timer) {
-  uint32_t count = 0;
-  GLAYxrtBufferHandlePerKernel *glayGraphCSRxrtBufferHandlePerKernel;
-  Start(timer);
-  printf("-----------------------------------------------------\n");
-  printf(" Start TC Iterations\n");
-  printf("-----------------------------------------------------\n");
-  glayGraphCSRxrtBufferHandlePerKernel =
-      new GLAYxrtBufferHandlePerKernel(arguments, graph, graphAuxiliary);
-  glayGraphCSRxrtBufferHandlePerKernel->setupGLAY();
-  glayGraphCSRxrtBufferHandlePerKernel->printGLAYxrtBufferHandlePerKernel();
-  printf(" setupGLAYUserManaged\n");
-  printf("-----------------------------------------------------\n");
-  glayGraphCSRxrtBufferHandlePerKernel->startGLAY();
-  Stop(timer);
-  printf(" -----------------------------------------------------\n");
-  printf("| %-9s | \n", "Setup Time (S)");
-  printf(" -----------------------------------------------------\n");
-  printf("| %-9f | \n", Seconds(timer));
-  printf(" -----------------------------------------------------\n");
+    uint32_t count = 0;
+    GLAYxrtBufferHandlePerKernel *glayGraphCSRxrtBufferHandlePerKernel;
+    Start(timer);
+    printf("-----------------------------------------------------\n");
+    printf(" Start TC Iterations\n");
+    printf("-----------------------------------------------------\n");
+    glayGraphCSRxrtBufferHandlePerKernel =
+        new GLAYxrtBufferHandlePerKernel(arguments, graph, graphAuxiliary);
+    glayGraphCSRxrtBufferHandlePerKernel->setupGLAY();
+    glayGraphCSRxrtBufferHandlePerKernel->printGLAYxrtBufferHandlePerKernel();
+    printf(" setupGLAYUserManaged\n");
+    printf("-----------------------------------------------------\n");
+    glayGraphCSRxrtBufferHandlePerKernel->startGLAY();
+    Stop(timer);
+    printf(" -----------------------------------------------------\n");
+    printf("| %-9s | \n", "Setup Time (S)");
+    printf(" -----------------------------------------------------\n");
+    printf("| %-9f | \n", Seconds(timer));
+    printf(" -----------------------------------------------------\n");
 
-  Start(timer);
-  glayGraphCSRxrtBufferHandlePerKernel->waitGLAY();
-  Stop(timer);
-  printf(" -----------------------------------------------------\n");
-  printf("| %-9s | \n", "Algorithm Time (S)");
-  printf(" -----------------------------------------------------\n");
-  printf("| %-9f | \n", Seconds(timer));
-  printf(" -----------------------------------------------------\n");
+    Start(timer);
+    glayGraphCSRxrtBufferHandlePerKernel->waitGLAY();
+    Stop(timer);
+    printf(" -----------------------------------------------------\n");
+    printf("| %-9s | \n", "Algorithm Time (S)");
+    printf(" -----------------------------------------------------\n");
+    printf("| %-9f | \n", Seconds(timer));
+    printf(" -----------------------------------------------------\n");
 
-  Start(timer);
-  glayGraphCSRxrtBufferHandlePerKernel->readGLAYDeviceToHostBuffersPerKernel();
-  Stop(timer);
-  printf(" -----------------------------------------------------\n");
-  printf("| %-9s | \n", "Result Time (S)");
-  printf(" -----------------------------------------------------\n");
-  printf("| %-9f | \n", Seconds(timer));
-  printf(" -----------------------------------------------------\n");
-  for (uint32_t i = 0; i < graph->num_vertices; i++) {
-    DEBUG_PRINT("%u \n",
-                static_cast<uint32_t *>(
+    Start(timer);
+    glayGraphCSRxrtBufferHandlePerKernel->readGLAYDeviceToHostBuffersPerKernel();
+    Stop(timer);
+    printf(" -----------------------------------------------------\n");
+    printf("| %-9s | \n", "Result Time (S)");
+    printf(" -----------------------------------------------------\n");
+    printf("| %-9f | \n", Seconds(timer));
+    printf(" -----------------------------------------------------\n");
+    for (uint32_t i = 0; i < graph->num_vertices; i++) {
+        DEBUG_PRINT("%u \n",
+                    static_cast<uint32_t *>(
                     graphAuxiliary->auxiliary_2)[i + graph->num_vertices]);
-  }
-  DEBUG_PRINT(" -----------------------------------------------------\n");
+    }
+    DEBUG_PRINT(" -----------------------------------------------------\n");
 
-  count = static_cast<uint32_t *>(graphAuxiliary->auxiliary_2)[1];
-  printf("| count %-9u | \n", count);
-  printf(" -----------------------------------------------------\n");
+    count = static_cast<uint32_t *>(graphAuxiliary->auxiliary_2)[1];
+    printf("| count %-9u | \n", count);
+    printf(" -----------------------------------------------------\n");
 }
 
 void multiple_iteration_BFS(struct GraphCSR *graph,
                             struct GraphAuxiliary *graphAuxiliary,
                             struct Arguments *arguments, struct Timer *timer) {
-  uint32_t frontier = 1;
-  GLAYxrtBufferHandlePerKernel *glayGraphCSRxrtBufferHandlePerKernel;
-  printf("-----------------------------------------------------\n");
-  printf(" Start BFS Iterations\n");
-  printf("-----------------------------------------------------\n");
-  do {
-    frontier = 0;
-    Start(timer);
+    uint32_t frontier = 1;
+    GLAYxrtBufferHandlePerKernel *glayGraphCSRxrtBufferHandlePerKernel;
     glayGraphCSRxrtBufferHandlePerKernel =
         new GLAYxrtBufferHandlePerKernel(arguments, graph, graphAuxiliary);
     glayGraphCSRxrtBufferHandlePerKernel->setupGLAY();
     glayGraphCSRxrtBufferHandlePerKernel->printGLAYxrtBufferHandlePerKernel();
-    printf(" setupGLAYUserManaged\n");
     printf("-----------------------------------------------------\n");
+    printf(" Start BFS Iterations\n");
+    printf("-----------------------------------------------------\n");
+    do {
+        frontier = 0;
+        Start(timer);
+        printf(" setupGLAYUserManaged\n");
+        printf("-----------------------------------------------------\n");
 
-    glayGraphCSRxrtBufferHandlePerKernel->startGLAY();
-    Stop(timer);
-    printf(" -----------------------------------------------------\n");
-    printf("| %-9s | \n", "Setup Time (S)");
-    printf(" -----------------------------------------------------\n");
-    printf("| %-9f | \n", Seconds(timer));
-    printf(" -----------------------------------------------------\n");
+        glayGraphCSRxrtBufferHandlePerKernel->startGLAY();
+        Stop(timer);
+        printf(" -----------------------------------------------------\n");
+        printf("| %-9s | \n", "Setup Time (S)");
+        printf(" -----------------------------------------------------\n");
+        printf("| %-9f | \n", Seconds(timer));
+        printf(" -----------------------------------------------------\n");
 
-    Start(timer);
-    glayGraphCSRxrtBufferHandlePerKernel->waitGLAY();
-    Stop(timer);
-    printf(" -----------------------------------------------------\n");
-    printf("| %-9s | \n", "Algorithm Time (S)");
-    printf(" -----------------------------------------------------\n");
-    printf("| %-9f | \n", Seconds(timer));
-    printf(" -----------------------------------------------------\n");
+        Start(timer);
+        glayGraphCSRxrtBufferHandlePerKernel->waitGLAY();
+        Stop(timer);
+        printf(" -----------------------------------------------------\n");
+        printf("| %-9s | \n", "Algorithm Time (S)");
+        printf(" -----------------------------------------------------\n");
+        printf("| %-9f | \n", Seconds(timer));
+        printf(" -----------------------------------------------------\n");
 
-    Start(timer);
-    glayGraphCSRxrtBufferHandlePerKernel
+        Start(timer);
+        glayGraphCSRxrtBufferHandlePerKernel
         ->readGLAYDeviceToHostBuffersPerKernel();
-    Stop(timer);
-    printf(" -----------------------------------------------------\n");
-    printf("| %-9s | \n", "Result Time (S)");
-    printf(" -----------------------------------------------------\n");
-    printf("| %-9f | \n", Seconds(timer));
-    printf(" -----------------------------------------------------\n");
-    for (uint32_t i = 0; i < graph->num_vertices; i++) {
-      // DEBUG_PRINT("%u \n",
-      //             static_cast<uint32_t *>(graphAuxiliary->auxiliary_1)[i]);
-      frontier += static_cast<uint32_t *>(
-          graphAuxiliary->auxiliary_2)[graph->num_vertices + i];
-      static_cast<uint32_t *>(
-          graphAuxiliary->auxiliary_1)[graph->num_vertices + i] =
-          static_cast<uint32_t *>(
-              graphAuxiliary->auxiliary_2)[graph->num_vertices + i];
-      static_cast<uint32_t *>(
-          graphAuxiliary->auxiliary_2)[graph->num_vertices + i] = 0;
-    }
-    printf("| %-9u | \n", frontier);
-    printf(" -----------------------------------------------------\n");
-  } while (frontier);
+        Stop(timer);
+        printf(" -----------------------------------------------------\n");
+        printf("| %-9s | \n", "Result Time (S)");
+        printf(" -----------------------------------------------------\n");
+        printf("| %-9f | \n", Seconds(timer));
+        printf(" -----------------------------------------------------\n");
+        for (uint32_t i = 0; i < graph->num_vertices; i++) {
+            // DEBUG_PRINT("%u \n",
+            //             static_cast<uint32_t *>(graphAuxiliary->auxiliary_1)[i]);
+            frontier += static_cast<uint32_t *>(
+                graphAuxiliary->auxiliary_2)[graph->num_vertices + i];
+            static_cast<uint32_t *>(
+                graphAuxiliary->auxiliary_1)[graph->num_vertices + i] =
+                static_cast<uint32_t *>(
+                    graphAuxiliary->auxiliary_2)[graph->num_vertices + i];
+            static_cast<uint32_t *>(
+                graphAuxiliary->auxiliary_2)[graph->num_vertices + i] = 0;
+        }
+        printf("| %-9u | \n", frontier);
+        printf(" -----------------------------------------------------\n");
+        glayGraphCSRxrtBufferHandlePerKernel->updateGLAYDeviceToHostBuffersPerKernel();
+    } while (frontier);
 }
 
 void multiple_iteration_CC(struct GraphCSR *graph,
                            struct GraphAuxiliary *graphAuxiliary,
                            struct Arguments *arguments, struct Timer *timer) {
-  uint32_t change = 0;
-  GLAYxrtBufferHandlePerKernel *glayGraphCSRxrtBufferHandlePerKernel;
-  printf("-----------------------------------------------------\n");
-  printf(" Start CC Iterations\n");
-  printf("-----------------------------------------------------\n");
-  do {
-    change = 0;
-    Start(timer);
+    uint32_t change = 0;
+    GLAYxrtBufferHandlePerKernel *glayGraphCSRxrtBufferHandlePerKernel;
     glayGraphCSRxrtBufferHandlePerKernel =
         new GLAYxrtBufferHandlePerKernel(arguments, graph, graphAuxiliary);
     glayGraphCSRxrtBufferHandlePerKernel->setupGLAY();
     glayGraphCSRxrtBufferHandlePerKernel->printGLAYxrtBufferHandlePerKernel();
-    printf(" setupGLAYUserManaged\n");
     printf("-----------------------------------------------------\n");
-    glayGraphCSRxrtBufferHandlePerKernel->startGLAY();
-    Stop(timer);
-    printf(" -----------------------------------------------------\n");
-    printf("| %-9s | \n", "Setup Time (S)");
-    printf(" -----------------------------------------------------\n");
-    printf("| %-9f | \n", Seconds(timer));
-    printf(" -----------------------------------------------------\n");
+    printf(" Start CC Iterations\n");
+    printf("-----------------------------------------------------\n");
+    do {
+        change = 0;
+        Start(timer);
+        printf(" setupGLAYUserManaged\n");
+        printf("-----------------------------------------------------\n");
+        glayGraphCSRxrtBufferHandlePerKernel->startGLAY();
+        Stop(timer);
+        printf(" -----------------------------------------------------\n");
+        printf("| %-9s | \n", "Setup Time (S)");
+        printf(" -----------------------------------------------------\n");
+        printf("| %-9f | \n", Seconds(timer));
+        printf(" -----------------------------------------------------\n");
 
-    Start(timer);
-    glayGraphCSRxrtBufferHandlePerKernel->waitGLAY();
-    Stop(timer);
-    printf(" -----------------------------------------------------\n");
-    printf("| %-9s | \n", "Algorithm Time (S)");
-    printf(" -----------------------------------------------------\n");
-    printf("| %-9f | \n", Seconds(timer));
-    printf(" -----------------------------------------------------\n");
+        Start(timer);
+        glayGraphCSRxrtBufferHandlePerKernel->waitGLAY();
+        Stop(timer);
+        printf(" -----------------------------------------------------\n");
+        printf("| %-9s | \n", "Algorithm Time (S)");
+        printf(" -----------------------------------------------------\n");
+        printf("| %-9f | \n", Seconds(timer));
+        printf(" -----------------------------------------------------\n");
 
-    Start(timer);
-    glayGraphCSRxrtBufferHandlePerKernel
+        Start(timer);
+        glayGraphCSRxrtBufferHandlePerKernel
         ->readGLAYDeviceToHostBuffersPerKernel();
-    Stop(timer);
-    printf(" -----------------------------------------------------\n");
-    printf("| %-9s | \n", "Result Time (S)");
-    printf(" -----------------------------------------------------\n");
-    printf("| %-9f | \n", Seconds(timer));
-    printf(" -----------------------------------------------------\n");
-    for (uint32_t i = 0; i < graph->num_vertices; i++) {
-      DEBUG_PRINT("%u \n",
-                  static_cast<uint32_t *>(graphAuxiliary->auxiliary_1)[i]);
-    }
-    change = static_cast<uint32_t *>(graphAuxiliary->auxiliary_2)[1];
-    printf("| change %-9u | \n", change);
-    printf(" -----------------------------------------------------\n");
-  } while (change);
+        Stop(timer);
+        printf(" -----------------------------------------------------\n");
+        printf("| %-9s | \n", "Result Time (S)");
+        printf(" -----------------------------------------------------\n");
+        printf("| %-9f | \n", Seconds(timer));
+        printf(" -----------------------------------------------------\n");
+        for (uint32_t i = 0; i < graph->num_vertices; i++) {
+            // DEBUG_PRINT("%u \n",
+            //             static_cast<uint32_t *>(graphAuxiliary->auxiliary_1)[i]);
+        }
+        change = static_cast<uint32_t *>(graphAuxiliary->auxiliary_2)[1];
+        printf("| change %-9u | \n", change);
+        printf(" -----------------------------------------------------\n");
+        glayGraphCSRxrtBufferHandlePerKernel->updateGLAYDeviceToHostBuffersPerKernel();
+    } while (change);
 }
 
 void initialize_PR_auxiliary_struct(struct GraphCSR *graph,
                                     struct GraphAuxiliary *graphAuxiliary,
                                     struct Arguments *arguments) {
-  // Check for NULL pointer
-  if (graph == NULL) {
-    return;
-  }
+    // Check for NULL pointer
+    if (graph == NULL) {
+        return;
+    }
 
-  graphAuxiliary->num_auxiliary_1 = graph->num_vertices * 2;
-  graphAuxiliary->auxiliary_1 =
-      (uint32_t *)my_malloc(graphAuxiliary->num_auxiliary_1 * sizeof(uint32_t));
+    graphAuxiliary->num_auxiliary_1 = graph->num_vertices * 2;
+    graphAuxiliary->auxiliary_1 =
+        (uint32_t *)my_malloc(graphAuxiliary->num_auxiliary_1 * sizeof(uint32_t));
 
-  graphAuxiliary->num_auxiliary_2 = graph->num_vertices * 2;
-  graphAuxiliary->auxiliary_2 =
-      (uint32_t *)my_malloc(graphAuxiliary->num_auxiliary_2 * sizeof(uint32_t));
+    graphAuxiliary->num_auxiliary_2 = graph->num_vertices * 2;
+    graphAuxiliary->auxiliary_2 =
+        (uint32_t *)my_malloc(graphAuxiliary->num_auxiliary_2 * sizeof(uint32_t));
 
-  printf("-----------------------------------------------------\n");
-  printf(" Initialize PR Auxiliary Struct\n");
-  printf("-----------------------------------------------------\n");
+    printf("-----------------------------------------------------\n");
+    printf(" Initialize PR Auxiliary Struct\n");
+    printf("-----------------------------------------------------\n");
 // Backdoor fill the memory with the content.
 #pragma omp parallel for default(none) shared(graphAuxiliary, graph, arguments)
-  for (uint32_t i = 0; i < graphAuxiliary->num_auxiliary_1 / 2; i++) {
-    static_cast<uint32_t *>(graphAuxiliary->auxiliary_1)[i] = 0;
-  }
+    for (uint32_t i = 0; i < graphAuxiliary->num_auxiliary_1 / 2; i++) {
+        static_cast<uint32_t *>(graphAuxiliary->auxiliary_1)[i] = 0;
+    }
 #pragma omp parallel for default(none) shared(graphAuxiliary, graph, arguments)
-  for (uint32_t i = graphAuxiliary->num_auxiliary_1 / 2;
-       i < graphAuxiliary->num_auxiliary_1; i++) {
-    static_cast<uint32_t *>(graphAuxiliary->auxiliary_1)[i] = 1;
-  }
+    for (uint32_t i = graphAuxiliary->num_auxiliary_1 / 2;
+         i < graphAuxiliary->num_auxiliary_1; i++) {
+        static_cast<uint32_t *>(graphAuxiliary->auxiliary_1)[i] = 1;
+    }
 #pragma omp parallel for default(none) shared(graphAuxiliary, graph, arguments)
-  for (uint32_t i = 0; i < graphAuxiliary->num_auxiliary_2 / 2; i++) {
-    static_cast<uint32_t *>(graphAuxiliary->auxiliary_2)[i] = 0;
-  }
+    for (uint32_t i = 0; i < graphAuxiliary->num_auxiliary_2 / 2; i++) {
+        static_cast<uint32_t *>(graphAuxiliary->auxiliary_2)[i] = 0;
+    }
 #pragma omp parallel for default(none) shared(graphAuxiliary, graph, arguments)
-  for (uint32_t i = graphAuxiliary->num_auxiliary_2 / 2;
-       i < graphAuxiliary->num_auxiliary_2; i++) {
-    static_cast<uint32_t *>(graphAuxiliary->auxiliary_2)[i] = 0;
-  }
+    for (uint32_t i = graphAuxiliary->num_auxiliary_2 / 2;
+         i < graphAuxiliary->num_auxiliary_2; i++) {
+        static_cast<uint32_t *>(graphAuxiliary->auxiliary_2)[i] = 0;
+    }
 }
 
 void initialize_SPMV_auxiliary_struct(struct GraphCSR *graph,
                                       struct GraphAuxiliary *graphAuxiliary,
                                       struct Arguments *arguments) {
-  // Check for NULL pointer
-  if (graph == NULL) {
-    return;
-  }
+    // Check for NULL pointer
+    if (graph == NULL) {
+        return;
+    }
 
-  graphAuxiliary->num_auxiliary_1 = graph->num_vertices * 2;
-  graphAuxiliary->auxiliary_1 =
-      (uint32_t *)my_malloc(graphAuxiliary->num_auxiliary_1 * sizeof(uint32_t));
+    graphAuxiliary->num_auxiliary_1 = graph->num_vertices * 2;
+    graphAuxiliary->auxiliary_1 =
+        (uint32_t *)my_malloc(graphAuxiliary->num_auxiliary_1 * sizeof(uint32_t));
 
-  graphAuxiliary->num_auxiliary_2 = graph->num_vertices * 2;
-  graphAuxiliary->auxiliary_2 =
-      (uint32_t *)my_malloc(graphAuxiliary->num_auxiliary_2 * sizeof(uint32_t));
+    graphAuxiliary->num_auxiliary_2 = graph->num_vertices * 2;
+    graphAuxiliary->auxiliary_2 =
+        (uint32_t *)my_malloc(graphAuxiliary->num_auxiliary_2 * sizeof(uint32_t));
 
-  printf("-----------------------------------------------------\n");
-  printf(" Initialize PR Auxiliary Struct\n");
-  printf("-----------------------------------------------------\n");
+    printf("-----------------------------------------------------\n");
+    printf(" Initialize PR Auxiliary Struct\n");
+    printf("-----------------------------------------------------\n");
 // Backdoor fill the memory with the content.
 #pragma omp parallel for default(none) shared(graphAuxiliary, graph, arguments)
-  for (uint32_t i = 0; i < graphAuxiliary->num_auxiliary_1 / 2; i++) {
-    static_cast<uint32_t *>(graphAuxiliary->auxiliary_1)[i] = 0;
-  }
+    for (uint32_t i = 0; i < graphAuxiliary->num_auxiliary_1 / 2; i++) {
+        static_cast<uint32_t *>(graphAuxiliary->auxiliary_1)[i] = 0;
+    }
 #pragma omp parallel for default(none) shared(graphAuxiliary, graph, arguments)
-  for (uint32_t i = graphAuxiliary->num_auxiliary_1 / 2;
-       i < graphAuxiliary->num_auxiliary_1; i++) {
-    static_cast<uint32_t *>(graphAuxiliary->auxiliary_1)[i] = 1;
-  }
+    for (uint32_t i = graphAuxiliary->num_auxiliary_1 / 2;
+         i < graphAuxiliary->num_auxiliary_1; i++) {
+        static_cast<uint32_t *>(graphAuxiliary->auxiliary_1)[i] = 1;
+    }
 #pragma omp parallel for default(none) shared(graphAuxiliary, graph, arguments)
-  for (uint32_t i = 0; i < graphAuxiliary->num_auxiliary_2 / 2; i++) {
-    static_cast<uint32_t *>(graphAuxiliary->auxiliary_2)[i] = 0;
-  }
+    for (uint32_t i = 0; i < graphAuxiliary->num_auxiliary_2 / 2; i++) {
+        static_cast<uint32_t *>(graphAuxiliary->auxiliary_2)[i] = 0;
+    }
 #pragma omp parallel for default(none) shared(graphAuxiliary, graph, arguments)
-  for (uint32_t i = graphAuxiliary->num_auxiliary_2 / 2;
-       i < graphAuxiliary->num_auxiliary_2; i++) {
-    static_cast<uint32_t *>(graphAuxiliary->auxiliary_2)[i] = 0;
-  }
+    for (uint32_t i = graphAuxiliary->num_auxiliary_2 / 2;
+         i < graphAuxiliary->num_auxiliary_2; i++) {
+        static_cast<uint32_t *>(graphAuxiliary->auxiliary_2)[i] = 0;
+    }
 }
 
 void initialize_TC_auxiliary_struct(struct GraphCSR *graph,
                                     struct GraphAuxiliary *graphAuxiliary,
                                     struct Arguments *arguments) {
-  // Check for NULL pointer
-  if (graph == NULL) {
-    return;
-  }
-  printf("-----------------------------------------------------\n");
-  printf(" Initialize TC Auxiliary Struct\n");
-  printf("-----------------------------------------------------\n");
-  graphAuxiliary->num_auxiliary_1 = graph->num_vertices * 2;
-  graphAuxiliary->auxiliary_1 =
-      (uint32_t *)my_malloc(graphAuxiliary->num_auxiliary_1 * sizeof(uint32_t));
+    // Check for NULL pointer
+    if (graph == NULL) {
+        return;
+    }
+    printf("-----------------------------------------------------\n");
+    printf(" Initialize TC Auxiliary Struct\n");
+    printf("-----------------------------------------------------\n");
+    graphAuxiliary->num_auxiliary_1 = graph->num_vertices * 2;
+    graphAuxiliary->auxiliary_1 =
+        (uint32_t *)my_malloc(graphAuxiliary->num_auxiliary_1 * sizeof(uint32_t));
 
-  graphAuxiliary->num_auxiliary_2 = graph->num_vertices * 2;
-  graphAuxiliary->auxiliary_2 =
-      (uint32_t *)my_malloc(graphAuxiliary->num_auxiliary_2 * sizeof(uint32_t));
+    graphAuxiliary->num_auxiliary_2 = graph->num_vertices * 2;
+    graphAuxiliary->auxiliary_2 =
+        (uint32_t *)my_malloc(graphAuxiliary->num_auxiliary_2 * sizeof(uint32_t));
 
 // Backdoor fill the memory with the content.
 #pragma omp parallel for default(none) shared(graphAuxiliary, graph, arguments)
-  for (uint32_t i = 0; i < graphAuxiliary->num_auxiliary_1 / 2; i++) {
-    static_cast<uint32_t *>(graphAuxiliary->auxiliary_1)[i] = 0;
-  }
+    for (uint32_t i = 0; i < graphAuxiliary->num_auxiliary_1 / 2; i++) {
+        static_cast<uint32_t *>(graphAuxiliary->auxiliary_1)[i] = 0;
+    }
 #pragma omp parallel for default(none) shared(graphAuxiliary, graph, arguments)
-  for (uint32_t i = graphAuxiliary->num_auxiliary_1 / 2;
-       i < graphAuxiliary->num_auxiliary_1; i++) {
-    static_cast<uint32_t *>(graphAuxiliary->auxiliary_1)[i] = 0;
-  }
+    for (uint32_t i = graphAuxiliary->num_auxiliary_1 / 2;
+         i < graphAuxiliary->num_auxiliary_1; i++) {
+        static_cast<uint32_t *>(graphAuxiliary->auxiliary_1)[i] = 0;
+    }
 #pragma omp parallel for default(none) shared(graphAuxiliary, graph, arguments)
-  for (uint32_t i = 0; i < graphAuxiliary->num_auxiliary_2 / 2; i++) {
-    static_cast<uint32_t *>(graphAuxiliary->auxiliary_2)[i] = 0;
-  }
+    for (uint32_t i = 0; i < graphAuxiliary->num_auxiliary_2 / 2; i++) {
+        static_cast<uint32_t *>(graphAuxiliary->auxiliary_2)[i] = 0;
+    }
 #pragma omp parallel for default(none) shared(graphAuxiliary, graph, arguments)
-  for (uint32_t i = graphAuxiliary->num_auxiliary_2 / 2;
-       i < graphAuxiliary->num_auxiliary_2; i++) {
-    static_cast<uint32_t *>(graphAuxiliary->auxiliary_2)[i] = 0;
-  }
+    for (uint32_t i = graphAuxiliary->num_auxiliary_2 / 2;
+         i < graphAuxiliary->num_auxiliary_2; i++) {
+        static_cast<uint32_t *>(graphAuxiliary->auxiliary_2)[i] = 0;
+    }
 }
 
 void initialize_CC_auxiliary_struct(struct GraphCSR *graph,
                                     struct GraphAuxiliary *graphAuxiliary,
                                     struct Arguments *arguments) {
-  // Check for NULL pointer
-  if (graph == NULL) {
-    return;
-  }
-  printf("-----------------------------------------------------\n");
-  printf(" Initialize CC Auxiliary Struct\n");
-  printf("-----------------------------------------------------\n");
-  graphAuxiliary->num_auxiliary_1 = graph->num_vertices * 2;
-  graphAuxiliary->auxiliary_1 =
-      (uint32_t *)my_malloc(graphAuxiliary->num_auxiliary_1 * sizeof(uint32_t));
+    // Check for NULL pointer
+    if (graph == NULL) {
+        return;
+    }
+    printf("-----------------------------------------------------\n");
+    printf(" Initialize CC Auxiliary Struct\n");
+    printf("-----------------------------------------------------\n");
+    graphAuxiliary->num_auxiliary_1 = graph->num_vertices * 2;
+    graphAuxiliary->auxiliary_1 =
+        (uint32_t *)my_malloc(graphAuxiliary->num_auxiliary_1 * sizeof(uint32_t));
 
-  graphAuxiliary->num_auxiliary_2 = graph->num_vertices * 2;
-  graphAuxiliary->auxiliary_2 =
-      (uint32_t *)my_malloc(graphAuxiliary->num_auxiliary_2 * sizeof(uint32_t));
+    graphAuxiliary->num_auxiliary_2 = graph->num_vertices * 2;
+    graphAuxiliary->auxiliary_2 =
+        (uint32_t *)my_malloc(graphAuxiliary->num_auxiliary_2 * sizeof(uint32_t));
 
 // Backdoor fill the memory with the content.
 #pragma omp parallel for default(none) shared(graphAuxiliary, graph, arguments)
-  for (uint32_t i = 0; i < graphAuxiliary->num_auxiliary_1 / 2; i++) {
-    static_cast<uint32_t *>(graphAuxiliary->auxiliary_1)[i] = i;
-  }
+    for (uint32_t i = 0; i < graphAuxiliary->num_auxiliary_1 / 2; i++) {
+        static_cast<uint32_t *>(graphAuxiliary->auxiliary_1)[i] = i;
+    }
 #pragma omp parallel for default(none) shared(graphAuxiliary, graph, arguments)
-  for (uint32_t i = graphAuxiliary->num_auxiliary_1 / 2;
-       i < graphAuxiliary->num_auxiliary_1; i++) {
-    static_cast<uint32_t *>(graphAuxiliary->auxiliary_1)[i] = 0;
-  }
+    for (uint32_t i = graphAuxiliary->num_auxiliary_1 / 2;
+         i < graphAuxiliary->num_auxiliary_1; i++) {
+        static_cast<uint32_t *>(graphAuxiliary->auxiliary_1)[i] = 0;
+    }
 #pragma omp parallel for default(none) shared(graphAuxiliary, graph, arguments)
-  for (uint32_t i = 0; i < graphAuxiliary->num_auxiliary_2 / 2; i++) {
-    static_cast<uint32_t *>(graphAuxiliary->auxiliary_2)[i] = 0;
-  }
+    for (uint32_t i = 0; i < graphAuxiliary->num_auxiliary_2 / 2; i++) {
+        static_cast<uint32_t *>(graphAuxiliary->auxiliary_2)[i] = 0;
+    }
 #pragma omp parallel for default(none) shared(graphAuxiliary, graph, arguments)
-  for (uint32_t i = graphAuxiliary->num_auxiliary_2 / 2;
-       i < graphAuxiliary->num_auxiliary_2; i++) {
-    static_cast<uint32_t *>(graphAuxiliary->auxiliary_2)[i] = 0;
-  }
+    for (uint32_t i = graphAuxiliary->num_auxiliary_2 / 2;
+         i < graphAuxiliary->num_auxiliary_2; i++) {
+        static_cast<uint32_t *>(graphAuxiliary->auxiliary_2)[i] = 0;
+    }
 }
 
 void initialize_BFS_auxiliary_struct(struct GraphCSR *graph,
                                      struct GraphAuxiliary *graphAuxiliary,
                                      struct Arguments *arguments) {
-  // Check for NULL pointer
-  if (graph == NULL) {
-    return;
-  }
-  printf("-----------------------------------------------------\n");
-  printf(" Initialize BFS Auxiliary Struct\n");
-  printf("-----------------------------------------------------\n");
-  graphAuxiliary->num_auxiliary_1 = graph->num_vertices * 2;
-  graphAuxiliary->auxiliary_1 =
-      (uint32_t *)my_malloc(graphAuxiliary->num_auxiliary_1 * sizeof(uint32_t));
+    // Check for NULL pointer
+    if (graph == NULL) {
+        return;
+    }
+    printf("-----------------------------------------------------\n");
+    printf(" Initialize BFS Auxiliary Struct\n");
+    printf("-----------------------------------------------------\n");
+    graphAuxiliary->num_auxiliary_1 = graph->num_vertices * 2;
+    graphAuxiliary->auxiliary_1 =
+        (uint32_t *)my_malloc(graphAuxiliary->num_auxiliary_1 * sizeof(uint32_t));
 
-  graphAuxiliary->num_auxiliary_2 = graph->num_vertices * 2;
-  graphAuxiliary->auxiliary_2 =
-      (uint32_t *)my_malloc(graphAuxiliary->num_auxiliary_2 * sizeof(uint32_t));
+    graphAuxiliary->num_auxiliary_2 = graph->num_vertices * 2;
+    graphAuxiliary->auxiliary_2 =
+        (uint32_t *)my_malloc(graphAuxiliary->num_auxiliary_2 * sizeof(uint32_t));
 
 #pragma omp parallel for default(none) shared(graphAuxiliary, graph, arguments)
-  for (uint32_t i = 0; i < graph->num_vertices; i++) {
-    static_cast<uint32_t *>(graphAuxiliary->auxiliary_1)[i] = 0xFFFFFFFF;
+    for (uint32_t i = 0; i < graph->num_vertices; i++) {
+        static_cast<uint32_t *>(graphAuxiliary->auxiliary_1)[i] = 0xFFFFFFFF;
 
-    if (i == arguments->source)
-      static_cast<uint32_t *>(graphAuxiliary->auxiliary_1)[i] =
-          arguments->source;
-  }
+        if (i == arguments->source)
+            static_cast<uint32_t *>(graphAuxiliary->auxiliary_1)[i] =
+                arguments->source;
+    }
 #pragma omp parallel for default(none) shared(graphAuxiliary, graph, arguments)
-  for (uint32_t i = graph->num_vertices; i < graph->num_vertices * 2; i++) {
-    static_cast<uint32_t *>(graphAuxiliary->auxiliary_1)[i] = 0;
+    for (uint32_t i = graph->num_vertices; i < graph->num_vertices * 2; i++) {
+        static_cast<uint32_t *>(graphAuxiliary->auxiliary_1)[i] = 0;
 
-    if (i == (graph->num_vertices + arguments->source))
-      static_cast<uint32_t *>(graphAuxiliary->auxiliary_1)[i] = 1;
-  }
+        if (i == (graph->num_vertices + arguments->source))
+            static_cast<uint32_t *>(graphAuxiliary->auxiliary_1)[i] = 1;
+    }
 
 // optimization for BFS implentaion instead of -1 we use -out degree to for
 // hybrid approach counter
 #pragma omp parallel for default(none) shared(graphAuxiliary, graph, arguments)
-  for (uint32_t i = 0; i < graph->num_vertices; i++) {
-    static_cast<uint32_t *>(graphAuxiliary->auxiliary_2)[i] = 0xFFFFFFFF;
-  }
+    for (uint32_t i = 0; i < graph->num_vertices; i++) {
+        static_cast<uint32_t *>(graphAuxiliary->auxiliary_2)[i] = 0xFFFFFFFF;
+    }
 #pragma omp parallel for default(none) shared(graphAuxiliary, graph, arguments)
-  for (uint32_t i = graph->num_vertices; i < graph->num_vertices * 2; i++) {
-    static_cast<uint32_t *>(graphAuxiliary->auxiliary_2)[i] = 0;
-  }
+    for (uint32_t i = graph->num_vertices; i < graph->num_vertices * 2; i++) {
+        static_cast<uint32_t *>(graphAuxiliary->auxiliary_2)[i] = 0;
+    }
 }
 
 void free_auxiliary_struct(struct GraphAuxiliary *graphAuxiliary) {
-  if (graphAuxiliary) {
-    if (graphAuxiliary->auxiliary_1) {
-      free(graphAuxiliary->auxiliary_1); // Use free for memory allocated with
-                                         // aligned_alloc
+    if (graphAuxiliary) {
+        if (graphAuxiliary->auxiliary_1) {
+            free(graphAuxiliary->auxiliary_1); // Use free for memory allocated with
+                                               // aligned_alloc
+        }
+        if (graphAuxiliary->auxiliary_2) {
+            free(graphAuxiliary->auxiliary_2); // Use free for memory allocated with
+                                               // aligned_alloc
+        }
+        free(graphAuxiliary);
     }
-    if (graphAuxiliary->auxiliary_2) {
-      free(graphAuxiliary->auxiliary_2); // Use free for memory allocated with
-                                         // aligned_alloc
-    }
-    free(graphAuxiliary);
-  }
 }
 
 #ifdef __cplusplus
