@@ -6,7 +6,7 @@
 0x80000002 // entry_2    cacheline[  0][ 2] <32b>: shift.amount[0:30]=2 || shift.direction[31:31]=1
 0x00400004 // entry_3    cacheline[  0][ 3] <30b>: cmd[0:5]=CMD_MEM_WRITE || id_module[6:13]=0x00 || id_engine[14:21]=0x00 || id_channel[22:29]=buffer_8
 0x80000000 // entry_4    cacheline[  0][ 4] <32b>: id_cu[0:7]=0x00 || id_bundle[8:15]=0x00 || id_lane[16:23]=0x00 || id_buffer[24:31]=buffer_8
-0x000104F0 // entry_5    cacheline[  0][ 5] <24b>: const_mask[0:3]=0x0 || mode_cache[4:7]=0xF || op_bundle[8:15]=0x04 || op_lane[16:23]=0x01
+0x00010430 // entry_5    cacheline[  0][ 5] <24b>: const_mask[0:3]=0x0 || mode_cache[4:7]=0x3 || op_bundle[8:15]=0x04 || op_lane[16:23]=0x01
 0x00000000 // entry_6    cacheline[  0][ 6] <32b>: const_value[0:31]=0x00000000
 0x00002148 // entry_7    cacheline[  0][ 7] <16b>: field_1[0:3]=0x8 || field_2[4:7]=0x4 || field_3[8:11]=0x1 || field_4[12:15]=0x2
 0x00000000 // entry_8    cacheline[  0][ 8] <32b>: index_start[0:31]=0x00000000
