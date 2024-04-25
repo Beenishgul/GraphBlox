@@ -32,7 +32,9 @@ GraphBlox is a promising new approach to graph processing on FPGAs. It has the p
 
 ## Overview
 
-![Figure 3: GraphBlox, adding engines to be used for different Graph Algorithms same time](./04_docs/fig/design/figure31.svg "Figure 3: GraphBlox, adding engines to be used for different Graph Algorithms same time")
+![Figure 4: Proposed Vertex Processing Elements (PEs) for graph processing kernels.](./04_docs/fig/design/figure29.svg "Figure 4: Proposed Vertex Processing Elements (PEs) for graph processing kernels.")
+
+![Figure 2: GraphBlox, adding engines to be used for different Graph Algorithms same time](./04_docs/fig/design/figure31.svg "Figure 3: GraphBlox, adding engines to be used for different Graph Algorithms same time")
 
 # Installation and Dependencies
 
@@ -333,13 +335,11 @@ module for each engine, while an ALU handles simple mathematical
 operations if needed. Figure 4 displays the final analysis for BFS and
 the proposed Processing Elements (PEs).
 
-![Figure 2: Graph fundamental Compressed Sparse Row Matrix (CSR) structure](./04_docs/fig/design/figure2.svg "Figure 2: Graph fundamental Compressed Sparse Row Matrix (CSR) structure")
+![Figure 4: Graph fundamental Compressed Sparse Row Matrix (CSR) structure](./04_docs/fig/design/figure2.svg "Figure 2: Graph fundamental Compressed Sparse Row Matrix (CSR) structure")
 
 
-![Figure 4: BFS bottom-up approach, a graph kernel contains identifiable behaviors that can be abstracted into FPGA overlay engines. ](./04_docs/fig/design/figure4.svg "Figure 4: BFS bottom-up approach, a graph kernel contains identifiable behaviors that can be abstracted into FPGA overlay engines.")
+![Figure 5: BFS bottom-up approach, a graph kernel contains identifiable behaviors that can be abstracted into FPGA overlay engines. ](./04_docs/fig/design/figure4.svg "Figure 4: BFS bottom-up approach, a graph kernel contains identifiable behaviors that can be abstracted into FPGA overlay engines.")
 
-
-![Figure 4: Proposed Vertex Processing Elements (PEs) for graph processing kernels.](./04_docs/fig/design/figure29.svg "Figure 4: Proposed Vertex Processing Elements (PEs) for graph processing kernels.")
 
 
 GraphBlox Architecture 
