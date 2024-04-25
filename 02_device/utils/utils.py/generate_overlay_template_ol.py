@@ -1196,10 +1196,10 @@ def process_entries_json(output_program_path_ol, source_program_path_json):
     append_to_file(output_program_path_ol, f"// CU vector {cu_vector}")
 
 
-append_to_file(output_file_path_cpp, '#include "glayenv.hpp"')
+append_to_file(output_file_path_cpp, '#include "graphbloxenv.hpp"')
 append_to_file(
     output_file_path_cpp,
-    f"void GLAYxrtBufferHandlePerKernel::mapGLAYOverlayProgramBuffers{ALGORITHM_NAME}(struct GraphCSR *graph)",
+    f"void GRAPHBLOXxrtBufferHandlePerKernel::mapGRAPHBLOXOverlayProgramBuffers{ALGORITHM_NAME}(struct GraphCSR *graph)",
 )
 append_to_file(output_file_path_cpp, "{")
 

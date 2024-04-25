@@ -1,19 +1,19 @@
 // -----------------------------------------------------------------------------
 //
-//      "00_GLay"
+//      "00_GraphBlox"
 //
 // -----------------------------------------------------------------------------
 // Copyright (c) 2014-2022 All rights reserved
 // -----------------------------------------------------------------------------
 // Author : Abdullah Mughrabi
 // Email  : atmughra@virginia||atmughrabi@gmail.com
-// File   : glay.c
+// File   : graphBlox.c
 // Create : 2022-06-21 17:15:17
 // Revise : 2022-09-28 15:37:28
 // Editor : Abdullah Mughrabi
 // -----------------------------------------------------------------------------
 
-#include "glayenv.hpp"
+#include "graphbloxenv.hpp"
 
 #ifdef __cplusplus
 extern "C" {
@@ -43,12 +43,12 @@ extern "C" {
 #include "edgeList.h"
 
 const char *argp_program_version =
-    "GLay v1.0";
+    "GraphBlox v1.0";
 const char *argp_program_bug_address =
     "<atmughrabi@gmail.com>|<atmughra@virginia.edu>|<atmughra@alumni.ncsu.edu>";
 /* Program documentation. */
 static char doc[] =
-    "GLay is an open source graph processing overlay framework, it is designed to be a benchmarking suite for various graph processing algorithms using pure C and GGDL.";
+    "GraphBlox is an open source graph processing overlay framework, it is designed to be a benchmarking suite for various graph processing algorithms using pure C and GGDL.";
 
 /* A description of the arguments we accept. */
 static char args_doc[] = "-f <graph file> -d [data structure] -a [algorithm] -r [root] -n [num threads] [-h -c -s -w]";

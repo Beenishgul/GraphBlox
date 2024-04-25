@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <root versionMajor="1" versionMinor="9">
-  <kernel name="glay_kernel" language="ip" vlnv="cs.virginia.edu:mezzanine:glay_kernel:1.0" attributes="" preferredWorkGroupSizeMultiple="0" workGroupSize="1" hwControlProtocol="user_managed">
+  <kernel name="graphBlox_kernel" language="ip" vlnv="cs.virginia.edu:mezzanine:graphBlox_kernel:1.0" attributes="" preferredWorkGroupSizeMultiple="0" workGroupSize="1" hwControlProtocol="user_managed">
     <ports>
       <port name="m00_axi" mode="master" range="0xFFFFFFFF" dataWidth="512" portType="addressable" base="0x0"/>
       <port name="s_axi_control" mode="slave" range="0x1000" dataWidth="32" portType="addressable" base="0x0"/>

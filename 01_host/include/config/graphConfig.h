@@ -48,7 +48,7 @@ struct Arguments
     uint32_t convert_format;
     mt19937state mt19937var;
     uint32_t cache_size;
-    // GLay Xilinx Parameters
+    // GraphBlox Xilinx Parameters
 
     char *kernel_name;
     int cu_id;

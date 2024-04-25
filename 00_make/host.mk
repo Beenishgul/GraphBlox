@@ -1,6 +1,6 @@
 #!make
 # =========================================================
-# Starting point of GLay generate IPs and compile Host
+# Starting point of GraphBlox generate IPs and compile Host
 # =========================================================
 .PHONY: start
 start:
@@ -55,7 +55,7 @@ help:
 # =========================================================
 
 # =========================================================
-# Run GLay HOST
+# Run GraphBlox HOST
 # =========================================================
 .PHONY: run
 run:

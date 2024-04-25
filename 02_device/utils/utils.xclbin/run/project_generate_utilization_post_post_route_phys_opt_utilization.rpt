@@ -3,7 +3,7 @@ Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2023 Advanc
 | Tool Version : Vivado v.2023.1 (lin64) Build 3865809 Sun May  7 15:04:56 MDT 2023
 | Date         : Sat Apr 20 06:13:08 2024
 | Host         : ab-razer running 64-bit Ubuntu 22.04.4 LTS
-| Command      : report_utilization -file /home/ab/Documents/00_github_repos/00_GLay/alg_6_GLay_Single_1_1_hw_1048576_1_300000000Hz/02_device/xilinx_project_glay_kernel_GLay_Single_CC_64b67913_c0c9d23a/vivado_glay_kernel.utils/utils.rpt/project_generate_utilization_post_post_route_phys_opt_utilization.rpt
+| Command      : report_utilization -file /home/ab/Documents/00_github_repos/00_GraphBlox/alg_6_GraphBlox_Single_1_1_hw_1048576_1_300000000Hz/02_device/xilinx_project_graphBlox_kernel_GraphBlox_Single_CC_64b67913_c0c9d23a/vivado_graphBlox_kernel.utils/utils.rpt/project_generate_utilization_post_post_route_phys_opt_utilization.rpt
 | Design       : level0_wrapper
 | Device       : xcu280-fsvh2892-2L-e
 | Speed File   : -2L
@@ -304,7 +304,7 @@ Table of Contents
 | ulp_m00_regslice_0                         |    1 |
 | ulp_ii_level0_wire_0                       |    1 |
 | ulp_hmss_0_0                               |    1 |
-| ulp_glay_kernel_1_0                        |    1 |
+| ulp_graphBlox_kernel_1_0                        |    1 |
 | ulp_axi_vip_data_0                         |    1 |
 | ulp_axi_vip_ctrl_userpf_2                  |    1 |
 | ulp_axi_vip_ctrl_userpf_1                  |    1 |

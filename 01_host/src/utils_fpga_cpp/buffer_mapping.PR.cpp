@@ -1,5 +1,5 @@
-#include "glayenv.hpp"
-void GLAYxrtBufferHandlePerKernel::mapGLAYOverlayProgramBuffersPR(struct GraphCSR *graph)
+#include "graphbloxenv.hpp"
+void GRAPHBLOXxrtBufferHandlePerKernel::mapGRAPHBLOXOverlayProgramBuffersPR(struct GraphCSR *graph)
 {
 // --------------------------------------------------------------------------------------
 // Name ENGINE_ALU_OPS                ID 0    mapping 5    cycles 6    None-None ( 0 )-( 0 )

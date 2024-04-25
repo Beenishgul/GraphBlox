@@ -4,7 +4,7 @@ print_usage () {
     echo "Usage: "
     echo "  generate_xrt_ini.sh APP_DIR_ACTIVE UTILS_DIR_ACTIVE KERNEL_NAME XILINX_CTRL_MODE"
     echo ""
-    echo "  APP_DIR_ACTIVE: /home/cmv6ru/Documents/00_github_repos/00_GLay/01_Device"
+    echo "  APP_DIR_ACTIVE: /home/cmv6ru/Documents/00_github_repos/00_GraphBlox/01_Device"
     echo "  UTILS_DIR_ACTIVE: scripts"
     echo "  KERNEL_NAME: kernel"
     echo "  XILINX_CTRL_MODE  : USER_MANAGED"

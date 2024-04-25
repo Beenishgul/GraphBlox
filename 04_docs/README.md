@@ -1,5 +1,5 @@
 
-GLay: A Vertex Centric Re-Configurable Graph Processing Overlay
+GraphBlox: A Vertex Centric Re-Configurable Graph Processing Overlay
 ===============================================================
 
 Abstract
@@ -16,28 +16,28 @@ graph algorithm to another, affecting the algorithm\'s critical path and
 performance. Such a paradigm heavily exists in virtual systems that
 demand generic support for graph processing to cover a wide range of
 use-cases while being managed efficiently by the hypervisor. In this
-work, we propose a coarse-grain overlay for graph processing GLay. This
+work, we propose a coarse-grain overlay for graph processing GraphBlox. This
 overlay extracts the typical access patterns in many graph algorithms
 and abstracts them into domain-specific graph Processing Elements (PE)
 interconnect. Compared to the classical FPGA ms-s reconfiguration time,
-GLay achieves ns-us reconfiguration time between graph algorithms. While
+GraphBlox achieves ns-us reconfiguration time between graph algorithms. While
 maintaining the performance and power optimizations, an FPGA provides.
 
 ![Figure 1: Graph fundamental Compressed Sparse
-Row Matrix (CSR) structure](./fig/glay/fig1.png "Figure 1: Graph fundamental Compressed Sparse
+Row Matrix (CSR) structure](./fig/graphBlox/fig1.png "Figure 1: Graph fundamental Compressed Sparse
 Row Matrix (CSR) structure")
 
 
 Identifying Access Patterns and Control Flow in Graph Algorithms
 ----------------------------------------------------------------
 
-Graph processing kernels share common behaviors. GLay's primary purpose
+Graph processing kernels share common behaviors. GraphBlox's primary purpose
 is to abstract such access flows into engines for faster programmability
 between graph algorithms instead of having a fixed accelerator. Such
 overlay architecture reduces the reconfiguration time from typical FPGA
 flow, taking ms-s into ns-us. Figure 2 and Figure 3 highlight the
 Breadth-First Search (BFS) bottom-up approach graph algorithm
-analysis and its correlation to the GLay architecture design. For
+analysis and its correlation to the GraphBlox architecture design. For
 instance, a graph algorithm needs to interact with the graph structure
 commonly represented in the Compressed Sparse Row Matrix (CSR), as shown
 in Figure 1. Such behaviors are abstracted into sequential accesses and
@@ -47,7 +47,7 @@ vertex as shown in Figure 3 step A.
 
 As illustrated in steps C and E, the graph property data is most often
 accessed randomly and has high cache miss rates. Both behaviors will be
-supported and optimized with specialized read/write engines in GLay
+supported and optimized with specialized read/write engines in GraphBlox
 architecture. Other behaviors such as mathematical operations and
 branches are kept in a dataflow approach. As each vertex read/write
 request is filtered or processed based on a conditional reprogrammable
@@ -55,24 +55,24 @@ module for each engine, while an ALU handles simple mathematical
 operations if needed. Figure 4 displays the final analysis for BFS and
 the proposed Processing Elements (PEs).
 
-![Figure 2: Breadth-First Search (BFS) algorithm](./fig/glay/fig2.png "Figure 2: Breadth-First Search (BFS) algorithm")
+![Figure 2: Breadth-First Search (BFS) algorithm](./fig/graphBlox/fig2.png "Figure 2: Breadth-First Search (BFS) algorithm")
 
 
 ![Figure 3: BFS bottom-up approach, a graph
 kernel contains identifiable behaviors that can be abstracted into FPGA
 overlay engines.
-](./fig/glay/fig3.png "Figure 3: BFS bottom-up approach, a graph kernel contains identifiable behaviors that can be abstracted into FPGA
+](./fig/graphBlox/fig3.png "Figure 3: BFS bottom-up approach, a graph kernel contains identifiable behaviors that can be abstracted into FPGA
 overlay engines.")
 
 
 ![Figure 4: Proposed Vertex Processing Elements
-(PEs) for graph processing kernels.](./fig/glay/fig4.png "Figure 4: Proposed Vertex Processing Elements (PEs) for graph processing kernels.")
+(PEs) for graph processing kernels.](./fig/graphBlox/fig4.png "Figure 4: Proposed Vertex Processing Elements (PEs) for graph processing kernels.")
 
 
-GLay Architecture 
+GraphBlox Architecture 
 ------------------
 
-Figure 5 illustrates an abstract overview of GLay vertex-centric graph
+Figure 5 illustrates an abstract overview of GraphBlox vertex-centric graph
 processing overlay. The Vertex CU supports multiple programmable engines
 and processing elements (PEs). These engines and PEs are bundled within
 the Vertex CU, where each PE bundle is pipelined in a step manner. A PE
@@ -97,14 +97,14 @@ the graph neighbor list from the CSR structure. Finally, in steps E and
 F, a conditional break halts the engine from processing the vertex
 neighbor list and updates the frontier data.
 
-![Figure 6: BFS algorithm on GLay](./fig/glay/fig6.png "Figure 6: BFS algorithm on GLay")
+![Figure 6: BFS algorithm on GraphBlox](./fig/graphBlox/fig6.png "Figure 6: BFS algorithm on GraphBlox")
 
-GLay Graph Description Language (GGDL)
+GraphBlox Graph Description Language (GGDL)
 ======================================
 
 GGDL is a description language that helps compile and port any graph
-algorithm to GLay graph processing overlay. This chapter describes some
-of the features of GLay architecture combined with a description
+algorithm to GraphBlox graph processing overlay. This chapter describes some
+of the features of GraphBlox architecture combined with a description
 language that can be compiled to reprogram the graph overlay.
 
 Serial\_Read\_Engine
@@ -210,4 +210,4 @@ Example Graph Algorithm GGDL Transformations
 BFS
 ---
 
-![Figure 7: Transforming BFS algorithm to GGDL](./fig/glay/fig7.png "Figure 7: Transforming BFS algorithm to GGDL")
+![Figure 7: Transforming BFS algorithm to GGDL](./fig/graphBlox/fig7.png "Figure 7: Transforming BFS algorithm to GGDL")

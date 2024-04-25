@@ -5,13 +5,13 @@
 APP                 ?= GraphBlox
 
 # APP_TEST            ?= test_match
-# APP_TEST            ?= test_glay
+# APP_TEST            ?= test_graphblox
 # APP_TEST            ?= test_StalaGraph
-APP_TEST            ?= test_glayGraph_$(XILINX_CTRL_MODE)
+APP_TEST            ?= test_GraphBlox_$(XILINX_CTRL_MODE)
 APP_LANG            ?= cpp
 # APP_LANG            ?= c
 INTEGRATION         ?= openmp
-# INTEGRATION         ?= GraphBlox
+# INTEGRATION         ?= graphBlox
 
 MAKE_NUM_THREADS    ?= $(shell grep -c ^processor /proc/cpuinfo)
 ROOT_DIR            ?= $(shell cd ../../ ; pwd)
@@ -71,21 +71,21 @@ REPORTS_DIR_ACTIVE  ?= vivado_$(REPORTS_DIR)
 
 APP_DIR_ACTIVE      ?= $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/$(XILINX_DIR_ACTIVE)
 
-KERNEL_NAME         ?= glay_kernel
+KERNEL_NAME         ?= graphBlox_kernel
 DEVICE_INDEX        ?= 0
 XCLBIN_PATH         ?= $(APP_DIR_ACTIVE)/$(VIVADO_BUILD_DIR)/$(KERNEL_NAME)_$(TARGET).xclbin
 FPGA_ARGS           ?= -m $(DEVICE_INDEX) -q $(XCLBIN_PATH) -Q $(KERNEL_NAME)
-GLAY_FPGA_ARGS      ?= -m $(DEVICE_INDEX) -q $(XCLBIN_PATH) -Q $(KERNEL_NAME)
+GRAPHBLOX_FPGA_ARGS      ?= -m $(DEVICE_INDEX) -q $(XCLBIN_PATH) -Q $(KERNEL_NAME)
 
 
 ACTIVE_PARAMS_DIR      ?= $(APP_DIR_ACTIVE)/$(UTILS_DIR_ACTIVE)/$(UTILS_PARAMS)
 ACTIVE_PARAMS_SH_DIR   ?= $(ACTIVR_PARAMS_DIR)/$(PARAMS_SH)
 ACTIVE_PARAMS_TCL_DIR  ?= $(ACTIVR_PARAMS_DIR)/$(PARAMS_TCL)
 # =========================================================
-# GLay HOST Argument list               
+# GraphBlox HOST Argument list               
 # =========================================================
 
-ARGS ?= $(GLAY_FPGA_ARGS) -k -M $(MASK_MODE) -j $(INOUT_STATS) -g $(BIN_SIZE) -z $(FILE_FORMAT) -d $(DATA_STRUCTURES) -a $(ALGORITHMS) -r $(ROOT) -n $(NUM_THREADS_PRE) -N $(NUM_THREADS_ALGO) -K $(NUM_THREADS_KER) -i $(NUM_ITERATIONS) -o $(SORT_TYPE) -p $(PULL_PUSH) -t $(NUM_TRIALS) -e $(TOLERANCE) -F $(FILE_LABEL) -l $(REORDER_LAYER1) -L $(REORDER_LAYER2) -O $(REORDER_LAYER3) -b $(DELTA) -C $(CACHE_SIZE)
+ARGS ?= $(GRAPHBLOX_FPGA_ARGS) -k -M $(MASK_MODE) -j $(INOUT_STATS) -g $(BIN_SIZE) -z $(FILE_FORMAT) -d $(DATA_STRUCTURES) -a $(ALGORITHMS) -r $(ROOT) -n $(NUM_THREADS_PRE) -N $(NUM_THREADS_ALGO) -K $(NUM_THREADS_KER) -i $(NUM_ITERATIONS) -o $(SORT_TYPE) -p $(PULL_PUSH) -t $(NUM_TRIALS) -e $(TOLERANCE) -F $(FILE_LABEL) -l $(REORDER_LAYER1) -L $(REORDER_LAYER2) -O $(REORDER_LAYER3) -b $(DELTA) -C $(CACHE_SIZE)
 # =========================================================
 
 ifeq ($(HOST_NAME), default)
@@ -168,12 +168,12 @@ TESTBENCH_MODULE     ?= integration
 # =========================================================
 # Each project has topology Architecture
 # ARCHITECTURE.CAPABILITY/architecture.ALGORITHM_NAME.json
-# Project GLay
+# Project GraphBlox
 # Capability Full, lite, Single, Test
 # Algorithm BFS, PR, CC, SSSP, TC
 # =========================================================
 #if you make a push and use a previous compile 
-ARCHITECTURE              ?= GLay
+ARCHITECTURE              ?= GraphBlox
 # CAPABILITY                = Test
 # CAPABILITY                = Single
 # CAPABILITY                = Lite
@@ -189,7 +189,7 @@ GCC     ?= gcc
 CC      ?= gcc
 
 # =========================================================
-# Starting point of GLay generate IPs and compile Host
+# Starting point of GraphBlox generate IPs and compile Host
 # =========================================================
 .PHONY: start
 start: package-kernel
@@ -674,13 +674,13 @@ clean-report-metrics: session-info
 # # Parameters for different algorithm configurations
 # algorithms = [
 #     # Format: (Algorithm Index, Architecture, Capability, Number of Kernels, Target)
-#     (0, "GLay", "Single", 8, "hw"),
-#     (1, "GLay", "Single", 8, "hw"),
-#     (5, "GLay", "Single", 8, "hw"),
-#     (6, "GLay", "Single", 8, "hw"),
-#     (8, "GLay", "Single", 8, "hw"),
-#     (0, "GLay", "Lite", 4, "hw"),
-#     (0, "GLay", "Full", 2, "hw"),
+#     (0, "GraphBlox", "Single", 8, "hw"),
+#     (1, "GraphBlox", "Single", 8, "hw"),
+#     (5, "GraphBlox", "Single", 8, "hw"),
+#     (6, "GraphBlox", "Single", 8, "hw"),
+#     (8, "GraphBlox", "Single", 8, "hw"),
+#     (0, "GraphBlox", "Lite", 4, "hw"),
+#     (0, "GraphBlox", "Full", 2, "hw"),
 #     # Add more tuples here for other algorithm configurations as needed
 # ]
 # =========================================================

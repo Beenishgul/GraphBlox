@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 //
-//      "00_GLay"
+//      "00_GraphBlox"
 //
 // -----------------------------------------------------------------------------
 // Copyright (c) 2014-2022 All rights reserved
@@ -82,7 +82,7 @@ struct Arguments *argumentsNew()
     arguments->fnameb_format = 1;
     arguments->convert_format = 1;
     initializeMersenneState (&(arguments->mt19937var), 27491095);
-    // GLay Xilinx Parameters
+    // GraphBlox Xilinx Parameters
 
     arguments->kernel_name = NULL;
     arguments->device_index = 0;
@@ -139,7 +139,7 @@ void argumentsCopy (struct Arguments *argFrom, struct Arguments *argTo)
     argTo->fnameb_format =  argFrom->fnameb_format;
     argTo->fnameb_format = argFrom->fnameb_format;
 
-    // GLay Xilinx Parameters
+    // GraphBlox Xilinx Parameters
     argTo->bankGroupIndex = argTo->bankGroupIndex;
     argTo->ctrl_mode = argFrom->ctrl_mode;
     argTo->device_index = argFrom->device_index;

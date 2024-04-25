@@ -1,9 +1,9 @@
 # =========================================================
 #                GENERAL DIRECTOIRES HOST               
 # =========================================================
-APP                 ?= GraphBlox
+APP                 ?= graphblox
 # APP_TEST            ?= test_match
-# APP_TEST            ?= test_GraphBlox
+# APP_TEST            ?= test_graphblox
 # APP_TEST            ?= test_StalaGraph
 APP_TEST            ?= test_GraphBlox_$(XILINX_CTRL_MODE)
 APP_LANG            ?= cpp
@@ -32,7 +32,7 @@ RES_DIR             ?= results
 STRUCT_DIR          ?= structures
 PREPRO_DIR          ?= preprocess
 ALGO_DIR            ?= algorithms
-ALGO_DIR_GLAY       ?= GraphBlox
+ALGO_DIR_GRAPHBLOX       ?= graphblox
 ALGO_DIR_OPENMP     ?= openmp
 UTIL_DIR            ?= utils_graph
 UTIL_DIR_FPGA_C     ?= utils_fpga_c
@@ -89,7 +89,7 @@ CXXFLAGS      += -fmessage-length=0
 LDFLAGS       += -lrt -lstdc++ $(XRT_LDFLAGS) 
 
 # =========================================================
-# GLAY COMPILATION FOLDERS/FILES     
+# GRAPHBLOX COMPILATION FOLDERS/FILES     
 # =========================================================
 
 #each implementation is contained in a separate folder. when you compile for openmp for example the files in openmp folder gets included
@@ -138,14 +138,14 @@ OPENMP_INC =    -I$(ACTIVE_APP_DIR)/$(INC_DIR)/$(STRUCT_DIR)               \
 				-I$(ACTIVE_APP_DIR)/$(INC_DIR)/$(CONFIG_DIR)
 
 # =========================================================
-# Starting point of GLay generate IPs and compile Host
+# Starting point of GraphBlox generate IPs and compile Host
 # =========================================================
 .PHONY: start
 start: $(APP)-$(INTEGRATION)
 	
 # =========================================================
 # =========================================================
-# GLAY GENERATION                        
+# GRAPHBLOX GENERATION                        
 # =========================================================
 
 .PHONY: help
@@ -200,7 +200,7 @@ clean-results:
 	-$(RMDIR) $(ACTIVE_APP_DIR)/$(RES_DIR)
 
 # =========================================================
-# GLAY COMPILATION                       
+# GRAPHBLOX COMPILATION                       
 # =========================================================
 
 $(ACTIVE_APP_DIR)/$(BIN_DIR)/$(INTEGRATION)/$(APP)-$(INTEGRATION) : $(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(MAIN_DIR)/$(APP).o $(OBJ_FILES_UTIL) $(OBJ_FILES_ALGO) $(OBJ_FILES_PREPRO) $(OBJ_FILES_STRUCT) $(OBJ_FILES_CONFIG)
@@ -240,7 +240,7 @@ $(ACTIVE_APP_DIR)/$(OBJ_DIR)/$(INTEGRATION)/$(CONFIG_DIR)/%.o : $(ACTIVE_APP_DIR
 	@$(CXX) $(CXXFLAGS) $(OPENMP_INC) -c -o $@ $< $(EXIT_STATUS)
 
 # =========================================================
-# RUN GLay
+# RUN GraphBlox
 # =========================================================
 
 .PHONY: run
@@ -373,7 +373,7 @@ MASK_MODE       ?= 0
 # GENERAL XILINX ARGS                    
 # =========================================================
 
-KERNEL_NAME ?= GraphBlox_kernel
+KERNEL_NAME ?= graphblox_kernel
 XILINX_DIR  ?= xilinx_project
 XILINX_DIR_ACTIVE  	?= $(XILINX_DIR)_$(KERNEL_NAME)_$(GIT_VER)
 
@@ -418,11 +418,11 @@ XILINX_CTRL_MODE     ?= USER_MANAGED
 
 DEVICE_INDEX        ?= 0
 XCLBIN_PATH         ?= $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/$(XILINX_DIR_ACTIVE)/vivado_build_$(TARGET)/$(KERNEL_NAME)_$(TARGET).xclbin
-GLAY_FPGA_ARGS      ?= -m $(DEVICE_INDEX) -q $(XCLBIN_PATH) -Q $(KERNEL_NAME)
+GRAPHBLOX_FPGA_ARGS      ?= -m $(DEVICE_INDEX) -q $(XCLBIN_PATH) -Q $(KERNEL_NAME)
 
 # =========================================================
-# GLay HOST Argument list               
+# GraphBlox HOST Argument list               
 # =========================================================
 
-ARGS ?= $(GLAY_FPGA_ARGS) -k -M $(MASK_MODE) -j $(INOUT_STATS) -g $(BIN_SIZE) -z $(FILE_FORMAT) -d $(DATA_STRUCTURES) -a $(ALGORITHMS) -r $(ROOT) -n $(NUM_THREADS_PRE) -N $(NUM_THREADS_ALGO) -K $(NUM_THREADS_KER) -i $(NUM_ITERATIONS) -o $(SORT_TYPE) -p $(PULL_PUSH) -t $(NUM_TRIALS) -e $(TOLERANCE) -F $(FILE_LABEL) -l $(REORDER_LAYER1) -L $(REORDER_LAYER2) -O $(REORDER_LAYER3) -b $(DELTA) -C $(CACHE_SIZE)
+ARGS ?= $(GRAPHBLOX_FPGA_ARGS) -k -M $(MASK_MODE) -j $(INOUT_STATS) -g $(BIN_SIZE) -z $(FILE_FORMAT) -d $(DATA_STRUCTURES) -a $(ALGORITHMS) -r $(ROOT) -n $(NUM_THREADS_PRE) -N $(NUM_THREADS_ALGO) -K $(NUM_THREADS_KER) -i $(NUM_ITERATIONS) -o $(SORT_TYPE) -p $(PULL_PUSH) -t $(NUM_TRIALS) -e $(TOLERANCE) -F $(FILE_LABEL) -l $(REORDER_LAYER1) -L $(REORDER_LAYER2) -O $(REORDER_LAYER3) -b $(DELTA) -C $(CACHE_SIZE)
 # =========================================================

@@ -1,19 +1,19 @@
 // -----------------------------------------------------------------------------
 //
-//      "00_GLay"
+//      "00_GraphBlox"
 //
 // -----------------------------------------------------------------------------
 // Copyright (c) 2014-2022 All rights reserved
 // -----------------------------------------------------------------------------
 // Author : Abdullah Mughrabi
 // Email  : atmughra@virginia||atmughrabi@gmail.com
-// File   : glay.c
+// File   : graphBlox.c
 // Create : 2022-06-21 17:15:17
 // Revise : 2022-09-28 15:37:28
 // Editor : Abdullah Mughrabi
 // -----------------------------------------------------------------------------
 
-#include "glayenv.hpp"
+#include "graphbloxenv.hpp"
 
 #ifdef __cplusplus
 extern "C" {
@@ -47,7 +47,7 @@ extern "C" {
 #include "graphRun.h"
 #include "graphStats.h"
 #include "reorder.h"
-// #include "glayGDL_emu.h"
+// #include "graphBloxGDL_emu.h"
 
 void initialize_PR_auxiliary_struct(struct GraphCSR *graph,
                                     struct GraphAuxiliary *graphAuxiliary,
@@ -75,12 +75,12 @@ void multiple_iteration_TC(struct GraphCSR *graph,
                            struct Arguments *arguments, struct Timer *timer);
 void free_auxiliary_struct(struct GraphAuxiliary *graphAuxiliary);
 
-const char *argp_program_version = "GLay v1.0";
+const char *argp_program_version = "GraphBlox v1.0";
 const char *argp_program_bug_address =
     "<atmughrabi@gmail.com>|<atmughra@virginia.edu>|<atmughra@alumni.ncsu.edu>";
 /* Program documentation. */
 static char doc[] =
-    "GLay is an open source graph processing overlay framework, it is designed "
+    "GraphBlox is an open source graph processing overlay framework, it is designed "
     "to be a benchmarking suite for various graph processing algorithms using "
     "pure C and GGDL.";
 
@@ -361,7 +361,7 @@ int main(int argc, char **argv) {
   arguments->convert_format = 1;
   initializeMersenneState(&(arguments->mt19937var), 27491095);
 
-  // GLay Xilinx Parameters
+  // GraphBlox Xilinx Parameters
   arguments->kernel_name = NULL;
   arguments->device_index = 0;
   arguments->xclbin_path = NULL;
@@ -449,9 +449,9 @@ int main(int argc, char **argv) {
   //     *>(graphAuxiliary->auxiliary_2)[i]);
   // }
   // printf(" -----------------------------------------------------\n");
-  // closeGLAYUserManaged();
+  // closeGRAPHBLOXUserManaged();
 
-  // releaseGLAY();
+  // releaseGRAPHBLOX();
   free(timer);
   free_auxiliary_struct(graphAuxiliary);
   freeGraphDataStructure((void *)graph, arguments->datastructure);
@@ -462,20 +462,20 @@ int main(int argc, char **argv) {
 void multiple_iteration_PR(struct GraphCSR *graph,
                            struct GraphAuxiliary *graphAuxiliary,
                            struct Arguments *arguments, struct Timer *timer) {
-  GLAYxrtBufferHandlePerKernel *glayGraphCSRxrtBufferHandlePerKernel;
+  GRAPHBLOXxrtBufferHandlePerKernel *graphBloxGraphCSRxrtBufferHandlePerKernel;
   Start(timer);
   printf("-----------------------------------------------------\n");
   printf(" Start PR Iterations\n");
   printf("-----------------------------------------------------\n");
-  glayGraphCSRxrtBufferHandlePerKernel =
-      new GLAYxrtBufferHandlePerKernel(arguments, graph, graphAuxiliary);
-  glayGraphCSRxrtBufferHandlePerKernel->setupGLAY();
-  glayGraphCSRxrtBufferHandlePerKernel->printGLAYxrtBufferHandlePerKernel();
+  graphBloxGraphCSRxrtBufferHandlePerKernel =
+      new GRAPHBLOXxrtBufferHandlePerKernel(arguments, graph, graphAuxiliary);
+  graphBloxGraphCSRxrtBufferHandlePerKernel->setupGRAPHBLOX();
+  graphBloxGraphCSRxrtBufferHandlePerKernel->printGRAPHBLOXxrtBufferHandlePerKernel();
   printf("-----------------------------------------------------\n");
-  printf(" setupGLAYUserManaged\n");
+  printf(" setupGRAPHBLOXUserManaged\n");
   printf("-----------------------------------------------------\n");
 
-  glayGraphCSRxrtBufferHandlePerKernel->startGLAY();
+  graphBloxGraphCSRxrtBufferHandlePerKernel->startGRAPHBLOX();
   Stop(timer);
   printf(" -----------------------------------------------------\n");
   printf("| %-9s | \n", "Setup Time (S)");
@@ -484,7 +484,7 @@ void multiple_iteration_PR(struct GraphCSR *graph,
   printf(" -----------------------------------------------------\n");
 
   Start(timer);
-  glayGraphCSRxrtBufferHandlePerKernel->waitGLAY();
+  graphBloxGraphCSRxrtBufferHandlePerKernel->waitGRAPHBLOX();
   Stop(timer);
   printf(" -----------------------------------------------------\n");
   printf("| %-9s | \n", "Algorithm Time (S)");
@@ -493,7 +493,7 @@ void multiple_iteration_PR(struct GraphCSR *graph,
   printf(" -----------------------------------------------------\n");
 
   Start(timer);
-  glayGraphCSRxrtBufferHandlePerKernel->readGLAYDeviceToHostBuffersPerKernel();
+  graphBloxGraphCSRxrtBufferHandlePerKernel->readGRAPHBLOXDeviceToHostBuffersPerKernel();
   Stop(timer);
   printf(" -----------------------------------------------------\n");
   printf("| %-9s | \n", "Result Time (S)");
@@ -512,18 +512,18 @@ void multiple_iteration_TC(struct GraphCSR *graph,
                            struct GraphAuxiliary *graphAuxiliary,
                            struct Arguments *arguments, struct Timer *timer) {
   uint32_t count = 0;
-  GLAYxrtBufferHandlePerKernel *glayGraphCSRxrtBufferHandlePerKernel;
+  GRAPHBLOXxrtBufferHandlePerKernel *graphBloxGraphCSRxrtBufferHandlePerKernel;
   Start(timer);
   printf("-----------------------------------------------------\n");
   printf(" Start TC Iterations\n");
   printf("-----------------------------------------------------\n");
-  glayGraphCSRxrtBufferHandlePerKernel =
-      new GLAYxrtBufferHandlePerKernel(arguments, graph, graphAuxiliary);
-  glayGraphCSRxrtBufferHandlePerKernel->setupGLAY();
-  glayGraphCSRxrtBufferHandlePerKernel->printGLAYxrtBufferHandlePerKernel();
-  printf(" setupGLAYUserManaged\n");
+  graphBloxGraphCSRxrtBufferHandlePerKernel =
+      new GRAPHBLOXxrtBufferHandlePerKernel(arguments, graph, graphAuxiliary);
+  graphBloxGraphCSRxrtBufferHandlePerKernel->setupGRAPHBLOX();
+  graphBloxGraphCSRxrtBufferHandlePerKernel->printGRAPHBLOXxrtBufferHandlePerKernel();
+  printf(" setupGRAPHBLOXUserManaged\n");
   printf("-----------------------------------------------------\n");
-  glayGraphCSRxrtBufferHandlePerKernel->startGLAY();
+  graphBloxGraphCSRxrtBufferHandlePerKernel->startGRAPHBLOX();
   Stop(timer);
   printf(" -----------------------------------------------------\n");
   printf("| %-9s | \n", "Setup Time (S)");
@@ -532,7 +532,7 @@ void multiple_iteration_TC(struct GraphCSR *graph,
   printf(" -----------------------------------------------------\n");
 
   Start(timer);
-  glayGraphCSRxrtBufferHandlePerKernel->waitGLAY();
+  graphBloxGraphCSRxrtBufferHandlePerKernel->waitGRAPHBLOX();
   Stop(timer);
   printf(" -----------------------------------------------------\n");
   printf("| %-9s | \n", "Algorithm Time (S)");
@@ -541,7 +541,7 @@ void multiple_iteration_TC(struct GraphCSR *graph,
   printf(" -----------------------------------------------------\n");
 
   Start(timer);
-  glayGraphCSRxrtBufferHandlePerKernel->readGLAYDeviceToHostBuffersPerKernel();
+  graphBloxGraphCSRxrtBufferHandlePerKernel->readGRAPHBLOXDeviceToHostBuffersPerKernel();
   Stop(timer);
   printf(" -----------------------------------------------------\n");
   printf("| %-9s | \n", "Result Time (S)");
@@ -564,21 +564,21 @@ void multiple_iteration_BFS(struct GraphCSR *graph,
                             struct GraphAuxiliary *graphAuxiliary,
                             struct Arguments *arguments, struct Timer *timer) {
   uint32_t frontier = 1;
-  GLAYxrtBufferHandlePerKernel *glayGraphCSRxrtBufferHandlePerKernel;
+  GRAPHBLOXxrtBufferHandlePerKernel *graphBloxGraphCSRxrtBufferHandlePerKernel;
   printf("-----------------------------------------------------\n");
   printf(" Start BFS Iterations\n");
   printf("-----------------------------------------------------\n");
   do {
     frontier = 0;
     Start(timer);
-    glayGraphCSRxrtBufferHandlePerKernel =
-        new GLAYxrtBufferHandlePerKernel(arguments, graph, graphAuxiliary);
-    glayGraphCSRxrtBufferHandlePerKernel->setupGLAY();
-    glayGraphCSRxrtBufferHandlePerKernel->printGLAYxrtBufferHandlePerKernel();
-    printf(" setupGLAYUserManaged\n");
+    graphBloxGraphCSRxrtBufferHandlePerKernel =
+        new GRAPHBLOXxrtBufferHandlePerKernel(arguments, graph, graphAuxiliary);
+    graphBloxGraphCSRxrtBufferHandlePerKernel->setupGRAPHBLOX();
+    graphBloxGraphCSRxrtBufferHandlePerKernel->printGRAPHBLOXxrtBufferHandlePerKernel();
+    printf(" setupGRAPHBLOXUserManaged\n");
     printf("-----------------------------------------------------\n");
 
-    glayGraphCSRxrtBufferHandlePerKernel->startGLAY();
+    graphBloxGraphCSRxrtBufferHandlePerKernel->startGRAPHBLOX();
     Stop(timer);
     printf(" -----------------------------------------------------\n");
     printf("| %-9s | \n", "Setup Time (S)");
@@ -587,7 +587,7 @@ void multiple_iteration_BFS(struct GraphCSR *graph,
     printf(" -----------------------------------------------------\n");
 
     Start(timer);
-    glayGraphCSRxrtBufferHandlePerKernel->waitGLAY();
+    graphBloxGraphCSRxrtBufferHandlePerKernel->waitGRAPHBLOX();
     Stop(timer);
     printf(" -----------------------------------------------------\n");
     printf("| %-9s | \n", "Algorithm Time (S)");
@@ -596,8 +596,8 @@ void multiple_iteration_BFS(struct GraphCSR *graph,
     printf(" -----------------------------------------------------\n");
 
     Start(timer);
-    glayGraphCSRxrtBufferHandlePerKernel
-        ->readGLAYDeviceToHostBuffersPerKernel();
+    graphBloxGraphCSRxrtBufferHandlePerKernel
+        ->readGRAPHBLOXDeviceToHostBuffersPerKernel();
     Stop(timer);
     printf(" -----------------------------------------------------\n");
     printf("| %-9s | \n", "Result Time (S)");
@@ -625,20 +625,20 @@ void multiple_iteration_CC(struct GraphCSR *graph,
                            struct GraphAuxiliary *graphAuxiliary,
                            struct Arguments *arguments, struct Timer *timer) {
   uint32_t change = 0;
-  GLAYxrtBufferHandlePerKernel *glayGraphCSRxrtBufferHandlePerKernel;
+  GRAPHBLOXxrtBufferHandlePerKernel *graphBloxGraphCSRxrtBufferHandlePerKernel;
   printf("-----------------------------------------------------\n");
   printf(" Start CC Iterations\n");
   printf("-----------------------------------------------------\n");
   do {
     change = 0;
     Start(timer);
-    glayGraphCSRxrtBufferHandlePerKernel =
-        new GLAYxrtBufferHandlePerKernel(arguments, graph, graphAuxiliary);
-    glayGraphCSRxrtBufferHandlePerKernel->setupGLAY();
-    glayGraphCSRxrtBufferHandlePerKernel->printGLAYxrtBufferHandlePerKernel();
-    printf(" setupGLAYUserManaged\n");
+    graphBloxGraphCSRxrtBufferHandlePerKernel =
+        new GRAPHBLOXxrtBufferHandlePerKernel(arguments, graph, graphAuxiliary);
+    graphBloxGraphCSRxrtBufferHandlePerKernel->setupGRAPHBLOX();
+    graphBloxGraphCSRxrtBufferHandlePerKernel->printGRAPHBLOXxrtBufferHandlePerKernel();
+    printf(" setupGRAPHBLOXUserManaged\n");
     printf("-----------------------------------------------------\n");
-    glayGraphCSRxrtBufferHandlePerKernel->startGLAY();
+    graphBloxGraphCSRxrtBufferHandlePerKernel->startGRAPHBLOX();
     Stop(timer);
     printf(" -----------------------------------------------------\n");
     printf("| %-9s | \n", "Setup Time (S)");
@@ -647,7 +647,7 @@ void multiple_iteration_CC(struct GraphCSR *graph,
     printf(" -----------------------------------------------------\n");
 
     Start(timer);
-    glayGraphCSRxrtBufferHandlePerKernel->waitGLAY();
+    graphBloxGraphCSRxrtBufferHandlePerKernel->waitGRAPHBLOX();
     Stop(timer);
     printf(" -----------------------------------------------------\n");
     printf("| %-9s | \n", "Algorithm Time (S)");
@@ -656,8 +656,8 @@ void multiple_iteration_CC(struct GraphCSR *graph,
     printf(" -----------------------------------------------------\n");
 
     Start(timer);
-    glayGraphCSRxrtBufferHandlePerKernel
-        ->readGLAYDeviceToHostBuffersPerKernel();
+    graphBloxGraphCSRxrtBufferHandlePerKernel
+        ->readGRAPHBLOXDeviceToHostBuffersPerKernel();
     Stop(timer);
     printf(" -----------------------------------------------------\n");
     printf("| %-9s | \n", "Result Time (S)");

@@ -1,5 +1,5 @@
 [![Build Status](https://app.travis-ci.com/atmughrabi/GraphBlox.svg?token=L3reAtGHdEVVPvzcVqQ6&branch=main)](https://app.travis-ci.com/atmughrabi/GraphBlox)
-[<p align="center"><img src="./04_docs/fig/logo.svg" width="250" ></p>](#GraphBlox-benchmark-suite)
+[<p align="center"><img src="./04_docs/fig/logo.svg" width="200" ></p>](#GraphBlox-benchmark-suite)
 
 GraphBlox: A Vertex Centric Re-Configurable Graph Processing Overlay
 ===============================================================
@@ -26,7 +26,7 @@ GraphBlox has been evaluated on a variety of graph algorithms, including breadth
 
 GraphBlox is a promising new approach to graph processing on FPGAs. It has the potential to significantly improve the performance and efficiency of graph processing on FPGAs.
 
-![Figure 1: Graph Overlay (GraphBlox) Contributions](./04_docs/fig/glay_gist.png "Figure 1: Graph Overlay (GraphBlox) Contributions")
+![Figure 1: Graph Overlay (GraphBlox) Contributions](./04_docs/fig/graphBlox_gist.png "Figure 1: Graph Overlay (GraphBlox) Contributions")
 
 # GraphBlox Benchmark Suite
 
@@ -118,19 +118,19 @@ user@host:~GraphBlox$ make
 | PLATFORM  | xilinx_u250_gen3x16_xdma_4_1_202210_1 | Platform matching u250 Alveo card |
 | TARGET  | hw_emu | Build target, hw or hw_emu |
 | XILINX_CTRL_MODE  | USER_MANAGED | ctrl mode, AP_CTRL_HS or AP_CTRL_CHAIN |
-| KERNEL_NAME  | glay_kernel | packaged kernel |
+| KERNEL_NAME  | graphBlox_kernel | packaged kernel |
 | DEVICE_INDEX  | 0 | FPGA device index |
 | XCLBIN_PATH  | file.xclbin | .xclbin filepath |
 
 
 ### Simulation Mode
 
-#### Refreshing glay_ip and scripts into xilinx_project directory
-1. When modifying glay_ip and scripts directories, especially in `simulation mode` use the following rule - this makes sure that the updated scripts and Verilog code are copied to the active `xilinx_project` directory:
+#### Refreshing graphBlox_ip and scripts into xilinx_project directory
+1. When modifying graphBlox_ip and scripts directories, especially in `simulation mode` use the following rule - this makes sure that the updated scripts and Verilog code are copied to the active `xilinx_project` directory:
 ```console
 user@host:~GraphBlox$ make gen-scripts-dir
 ```
-#### Simulation glay_ip flow
+#### Simulation graphBlox_ip flow
 
 1. Generate Xilinx IPs:
 ```console
@@ -215,7 +215,7 @@ user@host:~GraphBlox$ make run
 
 | PARAMETER  | FUNCTION | 
 | :--- | :--- |
-| ARGS  | arguments passed to glay |
+| ARGS  | arguments passed to graphBlox |
 
 | PARAMETER  | FUNCTION | 
 | :--- | :--- |
@@ -295,7 +295,7 @@ user@host:~GraphBlox$ make convert-w
 ```
 * OR (weighted graph)
 ```console
-user@host:~GraphBlox$ ./bin/glay-openmp  --generate-weights --stats --graph-file-format=0 --convert-format=1 --graph-file=../BENCHMARKS_DIR/GRAPH_NAME/graph
+user@host:~GraphBlox$ ./bin/graphBlox-openmp  --generate-weights --stats --graph-file-format=0 --convert-format=1 --graph-file=../BENCHMARKS_DIR/GRAPH_NAME/graph
 ```
 
 * `Makefile` parameters
@@ -360,16 +360,16 @@ module for each engine, while an ALU handles simple mathematical
 operations if needed. Figure 4 displays the final analysis for BFS and
 the proposed Processing Elements (PEs).
 
-![Figure 2: Graph fundamental Compressed Sparse Row Matrix (CSR) structure](./04_docs/fig/glay/fig1.png "Figure 2: Graph fundamental Compressed Sparse Row Matrix (CSR) structure")
+![Figure 2: Graph fundamental Compressed Sparse Row Matrix (CSR) structure](./04_docs/fig/graphBlox/fig1.png "Figure 2: Graph fundamental Compressed Sparse Row Matrix (CSR) structure")
 
 
-![Figure 3: Breadth-First Search (BFS) algorithm](./04_docs/fig/glay/fig2.png "Figure 3: Breadth-First Search (BFS) algorithm")
+![Figure 3: Breadth-First Search (BFS) algorithm](./04_docs/fig/graphBlox/fig2.png "Figure 3: Breadth-First Search (BFS) algorithm")
 
 
-![Figure 4: BFS bottom-up approach, a graph kernel contains identifiable behaviors that can be abstracted into FPGA overlay engines. ](./04_docs/fig/glay/fig3.png "Figure 4: BFS bottom-up approach, a graph kernel contains identifiable behaviors that can be abstracted into FPGA overlay engines.")
+![Figure 4: BFS bottom-up approach, a graph kernel contains identifiable behaviors that can be abstracted into FPGA overlay engines. ](./04_docs/fig/graphBlox/fig3.png "Figure 4: BFS bottom-up approach, a graph kernel contains identifiable behaviors that can be abstracted into FPGA overlay engines.")
 
 
-![Figure 4: Proposed Vertex Processing Elements (PEs) for graph processing kernels.](./04_docs/fig/glay/fig4.png "Figure 4: Proposed Vertex Processing Elements (PEs) for graph processing kernels.")
+![Figure 4: Proposed Vertex Processing Elements (PEs) for graph processing kernels.](./04_docs/fig/graphBlox/fig4.png "Figure 4: Proposed Vertex Processing Elements (PEs) for graph processing kernels.")
 
 
 GraphBlox Architecture 
@@ -400,7 +400,7 @@ the graph neighbor list from the CSR structure. Finally, in steps E and
 F, a conditional break halts the engine from processing the vertex
 neighbor list and updates the frontier data.
 
-![Figure 6: BFS algorithm on GraphBlox](./04_docs/fig/glay/fig6.png "Figure 6: BFS algorithm on GraphBlox")
+![Figure 6: BFS algorithm on GraphBlox](./04_docs/fig/graphBlox/fig6.png "Figure 6: BFS algorithm on GraphBlox")
 
 GraphIt integration ... Comming soon. -- GraphBlox Graph Description Language (GGDL)
 ======================================
@@ -513,7 +513,7 @@ Example Graph Algorithm GGDL Transformations
 BFS
 ---
 
-![Figure 7: Transforming BFS algorithm to GGDL](./04_docs/fig/glay/fig7.png "Figure 7: Transforming BFS algorithm to GGDL")
+![Figure 7: Transforming BFS algorithm to GGDL](./04_docs/fig/graphBlox/fig7.png "Figure 7: Transforming BFS algorithm to GGDL")
 
 
 # GraphBlox Options
@@ -521,7 +521,7 @@ BFS
 ## GraphBlox Host
 
 ```
-Usage: glay-openmp [OPTION...]
+Usage: graphBlox-openmp [OPTION...]
             -f <graph file> -d [data structure] -a [algorithm] -r [root] -n
             [num threads] [-h -c -s -w]
 
@@ -691,7 +691,7 @@ benchmarking suite for various graph processing algorithms using pure C.
 ## GraphBlox Device
 
 ```
-Usage: glay-openmp [OPTION...]
+Usage: graphBlox-openmp [OPTION...]
             -m <xclbin file> -q [device-index=0]
    -Q, --kernel-name=[DEFAULT:NULL]
                              Kernel package name.
@@ -742,7 +742,7 @@ Usage: glay-openmp [OPTION...]
 │   │   └── src
 │   │       ├── engines
 │   │       └── testbench
-│   │           └── glay
+│   │           └── graphBlox
 │   ├── ol
 │   │   └── GraphBlox
 │   │       ├── Engines
@@ -837,7 +837,7 @@ Usage: glay-openmp [OPTION...]
 └── 04_docs
     └── fig
         ├── datastructures
-        └── glay
+        └── graphBlox
 
 
 ```

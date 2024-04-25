@@ -178,7 +178,7 @@ algorithms = [
     # Format: (algorithm, architecture, capability, Number of Kernels, cache_properties[l2_size, l2_num_ways, l2_ram, l2_ctrl, l1_size, l1_num_ways, l1_buffer, l1_ram], synth_strategy, frequency)
     # (
     #     1,
-    #     "GLay",
+    #     "GraphBlox",
     #     "Single",
     #     1,
     #     4,
@@ -189,7 +189,7 @@ algorithms = [
     # ),
     # (
     #     1,
-    #     "GLay",
+    #     "GraphBlox",
     #     "Single",
     #     1,
     #     1,
@@ -200,7 +200,7 @@ algorithms = [
     # ),
     (
         1,
-        "GLay",
+        "GraphBlox",
         "Single",
         1,
         1,
@@ -211,7 +211,7 @@ algorithms = [
     ),
     (
         0,
-        "GLay",
+        "GraphBlox",
         "Single",
         1,
         1,
@@ -222,7 +222,7 @@ algorithms = [
     ),
     (
         8,
-        "GLay",
+        "GraphBlox",
         "Single",
         1,
         1,
@@ -233,7 +233,7 @@ algorithms = [
     ),
     (
         6,
-        "GLay",
+        "GraphBlox",
         "Single",
         1,
         1,
@@ -244,7 +244,7 @@ algorithms = [
     ),
     (
         5,
-        "GLay",
+        "GraphBlox",
         "Single",
         1,
         1,
@@ -255,7 +255,7 @@ algorithms = [
     ),
     # (
     #     1,
-    #     "GLay",
+    #     "GraphBlox",
     #     "Single",
     #     1,
     #     16,
@@ -266,7 +266,7 @@ algorithms = [
     # ),
     # (
     #     0,
-    #     "GLay",
+    #     "GraphBlox",
     #     "Single",
     #     1,
     #     16,
@@ -277,7 +277,7 @@ algorithms = [
     # ),
     # (
     #     1,
-    #     "GLay",
+    #     "GraphBlox",
     #     "Single",
     #     1,
     #     "hw",
@@ -285,13 +285,13 @@ algorithms = [
     #     1,
     #     300000000,
     # ),
-    # (5, "GLay", "Single", 8, "hw", 65536, 1),
-    # (6, "GLay", "Single", 8, "hw", 65536, 1),
-    # (8, "GLay", "Single", 8, "hw", 65536, 1),
-    # (0, "GLay", "Lite", 4, "hw", 131072, 1),
-    # (0, "GLay", "Full", 2, "hw", 262144, 1),
-    # (0, "GLay", "Lite", 4, "hw", 131072, 2),
-    # (0, "GLay", "Full", 2, "hw", 131072, 2),
+    # (5, "GraphBlox", "Single", 8, "hw", 65536, 1),
+    # (6, "GraphBlox", "Single", 8, "hw", 65536, 1),
+    # (8, "GraphBlox", "Single", 8, "hw", 65536, 1),
+    # (0, "GraphBlox", "Lite", 4, "hw", 131072, 1),
+    # (0, "GraphBlox", "Full", 2, "hw", 262144, 1),
+    # (0, "GraphBlox", "Lite", 4, "hw", 131072, 2),
+    # (0, "GraphBlox", "Full", 2, "hw", 131072, 2),
     # Add more tuples here for other algorithm configurations as needed
 ]
 
@@ -337,13 +337,13 @@ ch_properties = [
     #     ["33", "512", "0", "1", "33", "32", "4", "33", "32"],
     #     ["33", "512", "0", "2", "33", "32", "3", "33", "32"],
     # ),
-    # (5, "GLay", "Single", 8, "hw", 65536, 1),
-    # (6, "GLay", "Single", 8, "hw", 65536, 1),
-    # (8, "GLay", "Single", 8, "hw", 65536, 1),
-    # (0, "GLay", "Lite", 4, "hw", 131072, 1),
-    # (0, "GLay", "Full", 2, "hw", 262144, 1),
-    # (0, "GLay", "Lite", 4, "hw", 131072, 2),
-    # (0, "GLay", "Full", 2, "hw", 131072, 2),
+    # (5, "GraphBlox", "Single", 8, "hw", 65536, 1),
+    # (6, "GraphBlox", "Single", 8, "hw", 65536, 1),
+    # (8, "GraphBlox", "Single", 8, "hw", 65536, 1),
+    # (0, "GraphBlox", "Lite", 4, "hw", 131072, 1),
+    # (0, "GraphBlox", "Full", 2, "hw", 262144, 1),
+    # (0, "GraphBlox", "Lite", 4, "hw", 131072, 2),
+    # (0, "GraphBlox", "Full", 2, "hw", 131072, 2),
     # Add more tuples here for other algorithm configurations as needed
 ]
 

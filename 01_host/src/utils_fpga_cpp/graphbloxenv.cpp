@@ -1,19 +1,19 @@
 // -----------------------------------------------------------------------------
 //
-//      "GLAY"
+//      "GRAPHBLOX"
 //
 // -----------------------------------------------------------------------------
 // Copyright (c) 2014-2019 All rights reserved
 // -----------------------------------------------------------------------------
 // Author : Abdullah Mughrabi
 // Email  : atmughra@ncsu.edu||atmughrabi@gmail.com
-// File   : glayenv.c
+// File   : graphbloxenv.c
 // Create : 2019-10-09 19:20:39
 // Revise : 2019-12-01 00:12:59
 // Editor : Abdullah Mughrabi
 // -----------------------------------------------------------------------------
 
-#include "glayenv.hpp"
+#include "graphbloxenv.hpp"
 #include "myMalloc.h"
 #include <cstdlib>
 #include <fstream>
@@ -25,10 +25,10 @@
 #include <unistd.h>
 
 // ********************************************************************************************
-// ***************                  GLAY Handle **************
+// ***************                  GRAPHBLOX Handle **************
 // ********************************************************************************************
 
-xrtGLAYHandle::xrtGLAYHandle(struct Arguments *arguments) {
+xrtGRAPHBLOXHandle::xrtGRAPHBLOXHandle(struct Arguments *arguments) {
   deviceIndex = arguments->device_index;
   xclbinPath = arguments->xclbin_path;
   kernelName = arguments->kernel_name;
@@ -41,17 +41,17 @@ xrtGLAYHandle::xrtGLAYHandle(struct Arguments *arguments) {
   numThreads = arguments->ker_numThreads;
   overlay_algorithm = arguments->algorithm;
   cu_id = arguments->cu_id;
-  overlay_program_entries = 0; // Will be set in readGLAYDeviceEntriesFromFile
+  overlay_program_entries = 0; // Will be set in readGRAPHBLOXDeviceEntriesFromFile
   kernelNameFull =
       kernelName + ":{" + kernelName + "_" + std::to_string(cu_id + 1) + "}";
 
-  setupGLAYDevice();
+  setupGRAPHBLOXDevice();
 }
 
-void xrtGLAYHandle::setupGLAYDevice() {
-  // Perform the setup as in the original setupGLAYDevice function
+void xrtGRAPHBLOXHandle::setupGRAPHBLOXDevice() {
+  // Perform the setup as in the original setupGRAPHBLOXDevice function
   // This includes reading entries from file, initializing xrt devices, etc.
-  readGLAYDeviceEntriesFromFile(); // Reads entries into overlay_program and
+  readGRAPHBLOXDeviceEntriesFromFile(); // Reads entries into overlay_program and
   // sets overlay_program_entries
 
   // Initialize xrt::device, load xclbin, etc.
@@ -92,7 +92,7 @@ void xrtGLAYHandle::setupGLAYDevice() {
   }
 }
 
-void xrtGLAYHandle::readGLAYDeviceEntriesFromFile() {
+void xrtGRAPHBLOXHandle::readGRAPHBLOXDeviceEntriesFromFile() {
   std::ifstream file(overlayPath);
   if (!file.is_open()) {
     throw std::runtime_error("Failed to open overlay file.");
@@ -114,7 +114,7 @@ void xrtGLAYHandle::readGLAYDeviceEntriesFromFile() {
   overlay_program_entries = overlay_program.size();
 }
 
-void xrtGLAYHandle::printGLAYDevice() const {
+void xrtGRAPHBLOXHandle::printGRAPHBLOXDevice() const {
   DEBUG_PRINT("\n-----------------------------------------------------\n");
   DEBUG_PRINT("DEVICE::BDF                     [%s]\n",
               deviceHandle.get_info<xrt::info::device::bdf>().c_str());
@@ -167,23 +167,23 @@ void xrtGLAYHandle::printGLAYDevice() const {
 }
 
 // ********************************************************************************************
-// ***************                  GLAY General **************
+// ***************                  GRAPHBLOX General **************
 // ********************************************************************************************
 
-GLAYxrtBufferHandlePerKernel::GLAYxrtBufferHandlePerKernel(
+GRAPHBLOXxrtBufferHandlePerKernel::GRAPHBLOXxrtBufferHandlePerKernel(
     struct Arguments *arguments, struct GraphCSR *graph,
     struct GraphAuxiliary *graphAuxiliary) {
 
   // ********************************************************************************************
   // ***************                  Create Device Handle **************
   // ********************************************************************************************
-  glayHandle = new xrtGLAYHandle(arguments);
+  graphBloxHandle = new xrtGRAPHBLOXHandle(arguments);
 
-  if (glayHandle == NULL) {
-    DEBUG_PRINT("183::ERROR::GLAYxrtBufferHandlePerKernel::glayHandle = new "
-                "xrtGLAYHandle(arguments);\n");
+  if (graphBloxHandle == NULL) {
+    DEBUG_PRINT("183::ERROR::GRAPHBLOXxrtBufferHandlePerKernel::graphBloxHandle = new "
+                "xrtGRAPHBLOXHandle(arguments);\n");
   } else {
-    glayHandle->printGLAYDevice();
+    graphBloxHandle->printGRAPHBLOXDevice();
   }
 
   // ********************************************************************************************
@@ -191,37 +191,37 @@ GLAYxrtBufferHandlePerKernel::GLAYxrtBufferHandlePerKernel(
   // ********************************************************************************************
   assignGraphtoXRTBufferSize(graph, graphAuxiliary);
 
-  switch (glayHandle->ctrlMode) {
+  switch (graphBloxHandle->ctrlMode) {
   case 0: {
     for (int i = 0; i < xrt_buffers_num; i++) {
       xrt_buffer_object[i] =
-          xrt::bo(glayHandle->deviceHandle, xrt_buffer_size[i],
-                  glayHandle->mem_used.get_index());
+          xrt::bo(graphBloxHandle->deviceHandle, xrt_buffer_size[i],
+                  graphBloxHandle->mem_used.get_index());
       DEBUG_PRINT(
           "IP::Buffer::Allocate::xrt::bo xrt_buffer_object[%d] BankGroup[%d]\n",
-          i, glayHandle->mem_used.get_index());
+          i, graphBloxHandle->mem_used.get_index());
     }
   } break;
   case 1:
   case 2: {
     for (int i = 0; i < xrt_buffers_num; i++) {
       xrt_buffer_object[i] =
-          xrt::bo(glayHandle->deviceHandle, xrt_buffer_size[i],
-                  glayHandle->kernelHandle.group_id(i));
+          xrt::bo(graphBloxHandle->deviceHandle, xrt_buffer_size[i],
+                  graphBloxHandle->kernelHandle.group_id(i));
       DEBUG_PRINT("KERNEL::Buffer allocate(xrt::bo) xrt_buffer_object[%d] "
                   "BankGroup[%d]\n",
-                  i, glayHandle->kernelHandle.group_id(i));
+                  i, graphBloxHandle->kernelHandle.group_id(i));
     }
 
   } break;
   default: {
     for (int i = 0; i < xrt_buffers_num; i++) {
       xrt_buffer_object[i] =
-          xrt::bo(glayHandle->deviceHandle, xrt_buffer_size[i],
+          xrt::bo(graphBloxHandle->deviceHandle, xrt_buffer_size[i],
                   arguments->bankGroupIndex);
       DEBUG_PRINT("DEFAULT::IP::Buffer allocate(xrt::bo) xrt_buffer_object[%d] "
                   "BankGroup[%d]\n",
-                  i, glayHandle->mem_used.get_index());
+                  i, graphBloxHandle->mem_used.get_index());
     }
 
   } break;
@@ -244,7 +244,7 @@ GLAYxrtBufferHandlePerKernel::GLAYxrtBufferHandlePerKernel(
 
   system_cache_num_ways = 4;
   system_cache_data_width = 512 / 8;
-  system_cache_size = glayHandle->cacheSize;
+  system_cache_size = graphBloxHandle->cacheSize;
   system_cache_line_size_log = (uint32_t)log2(system_cache_data_width);
   system_cache_num_sets =
       (system_cache_size >>
@@ -260,9 +260,9 @@ GLAYxrtBufferHandlePerKernel::GLAYxrtBufferHandlePerKernel(
       (uint64_t)((uint64_t)(system_cache_count) << 32) |
       (uint64_t)(cu_vector.to_ullong() << 16) |
       (uint64_t)(overlay_program_entries << 3) |
-      (uint64_t)(glayHandle->flush_enable << 2) |
-      ((uint64_t)glayHandle->endian_write << 1) |
-      (uint64_t)glayHandle->endian_read;
+      (uint64_t)(graphBloxHandle->flush_enable << 2) |
+      ((uint64_t)graphBloxHandle->endian_write << 1) |
+      (uint64_t)graphBloxHandle->endian_read;
   DEBUG_PRINT("-----------------------------------------------------\n");
   for (int i = 0; i < xrt_buffers_num - 1; i++) {
     xrt_buffer_device[i] = xrt_buffer_object[i].address();
@@ -281,17 +281,17 @@ GLAYxrtBufferHandlePerKernel::GLAYxrtBufferHandlePerKernel(
   // ********************************************************************************************
   // ***************                  Setup Host pointers **************
   // ********************************************************************************************
-  initializeGLAYOverlayConfiguration(graph);
+  initializeGRAPHBLOXOverlayConfiguration(graph);
   assignGraphtoXRTBufferHost(graph, graphAuxiliary);
-  DEBUG_PRINT("SETUP::GLAYxrtBufferHandlePerKernel::"
-              "initializeGLAYOverlayConfiguration\n");
-  DEBUG_PRINT("SETUP::GLAYxrtBufferHandlePerKernel::"
+  DEBUG_PRINT("SETUP::GRAPHBLOXxrtBufferHandlePerKernel::"
+              "initializeGRAPHBLOXOverlayConfiguration\n");
+  DEBUG_PRINT("SETUP::GRAPHBLOXxrtBufferHandlePerKernel::"
               "assignGraphtoXRTBufferHost\n");
   DEBUG_PRINT("-----------------------------------------------------\n");
   // ********************************************************************************************
 }
 
-void GLAYxrtBufferHandlePerKernel::SetSyncBuffersBasedOnString(
+void GRAPHBLOXxrtBufferHandlePerKernel::SetSyncBuffersBasedOnString(
     const std::string &syncPattern) {
   // Reset all bits initially.
   xrt_buffer_sync.reset();
@@ -303,16 +303,16 @@ void GLAYxrtBufferHandlePerKernel::SetSyncBuffersBasedOnString(
   }
 }
 
-void GLAYxrtBufferHandlePerKernel::assignGraphtoXRTBufferSize(
+void GRAPHBLOXxrtBufferHandlePerKernel::assignGraphtoXRTBufferSize(
     struct GraphCSR *graph, struct GraphAuxiliary *graphAuxiliary) {
 
-  DEBUG_PRINT("IP::START::GLAYxrtBufferHandlePerKernel::"
+  DEBUG_PRINT("IP::START::GRAPHBLOXxrtBufferHandlePerKernel::"
               "assignGraphtoXRTBufferSize\n");
   if (xrt_buffers_num <= 10) // Adjust based on actual size
   {
-    overlay_program_entries = glayHandle->overlay_program_entries;
+    overlay_program_entries = graphBloxHandle->overlay_program_entries;
     xrt_buffer_size[0] =
-        ((glayHandle->overlay_program_entries + system_cache_count) *
+        ((graphBloxHandle->overlay_program_entries + system_cache_count) *
          sizeof(uint32_t));
     xrt_buffer_size[1] = graph->num_vertices * sizeof(uint32_t);
     xrt_buffer_size[2] = graph->num_vertices * sizeof(uint32_t);
@@ -326,11 +326,11 @@ void GLAYxrtBufferHandlePerKernel::assignGraphtoXRTBufferSize(
   } else {
     // Handle error or invalid `xrt_buffers_num` value
   }
-  DEBUG_PRINT("IP::DONE::GLAYxrtBufferHandlePerKernel::"
+  DEBUG_PRINT("IP::DONE::GRAPHBLOXxrtBufferHandlePerKernel::"
               "assignGraphtoXRTBufferSize\n");
 }
 
-void GLAYxrtBufferHandlePerKernel::prinGraphtoXRTBufferSize() const {
+void GRAPHBLOXxrtBufferHandlePerKernel::prinGraphtoXRTBufferSize() const {
   std::cout << "XRT Buffer Sizes:" << std::endl;
   for (int i = 0; i < xrt_buffers_num; ++i) {
     std::cout << "Buffer " << i << ": " << xrt_buffer_size[i] << " bytes"
@@ -338,7 +338,7 @@ void GLAYxrtBufferHandlePerKernel::prinGraphtoXRTBufferSize() const {
   }
 }
 
-void GLAYxrtBufferHandlePerKernel::assignGraphtoXRTBufferHost(
+void GRAPHBLOXxrtBufferHandlePerKernel::assignGraphtoXRTBufferHost(
     struct GraphCSR *graph, struct GraphAuxiliary *graphAuxiliary) {
   struct Vertex *vertices = NULL;
   struct EdgeList *sorted_edges_array = NULL;
@@ -369,9 +369,9 @@ void GLAYxrtBufferHandlePerKernel::assignGraphtoXRTBufferHost(
   }
 }
 
-int GLAYxrtBufferHandlePerKernel::writeGLAYHostToDeviceBuffersPerKernel() {
-  DEBUG_PRINT("IP::START::GLAYxrtBufferHandlePerKernel::"
-              "writeGLAYHostToDeviceBuffersPerKernel\n");
+int GRAPHBLOXxrtBufferHandlePerKernel::writeGRAPHBLOXHostToDeviceBuffersPerKernel() {
+  DEBUG_PRINT("IP::START::GRAPHBLOXxrtBufferHandlePerKernel::"
+              "writeGRAPHBLOXHostToDeviceBuffersPerKernel\n");
   for (int i = 0; i < xrt_buffers_num; i++) {
     xrt_buffer_object[i].write(xrt_buffer_host[i], xrt_buffer_size[i], 0);
     DEBUG_PRINT("WRITE::XCL_BO_SYNC_BO_TO_DEVICE xrt_buffer_object[%d] "
@@ -384,19 +384,19 @@ int GLAYxrtBufferHandlePerKernel::writeGLAYHostToDeviceBuffersPerKernel() {
                 "xrt_buffer_size[%ld]\n",
                 i, xrt_buffer_size[i]);
   }
-  DEBUG_PRINT("IP::DONE::GLAYxrtBufferHandlePerKernel::"
-              "writeGLAYHostToDeviceBuffersPerKernel\n");
+  DEBUG_PRINT("IP::DONE::GRAPHBLOXxrtBufferHandlePerKernel::"
+              "writeGRAPHBLOXHostToDeviceBuffersPerKernel\n");
   return 0;
 }
 
-int GLAYxrtBufferHandlePerKernel::mapGLAYHostToDeviceBuffersPerKernel() {
+int GRAPHBLOXxrtBufferHandlePerKernel::mapGRAPHBLOXHostToDeviceBuffersPerKernel() {
   for (int i = 0; i < xrt_buffers_num; i++) {
     // xrt_buffer_map[i] = xrt_buffer_device[i].map<uint32_t *>();
   }
   return 0;
 }
 
-int GLAYxrtBufferHandlePerKernel::updateGLAYDeviceToHostBuffersPerKernel() {
+int GRAPHBLOXxrtBufferHandlePerKernel::updateGRAPHBLOXDeviceToHostBuffersPerKernel() {
   for (int i = 0; i < xrt_buffers_num; i++) {
     if (xrt_buffer_sync.test(i)) // Check if sync is enabled
     {
@@ -408,7 +408,7 @@ int GLAYxrtBufferHandlePerKernel::updateGLAYDeviceToHostBuffersPerKernel() {
 }
 
 
-int GLAYxrtBufferHandlePerKernel::readGLAYDeviceToHostBuffersPerKernel() {
+int GRAPHBLOXxrtBufferHandlePerKernel::readGRAPHBLOXDeviceToHostBuffersPerKernel() {
   for (int i = 0; i < xrt_buffers_num; i++) {
     if (xrt_buffer_sync.test(i)) // Check if sync is enabled
     {
@@ -420,36 +420,36 @@ int GLAYxrtBufferHandlePerKernel::readGLAYDeviceToHostBuffersPerKernel() {
   return 0;
 }
 
-int GLAYxrtBufferHandlePerKernel::
-    writeRegistersAddressGLAYHostToDeviceBuffersPerKernel() {
-  auto args = glayHandle->cuHandles[glayHandle->cu_id].get_args();
-  DEBUG_PRINT("IP::START::GLAYxrtBufferHandlePerKernel::"
-              "writeRegistersAddressGLAYHostToDeviceBuffersPerKernel\n");
+int GRAPHBLOXxrtBufferHandlePerKernel::
+    writeRegistersAddressGRAPHBLOXHostToDeviceBuffersPerKernel() {
+  auto args = graphBloxHandle->cuHandles[graphBloxHandle->cu_id].get_args();
+  DEBUG_PRINT("IP::START::GRAPHBLOXxrtBufferHandlePerKernel::"
+              "writeRegistersAddressGRAPHBLOXHostToDeviceBuffersPerKernel\n");
   for (int i = 0; i < xrt_buffers_num; i++) {
-    glayHandle->ipHandle.write_register(args[i].get_offset(),
+    graphBloxHandle->ipHandle.write_register(args[i].get_offset(),
                                         xrt_buffer_device[i]);
-    glayHandle->ipHandle.write_register((args[i].get_offset() + 4),
+    graphBloxHandle->ipHandle.write_register((args[i].get_offset() + 4),
                                         xrt_buffer_device[i] >> 32);
     DEBUG_PRINT("IP::WRITE::REGISTER::ARGS[%d] RHS-OFFSET[0x%08lX][0x%08lX] "
                 "LHS-OFFSET[0x%08lX][0x%08lX]\n",
                 i, (args[i].get_offset() + 4), (xrt_buffer_device[i] >> 32),
                 args[i].get_offset(), xrt_buffer_device[i]);
   }
-  DEBUG_PRINT("IP::DONE::GLAYxrtBufferHandlePerKernel::"
-              "writeRegistersAddressGLAYHostToDeviceBuffersPerKernel\n");
+  DEBUG_PRINT("IP::DONE::GRAPHBLOXxrtBufferHandlePerKernel::"
+              "writeRegistersAddressGRAPHBLOXHostToDeviceBuffersPerKernel\n");
   return 0;
 }
 
-int GLAYxrtBufferHandlePerKernel::
-    setArgsKernelAddressGLAYHostToDeviceBuffersPerKernel() {
-  glayHandle->runKernelHandle = xrt::run(glayHandle->kernelHandle);
+int GRAPHBLOXxrtBufferHandlePerKernel::
+    setArgsKernelAddressGRAPHBLOXHostToDeviceBuffersPerKernel() {
+  graphBloxHandle->runKernelHandle = xrt::run(graphBloxHandle->kernelHandle);
   for (int i = 0; i < xrt_buffers_num; i++) {
-    glayHandle->runKernelHandle.set_arg(i, xrt_buffer_object[i]);
+    graphBloxHandle->runKernelHandle.set_arg(i, xrt_buffer_object[i]);
   }
   return 0;
 }
 
-void GLAYxrtBufferHandlePerKernel::initializeGLAYOverlayConfiguration(
+void GRAPHBLOXxrtBufferHandlePerKernel::initializeGRAPHBLOXOverlayConfiguration(
     struct GraphCSR *graph) {
 
   overlay_program = (uint32_t *)aligned_alloc(
@@ -460,46 +460,46 @@ void GLAYxrtBufferHandlePerKernel::initializeGLAYOverlayConfiguration(
   }
 
   if (!overlay_program) {
-    std::cerr << "ERROR::GLAYxrtBufferHandlePerKernel::"
-                 "setArgsKernelAddressGLAYHostToDeviceBuffersPerKernel "
+    std::cerr << "ERROR::GRAPHBLOXxrtBufferHandlePerKernel::"
+                 "setArgsKernelAddressGRAPHBLOXHostToDeviceBuffersPerKernel "
                  "Memory alignment error."
               << std::endl;
     return;
   }
 
   for (int i = 0; i < overlay_program_entries; i++) {
-    overlay_program[i] = glayHandle->overlay_program[i];
+    overlay_program[i] = graphBloxHandle->overlay_program[i];
   }
 
-  switch (glayHandle->overlay_algorithm) {
+  switch (graphBloxHandle->overlay_algorithm) {
   case 0: // bfs
   {
-    mapGLAYOverlayProgramBuffersBFS(graph);
+    mapGRAPHBLOXOverlayProgramBuffersBFS(graph);
   } break;
   case 1: // pagerank
   {
-    mapGLAYOverlayProgramBuffersPR(graph);
+    mapGRAPHBLOXOverlayProgramBuffersPR(graph);
   } break;
   case 5: // SPMV
   {
-    mapGLAYOverlayProgramBuffersSPMV(graph);
+    mapGRAPHBLOXOverlayProgramBuffersSPMV(graph);
   } break;
   case 6: // Connected Components
   {
-    mapGLAYOverlayProgramBuffersCC(graph);
+    mapGRAPHBLOXOverlayProgramBuffersCC(graph);
   } break;
   case 8: // Triangle Counting
   {
-    mapGLAYOverlayProgramBuffersTC(graph);
+    mapGRAPHBLOXOverlayProgramBuffersTC(graph);
   } break;
   default: // BFS
   {
-    mapGLAYOverlayProgramBuffersBFS(graph);
+    mapGRAPHBLOXOverlayProgramBuffersBFS(graph);
   } break;
   }
 }
 
-void GLAYxrtBufferHandlePerKernel::printGLAYxrtBufferHandlePerKernel() {
+void GRAPHBLOXxrtBufferHandlePerKernel::printGRAPHBLOXxrtBufferHandlePerKernel() {
   for (uint32_t i = 0; i < 10; ++i) {
     DEBUG_PRINT(
         "XRT-BUFFER-ID %-4u : HOST[%16p] DEVICE[0x%016lX] SIZE-BYTES[%lu], "
@@ -516,204 +516,204 @@ void GLAYxrtBufferHandlePerKernel::printGLAYxrtBufferHandlePerKernel() {
 }
 
 // ********************************************************************************************
-// ***************                  GLAY Control **************
+// ***************                  GRAPHBLOX Control **************
 // ********************************************************************************************
-void GLAYxrtBufferHandlePerKernel::setupGLAY() {
-  switch (glayHandle->ctrlMode) {
+void GRAPHBLOXxrtBufferHandlePerKernel::setupGRAPHBLOX() {
+  switch (graphBloxHandle->ctrlMode) {
   case 0: // UserManaged
-    setupGLAYUserManaged();
+    setupGRAPHBLOXUserManaged();
     break;
   case 1: // CtrlHS
-    setupGLAYCtrlHs();
+    setupGRAPHBLOXCtrlHs();
     break;
   case 2: // CtrlChain
-    setupGLAYCtrlChain();
+    setupGRAPHBLOXCtrlChain();
     break;
   default:
-    setupGLAYUserManaged();
+    setupGRAPHBLOXUserManaged();
     break;
   }
 }
 
-void GLAYxrtBufferHandlePerKernel::startGLAY() {
-  switch (glayHandle->ctrlMode) {
+void GRAPHBLOXxrtBufferHandlePerKernel::startGRAPHBLOX() {
+  switch (graphBloxHandle->ctrlMode) {
   case 0: // UserManaged
-    startGLAYUserManaged();
+    startGRAPHBLOXUserManaged();
     break;
   case 1: // CtrlHS
-    startGLAYCtrlHs();
+    startGRAPHBLOXCtrlHs();
     break;
   case 2: // CtrlChain
-    startGLAYCtrlChain();
+    startGRAPHBLOXCtrlChain();
     break;
   default:
-    startGLAYUserManaged();
+    startGRAPHBLOXUserManaged();
     break;
   }
 }
 
-void GLAYxrtBufferHandlePerKernel::waitGLAY() {
-  switch (glayHandle->ctrlMode) {
+void GRAPHBLOXxrtBufferHandlePerKernel::waitGRAPHBLOX() {
+  switch (graphBloxHandle->ctrlMode) {
   case 0: // UserManaged
-    waitGLAYUserManaged();
+    waitGRAPHBLOXUserManaged();
     break;
   case 1: // CtrlHS
-    waitGLAYCtrlHs();
+    waitGRAPHBLOXCtrlHs();
     break;
   case 2: // CtrlChain
-    waitGLAYCtrlChain();
+    waitGRAPHBLOXCtrlChain();
     break;
   default:
-    releaseGLAYUserManaged();
+    releaseGRAPHBLOXUserManaged();
     break;
   }
 }
 
-void GLAYxrtBufferHandlePerKernel::releaseGLAY() {
-  switch (glayHandle->ctrlMode) {
+void GRAPHBLOXxrtBufferHandlePerKernel::releaseGRAPHBLOX() {
+  switch (graphBloxHandle->ctrlMode) {
   case 0: // UserManaged
-    releaseGLAYUserManaged();
+    releaseGRAPHBLOXUserManaged();
     break;
   case 1: // CtrlHS
-    releaseGLAYCtrlHs();
+    releaseGRAPHBLOXCtrlHs();
     break;
   case 2: // CtrlChain
-    releaseGLAYCtrlChain();
+    releaseGRAPHBLOXCtrlChain();
     break;
   default:
-    releaseGLAYUserManaged();
+    releaseGRAPHBLOXUserManaged();
     break;
   }
 }
 
 // ********************************************************************************************
-// ***************                  GLAY Control USER_MANAGED **************
+// ***************                  GRAPHBLOX Control USER_MANAGED **************
 // ********************************************************************************************
 
-void GLAYxrtBufferHandlePerKernel::setupGLAYUserManaged() {
-  writeGLAYHostToDeviceBuffersPerKernel();
-  writeRegistersAddressGLAYHostToDeviceBuffersPerKernel();
+void GRAPHBLOXxrtBufferHandlePerKernel::setupGRAPHBLOXUserManaged() {
+  writeGRAPHBLOXHostToDeviceBuffersPerKernel();
+  writeRegistersAddressGRAPHBLOXHostToDeviceBuffersPerKernel();
 }
 
-void GLAYxrtBufferHandlePerKernel::startGLAYUserManaged() {
-  uint32_t glay_control_write = 0;
-  uint32_t glay_control_read = 0;
-  glay_control_write = CONTROL_START;
+void GRAPHBLOXxrtBufferHandlePerKernel::startGRAPHBLOXUserManaged() {
+  uint32_t graphBlox_control_write = 0;
+  uint32_t graphBlox_control_read = 0;
+  graphBlox_control_write = CONTROL_START;
 
-  glayHandle->ipHandle.write_register(CONTROL_OFFSET, glay_control_write);
+  graphBloxHandle->ipHandle.write_register(CONTROL_OFFSET, graphBlox_control_write);
 
   do {
-    glay_control_read = glayHandle->ipHandle.read_register(CONTROL_OFFSET);
-    DEBUG_PRINT("MSG::UserManaged::START-[0x%08X] \n", glay_control_read);
-  } while (!(glay_control_read & CONTROL_READY));
+    graphBlox_control_read = graphBloxHandle->ipHandle.read_register(CONTROL_OFFSET);
+    DEBUG_PRINT("MSG::UserManaged::START-[0x%08X] \n", graphBlox_control_read);
+  } while (!(graphBlox_control_read & CONTROL_READY));
 
-  DEBUG_PRINT("MSG::UserManaged::WAIT-[0x%08X] \n", glay_control_read);
+  DEBUG_PRINT("MSG::UserManaged::WAIT-[0x%08X] \n", graphBlox_control_read);
 }
 
-void GLAYxrtBufferHandlePerKernel::waitGLAYUserManaged() {
-  uint32_t glay_control_read = 0;
+void GRAPHBLOXxrtBufferHandlePerKernel::waitGRAPHBLOXUserManaged() {
+  uint32_t graphBlox_control_read = 0;
 
   do {
-    glay_control_read = glayHandle->ipHandle.read_register(CONTROL_OFFSET);
-    // DEBUG_PRINT("MSG: WAIT-[0x%08X] \n", glay_control_read);
-  } while (!(glay_control_read & CONTROL_IDLE));
+    graphBlox_control_read = graphBloxHandle->ipHandle.read_register(CONTROL_OFFSET);
+    // DEBUG_PRINT("MSG: WAIT-[0x%08X] \n", graphBlox_control_read);
+  } while (!(graphBlox_control_read & CONTROL_IDLE));
 
-  DEBUG_PRINT("MSG::UserManaged::WAIT-[0x%08X] \n", glay_control_read);
+  DEBUG_PRINT("MSG::UserManaged::WAIT-[0x%08X] \n", graphBlox_control_read);
 }
 
-void GLAYxrtBufferHandlePerKernel::releaseGLAYUserManaged() {
+void GRAPHBLOXxrtBufferHandlePerKernel::releaseGRAPHBLOXUserManaged() {
   // Close an opened device
-  //  xrtKernelClose(glayHandle->kernelHandle);
-  //  xrtDeviceClose(glayHandle->deviceHandle);
+  //  xrtKernelClose(graphBloxHandle->kernelHandle);
+  //  xrtDeviceClose(graphBloxHandle->deviceHandle);
 }
 
 // ********************************************************************************************
-// ***************                  GLAY Control AP_CTRL_HS **************
+// ***************                  GRAPHBLOX Control AP_CTRL_HS **************
 // ********************************************************************************************
 
-void GLAYxrtBufferHandlePerKernel::setupGLAYCtrlHs() {
-  writeGLAYHostToDeviceBuffersPerKernel();
-  setArgsKernelAddressGLAYHostToDeviceBuffersPerKernel();
+void GRAPHBLOXxrtBufferHandlePerKernel::setupGRAPHBLOXCtrlHs() {
+  writeGRAPHBLOXHostToDeviceBuffersPerKernel();
+  setArgsKernelAddressGRAPHBLOXHostToDeviceBuffersPerKernel();
 }
 
-void GLAYxrtBufferHandlePerKernel::startGLAYCtrlHs() {
-  glayHandle->runKernelHandle.start();
+void GRAPHBLOXxrtBufferHandlePerKernel::startGRAPHBLOXCtrlHs() {
+  graphBloxHandle->runKernelHandle.start();
 }
 
-void GLAYxrtBufferHandlePerKernel::waitGLAYCtrlHs() {
-  glayHandle->runKernelHandle.wait();
+void GRAPHBLOXxrtBufferHandlePerKernel::waitGRAPHBLOXCtrlHs() {
+  graphBloxHandle->runKernelHandle.wait();
 }
 
-void GLAYxrtBufferHandlePerKernel::releaseGLAYCtrlHs() {
+void GRAPHBLOXxrtBufferHandlePerKernel::releaseGRAPHBLOXCtrlHs() {
   // Close an opened device
-  //  xrtKernelClose(glayHandle->kernelHandle);
-  //  xrtDeviceClose(glayHandle->deviceHandle);
+  //  xrtKernelClose(graphBloxHandle->kernelHandle);
+  //  xrtDeviceClose(graphBloxHandle->deviceHandle);
 }
 
 // ********************************************************************************************
-// ***************                  GLAY Control AP_CTRL_CHAIN **************
+// ***************                  GRAPHBLOX Control AP_CTRL_CHAIN **************
 // ********************************************************************************************
 
-void GLAYxrtBufferHandlePerKernel::setupGLAYCtrlChain() {
-  writeGLAYHostToDeviceBuffersPerKernel();
-  setArgsKernelAddressGLAYHostToDeviceBuffersPerKernel();
+void GRAPHBLOXxrtBufferHandlePerKernel::setupGRAPHBLOXCtrlChain() {
+  writeGRAPHBLOXHostToDeviceBuffersPerKernel();
+  setArgsKernelAddressGRAPHBLOXHostToDeviceBuffersPerKernel();
 }
 
-void GLAYxrtBufferHandlePerKernel::startGLAYCtrlChain() {
-  glayHandle->runKernelHandle.start();
+void GRAPHBLOXxrtBufferHandlePerKernel::startGRAPHBLOXCtrlChain() {
+  graphBloxHandle->runKernelHandle.start();
 }
 
-void GLAYxrtBufferHandlePerKernel::waitGLAYCtrlChain() {
-  glayHandle->runKernelHandle.wait();
+void GRAPHBLOXxrtBufferHandlePerKernel::waitGRAPHBLOXCtrlChain() {
+  graphBloxHandle->runKernelHandle.wait();
 }
 
-void GLAYxrtBufferHandlePerKernel::releaseGLAYCtrlChain() {
+void GRAPHBLOXxrtBufferHandlePerKernel::releaseGRAPHBLOXCtrlChain() {
   // Close an opened device
-  //  xrtKernelClose(glayHandle->kernelHandle);
-  //  xrtDeviceClose(glayHandle->deviceHandle);
+  //  xrtKernelClose(graphBloxHandle->kernelHandle);
+  //  xrtDeviceClose(graphBloxHandle->deviceHandle);
 }
 
 // ********************************************************************************************
-// ***************                  GLAY Control multithreaded **************
+// ***************                  GRAPHBLOX Control multithreaded **************
 // ********************************************************************************************
 
 // // kernel running thread
-// void executeGLayThread(xrt::run runGLayKernel,
-// GLAYxrtBufferHandlePerKernel *glayGraphCSRxrtBufferHandlePerKernel)
+// void executeGraphBloxThread(xrt::run runGraphBloxKernel,
+// GRAPHBLOXxrtBufferHandlePerKernel *graphBloxGraphCSRxrtBufferHandlePerKernel)
 // {
-//     runGLayKernel.set_arg(ADDR_BUFFER_0_ID,
-//     glayGraphCSRxrtBufferHandlePerKernel->xrt_buffer_object[0]);
-//     runGLayKernel.set_arg(ADDR_BUFFER_1_ID,
-//     glayGraphCSRxrtBufferHandlePerKernel->xrt_buffer_object[1]);
-//     runGLayKernel.set_arg(ADDR_BUFFER_2_ID,
-//     glayGraphCSRxrtBufferHandlePerKernel->xrt_buffer_object[2]);
-//     runGLayKernel.set_arg(ADDR_BUFFER_3_ID,
-//     glayGraphCSRxrtBufferHandlePerKernel->xrt_buffer_object[3]);
-//     runGLayKernel.set_arg(ADDR_BUFFER_4_ID,
-//     glayGraphCSRxrtBufferHandlePerKernel->xrt_buffer_object[4]);
-//     runGLayKernel.set_arg(ADDR_BUFFER_5_ID,
-//     glayGraphCSRxrtBufferHandlePerKernel->xrt_buffer_object[5]);
-//     runGLayKernel.set_arg(ADDR_BUFFER_6_ID,
-//     glayGraphCSRxrtBufferHandlePerKernel->xrt_buffer_object[6]);
-//     runGLayKernel.set_arg(ADDR_BUFFER_7_ID,
-//     glayGraphCSRxrtBufferHandlePerKernel->xrt_buffer_object[7]);
-//     runGLayKernel.set_arg(ADDR_BUFFER_8_ID,
-//     glayGraphCSRxrtBufferHandlePerKernel->xrt_buffer_object[8]);
-//     runGLayKernel.set_arg(ADDR_BUFFER_9_ID,
-//     glayGraphCSRxrtBufferHandlePerKernel->xrt_buffer_object[9]);
-//     runGLayKernel.start();
-//     runGLayKernel.wait();
+//     runGraphBloxKernel.set_arg(ADDR_BUFFER_0_ID,
+//     graphBloxGraphCSRxrtBufferHandlePerKernel->xrt_buffer_object[0]);
+//     runGraphBloxKernel.set_arg(ADDR_BUFFER_1_ID,
+//     graphBloxGraphCSRxrtBufferHandlePerKernel->xrt_buffer_object[1]);
+//     runGraphBloxKernel.set_arg(ADDR_BUFFER_2_ID,
+//     graphBloxGraphCSRxrtBufferHandlePerKernel->xrt_buffer_object[2]);
+//     runGraphBloxKernel.set_arg(ADDR_BUFFER_3_ID,
+//     graphBloxGraphCSRxrtBufferHandlePerKernel->xrt_buffer_object[3]);
+//     runGraphBloxKernel.set_arg(ADDR_BUFFER_4_ID,
+//     graphBloxGraphCSRxrtBufferHandlePerKernel->xrt_buffer_object[4]);
+//     runGraphBloxKernel.set_arg(ADDR_BUFFER_5_ID,
+//     graphBloxGraphCSRxrtBufferHandlePerKernel->xrt_buffer_object[5]);
+//     runGraphBloxKernel.set_arg(ADDR_BUFFER_6_ID,
+//     graphBloxGraphCSRxrtBufferHandlePerKernel->xrt_buffer_object[6]);
+//     runGraphBloxKernel.set_arg(ADDR_BUFFER_7_ID,
+//     graphBloxGraphCSRxrtBufferHandlePerKernel->xrt_buffer_object[7]);
+//     runGraphBloxKernel.set_arg(ADDR_BUFFER_8_ID,
+//     graphBloxGraphCSRxrtBufferHandlePerKernel->xrt_buffer_object[8]);
+//     runGraphBloxKernel.set_arg(ADDR_BUFFER_9_ID,
+//     graphBloxGraphCSRxrtBufferHandlePerKernel->xrt_buffer_object[9]);
+//     runGraphBloxKernel.start();
+//     runGraphBloxKernel.wait();
 // }
 
-// void executeGLayMultiThreaded(xrtGLAYHandle *glayHandle,
-// GLAYxrtBufferHandlePerKernel *glayGraphCSRxrtBufferHandlePerKernel)
+// void executeGraphBloxMultiThreaded(xrtGRAPHBLOXHandle *graphBloxHandle,
+// GRAPHBLOXxrtBufferHandlePerKernel *graphBloxGraphCSRxrtBufferHandlePerKernel)
 // {
-//     std::vector<xrt::run> runGLayKernels;
+//     std::vector<xrt::run> runGraphBloxKernels;
 //     std::vector<std::thread> t(thread_num);
 
 //     for (int i = 0; i < thread_num; i++)
 //     {
-//         runGLayKernels.push_back(xrt::run(glayHandle->kernelHandle));
+//         runGraphBloxKernels.push_back(xrt::run(graphBloxHandle->kernelHandle));
 //     }
 
 //     int residue = groups_num % thread_num;
@@ -722,8 +722,8 @@ void GLAYxrtBufferHandlePerKernel::releaseGLAYCtrlChain() {
 //     {
 //         for (i = 0; i < thread_num; i++)
 //         {
-//             t[i] = std::thread(executeGLayThread, runGLayKernels[i],
-//             glayGraphCSRxrtBufferHandlePerKernel);
+//             t[i] = std::thread(executeGraphBloxThread, runGraphBloxKernels[i],
+//             graphBloxGraphCSRxrtBufferHandlePerKernel);
 //         }
 //         for (i = 0; i < thread_num; i++)
 //         {
@@ -732,12 +732,12 @@ void GLAYxrtBufferHandlePerKernel::releaseGLAYCtrlChain() {
 //     }
 //     for (i = 0; i < residue; i++)
 //     {
-//         //runGLayKernels[i].set_arg(krnl_cbc_arg_SRC_ADDR, input_sub_buffer[k
+//         //runGraphBloxKernels[i].set_arg(krnl_cbc_arg_SRC_ADDR, input_sub_buffer[k
 //         * thread_num + i]);   // use sub-buffer for source pointer argument
-//         //runGLayKernels[i].set_arg(krnl_cbc_arg_DEST_ADDR,
+//         //runGraphBloxKernels[i].set_arg(krnl_cbc_arg_DEST_ADDR,
 //         output_sub_buffer[k * thread_num + i]); // use sub-buffer for source
-//         pointer argument t[i] = std::thread(executeGLayThread,
-//         runGLayKernels[i], glayGraphCSRxrtBufferHandlePerKernel);
+//         pointer argument t[i] = std::thread(executeGraphBloxThread,
+//         runGraphBloxKernels[i], graphBloxGraphCSRxrtBufferHandlePerKernel);
 //     }
 //     for (i = 0; i < residue; i++)
 //     {

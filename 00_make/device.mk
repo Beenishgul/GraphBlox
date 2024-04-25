@@ -244,13 +244,13 @@ clean-report-metrics:
 # # Parameters for different algorithm configurations
 # algorithms = [
 #     # Format: (Algorithm Index, Architecture, Capability, Number of Kernels, Target)
-#     (0, "GLay", "Single", 8, "hw"),
-#     (1, "GLay", "Single", 8, "hw"),
-#     (5, "GLay", "Single", 8, "hw"),
-#     (6, "GLay", "Single", 8, "hw"),
-#     (8, "GLay", "Single", 8, "hw"),
-#     (0, "GLay", "Lite", 4, "hw"),
-#     (0, "GLay", "Full", 2, "hw"),
+#     (0, "GraphBlox", "Single", 8, "hw"),
+#     (1, "GraphBlox", "Single", 8, "hw"),
+#     (5, "GraphBlox", "Single", 8, "hw"),
+#     (6, "GraphBlox", "Single", 8, "hw"),
+#     (8, "GraphBlox", "Single", 8, "hw"),
+#     (0, "GraphBlox", "Lite", 4, "hw"),
+#     (0, "GraphBlox", "Full", 2, "hw"),
 #     # Add more tuples here for other algorithm configurations as needed
 # ]
 # =========================================================

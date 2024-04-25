@@ -1,5 +1,5 @@
-#ifndef GLAYENV_H
-#define GLAYENV_H
+#ifndef GRAPHBLOXENV_H
+#define GRAPHBLOXENV_H
 
 #include <bitset>
 #include <cmath>
@@ -50,7 +50,7 @@ struct __attribute__((__packed__)) GraphAuxiliary {
   void *auxiliary_2;
 };
 
-class xrtGLAYHandle {
+class xrtGRAPHBLOXHandle {
 public:
   bool endian_read;
   bool endian_write;
@@ -78,20 +78,20 @@ public:
   // xrt::ip::interrupt interruptHandle;
 
   // Constructor to initialize the device with arguments
-  xrtGLAYHandle(struct Arguments *arguments);
+  xrtGRAPHBLOXHandle(struct Arguments *arguments);
   // Destructor to clean up resources if necessary
-  ~xrtGLAYHandle() {
+  ~xrtGRAPHBLOXHandle() {
     // Implement any necessary cleanup
   }
-  void setupGLAYDevice();
-  void readGLAYDeviceEntriesFromFile();
-  void printGLAYDevice() const;
+  void setupGRAPHBLOXDevice();
+  void readGRAPHBLOXDeviceEntriesFromFile();
+  void printGRAPHBLOXDevice() const;
   // Other methods as necessary for device interaction
 };
 // ********************************************************************************************
 // ***************                      XRT Buffer Management **************
 // ********************************************************************************************
-class GLAYxrtBufferHandlePerKernel {
+class GRAPHBLOXxrtBufferHandlePerKernel {
 public:
   // User Managed Kernel MASK
   const uint32_t CONTROL_OFFSET = 0x00;
@@ -125,28 +125,28 @@ public:
   void *xrt_buffer_host[10];
   void *xrt_buffer_map[10];
   xrt::bo xrt_buffer_object[10];
-  xrtGLAYHandle *glayHandle;
+  xrtGRAPHBLOXHandle *graphBloxHandle;
 
-  GLAYxrtBufferHandlePerKernel() : overlay_program(nullptr) {}
-  ~GLAYxrtBufferHandlePerKernel() {
+  GRAPHBLOXxrtBufferHandlePerKernel() : overlay_program(nullptr) {}
+  ~GRAPHBLOXxrtBufferHandlePerKernel() {
     if (overlay_program) {
       free(overlay_program); // Use free for memory allocated with aligned_alloc
     }
-    delete glayHandle;
-    glayHandle = nullptr; // Good practice to avoid dangling pointer
+    delete graphBloxHandle;
+    graphBloxHandle = nullptr; // Good practice to avoid dangling pointer
   }
 
-  GLAYxrtBufferHandlePerKernel(struct Arguments *arguments,
+  GRAPHBLOXxrtBufferHandlePerKernel(struct Arguments *arguments,
                                struct GraphCSR *graph,
                                struct GraphAuxiliary *graphAuxiliary);
-  int writeGLAYHostToDeviceBuffersPerKernel();
-  int mapGLAYHostToDeviceBuffersPerKernel();
-  int readGLAYDeviceToHostBuffersPerKernel();
-  int updateGLAYDeviceToHostBuffersPerKernel();
-  int writeRegistersAddressGLAYHostToDeviceBuffersPerKernel();
-  int setArgsKernelAddressGLAYHostToDeviceBuffersPerKernel();
-  void initializeGLAYOverlayConfiguration(struct GraphCSR *graph);
-  void printGLAYxrtBufferHandlePerKernel();
+  int writeGRAPHBLOXHostToDeviceBuffersPerKernel();
+  int mapGRAPHBLOXHostToDeviceBuffersPerKernel();
+  int readGRAPHBLOXDeviceToHostBuffersPerKernel();
+  int updateGRAPHBLOXDeviceToHostBuffersPerKernel();
+  int writeRegistersAddressGRAPHBLOXHostToDeviceBuffersPerKernel();
+  int setArgsKernelAddressGRAPHBLOXHostToDeviceBuffersPerKernel();
+  void initializeGRAPHBLOXOverlayConfiguration(struct GraphCSR *graph);
+  void printGRAPHBLOXxrtBufferHandlePerKernel();
   void assignGraphtoXRTBufferHost(struct GraphCSR *graph,
                                   struct GraphAuxiliary *graphAuxiliary);
   void assignGraphtoXRTBufferSize(struct GraphCSR *graph,
@@ -154,43 +154,43 @@ public:
   void prinGraphtoXRTBufferSize() const;
   void SetSyncBuffersBasedOnString(const std::string &syncPattern);
 
-  void mapGLAYOverlayProgramBuffersBFS(struct GraphCSR *graph);
-  void mapGLAYOverlayProgramBuffersPR(struct GraphCSR *graph);
-  void mapGLAYOverlayProgramBuffersTC(struct GraphCSR *graph);
-  void mapGLAYOverlayProgramBuffersSPMV(struct GraphCSR *graph);
-  void mapGLAYOverlayProgramBuffersCC(struct GraphCSR *graph);
+  void mapGRAPHBLOXOverlayProgramBuffersBFS(struct GraphCSR *graph);
+  void mapGRAPHBLOXOverlayProgramBuffersPR(struct GraphCSR *graph);
+  void mapGRAPHBLOXOverlayProgramBuffersTC(struct GraphCSR *graph);
+  void mapGRAPHBLOXOverlayProgramBuffersSPMV(struct GraphCSR *graph);
+  void mapGRAPHBLOXOverlayProgramBuffersCC(struct GraphCSR *graph);
 
   // ********************************************************************************************
-  // ***************                  GLAY Control **************
+  // ***************                  GRAPHBLOX Control **************
   // ********************************************************************************************
-  void setupGLAY();
-  void startGLAY();
-  void waitGLAY();
-  void releaseGLAY();
+  void setupGRAPHBLOX();
+  void startGRAPHBLOX();
+  void waitGRAPHBLOX();
+  void releaseGRAPHBLOX();
 
   // ********************************************************************************************
-  // ***************                  GLAY Control USER_MANAGED **************
+  // ***************                  GRAPHBLOX Control USER_MANAGED **************
   // ********************************************************************************************
-  void setupGLAYUserManaged();
-  void startGLAYUserManaged();
-  void waitGLAYUserManaged();
-  void releaseGLAYUserManaged();
+  void setupGRAPHBLOXUserManaged();
+  void startGRAPHBLOXUserManaged();
+  void waitGRAPHBLOXUserManaged();
+  void releaseGRAPHBLOXUserManaged();
 
   // ********************************************************************************************
-  // ***************                  GLAY Control AP_CTRL_HS **************
+  // ***************                  GRAPHBLOX Control AP_CTRL_HS **************
   // ********************************************************************************************
-  void setupGLAYCtrlHs();
-  void startGLAYCtrlHs();
-  void waitGLAYCtrlHs();
-  void releaseGLAYCtrlHs();
+  void setupGRAPHBLOXCtrlHs();
+  void startGRAPHBLOXCtrlHs();
+  void waitGRAPHBLOXCtrlHs();
+  void releaseGRAPHBLOXCtrlHs();
 
   // ********************************************************************************************
-  // ***************                  GLAY Control AP_CTRL_CHAIN **************
+  // ***************                  GRAPHBLOX Control AP_CTRL_CHAIN **************
   // ********************************************************************************************
-  void setupGLAYCtrlChain();
-  void startGLAYCtrlChain();
-  void waitGLAYCtrlChain();
-  void releaseGLAYCtrlChain();
+  void setupGRAPHBLOXCtrlChain();
+  void startGRAPHBLOXCtrlChain();
+  void waitGRAPHBLOXCtrlChain();
+  void releaseGRAPHBLOXCtrlChain();
 };
 
 #endif

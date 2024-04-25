@@ -1,5 +1,5 @@
-#include "glayenv.hpp"
-void GLAYxrtBufferHandlePerKernel::mapGLAYOverlayProgramBuffersTC(struct GraphCSR *graph)
+#include "graphbloxenv.hpp"
+void GRAPHBLOXxrtBufferHandlePerKernel::mapGRAPHBLOXOverlayProgramBuffersTC(struct GraphCSR *graph)
 {
 // --------------------------------------------------------------------------------------
 // Name ENGINE_CSR_INDEX              ID 0    mapping 2    cycles 11   buffer_5-edges_array_dest ( 0 )-( graph->num_edges )
