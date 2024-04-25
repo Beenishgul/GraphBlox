@@ -5,13 +5,13 @@
 APP                 ?= GraphBlox
 
 # APP_TEST            ?= test_match
-# APP_TEST            ?= test_graphblox
+# APP_TEST            ?= test_$(APP)
 # APP_TEST            ?= test_StalaGraph
-APP_TEST            ?= test_GraphBlox_$(XILINX_CTRL_MODE)
+APP_TEST            ?= test_$(APP)_$(XILINX_CTRL_MODE)
 APP_LANG            ?= cpp
 # APP_LANG            ?= c
 INTEGRATION         ?= openmp
-# INTEGRATION         ?= graphBlox
+# INTEGRATION         ?= $(APP)
 
 MAKE_NUM_THREADS    ?= $(shell grep -c ^processor /proc/cpuinfo)
 ROOT_DIR            ?= $(shell cd ../../ ; pwd)
@@ -71,7 +71,7 @@ REPORTS_DIR_ACTIVE  ?= vivado_$(REPORTS_DIR)
 
 APP_DIR_ACTIVE      ?= $(ROOT_DIR)/$(APP_DIR)/$(DEVICE_DIR)/$(XILINX_DIR_ACTIVE)
 
-KERNEL_NAME         ?= graphBlox_kernel
+KERNEL_NAME         ?= $(APP)_kernel
 DEVICE_INDEX        ?= 0
 XCLBIN_PATH         ?= $(APP_DIR_ACTIVE)/$(VIVADO_BUILD_DIR)/$(KERNEL_NAME)_$(TARGET).xclbin
 FPGA_ARGS           ?= -m $(DEVICE_INDEX) -q $(XCLBIN_PATH) -Q $(KERNEL_NAME)
