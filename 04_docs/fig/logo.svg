@@ -4,6 +4,13 @@
    height="688"
    version="1.1"
    id="svg9"
+   sodipodi:docname="logo.svg"
+   inkscape:version="1.3.2 (1:1.3.2+202311252150+091e20ef0f)"
+   inkscape:export-filename="logo.svg"
+   inkscape:export-xdpi="96"
+   inkscape:export-ydpi="96"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:xlink="http://www.w3.org/1999/xlink"
    xmlns="http://www.w3.org/2000/svg"
    xmlns:svg="http://www.w3.org/2000/svg"
@@ -12,79 +19,115 @@
      id="defs10">
     <clipPath
        clipPathUnits="userSpaceOnUse"
-       id="clipPath16">
+       id="clipPath10">
       <rect
-         style="fill:none;stroke-width:1.23002"
-         id="rect17"
-         width="667.98383"
-         height="672.95166"
-         x="486.2749"
-         y="283.02426"
-         rx="120.11145"
-         ry="106.37074" />
+         style="fill:none"
+         id="rect11"
+         width="668.27362"
+         height="672.50317"
+         x="486.57913"
+         y="283.16339"
+         rx="113.37481"
+         ry="111.54702" />
     </clipPath>
   </defs>
+  <sodipodi:namedview
+     id="namedview9"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     showgrid="false"
+     inkscape:zoom="1.3742733"
+     inkscape:cx="355.09677"
+     inkscape:cy="340.1798"
+     inkscape:window-width="1504"
+     inkscape:window-height="1289"
+     inkscape:window-x="26"
+     inkscape:window-y="23"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="svg9">
+    <inkscape:grid
+       id="grid11"
+       units="px"
+       originx="0"
+       originy="0"
+       spacingx="1"
+       spacingy="1"
+       empcolor="#0099e5"
+       empopacity="0.30196078"
+       color="#0099e5"
+       opacity="0.14901961"
+       empspacing="5"
+       dotted="false"
+       gridanglex="30"
+       gridanglez="30"
+       visible="false" />
+  </sodipodi:namedview>
   <g
-     transform="matrix(0.78564964,0,0,0.8412875,-308.71432,-187.54697)"
+     transform="translate(-482 -275)"
      lucid:page-tab-id="BiFvUoO9mq~~"
      id="g9">
     <path
-       d="m 480,286 a 6,6 0 0 1 6,-6 h 668 a 6,6 0 0 1 6,6 v 668 a 6,6 0 0 1 -6,6 H 486 a 6,6 0 0 1 -6,-6 z"
+       d="M480 286a6 6 0 0 1 6-6h668a6 6 0 0 1 6 6v668a6 6 0 0 1-6 6H486a6 6 0 0 1-6-6z"
        fill="url(#a)"
        id="path1"
-       clip-path="url(#clipPath16)" />
+       clip-path="url(#clipPath10)" />
     <path
-       d="m 540,626 a 6,6 0 0 1 6,-6 h 548 a 6,6 0 0 1 6,6 v 268 a 6,6 0 0 1 -6,6 H 546 a 6,6 0 0 1 -6,-6 z"
-       stroke="#000000"
+       d="M540 626a6 6 0 0 1 6-6h548a6 6 0 0 1 6 6v268a6 6 0 0 1-6 6H546a6 6 0 0 1-6-6z"
+       stroke="#000"
        stroke-opacity="0"
        stroke-width="3"
        fill="#fffffb"
        id="path2" />
     <path
-       d="m 580,646 a 6,6 0 0 1 6,-6 h 48 a 6,6 0 0 1 6,6 v 248 a 6,6 0 0 1 -6,6 h -48 a 6,6 0 0 1 -6,-6 z"
-       stroke="#000000"
+       d="M580 646a6 6 0 0 1 6-6h48a6 6 0 0 1 6 6v248a6 6 0 0 1-6 6h-48a6 6 0 0 1-6-6z"
+       stroke="#000"
        stroke-opacity="0"
        stroke-width="3"
        fill="#cbc2a3"
        id="path3" />
     <path
-       d="m 660,846 a 6,6 0 0 1 6,-6 h 128 a 6,6 0 0 1 6,6 v 48 a 6,6 0 0 1 -6,6 H 666 a 6,6 0 0 1 -6,-6 z"
-       stroke="#000000"
+       d="M660 846a6 6 0 0 1 6-6h128a6 6 0 0 1 6 6v48a6 6 0 0 1-6 6H666a6 6 0 0 1-6-6z"
+       stroke="#000"
        stroke-opacity="0"
        stroke-width="3"
        fill="#dedeff"
        id="path4" />
     <path
-       d="m 660,721.26 a 6,6 0 0 1 6,-6 h 244.4 a 6,6 0 0 1 6,6 v 97.48 a 6,6 0 0 1 -6,6 H 666 a 6,6 0 0 1 -6,-6 z"
-       stroke="#000000"
+       d="M660 721.26a6 6 0 0 1 6-6h244.4a6 6 0 0 1 6 6v97.48a6 6 0 0 1-6 6H666a6 6 0 0 1-6-6z"
+       stroke="#000"
        stroke-opacity="0"
        stroke-width="3"
        fill="#cfe4ff"
        id="path5" />
     <path
-       d="m 820,846 a 6,6 0 0 1 6,-6 h 84.4 a 6,6 0 0 1 6,6 v 48 a 6,6 0 0 1 -6,6 H 826 a 6,6 0 0 1 -6,-6 z"
-       stroke="#000000"
+       d="M820 846a6 6 0 0 1 6-6h84.4a6 6 0 0 1 6 6v48a6 6 0 0 1-6 6H826a6 6 0 0 1-6-6z"
+       stroke="#000"
        stroke-opacity="0"
        stroke-width="3"
        fill="#b8f5ed"
        id="path6" />
     <path
-       d="m 660,646 a 6,6 0 0 1 6,-6 h 324.94 a 6,6 0 0 1 6,6 v 48 a 6,6 0 0 1 -6,6 H 666 a 6,6 0 0 1 -6,-6 z"
-       stroke="#000000"
+       d="M660 646a6 6 0 0 1 6-6h324.94a6 6 0 0 1 6 6v48a6 6 0 0 1-6 6H666a6 6 0 0 1-6-6z"
+       stroke="#000"
        stroke-opacity="0"
        stroke-width="3"
        fill="#ffdda6"
        id="path7" />
     <path
-       d="m 936.4,721.26 a 6,6 0 0 1 6,-6 H 1054 a 6,6 0 0 1 6,6 V 894 a 6,6 0 0 1 -6,6 H 942.4 a 6,6 0 0 1 -6,-6 z"
-       stroke="#000000"
+       d="M936.4 721.26a6 6 0 0 1 6-6H1054a6 6 0 0 1 6 6V894a6 6 0 0 1-6 6H942.4a6 6 0 0 1-6-6z"
+       stroke="#000"
        stroke-opacity="0"
        stroke-width="3"
        fill="#c3f7c8"
        id="path8" />
     <path
-       d="m 1016.94,646 a 6,6 0 0 1 6,-6 H 1054 a 6,6 0 0 1 6,6 v 48 a 6,6 0 0 1 -6,6 h -31.06 a 6,6 0 0 1 -6,-6 z"
-       stroke="#000000"
+       d="M1016.94 646a6 6 0 0 1 6-6H1054a6 6 0 0 1 6 6v48a6 6 0 0 1-6 6h-31.06a6 6 0 0 1-6-6z"
+       stroke="#000"
        stroke-opacity="0"
        stroke-width="3"
        fill="#ffd9d9"
@@ -111,58 +154,4 @@
       </pattern>
     </defs>
   </g>
-  <rect
-     style="fill:none"
-     id="rect10"
-     width="524.44257"
-     height="567.23639"
-     x="73.524239"
-     y="50.276051"
-     rx="97.429031"
-     ry="99.399666" />
-  <rect
-     style="fill:none"
-     id="rect11"
-     width="39.698711"
-     height="85.885933"
-     x="37.948917"
-     y="62.984295"
-     rx="97.429031"
-     ry="85.885933" />
-  <rect
-     style="fill:none"
-     id="rect12"
-     width="488.99908"
-     height="543.89819"
-     x="85.040833"
-     y="55.671143"
-     rx="97.429031"
-     ry="85.885933" />
-  <rect
-     style="fill:none"
-     id="rect13"
-     width="476.46667"
-     height="524.021"
-     x="78.136375"
-     y="62.278687"
-     rx="97.429031"
-     ry="85.885933" />
-  <rect
-     style="fill:none"
-     id="rect14"
-     width="442.18848"
-     height="501.26297"
-     x="102.25034"
-     y="92.331505"
-     rx="97.429031"
-     ry="85.885933" />
-  <rect
-     style="fill:none"
-     id="rect15"
-     width="20.684479"
-     height="19.194006"
-     x="83.550575"
-     y="592.4903"
-     rx="97.429031"
-     ry="19.194006" />
 </svg>
