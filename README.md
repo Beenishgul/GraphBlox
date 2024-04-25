@@ -1,5 +1,5 @@
 [![Build Status](https://app.travis-ci.com/atmughrabi/GraphBlox.svg?token=L3reAtGHdEVVPvzcVqQ6&branch=main)](https://app.travis-ci.com/atmughrabi/GraphBlox)
-[<p align="center"><img src="./04_docs/fig/logo.svg" width="200" ></p>](#GraphBlox-benchmark-suite)
+[<p align="center"><img src="./04_docs/fig/logo.svg" width="230" ></p>](#GraphBlox-benchmark-suite)
 
 GraphBlox: A Vertex Centric Re-Configurable Graph Processing Overlay
 ===============================================================
