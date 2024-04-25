@@ -1,5 +1,5 @@
 //
-//      "GLay: A Vertex Centric Re-Configurable Graph Processing Overlay"
+//      "GraphBlox: A Vertex Centric Re-Configurable Graph Processing Overlay"
 //
 // -----------------------------------------------------------------------------
 // Copyright (c) 2021-2023 All rights reserved
@@ -26,7 +26,6 @@ module engine_alu_ops_kernel (
 // Define internal signals
 EnginePacketData              ops_value_reg    ;
 EnginePacketData              result_reg       ;
-EnginePacketData              org_value_reg    ;
 logic                         data_valid_reg   ;
 ALUOpsConfigurationParameters config_params_reg;
 
@@ -58,27 +57,13 @@ always_ff @(posedge ap_clk) begin
       end
     end
   end
-
-  for (int i = 0; i<ENGINE_PACKET_DATA_NUM_FIELDS; i++) begin
-    if(|config_params_in.ops_mask[i])begin
-      for (int j = 0; j<ENGINE_PACKET_DATA_NUM_FIELDS; j++) begin
-        if(config_params_in.ops_mask[i][j]) begin
-          org_value_reg.field[i]       <= data_in.field[j];
-          org_value_reg.field_state[i] <= data_in.field_state[j];
-        end
-      end
-    end else begin
-      org_value_reg.field[i]       <= data_in.field[i];
-      org_value_reg.field_state[i] <= data_in.field_state[i];
-    end
-  end
 end
 
 // ALU operations logic
 always_ff @(posedge ap_clk) begin
   config_params_reg.alu_mask      <= config_params_in.alu_mask;
   config_params_reg.alu_operation <= config_params_in.alu_operation;
-  result_reg.field_state          <= org_value_reg.field_state; // Undefined operations reset result_out
+  result_reg.field_state          <= ops_value_reg.field_state; // Undefined operations reset result_out
 
   if (clear) begin
     result_reg.field <= 0;
@@ -86,7 +71,7 @@ always_ff @(posedge ap_clk) begin
     case (config_params_reg.alu_operation)
 // --------------------------------------------------------------------------------------
       ALU_NOP : begin
-        result_reg <= ops_value_reg; // No operation
+        result_reg.field  <= ops_value_reg.field ; // No operation
       end
 // --------------------------------------------------------------------------------------
       ALU_ADD : begin
@@ -145,8 +130,8 @@ always_ff @(posedge ap_clk) begin
     result_out.field_state[i] <= result_reg.field_state[i];
   end
   for (int i = 1; i<ENGINE_PACKET_DATA_NUM_FIELDS; i++) begin
-    result_out.field[i]       <= org_value_reg.field[i];
-    result_out.field_state[i] <= org_value_reg.field_state[i];
+    result_out.field[i]       <= ops_value_reg.field[i];
+    result_out.field_state[i] <= ops_value_reg.field_state[i];
   end
 end
 

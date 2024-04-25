@@ -83,7 +83,7 @@
                 "ENGINE_PARALLEL_READ_WRITE(B:auxiliary_2,num_vertices,num_vertices*2)(B:auxiliary_1,0,num_vertices)"
             ],
             [
-                "ENGINE_CSR_INDEX(B:NONE,0,num_vertices)"
+                "ENGINE_CSR_INDEX(P:1)(B:NONE,0,num_vertices)"
             ],
             [
                 "ENGINE_FORWARD_DATA"
@@ -116,112 +116,10 @@
             ]
         ]
     },
-    "Single.BFSv1": {
-        "0": [
-            [
-                "ENGINE_READ_WRITE(B:auxiliary_2,num_vertices,num_vertices*2)"
-            ],
-            [
-                "ENGINE_READ_WRITE(B:auxiliary_1,0,num_vertices)"
-            ],
-            [
-                "ENGINE_CSR_INDEX(B:NONE,0,num_vertices)"
-            ],
-            [
-                "ENGINE_FORWARD_DATA"
-            ]
-        ],
-        "1": [
-            [
-                "ENGINE_READ_WRITE(B:edges_idx,0,num_vertices)",
-                "ENGINE_MERGE_DATA(W:2)",
-                "ENGINE_FILTER_COND"
-            ],
-            [
-                "ENGINE_READ_WRITE(C:0)(B:out_degree,0,num_vertices)"
-            ],
-            [
-                "ENGINE_READ_WRITE(C:0)(B:auxiliary_1,0,num_vertices)"
-            ],
-            [
-                "ENGINE_FORWARD_DATA"
-            ]
-        ],
-        "2": [
-            [
-                "ENGINE_CSR_INDEX(B:edges_array_dest,0,num_edges)"
-            ],
-            [
-                "ENGINE_FORWARD_DATA"
-            ]
-        ],
-        "3": [
-            [
-                "ENGINE_READ_WRITE(B:auxiliary_1,num_vertices,num_vertices*2)",
-                "ENGINE_FILTER_COND"
-            ],
-            [
-                "ENGINE_FORWARD_DATA"
-            ]
-        ]
-    },
-    "Single.CCv1": {
-        "0": [
-            [
-                "ENGINE_CSR_INDEX(B:NONE,0,num_vertices)"
-            ],
-            [
-                "ENGINE_READ_WRITE(B:auxiliary_1,0,num_vertices)",
-                "ENGINE_FILTER_COND"
-            ],
-            [
-                "ENGINE_FORWARD_DATA"
-            ]
-        ],
-        "1": [
-            [
-                "ENGINE_READ_WRITE(B:edges_idx,0,num_vertices)",
-                "ENGINE_MERGE_DATA(W:2)"
-            ],
-            [
-                "ENGINE_READ_WRITE(C:0)(B:out_degree,0,num_vertices)"
-            ],
-            [
-                "ENGINE_READ_WRITE(C:0)(B:auxiliary_1,0,num_vertices)"
-            ],
-            [
-                "ENGINE_FORWARD_DATA"
-            ]
-        ],
-        "2": [
-            [
-                "ENGINE_READ_WRITE(B:auxiliary_1,0,num_vertices)"
-            ],
-            [
-                "ENGINE_READ_WRITE(B:auxiliary_2,0,num_vertices)"
-            ],
-            [
-                "ENGINE_CSR_INDEX(B:edges_array_dest,0,num_edges)"
-            ],
-            [
-                "ENGINE_FORWARD_DATA"
-            ]
-        ],
-        "3": [
-            [
-                "ENGINE_READ_WRITE(B:auxiliary_1,0,num_vertices)",
-                "ENGINE_FILTER_COND",
-                "ENGINE_FILTER_COND"
-            ],
-            [
-                "ENGINE_FORWARD_DATA"
-            ]
-        ]
-    },
     "Single.CC": {
         "0": [
             [
-                "ENGINE_CSR_INDEX(B:NONE,0,num_vertices)"
+                "ENGINE_CSR_INDEX(P:1)(B:NONE,0,num_vertices)"
             ],
             [
                 "ENGINE_READ_WRITE(B:auxiliary_1,0,num_vertices)",
@@ -267,7 +165,7 @@
                 "ENGINE_ALU_OPS"
             ],
             [
-                "ENGINE_CSR_INDEX(B:NONE,0,num_vertices)"
+                "ENGINE_CSR_INDEX(P:8)(B:NONE,0,num_vertices)"
             ],
             [
                 "ENGINE_FORWARD_DATA"
@@ -301,56 +199,13 @@
             ]
         ]
     },
-    "Single.PRv1": {
-        "0": [
-            [
-                "ENGINE_ALU_OPS"
-            ],
-            [
-                "ENGINE_CSR_INDEX(B:NONE,0,num_vertices)"
-            ],
-            [
-                "ENGINE_FORWARD_DATA"
-            ]
-        ],
-        "1": [
-            [
-                "ENGINE_READ_WRITE(B:edges_idx,0,num_vertices)",
-                "ENGINE_MERGE_DATA(W:1)"
-            ],
-            [
-                "ENGINE_READ_WRITE(C:0)(B:out_degree,0,num_vertices)"
-            ],
-            [
-                "ENGINE_READ_WRITE(B:auxiliary_2,num_vertices,num_vertices*2)"
-            ],
-            [
-                "ENGINE_FORWARD_DATA"
-            ]
-        ],
-        "2": [
-            [
-                "ENGINE_CSR_INDEX(B:edges_array_dest,0,num_edges)"
-            ],
-            [
-                "ENGINE_FORWARD_DATA"
-            ]
-        ],
-        "3": [
-            [
-                "ENGINE_READ_WRITE(B:auxiliary_1,num_vertices,num_vertices*2)"
-            ],
-            [
-                "ENGINE_FORWARD_DATA"
-            ]
-        ]
-    },
     "Single.SPMV": {
         "0": [
             [
                 "ENGINE_CSR_INDEX(B:NONE,0,num_vertices)"
             ],
             [
+                "ENGINE_ALU_OPS",
                 "ENGINE_ALU_OPS"
             ],
             [
@@ -359,29 +214,13 @@
         ],
         "1": [
             [
-                "ENGINE_READ_WRITE(B:edges_idx,0,num_vertices)",
-                "ENGINE_MERGE_DATA(W:4)"
-            ],
-            [
-                "ENGINE_READ_WRITE(C:0)(B:out_degree,0,num_vertices)"
-            ],
-            [
-                "ENGINE_READ_WRITE(C:0)(B:auxiliary_2,num_vertices,num_vertices*2)"
-            ],
-            [
-                "ENGINE_CSR_INDEX(C:0)(B:NONE,0,num_vertices)"
-            ],
-            [
-                "ENGINE_ALU_OPS"
+                "ENGINE_PARALLEL_READ_WRITE(B:edges_idx,0,num_vertices)(B:out_degree,0,num_vertices)(B:auxiliary_2,0,num_vertices)"
             ],
             [
                 "ENGINE_FORWARD_DATA"
             ]
         ],
         "2": [
-            [
-                "ENGINE_READ_WRITE(C:0)(B:out_degree,0,num_vertices)"
-            ],
             [
                 "ENGINE_CSR_INDEX(B:edges_array_dest,0,num_edges)"
             ],
@@ -391,7 +230,7 @@
         ],
         "3": [
             [
-                "ENGINE_READ_WRITE(B:auxiliary_1,num_vertices,num_vertices*2)"
+                "ENGINE_PARALLEL_READ_WRITE(B:auxiliary_1,num_vertices,num_vertices*2)(B:auxiliary_2,num_vertices,num_vertices*2)"
             ],
             [
                 "ENGINE_FORWARD_DATA"
@@ -405,7 +244,7 @@
                 "ENGINE_FILTER_COND"
             ],
             [
-                "ENGINE_CSR_INDEX(B:NONE,0,num_vertices)"
+                "ENGINE_CSR_INDEX(P:1)(B:NONE,0,num_vertices)"
             ],
             [
                 "ENGINE_FORWARD_DATA"
@@ -448,71 +287,6 @@
             ]
         ]
     },
-    "Single.TCv1": {
-        "0": [
-            [
-                "ENGINE_CSR_INDEX(B:edges_array_dest,0,num_edges)",
-                "ENGINE_FILTER_COND"
-            ],
-            [
-                "ENGINE_CSR_INDEX(B:NONE,0,num_vertices)"
-            ],
-            [
-                "ENGINE_FORWARD_DATA"
-            ]
-        ],
-        "1": [
-            [
-                "ENGINE_READ_WRITE(B:edges_idx,0,num_vertices)",
-                "ENGINE_MERGE_DATA(W:1)"
-            ],
-            [
-                "ENGINE_READ_WRITE(C:0)(B:out_degree,0,num_vertices)"
-            ],
-            [
-                "ENGINE_CSR_INDEX(B:edges_array_dest,0,num_edges)",
-                "ENGINE_FILTER_COND"
-            ],
-            [
-                "ENGINE_FORWARD_DATA"
-            ]
-        ],
-        "2": [
-            [
-                "ENGINE_FILTER_COND",
-                "ENGINE_ALU_OPS",
-                "ENGINE_ALU_OPS"
-            ],
-            [
-                "ENGINE_READ_WRITE(B:out_degree,0,num_vertices)"
-            ],
-            [
-                "ENGINE_CSR_INDEX(B:edges_array_dest,0,num_edges)",
-                "ENGINE_FILTER_COND"
-            ],
-            [
-                "ENGINE_FORWARD_DATA"
-            ]
-        ],
-        "3": [
-            [
-                "ENGINE_READ_WRITE(B:auxiliary_2,0,num_vertices)"
-            ],
-            [
-                "ENGINE_READ_WRITE(B:edges_idx,0,num_vertices)",
-                "ENGINE_MERGE_DATA(W:2)"
-            ],
-            [
-                "ENGINE_READ_WRITE(C:1)(B:out_degree,0,num_vertices)"
-            ],
-            [
-                "ENGINE_READ_WRITE(C:1)(B:edges_idx,0,num_vertices)"
-            ],
-            [
-                "ENGINE_FORWARD_DATA"
-            ]
-        ]
-    },
     "buffers": {
         "buffer_0": "overlay_program",
         "buffer_1": "in_degree",
@@ -546,15 +320,15 @@
             "64"
         ],
         "buffer_4": [
-            "1",
+            "0",
             "64"
         ],
         "buffer_5": [
-            "1",
+            "0",
             "64"
         ],
         "buffer_6": [
-            "1",
+            "0",
             "64"
         ],
         "buffer_7": [
@@ -581,7 +355,7 @@
             "1",
             "33",
             "32",
-            "4",
+            "2",
             "33",
             "32"
         ],
@@ -589,10 +363,10 @@
             "33",
             "512",
             "0",
-            "2",
+            "0",
             "33",
             "32",
-            "3",
+            "0",
             "33",
             "32"
         ],
@@ -690,7 +464,7 @@
     },
     "cache_properties": {
         "channel_0": [
-            "4194304",
+            "1048576",
             "4",
             "URAM",
             "0",
@@ -792,7 +566,7 @@
     },
     "cu_properties_comments": {
         "architecture": {
-            "GLay": "Graph Processing",
+            "GraphBlox": "Graph Processing",
             "NearAutomata": "Automata Processing",
             "Sieve": "PIM Emulation Sieve",
             "Suite": "Random Tests"
@@ -830,6 +604,7 @@
         "frequency_scale": "1",
         "ctrl_mode": "USER_MANAGED",
         "num_kernels": "1",
+        "num_kernel_cu": "1",
         "xpm_fifo": "3",
         "slr_percent": [
             33,
@@ -917,7 +692,7 @@
             ],
             "ENGINE_FILTER_COND": [
                 3,
-                9,
+                10,
                 1929,
                 16,
                 0,
@@ -962,7 +737,7 @@
             ],
             "ENGINE_PARALLEL_READ_WRITE": [
                 8,
-                36,
+                29,
                 2374,
                 16,
                 32,
@@ -1010,7 +785,7 @@
         ],
         "ENGINE_FILTER_COND": [
             3,
-            9,
+            10,
             2070,
             16,
             0,
@@ -1046,7 +821,7 @@
         ],
         "ENGINE_PARALLEL_READ_WRITE": [
             7,
-            36,
+            29,
             2374,
             16,
             32,

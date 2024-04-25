@@ -1,38 +1,38 @@
-[![Build Status](https://app.travis-ci.com/atmughrabi/GLay.svg?token=L3reAtGHdEVVPvzcVqQ6&branch=main)](https://app.travis-ci.com/atmughrabi/GLay)
-[<p align="center"><img src="./04_docs/fig/logo.png" width="300" ></p>](#GLay-benchmark-suite)
+[![Build Status](https://app.travis-ci.com/atmughrabi/GraphBlox.svg?token=L3reAtGHdEVVPvzcVqQ6&branch=main)](https://app.travis-ci.com/atmughrabi/GraphBlox)
+[<p align="center"><img src="./04_docs/fig/logo.svg" width="200" ></p>](#GraphBlox-benchmark-suite)
 
-GLay: A Vertex Centric Re-Configurable Graph Processing Overlay
+GraphBlox: A Vertex Centric Re-Configurable Graph Processing Overlay
 ===============================================================
 
 Abstract
 --------
 
-GLay is a vertex-centric reconfigurable graph processing overlay for FPGAs. It is designed to address the challenges of graph processing on FPGAs, such as long reconfiguration time, limited memory bandwidth, and high power consumption.
+GraphBlox is a vertex-centric reconfigurable graph processing overlay for FPGAs. It is designed to address the challenges of graph processing on FPGAs, such as long reconfiguration time, limited memory bandwidth, and high power consumption.
 
-* GLay achieves its performance and efficiency by:
+* GraphBlox achieves its performance and efficiency by:
   * Abstracting common access patterns in graph algorithms into engines for faster programmability.
   * Providing a scalable and flexible architecture that can be customized to the specific needs of a graph algorithm.
   * Using a high-performance memory system that can efficiently access large graphs.
   * Implementing efficient dataflow and control flow mechanisms.
 
-GLay has been evaluated on a variety of graph algorithms, including breadth-first search (BFS), depth-first search (DFS), and single source shortest path (SSSP). It has shown significant performance improvements over state-of-the-art FPGA-based graph processing systems.
+GraphBlox has been evaluated on a variety of graph algorithms, including breadth-first search (BFS), depth-first search (DFS), and single source shortest path (SSSP). It has shown significant performance improvements over state-of-the-art FPGA-based graph processing systems.
 
-* The following are some of the key features of GLay:
-  * **Vertex-centric programming model**: GLay uses a vertex-centric programming model, which is a natural fit for many graph algorithms. In this model, each vertex is processed independently, and the results of processing one vertex are used to process the next vertex.
-  * **Reconfigurable engines**: GLay provides a set of reconfigurable engines that can be used to implement the common access patterns in graph algorithms. This allows GLay to be quickly and easily reconfigured for different graph algorithms.
-  * **Scalable architecture**: GLay is designed to be scalable to large graphs. It can be easily scaled up by adding more processing elements.
-  * **High-performance memory system**: GLay uses a high-performance memory system that can efficiently access large graphs. This is achieved by using a distributed memory system with a high bandwidth interconnect HBM.
-  * **Efficient dataflow and control flow mechanisms**: GLay uses efficient dataflow and control flow mechanisms to minimize the overhead of processing graphs. This is achieved by using a pipelined execution model and by avoiding unnecessary data movement.
+* The following are some of the key features of GraphBlox:
+  * **Vertex-centric programming model**: GraphBlox uses a vertex-centric programming model, which is a natural fit for many graph algorithms. In this model, each vertex is processed independently, and the results of processing one vertex are used to process the next vertex.
+  * **Reconfigurable engines**: GraphBlox provides a set of reconfigurable engines that can be used to implement the common access patterns in graph algorithms. This allows GraphBlox to be quickly and easily reconfigured for different graph algorithms.
+  * **Scalable architecture**: GraphBlox is designed to be scalable to large graphs. It can be easily scaled up by adding more processing elements.
+  * **High-performance memory system**: GraphBlox uses a high-performance memory system that can efficiently access large graphs. This is achieved by using a distributed memory system with a high bandwidth interconnect HBM.
+  * **Efficient dataflow and control flow mechanisms**: GraphBlox uses efficient dataflow and control flow mechanisms to minimize the overhead of processing graphs. This is achieved by using a pipelined execution model and by avoiding unnecessary data movement.
 
-GLay is a promising new approach to graph processing on FPGAs. It has the potential to significantly improve the performance and efficiency of graph processing on FPGAs.
+GraphBlox is a promising new approach to graph processing on FPGAs. It has the potential to significantly improve the performance and efficiency of graph processing on FPGAs.
 
-![Figure 1: Graph Overlay (GLay) Contributions](./04_docs/fig/glay_gist.png "Figure 1: Graph Overlay (GLay) Contributions")
+![Figure 1: Graph Overlay (GraphBlox) Contributions](./04_docs/fig/graphBlox_gist.png "Figure 1: Graph Overlay (GraphBlox) Contributions")
 
-# GLay Benchmark Suite
+# GraphBlox Benchmark Suite
 
 ## Overview
 
-![End-to-End Evaluation](./04_docs/fig/theme.png "GLay")
+![End-to-End Evaluation](./04_docs/fig/theme.png "GraphBlox")
 
 * Presentations that explains end-to-end graph processing (implementation is inspired from these sources)
   * Preprocessing two steps (third one is optional) :
@@ -78,39 +78,39 @@ user@host:~$ sudo apt-get install libjudy-dev
 user@host:~$ sudo apt-get install libomp-dev
 ```
 
-# Running GLay
+# Running GraphBlox
 
-## Setting up GLay for Emulation - Example
+## Setting up GraphBlox for Emulation - Example
 
-1. Clone GLay.
+1. Clone GraphBlox.
 ```console
-user@host:~$ git clone https://github.com/atmughrabi/GLay.git
+user@host:~$ git clone https://github.com/atmughrabi/GraphBlox.git
 ```
-2. From the home directory go to the GLay directory:
+2. From the home directory go to the GraphBlox directory:
 ```console
-user@host:~$ cd GLay/
+user@host:~$ cd GraphBlox/
 ```
 3. Make the source code, package kernel, and generate Xilinxs IPs (AXI/FIFOs).
 ```console
-user@host:~GLay$ make
+user@host:~GraphBlox$ make
 ```
-4. Running GLay overlay emulation
+4. Running GraphBlox overlay emulation
     1. Make xclbin file for emulation (cycle accurate emualtion of hw) -- Modify TARGET=hw_emu in Makefile or pass it in CLI:
     ```console
-    user@host:~GLay$ make build-hw TARGET=hw_emu
+    user@host:~GraphBlox$ make build-hw TARGET=hw_emu
     ```
     2. Run in emulation mode:
     ```console
-    user@host:~GLay$ make run-emu TARGET=hw_emu
+    user@host:~GraphBlox$ make run-emu TARGET=hw_emu
     ```
     3. View emulation waves:
     ```console
-    user@host:~GLay$ make run-emu-waves TARGET=hw_emu
+    user@host:~GraphBlox$ make run-emu-waves TARGET=hw_emu
     ```
 
 ## Xilinx Flow [<img src="./04_docs/fig/xilinx_logo.png" height="45" align="right" >](https://xilinx.github.io/XRT/2022.1/html/index.html)
 
-* You can pass parameters or modify `Makefile` parameters (easiest way) at GLay root directory, to control the FPGA development flow and support.
+* You can pass parameters or modify `Makefile` parameters (easiest way) at GraphBlox root directory, to control the FPGA development flow and support.
 
 | PARAMETER  | VALUE | FUNCTION |
 | :--- | :--- | :--- |
@@ -118,84 +118,84 @@ user@host:~GLay$ make
 | PLATFORM  | xilinx_u250_gen3x16_xdma_4_1_202210_1 | Platform matching u250 Alveo card |
 | TARGET  | hw_emu | Build target, hw or hw_emu |
 | XILINX_CTRL_MODE  | USER_MANAGED | ctrl mode, AP_CTRL_HS or AP_CTRL_CHAIN |
-| KERNEL_NAME  | glay_kernel | packaged kernel |
+| KERNEL_NAME  | graphBlox_kernel | packaged kernel |
 | DEVICE_INDEX  | 0 | FPGA device index |
 | XCLBIN_PATH  | file.xclbin | .xclbin filepath |
 
 
 ### Simulation Mode
 
-#### Refreshing glay_ip and scripts into xilinx_project directory
-1. When modifying glay_ip and scripts directories, especially in `simulation mode` use the following rule - this makes sure that the updated scripts and Verilog code are copied to the active `xilinx_project` directory:
+#### Refreshing graphBlox_ip and scripts into xilinx_project directory
+1. When modifying graphBlox_ip and scripts directories, especially in `simulation mode` use the following rule - this makes sure that the updated scripts and Verilog code are copied to the active `xilinx_project` directory:
 ```console
-user@host:~GLay$ make gen-scripts-dir
+user@host:~GraphBlox$ make gen-scripts-dir
 ```
-#### Simulation glay_ip flow
+#### Simulation graphBlox_ip flow
 
 1. Generate Xilinx IPs:
 ```console
-user@host:~GLay$ make gen-vip
+user@host:~GraphBlox$ make gen-vip
 ```
 2. Run simulation on xsim:
 ```console
-user@host:~GLay$ make run-sim
+user@host:~GraphBlox$ make run-sim
 ```
 3. View simulation waves:
 ```console
-user@host:~GLay$ make run-sim-wave
+user@host:~GraphBlox$ make run-sim-wave
 ```
 ### Hardware Emulation Mode (TARGET=hw_emu)
 
 1. Generate Xilinx IPs:
 ```console
-user@host:~GLay$ make gen-vip
+user@host:~GraphBlox$ make gen-vip
 ```
-2. Package GLay kernel:
+2. Package GraphBlox kernel:
 ```console
-user@host:~GLay$ make package-kernel
+user@host:~GraphBlox$ make package-kernel
 ```
 3. Build binary for emulation:
 ```console
-user@host:~GLay$ make build-hw TARGET=hw_emu
+user@host:~GraphBlox$ make build-hw TARGET=hw_emu
 ```
-4. Run GLay on emulated hw:
+4. Run GraphBlox on emulated hw:
 ```console
-user@host:~GLay$ make run-emu
+user@host:~GraphBlox$ make run-emu
 ```
 5. View emulation waves:
 ```console
-user@host:~GLay$ make run-emu-wave
+user@host:~GraphBlox$ make run-emu-wave
 ```
 ### Hardware Mode (TARGET=hw)
 
 1. Generate Xilinx IPs:
 ```console
-user@host:~GLay$ make gen-vip
+user@host:~GraphBlox$ make gen-vip
 ```
-2. Package GLay kernel:
+2. Package GraphBlox kernel:
 ```console
-user@host:~GLay$ make package-kernel
+user@host:~GraphBlox$ make package-kernel
 ```
 3. Build binary for FPGA:
 ```console
-user@host:~GLay$ make build-hw TARGET=hw
+user@host:~GraphBlox$ make build-hw TARGET=hw
 ```
-4. Run GLay on taget fgpa:
+4. Run GraphBlox on taget fgpa:
 ```console
-user@host:~GLay$ make run-fpga
+user@host:~GraphBlox$ make run-fpga
 ```
 #### Generate reports in hardware mode (TARGET=hw)
 
 1. Generate Timing, Resource utilization and power reports:
 ```console
-user@host:~GLay$ make report_metrics 
+user@host:~GraphBlox$ make report_metrics 
 ```
 
 #### Open Project in Vivado GUI hardware or emulation mode (TARGET=hw/hw_emu)
 
 1. Generate Vivado project:
 ```console
-user@host:~GLay$ make open-vivado-project
+user@host:~GraphBlox$ make open-vivado-project
 ```
 
 ## CPU Flow [<img src="./04_docs/fig/openmp_logo.png" height="45" align="right" >](https://www.openmp.org/)
@@ -204,18 +204,18 @@ user@host:~GLay$ make open-vivado-project
 
 1. The default compilation is `openmp` mode:
 ```console
-user@host:~GLay$ make
+user@host:~GraphBlox$ make
 ```
-2. From the root directory you can modify the Makefile with the [(parameters)](#GLay-options) you need for OpenMP:
+2. From the root directory you can modify the Makefile with the [(parameters)](#GraphBlox-options) you need for OpenMP:
 ```console
-user@host:~GLay$ make run
+user@host:~GraphBlox$ make run
 ```
-* You can pass parameters modifying `Makefile` parameters (easiest way) - cross reference with [(parameters)](#GLay-options) to pass the correct values.
+* You can pass parameters modifying `Makefile` parameters (easiest way) - cross reference with [(parameters)](#GraphBlox-options) to pass the correct values.
 
 
 | PARAMETER  | FUNCTION | 
 | :--- | :--- |
-| ARGS  | arguments passed to glay |
+| ARGS  | arguments passed to graphBlox |
 
 | PARAMETER  | FUNCTION | 
 | :--- | :--- |
@@ -287,15 +287,15 @@ user@host:~GLay$ make run
 * `--stats` is a flag that enables conversion. It used also for collecting stats about the graph (but this feature is on hold for now).
 * (unweighted graph)
 ```console
-user@host:~GLay$ make convert
+user@host:~GraphBlox$ make convert
 ```
 * OR (weighted graph)
 ```console
-user@host:~GLay$ make convert-w
+user@host:~GraphBlox$ make convert-w
 ```
 * OR (weighted graph)
 ```console
-user@host:~GLay$ ./bin/glay-openmp  --generate-weights --stats --graph-file-format=0 --convert-format=1 --graph-file=../BENCHMARKS_DIR/GRAPH_NAME/graph
+user@host:~GraphBlox$ ./bin/graphBlox-openmp  --generate-weights --stats --graph-file-format=0 --convert-format=1 --graph-file=../BENCHMARKS_DIR/GRAPH_NAME/graph
 ```
 
 * `Makefile` parameters
@@ -322,7 +322,7 @@ user@host:~GLay$ ./bin/glay-openmp  --generate-weights --stats --graph-file-form
 ```
 
 # Graph Structure Preprocessing:
-GLay can handle multiple representations of the graph structure in memory, each has their own theoretical benefits and shortcomings.
+GraphBlox can handle multiple representations of the graph structure in memory, each has their own theoretical benefits and shortcomings.
 
 ## Regular unsorted Edge-list as input.
 <p align="center"><img src="./04_docs/fig/datastructures/edgelist-file.png" width ="500" ></p>
@@ -336,13 +336,13 @@ GLay can handle multiple representations of the graph structure in memory, each 
 Identifying Access Patterns and Control Flow in Graph Algorithms
 ----------------------------------------------------------------
 
-Graph processing kernels share common behaviors. GLay's primary purpose
+Graph processing kernels share common behaviors. GraphBlox's primary purpose
 is to abstract such access flows into engines for faster programmability
 between graph algorithms instead of having a fixed accelerator. Such
 overlay architecture reduces the reconfiguration time from typical FPGA
 flow, taking ms-s into ns-us. Figure 3 and Figure 4 highlight the
 Breadth-First Search (BFS) bottom-up approach graph algorithm
-analysis and its correlation to the GLay architecture design. For
+analysis and its correlation to the GraphBlox architecture design. For
 instance, a graph algorithm needs to interact with the graph structure
 commonly represented in the Compressed Sparse Row Matrix (CSR), as shown
 in Figure 2. Such behaviors are abstracted into sequential accesses and
@@ -352,7 +352,7 @@ vertex as shown in Figure 4 step A.
 
 As illustrated in steps C and E, the graph property data is most often
 accessed randomly and has high cache miss rates. Both behaviors will be
-supported and optimized with specialized read/write engines in GLay
+supported and optimized with specialized read/write engines in GraphBlox
 architecture. Other behaviors such as mathematical operations and
 branches are kept in a dataflow approach. As each vertex read/write
 request is filtered or processed based on a conditional reprogrammable
@@ -360,22 +360,22 @@ module for each engine, while an ALU handles simple mathematical
 operations if needed. Figure 4 displays the final analysis for BFS and
 the proposed Processing Elements (PEs).
 
-![Figure 2: Graph fundamental Compressed Sparse Row Matrix (CSR) structure](./04_docs/fig/glay/fig1.png "Figure 2: Graph fundamental Compressed Sparse Row Matrix (CSR) structure")
+![Figure 2: Graph fundamental Compressed Sparse Row Matrix (CSR) structure](./04_docs/fig/graphBlox/fig1.png "Figure 2: Graph fundamental Compressed Sparse Row Matrix (CSR) structure")
 
 
-![Figure 3: Breadth-First Search (BFS) algorithm](./04_docs/fig/glay/fig2.png "Figure 3: Breadth-First Search (BFS) algorithm")
+![Figure 3: Breadth-First Search (BFS) algorithm](./04_docs/fig/graphBlox/fig2.png "Figure 3: Breadth-First Search (BFS) algorithm")
 
 
-![Figure 4: BFS bottom-up approach, a graph kernel contains identifiable behaviors that can be abstracted into FPGA overlay engines. ](./04_docs/fig/glay/fig3.png "Figure 4: BFS bottom-up approach, a graph kernel contains identifiable behaviors that can be abstracted into FPGA overlay engines.")
+![Figure 4: BFS bottom-up approach, a graph kernel contains identifiable behaviors that can be abstracted into FPGA overlay engines. ](./04_docs/fig/graphBlox/fig3.png "Figure 4: BFS bottom-up approach, a graph kernel contains identifiable behaviors that can be abstracted into FPGA overlay engines.")
 
 
-![Figure 4: Proposed Vertex Processing Elements (PEs) for graph processing kernels.](./04_docs/fig/glay/fig4.png "Figure 4: Proposed Vertex Processing Elements (PEs) for graph processing kernels.")
+![Figure 4: Proposed Vertex Processing Elements (PEs) for graph processing kernels.](./04_docs/fig/graphBlox/fig4.png "Figure 4: Proposed Vertex Processing Elements (PEs) for graph processing kernels.")
 
 
-GLay Architecture 
+GraphBlox Architecture 
 ------------------
 
-Figure 5 illustrates an abstract overview of GLay vertex-centric graph
+Figure 5 illustrates an abstract overview of GraphBlox vertex-centric graph
 processing overlay. The Vertex CU supports multiple programmable engines
 and processing elements (PEs). These engines and PEs are bundled within
 the Vertex CU, where each PE bundle is pipelined in a step manner. A PE
@@ -400,14 +400,14 @@ the graph neighbor list from the CSR structure. Finally, in steps E and
 F, a conditional break halts the engine from processing the vertex
 neighbor list and updates the frontier data.
 
-![Figure 6: BFS algorithm on GLay](./04_docs/fig/glay/fig6.png "Figure 6: BFS algorithm on GLay")
+![Figure 6: BFS algorithm on GraphBlox](./04_docs/fig/graphBlox/fig6.png "Figure 6: BFS algorithm on GraphBlox")
 
-GraphIt integration ... Comming soon. -- GLay Graph Description Language (GGDL)
+GraphIt integration ... Comming soon. -- GraphBlox Graph Description Language (GGDL)
 ======================================
 
 GGDL is a description language that helps compile and port any graph
-algorithm to GLay graph processing overlay. This chapter describes some
-of the features of GLay architecture combined with a description
+algorithm to GraphBlox graph processing overlay. This chapter describes some
+of the features of GraphBlox architecture combined with a description
 language that can be compiled to reprogram the graph overlay.
 
 Serial\_Read\_Engine
@@ -513,19 +513,19 @@ Example Graph Algorithm GGDL Transformations
 BFS
 ---
 
-![Figure 7: Transforming BFS algorithm to GGDL](./04_docs/fig/glay/fig7.png "Figure 7: Transforming BFS algorithm to GGDL")
+![Figure 7: Transforming BFS algorithm to GGDL](./04_docs/fig/graphBlox/fig7.png "Figure 7: Transforming BFS algorithm to GGDL")
 
 
-# GLay Options
+# GraphBlox Options
 
-## GLay Host
+## GraphBlox Host
 
 ```
-Usage: glay-openmp [OPTION...]
+Usage: graphBlox-openmp [OPTION...]
             -f <graph file> -d [data structure] -a [algorithm] -r [root] -n
             [num threads] [-h -c -s -w]
 
-GLay is an open source graph processing framework, it is designed to be a
+GraphBlox is an open source graph processing framework, it is designed to be a
 benchmarking suite for various graph processing algorithms using pure C.
 
    -a, --algorithm=[DEFAULT:[0]-BFS]
@@ -688,10 +688,10 @@ benchmarking suite for various graph processing algorithms using pure C.
 
 
 ```
-## GLay Device
+## GraphBlox Device
 
 ```
-Usage: glay-openmp [OPTION...]
+Usage: graphBlox-openmp [OPTION...]
             -m <xclbin file> -q [device-index=0]
    -Q, --kernel-name=[DEFAULT:NULL]
                              Kernel package name.
@@ -707,7 +707,7 @@ Usage: glay-openmp [OPTION...]
 
 ```
 
-# GLay Organization
+# GraphBlox Organization
 
 ```console
 .
@@ -742,9 +742,9 @@ Usage: glay-openmp [OPTION...]
 │   │   └── src
 │   │       ├── engines
 │   │       └── testbench
-│   │           └── glay
+│   │           └── graphBlox
 │   ├── ol
-│   │   └── GLay
+│   │   └── GraphBlox
 │   │       ├── Engines
 │   │       │   ├── Templates.json
 │   │       │   └── Templates.ol
@@ -837,7 +837,7 @@ Usage: glay-openmp [OPTION...]
 └── 04_docs
     └── fig
         ├── datastructures
-        └── glay
+        └── graphBlox
 
 
 ```
@@ -858,7 +858,7 @@ Usage: glay-openmp [OPTION...]
   - [x] CC    (Connected Components)
   - [x] TC    (Triangle Counting)
   - [x] BC    (Betweenness Centrality)
-- [x] Finish graph algorithms suite GLay
+- [x] Finish graph algorithms suite GraphBlox
   - [x] BFS   (Breadth First Search)
   - [x] PR    (Page-Rank)
   - [ ] DFS   (Depth First Search)
@@ -867,7 +867,7 @@ Usage: glay-openmp [OPTION...]
   - [x] CC    (Connected Components)
   - [x] TC    (Triangle Counting)
   - [ ] BC    (Betweenness Centrality)
-- [x] Finish graph algorithms suite GLay FPGA
+- [x] Finish graph algorithms suite GraphBlox FPGA
   - [x] BFS   (Breadth First Search)
   - [x] PR    (Page-Rank)
   - [ ] DFS   (Depth First Search)
@@ -882,4 +882,4 @@ Usage: glay-openmp [OPTION...]
 Report bugs to:
 - <atmughrabi@gmail.com>
 - <atmughra@virginia.edu>
-[<p align="right"> <img src="./04_docs/fig/logo1.png" width="100" ></p>](#GLay-benchmark-suite)
+[<p align="right"> <img src="./04_docs/fig/logo.svg" width="100" ></p>](#GraphBlox-benchmark-suite)

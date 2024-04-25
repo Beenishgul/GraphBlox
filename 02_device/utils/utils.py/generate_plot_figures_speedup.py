@@ -30,8 +30,8 @@ speedup_data_corrected = {alg: [] for alg in algorithms}
 for alg_index, alg in enumerate(algorithms):
     for dataset in labels:
         gap_time = table_1_data[dataset][alg_index]
-        glay_time = table_2_data[dataset][alg_index]
-        speedup_factor = gap_time / glay_time if glay_time != 0 else np.inf
+        graphBlox_time = table_2_data[dataset][alg_index]
+        speedup_factor = gap_time / graphBlox_time if graphBlox_time != 0 else np.inf
         speedup_data_corrected[alg].append(speedup_factor)
 
 # Calculate the geometric mean for each algorithm's speedup data

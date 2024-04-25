@@ -5,7 +5,7 @@ print_usage () {
     echo "Usage: "
     echo "  generate_build_cfg.sh APP_DIR_ACTIVE UTILS_DIR_ACTIVE KERNEL_NAME"
     echo ""
-    echo "  APP_DIR_ACTIVE: /home/cmv6ru/Documents/00_github_repos/00_GLay/"
+    echo "  APP_DIR_ACTIVE: /home/cmv6ru/Documents/00_github_repos/00_GraphBlox/"
     echo "  UTILS_DIR_ACTIVE: utils"
     echo "  KERNEL_NAME: kernel"
     echo "  XILINX_IMPL_STRATEGY: 0"

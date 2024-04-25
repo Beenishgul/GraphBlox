@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 //
-//      "GLay: A Vertex Centric Re-Configurable Graph Processing Overlay"
+//      "GraphBlox: A Vertex Centric Re-Configurable Graph Processing Overlay"
 //
 // -----------------------------------------------------------------------------
 // Copyright (c) 2021-2023 All rights reserved
@@ -341,43 +341,43 @@ always_ff @(posedge ap_clk) begin
             end
 
 
-            (1 << (1+(7*4))) : begin
-                configure_memory_reg.payload.param.param_field[4].index_start <= fifo_response_memory_in_dout_reg.payload.data.field;
-            end
-            (1 << (2+(7*4))) : begin
-                configure_memory_reg.payload.param.param_field[4].granularity      <= fifo_response_memory_in_dout_reg.payload.data.field[$clog2(M00_AXI4_FE_ADDR_W)-1:0];
-                configure_memory_reg.payload.param.param_field[4].direction        <= fifo_response_memory_in_dout_reg.payload.data.field[M00_AXI4_FE_DATA_W-1];
-                configure_memory_reg.payload.param.meta[4].address.shift.amount    <= fifo_response_memory_in_dout_reg.payload.data.field[$clog2(M00_AXI4_FE_ADDR_W)-1:0];
-                configure_memory_reg.payload.param.meta[4].address.shift.direction <= fifo_response_memory_in_dout_reg.payload.data.field[M00_AXI4_FE_DATA_W-1];
-            end
-            (1 << (3+(7*4))) : begin
-                configure_memory_reg.payload.param.meta[4].subclass.cmd                       <= type_memory_cmd'(fifo_response_memory_in_dout_reg.payload.data.field[TYPE_MEMORY_CMD_BITS-1:0]);
-                configure_memory_reg.payload.param.meta[4].route.packet_destination.id_module <= fifo_response_memory_in_dout_reg.payload.data.field[(TYPE_MEMORY_CMD_BITS+NUM_MODULES_WIDTH_BITS)-1:(TYPE_MEMORY_CMD_BITS)];
-                configure_memory_reg.payload.param.meta[4].route.packet_destination.id_engine <= fifo_response_memory_in_dout_reg.payload.data.field[(TYPE_MEMORY_CMD_BITS+CU_MODULE_COUNT_MAX_WIDTH_BITS+NUM_ENGINES_WIDTH_BITS)-1:(TYPE_MEMORY_CMD_BITS+CU_MODULE_COUNT_MAX_WIDTH_BITS)];
-                configure_memory_reg.payload.param.meta[4].address.id_channel                 <= fifo_response_memory_in_dout_reg.payload.data.field[(TYPE_MEMORY_CMD_BITS+CU_MODULE_COUNT_MAX_WIDTH_BITS+CU_ENGINE_COUNT_MAX_WIDTH_BITS+NUM_CHANNELS_WIDTH_BITS)-1:(TYPE_MEMORY_CMD_BITS+CU_MODULE_COUNT_MAX_WIDTH_BITS+CU_ENGINE_COUNT_MAX_WIDTH_BITS)];
-                configure_memory_reg.payload.param.param_field[4].id_channel                  <= fifo_response_memory_in_dout_reg.payload.data.field[(TYPE_MEMORY_CMD_BITS+CU_MODULE_COUNT_MAX_WIDTH_BITS+CU_ENGINE_COUNT_MAX_WIDTH_BITS+NUM_CHANNELS_WIDTH_BITS)-1:(TYPE_MEMORY_CMD_BITS+CU_MODULE_COUNT_MAX_WIDTH_BITS+CU_ENGINE_COUNT_MAX_WIDTH_BITS)];
-            end
-            (1 << (4+(7*4))) : begin
-                configure_memory_reg.payload.param.meta[4].route.packet_destination.id_cu     <= fifo_response_memory_in_dout_reg.payload.data.field[(NUM_CUS_WIDTH_BITS)-1:0];
-                configure_memory_reg.payload.param.meta[4].route.packet_destination.id_bundle <= fifo_response_memory_in_dout_reg.payload.data.field[(NUM_BUNDLES_WIDTH_BITS+CU_KERNEL_COUNT_MAX_WIDTH_BITS)-1:CU_KERNEL_COUNT_MAX_WIDTH_BITS];
-                configure_memory_reg.payload.param.meta[4].route.packet_destination.id_lane   <= fifo_response_memory_in_dout_reg.payload.data.field[(NUM_LANES_WIDTH_BITS+CU_BUNDLE_COUNT_MAX_WIDTH_BITS+CU_KERNEL_COUNT_MAX_WIDTH_BITS)-1:(CU_BUNDLE_COUNT_MAX_WIDTH_BITS+CU_KERNEL_COUNT_MAX_WIDTH_BITS)];
-                configure_memory_reg.payload.param.meta[4].address.id_buffer                  <= fifo_response_memory_in_dout_reg.payload.data.field[(CU_BUFFER_COUNT_WIDTH_BITS+CU_LANE_COUNT_MAX_WIDTH_BITS+CU_BUNDLE_COUNT_MAX_WIDTH_BITS+CU_KERNEL_COUNT_MAX_WIDTH_BITS)-1:(CU_LANE_COUNT_MAX_WIDTH_BITS+CU_BUNDLE_COUNT_MAX_WIDTH_BITS+CU_KERNEL_COUNT_MAX_WIDTH_BITS)];
-                configure_memory_reg.payload.param.param_field[4].id_buffer                   <= fifo_response_memory_in_dout_reg.payload.data.field[(CU_BUFFER_COUNT_WIDTH_BITS+CU_LANE_COUNT_MAX_WIDTH_BITS+CU_BUNDLE_COUNT_MAX_WIDTH_BITS+CU_KERNEL_COUNT_MAX_WIDTH_BITS)-1:(CU_LANE_COUNT_MAX_WIDTH_BITS+CU_BUNDLE_COUNT_MAX_WIDTH_BITS+CU_KERNEL_COUNT_MAX_WIDTH_BITS)];
-            end
-            (1 << (5+(7*4))) : begin
-                configure_memory_reg.payload.param.param_field[4].const_mask <= fifo_response_memory_in_dout_reg.payload.data.field[ENGINE_PACKET_DATA_NUM_FIELDS-1:0];
-                configure_memory_reg.payload.param.param_field[4].mode_cache <= fifo_response_memory_in_dout_reg.payload.data.field[M00_AXI4_FE_CACHE_W + ENGINE_PACKET_DATA_NUM_FIELDS-1:ENGINE_PACKET_DATA_NUM_FIELDS];
-                configure_memory_reg.payload.param.meta[4].address.mode_cache  <= fifo_response_memory_in_dout_reg.payload.data.field[M00_AXI4_FE_CACHE_W + ENGINE_PACKET_DATA_NUM_FIELDS-1:ENGINE_PACKET_DATA_NUM_FIELDS];
+            // (1 << (1+(7*4))) : begin
+            //     configure_memory_reg.payload.param.param_field[4].index_start <= fifo_response_memory_in_dout_reg.payload.data.field;
+            // end
+            // (1 << (2+(7*4))) : begin
+            //     configure_memory_reg.payload.param.param_field[4].granularity      <= fifo_response_memory_in_dout_reg.payload.data.field[$clog2(M00_AXI4_FE_ADDR_W)-1:0];
+            //     configure_memory_reg.payload.param.param_field[4].direction        <= fifo_response_memory_in_dout_reg.payload.data.field[M00_AXI4_FE_DATA_W-1];
+            //     configure_memory_reg.payload.param.meta[4].address.shift.amount    <= fifo_response_memory_in_dout_reg.payload.data.field[$clog2(M00_AXI4_FE_ADDR_W)-1:0];
+            //     configure_memory_reg.payload.param.meta[4].address.shift.direction <= fifo_response_memory_in_dout_reg.payload.data.field[M00_AXI4_FE_DATA_W-1];
+            // end
+            // (1 << (3+(7*4))) : begin
+            //     configure_memory_reg.payload.param.meta[4].subclass.cmd                       <= type_memory_cmd'(fifo_response_memory_in_dout_reg.payload.data.field[TYPE_MEMORY_CMD_BITS-1:0]);
+            //     configure_memory_reg.payload.param.meta[4].route.packet_destination.id_module <= fifo_response_memory_in_dout_reg.payload.data.field[(TYPE_MEMORY_CMD_BITS+NUM_MODULES_WIDTH_BITS)-1:(TYPE_MEMORY_CMD_BITS)];
+            //     configure_memory_reg.payload.param.meta[4].route.packet_destination.id_engine <= fifo_response_memory_in_dout_reg.payload.data.field[(TYPE_MEMORY_CMD_BITS+CU_MODULE_COUNT_MAX_WIDTH_BITS+NUM_ENGINES_WIDTH_BITS)-1:(TYPE_MEMORY_CMD_BITS+CU_MODULE_COUNT_MAX_WIDTH_BITS)];
+            //     configure_memory_reg.payload.param.meta[4].address.id_channel                 <= fifo_response_memory_in_dout_reg.payload.data.field[(TYPE_MEMORY_CMD_BITS+CU_MODULE_COUNT_MAX_WIDTH_BITS+CU_ENGINE_COUNT_MAX_WIDTH_BITS+NUM_CHANNELS_WIDTH_BITS)-1:(TYPE_MEMORY_CMD_BITS+CU_MODULE_COUNT_MAX_WIDTH_BITS+CU_ENGINE_COUNT_MAX_WIDTH_BITS)];
+            //     configure_memory_reg.payload.param.param_field[4].id_channel                  <= fifo_response_memory_in_dout_reg.payload.data.field[(TYPE_MEMORY_CMD_BITS+CU_MODULE_COUNT_MAX_WIDTH_BITS+CU_ENGINE_COUNT_MAX_WIDTH_BITS+NUM_CHANNELS_WIDTH_BITS)-1:(TYPE_MEMORY_CMD_BITS+CU_MODULE_COUNT_MAX_WIDTH_BITS+CU_ENGINE_COUNT_MAX_WIDTH_BITS)];
+            // end
+            // (1 << (4+(7*4))) : begin
+            //     configure_memory_reg.payload.param.meta[4].route.packet_destination.id_cu     <= fifo_response_memory_in_dout_reg.payload.data.field[(NUM_CUS_WIDTH_BITS)-1:0];
+            //     configure_memory_reg.payload.param.meta[4].route.packet_destination.id_bundle <= fifo_response_memory_in_dout_reg.payload.data.field[(NUM_BUNDLES_WIDTH_BITS+CU_KERNEL_COUNT_MAX_WIDTH_BITS)-1:CU_KERNEL_COUNT_MAX_WIDTH_BITS];
+            //     configure_memory_reg.payload.param.meta[4].route.packet_destination.id_lane   <= fifo_response_memory_in_dout_reg.payload.data.field[(NUM_LANES_WIDTH_BITS+CU_BUNDLE_COUNT_MAX_WIDTH_BITS+CU_KERNEL_COUNT_MAX_WIDTH_BITS)-1:(CU_BUNDLE_COUNT_MAX_WIDTH_BITS+CU_KERNEL_COUNT_MAX_WIDTH_BITS)];
+            //     configure_memory_reg.payload.param.meta[4].address.id_buffer                  <= fifo_response_memory_in_dout_reg.payload.data.field[(CU_BUFFER_COUNT_WIDTH_BITS+CU_LANE_COUNT_MAX_WIDTH_BITS+CU_BUNDLE_COUNT_MAX_WIDTH_BITS+CU_KERNEL_COUNT_MAX_WIDTH_BITS)-1:(CU_LANE_COUNT_MAX_WIDTH_BITS+CU_BUNDLE_COUNT_MAX_WIDTH_BITS+CU_KERNEL_COUNT_MAX_WIDTH_BITS)];
+            //     configure_memory_reg.payload.param.param_field[4].id_buffer                   <= fifo_response_memory_in_dout_reg.payload.data.field[(CU_BUFFER_COUNT_WIDTH_BITS+CU_LANE_COUNT_MAX_WIDTH_BITS+CU_BUNDLE_COUNT_MAX_WIDTH_BITS+CU_KERNEL_COUNT_MAX_WIDTH_BITS)-1:(CU_LANE_COUNT_MAX_WIDTH_BITS+CU_BUNDLE_COUNT_MAX_WIDTH_BITS+CU_KERNEL_COUNT_MAX_WIDTH_BITS)];
+            // end
+            // (1 << (5+(7*4))) : begin
+            //     configure_memory_reg.payload.param.param_field[4].const_mask <= fifo_response_memory_in_dout_reg.payload.data.field[ENGINE_PACKET_DATA_NUM_FIELDS-1:0];
+            //     configure_memory_reg.payload.param.param_field[4].mode_cache <= fifo_response_memory_in_dout_reg.payload.data.field[M00_AXI4_FE_CACHE_W + ENGINE_PACKET_DATA_NUM_FIELDS-1:ENGINE_PACKET_DATA_NUM_FIELDS];
+            //     configure_memory_reg.payload.param.meta[4].address.mode_cache  <= fifo_response_memory_in_dout_reg.payload.data.field[M00_AXI4_FE_CACHE_W + ENGINE_PACKET_DATA_NUM_FIELDS-1:ENGINE_PACKET_DATA_NUM_FIELDS];
 
-                configure_memory_reg.payload.param.meta[4].ops_bundle <= fifo_response_memory_in_dout_reg.payload.data.field[NUM_BUNDLES_WIDTH_BITS+M00_AXI4_FE_CACHE_W +ENGINE_PACKET_DATA_NUM_FIELDS-1:M00_AXI4_FE_CACHE_W +ENGINE_PACKET_DATA_NUM_FIELDS];
-                configure_memory_reg.payload.param.meta[4].ops_lane   <= fifo_response_memory_in_dout_reg.payload.data.field[NUM_LANES_WIDTH_BITS+CU_BUNDLE_COUNT_MAX_WIDTH_BITS+M00_AXI4_FE_CACHE_W +ENGINE_PACKET_DATA_NUM_FIELDS-1:CU_BUNDLE_COUNT_MAX_WIDTH_BITS+M00_AXI4_FE_CACHE_W +ENGINE_PACKET_DATA_NUM_FIELDS];
-            end
-            (1 << (6+(7*4))) : begin
-                configure_memory_reg.payload.param.param_field[4].const_value <= fifo_response_memory_in_dout_reg.payload.data.field;
-            end
-            (1 << (7+(7*4))) : begin
-                configure_memory_reg.payload.param.param_field[4].ops_mask <= fifo_response_memory_in_dout_reg.payload.data.field[(ENGINE_PACKET_DATA_NUM_FIELDS*ENGINE_PACKET_DATA_NUM_FIELDS)-1:0];
-            end
+            //     configure_memory_reg.payload.param.meta[4].ops_bundle <= fifo_response_memory_in_dout_reg.payload.data.field[NUM_BUNDLES_WIDTH_BITS+M00_AXI4_FE_CACHE_W +ENGINE_PACKET_DATA_NUM_FIELDS-1:M00_AXI4_FE_CACHE_W +ENGINE_PACKET_DATA_NUM_FIELDS];
+            //     configure_memory_reg.payload.param.meta[4].ops_lane   <= fifo_response_memory_in_dout_reg.payload.data.field[NUM_LANES_WIDTH_BITS+CU_BUNDLE_COUNT_MAX_WIDTH_BITS+M00_AXI4_FE_CACHE_W +ENGINE_PACKET_DATA_NUM_FIELDS-1:CU_BUNDLE_COUNT_MAX_WIDTH_BITS+M00_AXI4_FE_CACHE_W +ENGINE_PACKET_DATA_NUM_FIELDS];
+            // end
+            // (1 << (6+(7*4))) : begin
+            //     configure_memory_reg.payload.param.param_field[4].const_value <= fifo_response_memory_in_dout_reg.payload.data.field;
+            // end
+            // (1 << (7+(7*4))) : begin
+            //     configure_memory_reg.payload.param.param_field[4].ops_mask <= fifo_response_memory_in_dout_reg.payload.data.field[(ENGINE_PACKET_DATA_NUM_FIELDS*ENGINE_PACKET_DATA_NUM_FIELDS)-1:0];
+            // end
 
             default : begin
                 configure_memory_reg.payload.param <= configure_memory_reg.payload.param;

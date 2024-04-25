@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 //
-//      "GLay: A Vertex Centric Re-Configurable Graph Processing Overlay"
+//      "GraphBlox: A Vertex Centric Re-Configurable Graph Processing Overlay"
 //
 // -----------------------------------------------------------------------------
 // Copyright (c) 2021-2023 All rights reserved
@@ -232,7 +232,7 @@ typedef struct packed{
   EnginePacketRouteAttributes route;
 } EnginePacketMeta;
 
-parameter ENGINE_PACKET_DATA_NUM_FIELDS = 5;
+parameter ENGINE_PACKET_DATA_NUM_FIELDS = 4;
 typedef struct packed{
   EnginePacketRouteAttributes               route   ;
   PacketRequestDataAddress                  address ;

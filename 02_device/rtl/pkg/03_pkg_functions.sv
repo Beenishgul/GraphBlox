@@ -1,7 +1,7 @@
 
 // -----------------------------------------------------------------------------
 //
-//      "GLay: A Vertex Centric Re-Configurable Graph Processing Overlay"
+//      "GraphBlox: A Vertex Centric Re-Configurable Graph Processing Overlay"
 //
 // -----------------------------------------------------------------------------
 // Copyright (c) 2021-2022 All rights reserved

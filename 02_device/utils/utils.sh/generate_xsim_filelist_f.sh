@@ -5,12 +5,12 @@ print_usage () {
     echo "Usage: "
     echo "  generate_xsim_filelist_f.sh APP_DIR_ACTIVE UTILS_DIR_ACTIVE KERNEL_NAME IP_DIR_RTL_ACTIVE"
     echo ""
-    echo "  APP_DIR_ACTIVE: /home/cmv6ru/Documents/00_github_repos/00_GLay/01_Device"
+    echo "  APP_DIR_ACTIVE: /home/cmv6ru/Documents/00_github_repos/00_GraphBlox/01_Device"
     echo "  UTILS_DIR_ACTIVE: utils"
     echo "  KERNEL_NAME: kernel"
     echo "  IP_DIR_RTL_ACTIVE : IP"
     echo "  VIVADO_VIP_DIR: vivado_generated_vip"
-    echo "  TESTBENCH_MODULE : glay|unit"
+    echo "  TESTBENCH_MODULE : graphBlox|unit"
     echo ""
 }
 if [ "$1" = "" ]

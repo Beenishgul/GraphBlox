@@ -47,9 +47,9 @@ bit [M00_AXI4_FE_DATA_W/8-1:0][8-1:0] auxiliary_2[];
 bit [M00_AXI4_FE_DATA_W/8-1:0][8-1:0] in_degree[];
 bit [M00_AXI4_FE_DATA_W/8-1:0][8-1:0] out_degree[];
 bit [M00_AXI4_FE_DATA_W/8-1:0][8-1:0] edges_idx[];
-bit [M01_AXI4_FE_DATA_W/8-1:0][8-1:0] edges_array_src[];
-bit [M01_AXI4_FE_DATA_W/8-1:0][8-1:0] edges_array_dest[];
-bit [M01_AXI4_FE_DATA_W/8-1:0][8-1:0] edges_array_weight[];
+bit [M00_AXI4_FE_DATA_W/8-1:0][8-1:0] edges_array_src[];
+bit [M00_AXI4_FE_DATA_W/8-1:0][8-1:0] edges_array_dest[];
+bit [M00_AXI4_FE_DATA_W/8-1:0][8-1:0] edges_array_weight[];
 
 function new ();
     this.file_error                = 0;
@@ -639,7 +639,7 @@ module __KERNEL___testbench ();
             buffer_6_ptr[63:0] = get_random_nbytes(M00_AXI4_BE_ADDR_W);
             buffer_7_ptr[63:0] = get_random_nbytes(M00_AXI4_BE_ADDR_W);
             buffer_8_ptr[63:0] = get_random_nbytes(M00_AXI4_BE_ADDR_W);
-            buffer_9_ptr = {(SYSTEM_CACHE_SIZE_ITERAIONS +_NUM_ENTRIES_),29'd_NUM_ENTRIES_, 1'b1, 1'b1, 1'b1}; //flush_cache , endian_write_reg , endian_read_reg
+            buffer_9_ptr = {(SYSTEM_CACHE_SIZE_ITERAIONS +_NUM_ENTRIES_),16'd_CU_VECTOR_,13'd_NUM_ENTRIES_, 1'b1, 1'b1, 1'b1}; //flush_cache , endian_write_reg , endian_read_reg
 
             ///////////////////////////////////////////////////////////////////////////
             //Write ID 0: buffer_0 (0x010) -> Randomized 4k aligned address (Global memory, lower 32 bits)
@@ -1288,9 +1288,9 @@ module __KERNEL___testbench ();
             graph.mem_in_degree       = graph.mem_num_vertices ;
             graph.mem_out_degree      = graph.mem_num_vertices ;
 
-            graph.mem_edges_array_src   = ((graph.num_edges*M01_AXI4_FE_DATA_W) + (M01_AXI4_FE_DATA_W-1) )/ (M01_AXI4_FE_DATA_W);
-            graph.mem_edges_array_dest  = ((graph.num_edges*M01_AXI4_FE_DATA_W) + (M01_AXI4_FE_DATA_W-1) )/ (M01_AXI4_FE_DATA_W);
-            graph.mem_edges_array_weight= ((graph.num_edges*M01_AXI4_FE_DATA_W) + (M01_AXI4_FE_DATA_W-1) )/ (M01_AXI4_FE_DATA_W);
+            graph.mem_edges_array_src   = ((graph.num_edges*M00_AXI4_FE_DATA_W) + (M00_AXI4_FE_DATA_W-1) )/ (M00_AXI4_FE_DATA_W);
+            graph.mem_edges_array_dest  = ((graph.num_edges*M00_AXI4_FE_DATA_W) + (M00_AXI4_FE_DATA_W-1) )/ (M00_AXI4_FE_DATA_W);
+            graph.mem_edges_array_weight= ((graph.num_edges*M00_AXI4_FE_DATA_W) + (M00_AXI4_FE_DATA_W-1) )/ (M00_AXI4_FE_DATA_W);
 
             graph.mem_auxiliary_1 = ((graph.num_auxiliary_1*M00_AXI4_FE_DATA_W*2) + (M00_AXI4_FE_DATA_W-1) )/ (M00_AXI4_FE_DATA_W);
             graph.mem_auxiliary_2 = ((graph.num_auxiliary_2*M00_AXI4_FE_DATA_W*2) + (M00_AXI4_FE_DATA_W-1) )/ (M00_AXI4_FE_DATA_W);
@@ -1362,9 +1362,9 @@ module __KERNEL___testbench ();
             graph.mem_in_degree       = graph.mem_num_vertices ;
             graph.mem_out_degree      = graph.mem_num_vertices ;
 
-            graph.mem_edges_array_src   = ((graph.num_edges*M01_AXI4_FE_DATA_W) + (M01_AXI4_FE_DATA_W-1) )/ (M01_AXI4_FE_DATA_W);
-            graph.mem_edges_array_dest  = ((graph.num_edges*M01_AXI4_FE_DATA_W) + (M01_AXI4_FE_DATA_W-1) )/ (M01_AXI4_FE_DATA_W);
-            graph.mem_edges_array_weight= ((graph.num_edges*M01_AXI4_FE_DATA_W) + (M01_AXI4_FE_DATA_W-1) )/ (M01_AXI4_FE_DATA_W);
+            graph.mem_edges_array_src   = ((graph.num_edges*M00_AXI4_FE_DATA_W) + (M00_AXI4_FE_DATA_W-1) )/ (M00_AXI4_FE_DATA_W);
+            graph.mem_edges_array_dest  = ((graph.num_edges*M00_AXI4_FE_DATA_W) + (M00_AXI4_FE_DATA_W-1) )/ (M00_AXI4_FE_DATA_W);
+            graph.mem_edges_array_weight= ((graph.num_edges*M00_AXI4_FE_DATA_W) + (M00_AXI4_FE_DATA_W-1) )/ (M00_AXI4_FE_DATA_W);
 
             graph.mem_auxiliary_1 = ((graph.num_auxiliary_1*M00_AXI4_FE_DATA_W*2) + (M00_AXI4_FE_DATA_W-1) )/ (M00_AXI4_FE_DATA_W);
             graph.mem_auxiliary_2 = ((graph.num_auxiliary_2*M00_AXI4_FE_DATA_W*2) + (M00_AXI4_FE_DATA_W-1) )/ (M00_AXI4_FE_DATA_W);
@@ -1681,7 +1681,7 @@ module __KERNEL___testbench ();
                         break;
                     iter++;
                 end
-                update_BFS_auxiliary_struct(graph);
+                update_CC_auxiliary_struct(graph);
                 $display("Finished - Iteration: %0d - Components: %0d", iter+1, graph.debug_counter_1);
             end
         endtask

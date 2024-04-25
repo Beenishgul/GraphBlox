@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 //
-//    "GLay: A Vertex Centric Re-Configurable Graph Processing Overlay"
+//    "GraphBlox: A Vertex Centric Re-Configurable Graph Processing Overlay"
 //
 // -----------------------------------------------------------------------------
 // Copyright (c) 2021-2023 All rights reserved
@@ -79,7 +79,7 @@ FIFOStateSignalsInput  cu_setup_fifo_request_signals_in  ;
 logic                  cu_setup_fifo_setup_signal        ;
 logic                  cu_setup_cu_flush                 ;
 logic                  cu_setup_done_out                 ;
-
+logic                  cu_setup_cu_enable                ;
 // --------------------------------------------------------------------------------------
 // Signals for CU
 // --------------------------------------------------------------------------------------
@@ -372,7 +372,8 @@ cu_setup #(
   .fifo_request_signals_in  (cu_setup_fifo_request_signals_in  ),
   .fifo_request_signals_out (cu_setup_fifo_request_signals_out ),
   .fifo_setup_signal        (cu_setup_fifo_setup_signal        ),
-  .done_out                 (cu_setup_done_out                 )
+  .done_out                 (cu_setup_done_out                 ),
+  .cu_enable                (cu_setup_cu_enable)
 );
 
 // --------------------------------------------------------------------------------------
@@ -403,7 +404,7 @@ always_ff @(posedge ap_clk) begin
   if (areset_bundles) begin
     cu_bundles_done_hold <= 0;
   end else begin
-    cu_bundles_done_hold <= {cu_bundles_done_hold[PULSE_HOLD-2:0],(cu_bundles_done_out & (&cu_channel_done_out) & fifo_empty_reg)};
+    cu_bundles_done_hold <= {cu_bundles_done_hold[PULSE_HOLD-2:0],(cu_bundles_done_out & (&cu_channel_done_out) & fifo_empty_reg) | ~cu_setup_cu_enable};
   end
 end
 

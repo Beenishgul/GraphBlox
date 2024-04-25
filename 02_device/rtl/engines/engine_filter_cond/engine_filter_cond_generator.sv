@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 //
-//      "GLay: A Vertex Centric Re-Configurable Graph Processing Overlay"
+//      "GraphBlox: A Vertex Centric Re-Configurable Graph Processing Overlay"
 //
 // -----------------------------------------------------------------------------
 // Copyright (c) 2021-2023 All rights reserved
@@ -442,13 +442,13 @@ always_comb begin
     generator_engine_request_engine_start_Stage.valid        = filter_flow_post & ~break_running_flow_reg;
     generator_engine_request_engine_start_Stage.payload.data = result_int;
 
-    for (int i = 0; i<ENGINE_PACKET_DATA_NUM_FIELDS-1; i++) begin
+    for (int i = 0; i<ENGINE_PACKET_DATA_NUM_FIELDS; i++) begin
         if (configure_engine_int.payload.param.filter_mask[i]) begin
             generator_engine_request_engine_start_Stage.payload.data.field_state[i] = sequence_state_engine_int;
         end
     end
 
-    for (int i = 0; i<ENGINE_PACKET_DATA_NUM_FIELDS-1; i++) begin
+    for (int i = 0; i<ENGINE_PACKET_DATA_NUM_FIELDS; i++) begin
         if (configure_engine_int.payload.param.set_mask[i] & (filter_flow_int & ~break_running_flow_reg)) begin
             generator_engine_request_engine_start_Stage.payload.data.field[i] = configure_engine_int.payload.param.set_value;
         end

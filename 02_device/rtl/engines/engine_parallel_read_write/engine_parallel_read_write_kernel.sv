@@ -1,5 +1,5 @@
 //
-//      "GLay: A Vertex Centric Re-Configurable Graph Processing Overlay"
+//      "GraphBlox: A Vertex Centric Re-Configurable Graph Processing Overlay"
 //
 // -----------------------------------------------------------------------------
 // Copyright (c) 2021-2023 All rights reserved
@@ -22,29 +22,24 @@ module engine_parallel_read_write_kernel (
 );
 
 // Define internal signals
-EnginePacketData                             ops_value_reg    ;
+logic [M00_AXI4_FE_DATA_W-1:0]               address_offset   ;
 PacketRequestDataAddress                     address_int      ;
 EnginePacketData                             org_value_reg    ;
 EnginePacketData                             org_data_int     ;
 ParallelReadWriteConfigurationParameterField config_params_reg;
 
 always_ff @(posedge ap_clk) begin
-  for (int i = 0; i<ENGINE_PACKET_DATA_NUM_FIELDS; i++) begin
-    if(config_params_in.const_mask[i]) begin
-      ops_value_reg.field[i]       <= config_params_in.const_value;
-      ops_value_reg.field_state[i] <= SEQUENCE_RUNNING;
-    end else  begin
-      if(|config_params_in.ops_mask[i])begin
-        for (int j = 0; j<ENGINE_PACKET_DATA_NUM_FIELDS; j++) begin
-          if(config_params_in.ops_mask[i][j]) begin
-            ops_value_reg.field[i]       <= data_in.field[j];
-            ops_value_reg.field_state[i] <= data_in.field_state[j];
-          end
+  if(config_params_in.const_mask[1]) begin
+    address_offset <= config_params_in.const_value;
+  end else  begin
+    if(|config_params_in.ops_mask[1])begin
+      for (int j = 0; j<ENGINE_PACKET_DATA_NUM_FIELDS; j++) begin
+        if(config_params_in.ops_mask[1][j]) begin
+          address_offset <= data_in.field[j];
         end
-      end else begin
-        ops_value_reg.field[i]       <= 0;
-        ops_value_reg.field_state[i] <= SEQUENCE_INVALID;
       end
+    end else begin
+      address_offset <= 0;
     end
   end
 end
@@ -63,8 +58,8 @@ always_ff @(posedge ap_clk) begin
           end
         end
       end else begin
-        org_value_reg.field[i]       <= data_in.field[i];
-        org_value_reg.field_state[i] <= data_in.field_state[i];
+        org_value_reg.field[i]       <= 0;
+        org_value_reg.field_state[i] <= SEQUENCE_INVALID;
       end
     end
   end
@@ -80,10 +75,13 @@ always_ff @(posedge ap_clk) begin
   address_int.id_buffer       <= config_params_reg.id_buffer;
   address_int.burst_length    <= 1;
   if(config_params_reg.direction) begin
-    address_int.offset <= (config_params_reg.index_start + ops_value_reg.field[1]) << config_params_reg.granularity;
+    address_int.offset <= (config_params_reg.index_start + address_offset) << config_params_reg.granularity;
   end else begin
-    address_int.offset <= (config_params_reg.index_start + ops_value_reg.field[1]) >> config_params_reg.granularity;
+    address_int.offset <= (config_params_reg.index_start + address_offset) >> config_params_reg.granularity;
   end
+end
+
+always_ff @(posedge ap_clk) begin
   org_data_int <= org_value_reg;
 end
 

@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 //
-//      "GLay: A Vertex Centric Re-Configurable Graph Processing Overlay"
+//      "GraphBlox: A Vertex Centric Re-Configurable Graph Processing Overlay"
 //
 // -----------------------------------------------------------------------------
 // Copyright (c) 2021-2023 All rights reserved
@@ -37,7 +37,8 @@ module cu_setup #(
     input  FIFOStateSignalsInput  fifo_request_signals_in  ,
     output FIFOStateSignalsOutput fifo_request_signals_out ,
     output logic                  fifo_setup_signal        ,
-    output logic                  done_out
+    output logic                  done_out                 ,
+    output logic                  cu_enable            
 );
 
 
@@ -167,11 +168,13 @@ always_ff @(posedge ap_clk) begin
         fifo_setup_signal <= 1'b1;
         request_out.valid <= 1'b0;
         done_out          <= 1'b0;
+        cu_enable         <= 1'b0;
     end
     else begin
         fifo_setup_signal <= engine_cu_setup_fifo_setup_signal | fifo_request_setup_signal_int;
         request_out.valid <= request_out_int.valid;
         done_out          <= done_out_reg;
+        cu_enable         <= configuration_comb_program.param.cu_vector[TRUE_ID_CU];
     end
 end
 
@@ -199,8 +202,10 @@ always_comb begin
             next_state = CU_SETUP_IDLE;
         end
         CU_SETUP_IDLE : begin
-            if(descriptor_in_reg.valid & (engine_cu_setup_done_out & engine_cu_setup_ready_out))
+            if(descriptor_in_reg.valid & (engine_cu_setup_done_out & engine_cu_setup_ready_out) & configuration_comb_program.param.cu_vector[TRUE_ID_CU])
                 next_state = CU_SETUP_REQ_START;
+            else if(descriptor_in_reg.valid & ~configuration_comb_program.param.cu_vector[TRUE_ID_CU])
+                next_state = CU_SETUP_REQ_DONE;
             else
                 next_state = CU_SETUP_IDLE;
         end
@@ -366,11 +371,12 @@ assign configuration_comb_program.param.increment                    = 1'b1;
 assign configuration_comb_program.param.decrement                    = 1'b0;
 assign configuration_comb_program.param.flush_mode                   = 1'b0;
 assign configuration_comb_program.param.flush_enable                 = descriptor_in_reg.payload.buffer_9[2];
+assign configuration_comb_program.param.cu_vector                    = descriptor_in_reg.payload.buffer_9[NUM_CUS+(BUFFER_9_WIDTH_BITS/2)-16-1:(BUFFER_9_WIDTH_BITS/2)-16];
 assign configuration_comb_program.param.id_channel                   = 1;
 assign configuration_comb_program.param.id_buffer                    = 0;
-assign configuration_comb_program.param.array_size                   = {3'b000,descriptor_in_reg.payload.buffer_9[(BUFFER_9_WIDTH_BITS/2)-1:3]};
+assign configuration_comb_program.param.array_size                   = {19'b0,descriptor_in_reg.payload.buffer_9[(BUFFER_9_WIDTH_BITS/2)-16-1:3]};
 assign configuration_comb_program.param.start_read                   = 0;
-assign configuration_comb_program.param.end_read                     = {3'b000,descriptor_in_reg.payload.buffer_9[(BUFFER_9_WIDTH_BITS/2)-1:3]};
+assign configuration_comb_program.param.end_read                     = {19'b0,descriptor_in_reg.payload.buffer_9[(BUFFER_9_WIDTH_BITS/2)-16-1:3]};
 assign configuration_comb_program.param.stride                       = 1;
 assign configuration_comb_program.param.granularity                  = $clog2(M00_AXI4_FE_DATA_W/8);
 assign configuration_comb_program.meta.route.packet_source.id_cu     = ID_CU;
@@ -394,6 +400,7 @@ assign configuration_comb_flush.param.increment              = 1'b1;
 assign configuration_comb_flush.param.decrement              = 1'b0;
 assign configuration_comb_flush.param.flush_mode             = 1'b1;
 assign configuration_comb_flush.param.flush_enable           = descriptor_in_reg.payload.buffer_9[2];
+assign configuration_comb_flush.param.cu_vector              = descriptor_in_reg.payload.buffer_9[NUM_CUS+(BUFFER_9_WIDTH_BITS/2)-16-1:(BUFFER_9_WIDTH_BITS/2)-16];
 assign configuration_comb_flush.param.id_channel             = 1;
 assign configuration_comb_flush.param.id_buffer              = 0;
 assign configuration_comb_flush.param.array_size             = descriptor_in_reg.payload.buffer_9[BUFFER_9_WIDTH_BITS-1:(BUFFER_9_WIDTH_BITS/2)];

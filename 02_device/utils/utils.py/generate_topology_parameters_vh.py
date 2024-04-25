@@ -127,13 +127,13 @@ output_file_kernel_cu_ports = os.path.join(
 )
 
 output_file_filelist_xsim_ip_vhdl_f = os.path.join(
-    FULL_SRC_IP_DIR_UTILS, "glay_kernel_filelist_xsim.ip.vhdl.f"
+    FULL_SRC_IP_DIR_UTILS, "graphBlox_kernel_filelist_xsim.ip.vhdl.f"
 )
 output_file_filelist_xsim_ip_sv_f = os.path.join(
-    FULL_SRC_IP_DIR_UTILS, "glay_kernel_filelist_xsim.ip.sv.f"
+    FULL_SRC_IP_DIR_UTILS, "graphBlox_kernel_filelist_xsim.ip.sv.f"
 )
 output_file_filelist_xsim_ip_v_f = os.path.join(
-    FULL_SRC_IP_DIR_UTILS, "glay_kernel_filelist_xsim.ip.v.f"
+    FULL_SRC_IP_DIR_UTILS, "graphBlox_kernel_filelist_xsim.ip.v.f"
 )
 
 output_file_pkg_mxx_axi4_fe = os.path.join(
@@ -7826,7 +7826,7 @@ fill_mxx_axi_register_slice_be_wrapper_module = []
 fill_mxx_axi_register_slice_be_wrapper_pre = """
 // -----------------------------------------------------------------------------
 //
-//      "GLay: A Vertex Centric Re-Configurable Graph Processing Overlay"
+//      "GraphBlox: A Vertex Centric Re-Configurable Graph Processing Overlay"
 //
 // -----------------------------------------------------------------------------
 // Copyright (c) 2021-2023 All rights reserved
@@ -8029,7 +8029,7 @@ fill_mxx_axi_register_slice_mid_wrapper_module = []
 fill_mxx_axi_register_slice_mid_wrapper_pre = """
 // -----------------------------------------------------------------------------
 //
-//      "GLay: A Vertex Centric Re-Configurable Graph Processing Overlay"
+//      "GraphBlox: A Vertex Centric Re-Configurable Graph Processing Overlay"
 //
 // -----------------------------------------------------------------------------
 // Copyright (c) 2021-2023 All rights reserved
@@ -8230,7 +8230,7 @@ fill_mxx_axi_lite_register_slice_mid_wrapper_module = []
 fill_mxx_axi_lite_register_slice_mid_wrapper_pre = """
 // -----------------------------------------------------------------------------
 //
-//      "GLay: A Vertex Centric Re-Configurable Graph Processing Overlay"
+//      "GraphBlox: A Vertex Centric Re-Configurable Graph Processing Overlay"
 //
 // -----------------------------------------------------------------------------
 // Copyright (c) 2021-2023 All rights reserved
@@ -8348,7 +8348,7 @@ fill_kernel_mxx_axi_system_cache_wrapper_module = []
 fill_kernel_mxx_axi_system_cache_wrapper_header = """
 // -----------------------------------------------------------------------------
 //
-//      "GLay: A Vertex Centric Re-Configurable Graph Processing Overlay"
+//      "GraphBlox: A Vertex Centric Re-Configurable Graph Processing Overlay"
 //
 // -----------------------------------------------------------------------------
 // Copyright (c) 2021-2023 All rights reserved
@@ -8924,7 +8924,7 @@ fill_cu_mxx_axi_cu_cache_wrapper_module = []
 fill_cu_mxx_axi_cu_cache_wrapper_pre = """
 // -----------------------------------------------------------------------------
 //
-//      "GLay: A Vertex Centric Re-Configurable Graph Processing Overlay"
+//      "GraphBlox: A Vertex Centric Re-Configurable Graph Processing Overlay"
 //
 // -----------------------------------------------------------------------------
 // Copyright (c) 2021-2023 All rights reserved
@@ -9808,7 +9808,7 @@ fill_cu_mxx_axi_cu_stream_wrapper_module = []
 fill_cu_mxx_axi_cu_stream_wrapper_pre = """
 // -----------------------------------------------------------------------------
 //
-//      "GLay: A Vertex Centric Re-Configurable Graph Processing Overlay"
+//      "GraphBlox: A Vertex Centric Re-Configurable Graph Processing Overlay"
 //
 // -----------------------------------------------------------------------------
 // Copyright (c) 2021-2023 All rights reserved
@@ -10311,7 +10311,7 @@ fill_cu_mxx_axi_cu_sram_wrapper_module = []
 fill_cu_mxx_axi_cu_sram_wrapper_pre = """
 // -----------------------------------------------------------------------------
 //
-//      "GLay: A Vertex Centric Re-Configurable Graph Processing Overlay"
+//      "GraphBlox: A Vertex Centric Re-Configurable Graph Processing Overlay"
 //
 // -----------------------------------------------------------------------------
 // Copyright (c) 2021-2023 All rights reserved

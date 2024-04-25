@@ -4,6 +4,7 @@ logs
 node_modules
 package-lock.json
 package.json
+graph_statistics.csv
 .vscode
 .Xil
 00_make/params.sh
@@ -15,8 +16,8 @@ package.json
 01_host/alg_*
 01_host/bin
 01_host/build
-01_host/glay.sublime-project
-01_host/glay.sublime-workspace
+01_host/graphBlox.sublime-project
+01_host/graphBlox.sublime-workspace
 01_host/nohup.out
 01_host/obj
 01_host/results
@@ -28,9 +29,9 @@ package.json
 02_device/.vscode
 02_device/.Xil
 02_device/alg_*
-02_device/glay.sublime-project
-02_device/glay.sublime-workspace
-02_device/ip/glay_kernel_ex
+02_device/graphBlox.sublime-project
+02_device/graphBlox.sublime-workspace
+02_device/ip/graphBlox_kernel_ex
 02_device/nohup.out
 02_device/ol/*/template.*.json
 02_device/ol/*/template.*.ol
@@ -71,8 +72,8 @@ package.json
 02_device/vivado_pid*.str   
 02_device/xilinx_*
 alg_*
-glay.sublime-project
-glay.sublime-workspace
+graphBlox.sublime-project
+graphBlox.sublime-workspace
 nohup.out
 vivado.jou  
 vivado.log 

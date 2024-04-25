@@ -4,10 +4,10 @@ print_usage () {
     echo "Usage: "
     echo "  generate_source_ip.sh FULL_SRC_IP_DIR_RTL FULL_SRC_IP_DIR_RTL_ACTIVE XILINX_CTRL_MODE"
     echo ""
-    echo "  FULL_SRC_IP_DIR_RTL: /home/cmv6ru/Documents/00_github_repos/00_GLay/01_Device/ip"
-    echo "  FULL_SRC_IP_DIR_RTL_ACTIVE: /home/cmv6ru/Documents/00_github_repos/00_GLay/01_Device/ip"
+    echo "  FULL_SRC_IP_DIR_RTL: /home/cmv6ru/Documents/00_github_repos/00_GraphBlox/01_Device/ip"
+    echo "  FULL_SRC_IP_DIR_RTL_ACTIVE: /home/cmv6ru/Documents/00_github_repos/00_GraphBlox/01_Device/ip"
     echo "  XILINX_CTRL_MODE: USER_MANAGED"
-    echo "  TESTBENCH_MODULE : glay|arbiter"
+    echo "  TESTBENCH_MODULE : graphBlox|arbiter"
     echo ""
 }
 if [ "$1" = "" ]
@@ -152,6 +152,12 @@ then
 
     search="_NUM_ENTRIES_"
     replace=${NUM_ENTRIES}
+    if [[ $search != "" && $replace != "" ]]; then
+        sed -i "s~$search~$replace~g" $newtext
+    fi
+
+    search="_CU_VECTOR_"
+    replace=${CU_VECTOR}
     if [[ $search != "" && $replace != "" ]]; then
         sed -i "s~$search~$replace~g" $newtext
     fi
