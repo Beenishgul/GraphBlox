@@ -346,7 +346,7 @@
     },
     "cu_properties_comments": {
         "architecture": {
-            "GLay"        : "Graph Processing",
+            "GraphBlox"   : "Graph Processing",
             "NearAutomata": "Automata Processing",
             "Sieve"       : "PIM Emulation Sieve",
             "Suite"       : "Random Tests"

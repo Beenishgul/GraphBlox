@@ -1,11 +1,11 @@
 # =========================================================
 #                GENERAL DIRECTOIRES HOST               
 # =========================================================
-APP                 ?= glay
+APP                 ?= GraphBlox
 # APP_TEST            ?= test_match
-# APP_TEST            ?= test_glay
+# APP_TEST            ?= test_GraphBlox
 # APP_TEST            ?= test_StalaGraph
-APP_TEST            ?= test_glayGraph_$(XILINX_CTRL_MODE)
+APP_TEST            ?= test_GraphBlox_$(XILINX_CTRL_MODE)
 APP_LANG            ?= cpp
 # APP_LANG            ?= c
 INTEGRATION         ?= openmp
@@ -32,7 +32,7 @@ RES_DIR             ?= results
 STRUCT_DIR          ?= structures
 PREPRO_DIR          ?= preprocess
 ALGO_DIR            ?= algorithms
-ALGO_DIR_GLAY       ?= glay
+ALGO_DIR_GLAY       ?= GraphBlox
 ALGO_DIR_OPENMP     ?= openmp
 UTIL_DIR            ?= utils_graph
 UTIL_DIR_FPGA_C     ?= utils_fpga_c
@@ -373,7 +373,7 @@ MASK_MODE       ?= 0
 # GENERAL XILINX ARGS                    
 # =========================================================
 
-KERNEL_NAME ?= glay_kernel
+KERNEL_NAME ?= GraphBlox_kernel
 XILINX_DIR  ?= xilinx_project
 XILINX_DIR_ACTIVE  	?= $(XILINX_DIR)_$(KERNEL_NAME)_$(GIT_VER)
 

@@ -2,7 +2,7 @@
 # Directory/Project Configurations                           
 # =========================================================
 
-APP                 ?= glay
+APP                 ?= GraphBlox
 
 # APP_TEST            ?= test_match
 # APP_TEST            ?= test_glay
@@ -11,7 +11,7 @@ APP_TEST            ?= test_glayGraph_$(XILINX_CTRL_MODE)
 APP_LANG            ?= cpp
 # APP_LANG            ?= c
 INTEGRATION         ?= openmp
-# INTEGRATION         ?= glay
+# INTEGRATION         ?= GraphBlox
 
 MAKE_NUM_THREADS    ?= $(shell grep -c ^processor /proc/cpuinfo)
 ROOT_DIR            ?= $(shell cd ../../ ; pwd)
