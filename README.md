@@ -26,29 +26,15 @@ GraphBlox has been evaluated on a variety of graph algorithms, including breadth
 
 GraphBlox is a promising new approach to graph processing on FPGAs. It has the potential to significantly improve the performance and efficiency of graph processing on FPGAs.
 
-![Figure 1: Graph Overlay (GraphBlox) Contributions](./04_docs/fig/graphBlox_gist.png "Figure 1: Graph Overlay (GraphBlox) Contributions")
+![Figure 1: Graph Overlay (GraphBlox) Contributions](./04_docs/fig/design/figure0.svg "Figure 1: Graph Overlay (GraphBlox) Contributions")
 
 # GraphBlox Benchmark Suite
 
 ## Overview
 
-![End-to-End Evaluation](./04_docs/fig/theme.png "GraphBlox")
+![Figure 4: Proposed Vertex Processing Elements (PEs) for graph processing kernels.](./04_docs/fig/design/figure29.svg "Figure 4: Proposed Vertex Processing Elements (PEs) for graph processing kernels.")
 
-* Presentations that explains end-to-end graph processing (implementation is inspired from these sources)
-  * Preprocessing two steps (third one is optional) :
-    1. [[Sorting the edge-list](./04_docs/02_preprocessing_countsort.pdf)], using count-sort or radix-sort.
-    2. [[Building the graph structure](./04_docs/03_preprocessing_DataStructures.pdf)]. CSR, Gird, Adjacency-Linked-List, and Adjacency-Array-List.
-        * [Ref](https://github.com/thu-pacman/GridGraph): Xiaowei Zhu, Wentao Han and Wenguang Chen. [GridGraph: Large-Scale Graph Processing on a Single Machine Using 2-Level Hierarchical Partitioning](https://www.usenix.org/system/files/conference/atc15/atc15-paper-zhu.pdf). Proceedings of the 2015 USENIX Annual Technical Conference, pages 375-386.
-        * [Ref](https://github.com/epfl-labos/EverythingGraph): Malicevic, Jasmina, Baptiste Lepers, and Willy Zwaenepoel. "Everything you always wanted to know about multicore graph processing but were afraid to ask." 2017 USENIX Annual Technical Conference. Proceedings of the 2015 USENIX Annual Technical Conference, pages 375-386.
-    3. [[Relabeling the graph](./04_docs/01_algorithm_PR_cache.pdf)], this step achieves better cache locality (better performance) with preprocessing overhead.
-        * [Ref](https://github.com/araij/rabbit_order): J. Arai, H. Shiokawa, T. Yamamuro, M. Onizuka, and S. Iwamura. Rabbit Order: Just-in-time Parallel Reordering for Fast Graph Analysis. IEEE International Parallel and Distributed Processing Symposium (IPDPS), 2016.
-        * [Ref](https://github.com/faldupriyank/dbg):P. Faldu and J. Diamond and B. Grot, "A Closer Look at Lightweight Graph Reordering," in Proceedings of the International Symposium on Workload Characterization (IISWC), November 2019.
-  * Graph Algorithm step depends on the direction of the data (Push/Pull):
-    1. [[BFS example](./04_docs/00_algorithm_BFS.pdf)], although it doesn't show direction optimized. But we discusses the Push and Pull approach separately.
-        * [[Ref](https://github.com/sbeamer/gapbs)]: Scott Beamer, Krste Asanović, David Patterson. [The GAP Benchmark Suite](http://arxiv.org/abs/1508.03619). arXiv:1508.03619 [cs.DC], 2015.
-    2. [[Page-Rank (PR) example](./04_docs/01_algorithm_PR_cache.pdf)]: Discussing PR cache behavior.
-       * [Ref](https://github.com/araij/rabbit_order): J. Arai, H. Shiokawa, T. Yamamuro, M. Onizuka, and S. Iwamura. Rabbit Order: Just-in-time Parallel Reordering for Fast Graph Analysis. IEEE International Parallel and Distributed Processing Symposium (IPDPS), 2016.
-
+![Figure 2: GraphBlox, adding engines to be used for different Graph Algorithms same time](./04_docs/fig/design/figure31.svg "Figure 3: GraphBlox, adding engines to be used for different Graph Algorithms same time")
 
 # Installation and Dependencies
 
@@ -62,7 +48,7 @@ The design has been verified with the following software/hardware environment an
     * Vitis: 2023.1
     * Operating Systems:
       * Ubuntu 22.04 (See [Additional Requirements for Ubuntu](#cpu-dependencies))
-      * GCC 11
+      * GCC 11+
 * Perl package installed for Verilog simulation (**required**)
 
 ## CPU Dependencies
@@ -321,17 +307,6 @@ user@host:~GraphBlox$ ./bin/graphBlox-openmp  --generate-weights --stats --graph
 0100 0000
 ```
 
-# Graph Structure Preprocessing:
-GraphBlox can handle multiple representations of the graph structure in memory, each has their own theoretical benefits and shortcomings.
-
-## Regular unsorted Edge-list as input.
-<p align="center"><img src="./04_docs/fig/datastructures/edgelist-file.png" width ="500" ></p>
-
-## CSR (Compressed Sparse Row)
-<p align="center"><img src="./04_docs/fig/datastructures/csr.png" width ="450" ></p>
-
-## CSR Segmented Format
-<p align="center"><img src="./04_docs/fig/datastructures/csr_segmented.png" width ="450" ></p>
 
 Identifying Access Patterns and Control Flow in Graph Algorithms
 ----------------------------------------------------------------
@@ -340,7 +315,7 @@ Graph processing kernels share common behaviors. GraphBlox's primary purpose
 is to abstract such access flows into engines for faster programmability
 between graph algorithms instead of having a fixed accelerator. Such
 overlay architecture reduces the reconfiguration time from typical FPGA
-flow, taking ms-s into ns-us. Figure 3 and Figure 4 highlight the
+flow, taking ms-s into ns-us. Figure 4 highlight the
 Breadth-First Search (BFS) bottom-up approach graph algorithm
 analysis and its correlation to the GraphBlox architecture design. For
 instance, a graph algorithm needs to interact with the graph structure
@@ -360,16 +335,11 @@ module for each engine, while an ALU handles simple mathematical
 operations if needed. Figure 4 displays the final analysis for BFS and
 the proposed Processing Elements (PEs).
 
-![Figure 2: Graph fundamental Compressed Sparse Row Matrix (CSR) structure](./04_docs/fig/graphBlox/fig1.png "Figure 2: Graph fundamental Compressed Sparse Row Matrix (CSR) structure")
+![Figure 4: Graph fundamental Compressed Sparse Row Matrix (CSR) structure](./04_docs/fig/design/figure2.svg "Figure 2: Graph fundamental Compressed Sparse Row Matrix (CSR) structure")
 
 
-![Figure 3: Breadth-First Search (BFS) algorithm](./04_docs/fig/graphBlox/fig2.png "Figure 3: Breadth-First Search (BFS) algorithm")
+![Figure 5: BFS bottom-up approach, a graph kernel contains identifiable behaviors that can be abstracted into FPGA overlay engines. ](./04_docs/fig/design/figure4.svg "Figure 4: BFS bottom-up approach, a graph kernel contains identifiable behaviors that can be abstracted into FPGA overlay engines.")
 
-
-![Figure 4: BFS bottom-up approach, a graph kernel contains identifiable behaviors that can be abstracted into FPGA overlay engines. ](./04_docs/fig/graphBlox/fig3.png "Figure 4: BFS bottom-up approach, a graph kernel contains identifiable behaviors that can be abstracted into FPGA overlay engines.")
-
-
-![Figure 4: Proposed Vertex Processing Elements (PEs) for graph processing kernels.](./04_docs/fig/graphBlox/fig4.png "Figure 4: Proposed Vertex Processing Elements (PEs) for graph processing kernels.")
 
 
 GraphBlox Architecture 
@@ -400,121 +370,10 @@ the graph neighbor list from the CSR structure. Finally, in steps E and
 F, a conditional break halts the engine from processing the vertex
 neighbor list and updates the frontier data.
 
-![Figure 6: BFS algorithm on GraphBlox](./04_docs/fig/graphBlox/fig6.png "Figure 6: BFS algorithm on GraphBlox")
+![Figure 6: BFS algorithm on GraphBlox](./04_docs/fig/design/figure3.svg "Figure 6: BFS algorithm on GraphBlox")
 
 GraphIt integration ... Comming soon. -- GraphBlox Graph Description Language (GGDL)
 ======================================
-
-GGDL is a description language that helps compile and port any graph
-algorithm to GraphBlox graph processing overlay. This chapter describes some
-of the features of GraphBlox architecture combined with a description
-language that can be compiled to reprogram the graph overlay.
-
-Serial\_Read\_Engine
---------------------
-
-### Input :array\_pointer, array\_size, start\_read, end\_read, stride, granularity
-
-The serial read engine sends read commands to the memory control layer.
-Each read or write requests a chunk of data specified with the
-"granularity" parameter -- alignment should be honored for a cache line.
-The "stride" parameter sets the offset taken by each consecutive read;
-strides should also honor alignment restrictions. This behavior is
-related to reading CSR structure data, for example, reading the offsets
-array.
-
-Serial\_Write\_Engine
----------------------
-
-### Input :array\_pointer, array\_size, index, granularity
-
-The serial write engine sends coalesced write commands to the memory
-control layer. Each write-request groups a chunk of data (group of
-vertices) intended to be written in a serial pattern. The serial write
-engine is simpler to design as it plans only to group serial data and
-write them in single bursts depending on the "granularity" parameter.
-This behavior can be found in iterative SpMV-based graph algorithms like
-PageRank.
-
-Random\_Read\_Engine / Random\_Write\_Engine
---------------------------------------------
-
-### Input: array\_pointer, array\_size, index, granularity
-
-A random read engine does not require a stride access pattern. Instead,
-arbitrary fine-grain commands are sent straight to a caching element in
-a fine-grained manner. Optimizations can occur on the caching level with
-grouping or reordering. The main challenge would be designing an engine
-that supports fine-grain accesses while balancing the design complexity
-if such optimizations were to be kept.
-
-Stride\_Index\_Generator
-------------------------
-
-### Input: index\_start, index\_end, stride, granularity
-
-The stride index generator serves two purposes. First, it generates a
-sequence of indices or Vertex-IDs scheduled to the Vertex Compute Units
-(CUs). For each Vertex-CU, a batch of Vertex-IDs is sent to be processed
-based on the granularity. For example, if granularity is (8), each CU
-(Compute Units) would get eight vertex IDs in chunks.
-
-CSR\_Index\_Generator
----------------------
-
-### Input: array\_pointer, array\_size, offset, degree
-
-When reading the edge list of the Graph CSR structure, a sequence of
-Vertex-IDs is generated based on the edges\_index and the degree size of
-the processed vertex. The read engines can connect to the
-CSR\_Index\_Generator to acquire the neighbor IDs for further
-processing, in this scenario reading the data of the vertex neighbors.
-
-ALU\_Operation\_\<Mul, Add, Sub, Acc\>
---------------------------------------
-
-### Input: op1, op2, id
-
-A simple ALU reprogrammable pipeline is responsible for multiple basic
-arithmetic operations. Each output is coupled with an ID that can be
-used for writing the result to the correct index if needed.
-
-Conditional\_Break\_\<GT, LT, EQ\>
-----------------------------------
-
-### Input: op1, op2
-
-A conditional statement module aims to break or stop the read/write
-engines from generating commands/sequences based on a trigger. The
-module is reprogrammable to implement Less Than (LT), Greater Than (GT),
-and Equal (EQ) operations.
-
-Conditional\_Filter\_\<GT, LT, EQ\>
------------------------------------
-
-Input: op1, op2
----------------
-
-Like Conditional\_Break, a filter would filter out results forwarded to
-other engines in the overlay based on a condition.
-
-Conditional\_Continue\_\<GT, LT, EQ\>
--------------------------------------
-
-### Input: op1, op2, id
-
-A conditional continue would mean for a specific command, a filter will
-be applied in order not to generate any subsequent dependent commands,
-for example, reads/writes correlated with a vertex ID.
-
-Example Graph Algorithm GGDL Transformations
-============================================
-
-BFS
----
-
-![Figure 7: Transforming BFS algorithm to GGDL](./04_docs/fig/graphBlox/fig7.png "Figure 7: Transforming BFS algorithm to GGDL")
-
 
 # GraphBlox Options
 
